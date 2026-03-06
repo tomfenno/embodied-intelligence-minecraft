@@ -28,3 +28,16 @@ tasks/construction_tasks/train/**
 server_data*
 **/.DS_Store
 src/mindcraft-py/__pycache__/
+
+# Manually added after fork
+.env
+.env.*
+venv/
+.venv/
+env/
+logs/
+*.log
+*.tmp
+*.temp
+*.cache
+.ipynb_checkpoints/
