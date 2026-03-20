@@ -12,6 +12,7 @@
 	docker-compose up --build
 	```
 - [Open Mindserver](http://localhost:8080)
+>**Important!** You will need to give commands through the Mindserver when the agent is in survival mode.
 
 #### Spectator Mode 
 ```bash
@@ -31,11 +32,12 @@ To do this go to `Options...`->`Chat Settings...` and adjust the `Width:` and `C
 
 ## Experiment Procedure  
 
-set time to sun rise,
-```bash
-/time set 0 # in minecraft
-```
+1. set time to sun rise,
+	```bash
+	/time set 0 # in minecraft
+	```
 
+2. Give the bot the command in the [Mindserver](http://localhost:8080). 
 
 To shutdown the agent run,
 ```bash
