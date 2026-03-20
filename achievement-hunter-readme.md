@@ -10,7 +10,16 @@
 - to start the agent run 
  	```bash
 	docker-compose up --build
+	```
 - [Open Mindserver](http://localhost:8080)
+
+#### Spectator Mode 
+```bash
+# In minecraft
+/gamemode spectator
+/spectate andy
+```
+
 ## Experiment Procedure  
 
 set time to sun rise,
