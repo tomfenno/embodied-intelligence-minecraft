@@ -17,11 +17,14 @@
 #### Spectator Mode 
 ```bash
 # In minecraft
-/gamemode spectator
-/spectate andy
+/gamemode spectator andy
+/effect give <your name>  minecraft:night_vision infinite 
 ```
+>**Note:** if the agent disconnects you will need to use the command: 
+` /spectate andy`
+to resume spectating the agent when they reconnect.
 
-This will set your camera to the pov of `andy`. When in chat mode you can leave the window without it pausing.
+This will set your camera to the pov of `andy` and it will give you night vision which comes in handy when the agent goes into a dark cave. When in chat mode you can leave the window without it pausing.
 
 It helps to make the chat screen smaller so you can still see what is happening. 
 
@@ -39,7 +42,22 @@ To do this go to `Options...`->`Chat Settings...` and adjust the `Width:` and `C
 
 2. Give the bot the command in the [Mindserver](http://localhost:8080). 
 
-To shutdown the agent run,
+
+Once the agent is done with its trial, send a final message saying. This trial has ended stay still.
+
+Once the agent has acknowledge this, disconnect the client in the[Mindserver](http://localhost:8080).  
+
+log the raw prompt history by running:
+```bash
+cat bots/andy/logs/*.txt > achievement_hunter/trial_logs/<agent>_<achievement>_<trial#>.txt 
+```
+
+After the prompts have been logged delete the log history with:
+```bash
+rm -r bots/andy/logs/*
+```
+
+To shutdown the server run,
 ```bash
 docker-compose down
 ```
