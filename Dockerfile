@@ -8,6 +8,7 @@ RUN apt-get update && \
     # unzip \
     python3 \
     python3-pip \
+    python-is-python3 \
     # tmux \
     xvfb \
     xauth \
