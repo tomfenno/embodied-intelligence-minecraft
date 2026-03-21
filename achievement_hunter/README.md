@@ -17,7 +17,8 @@
 #### Spectator Mode 
 ```bash
 # In minecraft
-/gamemode spectator andy
+/gamemode spectator
+/spectate andy
 /effect give <your name>  minecraft:night_vision infinite 
 ```
 >**Note:** if the agent disconnects you will need to use the command: 
@@ -49,7 +50,7 @@ Once the agent has acknowledge this, disconnect the client in the[Mindserver](ht
 
 log the raw prompt history by running:
 ```bash
-cat bots/andy/logs/*.txt > achievement_hunter/trial_logs/<agent>_<achievement>_<trial#>.txt 
+cat bots/andy/logs/*.txt > achievement_hunter/logs/<agent>_<achievement>_<trial#>.txt 
 ```
 
 After the prompts have been logged delete the log history with:
