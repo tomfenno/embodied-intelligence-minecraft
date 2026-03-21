@@ -49,6 +49,8 @@ Once the agent is done with its trial, send a final message saying. This trial h
 Once the agent has acknowledge this, disconnect the client in the[Mindserver](http://localhost:8080).  
 
 log the raw prompt history by running:
+### Logging
+> **To Do:** this was my first idea on how to log the trials, but I need to work on it more.
 ```bash
 cat bots/andy/logs/*.txt > achievement_hunter/logs/<agent>_<achievement>_<trial#>.txt 
 ```
@@ -57,7 +59,7 @@ After the prompts have been logged delete the log history with:
 ```bash
 rm -r bots/andy/logs/*
 ```
-
+## Shutting down the server
 To shutdown the server run,
 ```bash
 docker-compose down
