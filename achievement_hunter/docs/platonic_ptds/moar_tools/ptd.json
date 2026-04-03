@@ -1,0 +1,199 @@
+{
+  "objective": "construct one type of each tool",
+  "sink": [
+    "wooden_pickaxe",
+    "wooden_axe",
+    "wooden_shovel",
+    "wooden_hoe",
+    "wooden_sword"
+  ],
+  "nodes": [
+    {
+      "id": "any_log",
+      "qty": 6,
+      "type": "raw_resource"
+    },
+    {
+      "id": "any_planks",
+      "qty": 24,
+      "type": "crafted_item"
+    },
+    {
+      "id": "stick",
+      "qty": 12,
+      "type": "crafted_item"
+    },
+    {
+      "id": "crafting_table",
+      "qty": 1,
+      "type": "workstation"
+    },
+    {
+      "id": "wooden_pickaxe",
+      "qty": 1,
+      "type": "tool"
+    },
+    {
+      "id": "wooden_axe",
+      "qty": 1,
+      "type": "tool"
+    },
+    {
+      "id": "wooden_shovel",
+      "qty": 1,
+      "type": "tool"
+    },
+    {
+      "id": "wooden_hoe",
+      "qty": 1,
+      "type": "tool"
+    },
+    {
+      "id": "wooden_sword",
+      "qty": 1,
+      "type": "tool"
+    }
+  ],
+  "edges": [
+    {
+      "from": "any_log",
+      "to": "any_planks",
+      "type": "crafting_input",
+      "qty": 6,
+      "consumed": true
+    },
+    {
+      "from": "any_planks",
+      "to": "stick",
+      "type": "crafting_input",
+      "qty": 6,
+      "consumed": true
+    },
+    {
+      "from": "any_planks",
+      "to": "crafting_table",
+      "type": "crafting_input",
+      "qty": 4,
+      "consumed": true
+    },
+    {
+      "from": "any_planks",
+      "to": "wooden_pickaxe",
+      "type": "crafting_input",
+      "qty": 3,
+      "consumed": true
+    },
+    {
+      "from": "stick",
+      "to": "wooden_pickaxe",
+      "type": "crafting_input",
+      "qty": 2,
+      "consumed": true
+    },
+    {
+      "from": "crafting_table",
+      "to": "wooden_pickaxe",
+      "type": "workstation_required",
+      "qty": 1,
+      "consumed": false
+    },
+    {
+      "from": "any_planks",
+      "to": "wooden_axe",
+      "type": "crafting_input",
+      "qty": 3,
+      "consumed": true
+    },
+    {
+      "from": "stick",
+      "to": "wooden_axe",
+      "type": "crafting_input",
+      "qty": 2,
+      "consumed": true
+    },
+    {
+      "from": "crafting_table",
+      "to": "wooden_axe",
+      "type": "workstation_required",
+      "qty": 1,
+      "consumed": false
+    },
+    {
+      "from": "any_planks",
+      "to": "wooden_shovel",
+      "type": "crafting_input",
+      "qty": 1,
+      "consumed": true
+    },
+    {
+      "from": "stick",
+      "to": "wooden_shovel",
+      "type": "crafting_input",
+      "qty": 2,
+      "consumed": true
+    },
+    {
+      "from": "crafting_table",
+      "to": "wooden_shovel",
+      "type": "workstation_required",
+      "qty": 1,
+      "consumed": false
+    },
+    {
+      "from": "any_planks",
+      "to": "wooden_hoe",
+      "type": "crafting_input",
+      "qty": 2,
+      "consumed": true
+    },
+    {
+      "from": "stick",
+      "to": "wooden_hoe",
+      "type": "crafting_input",
+      "qty": 2,
+      "consumed": true
+    },
+    {
+      "from": "crafting_table",
+      "to": "wooden_hoe",
+      "type": "workstation_required",
+      "qty": 1,
+      "consumed": false
+    },
+    {
+      "from": "any_planks",
+      "to": "wooden_sword",
+      "type": "crafting_input",
+      "qty": 2,
+      "consumed": true
+    },
+    {
+      "from": "stick",
+      "to": "wooden_sword",
+      "type": "crafting_input",
+      "qty": 1,
+      "consumed": true
+    },
+    {
+      "from": "crafting_table",
+      "to": "wooden_sword",
+      "type": "workstation_required",
+      "qty": 1,
+      "consumed": false
+    }
+  ],
+  "assumptions": {
+    "start_state": "fresh survival start",
+    "allow_loot": false,
+    "allow_trading": false,
+    "allow_structures": false,
+    "allow_rng_shortcuts": false,
+    "optimization_goal": "minimum total required resources",
+    "notes": [
+      "interpreted the objective as crafting one of each basic tool category: pickaxe, axe, shovel, hoe, and sword",
+      "wooden tools are the minimal-resource valid solution from a fresh start",
+      "used abstract interchangeable resources any_log and any_planks because wood species does not change cost or dependency structure",
+      "6 logs produce 24 planks; 21 planks are required total: 4 for crafting_table, 6 for 12 sticks, and 11 for the five wooden tools"
+    ]
+  }
+}

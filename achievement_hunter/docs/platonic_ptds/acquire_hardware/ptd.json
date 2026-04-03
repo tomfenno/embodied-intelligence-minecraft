@@ -1,0 +1,183 @@
+{
+  "objective": "smelt an iron ingot",
+  "sink": ["iron_ingot"],
+  "nodes": [
+    {
+      "id": "any_log",
+      "qty": 3,
+      "type": "raw_resource"
+    },
+    {
+      "id": "any_planks",
+      "qty": 12,
+      "type": "crafted_item"
+    },
+    {
+      "id": "sticks",
+      "qty": 4,
+      "type": "crafted_item"
+    },
+    {
+      "id": "crafting_table",
+      "qty": 1,
+      "type": "workstation"
+    },
+    {
+      "id": "wooden_pickaxe",
+      "qty": 1,
+      "type": "tool"
+    },
+    {
+      "id": "cobblestone",
+      "qty": 11,
+      "type": "raw_resource"
+    },
+    {
+      "id": "stone_pickaxe",
+      "qty": 1,
+      "type": "tool"
+    },
+    {
+      "id": "furnace",
+      "qty": 1,
+      "type": "workstation"
+    },
+    {
+      "id": "raw_iron",
+      "qty": 1,
+      "type": "raw_resource"
+    },
+    {
+      "id": "iron_ingot",
+      "qty": 1,
+      "type": "smelted_item"
+    }
+  ],
+  "edges": [
+    {
+      "from": "any_log",
+      "to": "any_planks",
+      "type": "crafting_input",
+      "qty": 3,
+      "consumed": true
+    },
+    {
+      "from": "any_planks",
+      "to": "sticks",
+      "type": "crafting_input",
+      "qty": 2,
+      "consumed": true
+    },
+    {
+      "from": "any_planks",
+      "to": "crafting_table",
+      "type": "crafting_input",
+      "qty": 4,
+      "consumed": true
+    },
+    {
+      "from": "any_planks",
+      "to": "wooden_pickaxe",
+      "type": "crafting_input",
+      "qty": 3,
+      "consumed": true
+    },
+    {
+      "from": "sticks",
+      "to": "wooden_pickaxe",
+      "type": "crafting_input",
+      "qty": 2,
+      "consumed": true
+    },
+    {
+      "from": "crafting_table",
+      "to": "wooden_pickaxe",
+      "type": "workstation_required",
+      "qty": 1,
+      "consumed": false
+    },
+    {
+      "from": "wooden_pickaxe",
+      "to": "cobblestone",
+      "type": "tool_required",
+      "qty": 1,
+      "consumed": false
+    },
+    {
+      "from": "cobblestone",
+      "to": "stone_pickaxe",
+      "type": "crafting_input",
+      "qty": 3,
+      "consumed": true
+    },
+    {
+      "from": "sticks",
+      "to": "stone_pickaxe",
+      "type": "crafting_input",
+      "qty": 2,
+      "consumed": true
+    },
+    {
+      "from": "crafting_table",
+      "to": "stone_pickaxe",
+      "type": "workstation_required",
+      "qty": 1,
+      "consumed": false
+    },
+    {
+      "from": "cobblestone",
+      "to": "furnace",
+      "type": "crafting_input",
+      "qty": 8,
+      "consumed": true
+    },
+    {
+      "from": "crafting_table",
+      "to": "furnace",
+      "type": "workstation_required",
+      "qty": 1,
+      "consumed": false
+    },
+    {
+      "from": "stone_pickaxe",
+      "to": "raw_iron",
+      "type": "tool_required",
+      "qty": 1,
+      "consumed": false
+    },
+    {
+      "from": "raw_iron",
+      "to": "iron_ingot",
+      "type": "smelting_input",
+      "qty": 1,
+      "consumed": true
+    },
+    {
+      "from": "wooden_pickaxe",
+      "to": "iron_ingot",
+      "type": "fuel_input",
+      "qty": 1,
+      "consumed": true
+    },
+    {
+      "from": "furnace",
+      "to": "iron_ingot",
+      "type": "workstation_required",
+      "qty": 1,
+      "consumed": false
+    }
+  ],
+  "assumptions": {
+    "start_state": "fresh survival start",
+    "allow_loot": false,
+    "allow_trading": false,
+    "allow_structures": false,
+    "allow_rng_shortcuts": false,
+    "optimization_goal": "minimum total required resources",
+    "notes": [
+      "Uses the crafted wooden_pickaxe as the smelting fuel after cobblestone has been mined and the stone_pickaxe has been crafted.",
+      "any_log represents any overworld log type.",
+      "any_planks represents planks crafted from any_log."
+    ]
+  }
+}
