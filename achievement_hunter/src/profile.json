@@ -1,0 +1,10 @@
+{
+  "name": "AH_Bot",
+
+  "model": "gpt-5",
+
+  "skin": {
+    "model": "default",
+    "path": "https://www.minecraftskins.com/uploads/skins/2026/02/16/computer-23869410.png?v950"
+  }
+}

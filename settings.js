@@ -11,7 +11,7 @@ const settings = {
 
   'base_profile': 'survival',  // survival, assistant, creative, or god_mode
   'profiles': [
-    './andy.json',
+    './achievement_hunter/src/profile.json',
     // "./profiles/gpt.json",
     // "./profiles/claude.json",
     // "./profiles/gemini.json",
@@ -76,6 +76,10 @@ const settings = {
           // bot being kicked by anti-cheat mechanisms on servers.
 
   'log_all_prompts': true,  // log ALL prompts to file
+
+  'achievement_hunter':
+      true,  // when true, agent waits for a player command on spawn
+             // and runs the structured prompting loop with it as the objective
 
 }
 

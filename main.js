@@ -1,4 +1,5 @@
 import * as Mindcraft from './src/mindcraft/mindcraft.js';
+import { createAchievementAgent } from './achievement_hunter/src/create_achievement_agent.js';
 import settings from './settings.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -68,5 +69,9 @@ Mindcraft.init(true, settings.mindserver_port, settings.auto_open_ui);
 for (let profile of settings.profiles) {
     const profile_json = JSON.parse(readFileSync(profile, 'utf8'));
     settings.profile = profile_json;
-    Mindcraft.createAgent(settings);
+    if (settings.achievement_hunter) {
+        createAchievementAgent(settings);
+    } else {
+        Mindcraft.createAgent(settings);
+    }
 }
