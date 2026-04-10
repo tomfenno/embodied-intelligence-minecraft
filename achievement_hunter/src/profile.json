@@ -6,5 +6,18 @@
   "skin": {
     "model": "default",
     "path": "https://www.minecraftskins.com/uploads/skins/2026/02/16/computer-23869410.png?v950"
+  },
+
+  "modes": {
+    "self_preservation": true,
+    "unstuck": true,
+    "cowardice": false,
+    "self_defense": true,
+    "hunting": false,
+    "item_collecting": true,
+    "torch_placing": false,
+    "elbow_room": true,
+    "idle_staring": false,
+    "cheat": false
   }
 }

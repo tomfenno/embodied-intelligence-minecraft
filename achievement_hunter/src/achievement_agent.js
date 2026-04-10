@@ -1,4 +1,5 @@
 import { Agent } from '../../src/agent/agent.js';
+import { loadCheckpoint } from './checkpoint.js';
 
 /**
  * AchievementAgent extends the base Agent to implement the Structured Prompting Loop.
@@ -24,8 +25,23 @@ export class AchievementAgent extends Agent {
         this.bot.removeAllListeners('chat');
         this.bot.removeAllListeners('whisper');
 
-        this._waitingForObjective = true;
-        this.openChat('Achievement Hunter ready! Send me an objective to begin.');
+        // Check for a crash-recovery checkpoint from a previous run.
+        const checkpoint = loadCheckpoint();
+        if (checkpoint) {
+            this._waitingForObjective = false;
+            console.log('[SPL] Checkpoint found — resuming:', checkpoint.objective, '(saved at', checkpoint.saved_at + ')');
+            this.openChat(`Resuming previous task: "${checkpoint.objective}"`);
+            const { structuredLoop } = await import('./structured_loop.js');
+            structuredLoop(this.prompter.chat_model, this, checkpoint.objective, checkpoint.graph)
+                .catch(err => {
+                    console.error('[SPL] Structured loop crashed:', err);
+                    this._waitingForObjective = true;
+                    this.openChat('SPL crashed. Send a new objective to retry.');
+                });
+        } else {
+            this._waitingForObjective = true;
+            this.openChat('Achievement Hunter ready! Send me an objective to begin.');
+        }
     }
 
     async update(delta) {
@@ -36,15 +52,31 @@ export class AchievementAgent extends Agent {
 
     async handleMessage(source, message, max_responses = null) {
         // Intercept the first player message as the structured loop objective T.
-        // System and self-messages (e.g. death events) pass through normally.
-        if (this._waitingForObjective && source !== 'system' && source !== this.name) {
+        // Skip bot commands (messages starting with '!') and system/self-messages.
+        if (this._waitingForObjective && source !== 'system' && source !== this.name && !message.startsWith('!')) {
             this._waitingForObjective = false;
             console.log('[SPL] Received objective from', source, ':', message);
             const { structuredLoop } = await import('./structured_loop.js');
             structuredLoop(this.prompter.chat_model, this, message)
-                .catch(err => console.error('[SPL] Structured loop crashed:', err));
+                .catch(err => {
+                    console.error('[SPL] Structured loop crashed:', err);
+                    this._waitingForObjective = true;
+                    this.openChat('SPL crashed. Send a new objective to retry.');
+                });
             return true;
         }
+
+        // While the SPL is running, intercept auto-messages posted by modes after
+        // they finish a safety action (self_preservation, unstuck, self_defense, etc.).
+        // The modes still perform their physical actions (dodging fire, fighting back,
+        // picking up items) — we just prevent them from re-routing control away from
+        // the SPL via a new handleMessage conversation. The outer loop re-evaluates
+        // state naturally on the next SCSG iteration.
+        if (!this._waitingForObjective && message.startsWith('(AUTO MESSAGE)')) {
+            console.log('[SPL] Mode auto-message suppressed (SPL handles re-evaluation):', message.slice(0, 100));
+            return true;
+        }
+
         return super.handleMessage(source, message, max_responses);
     }
 }

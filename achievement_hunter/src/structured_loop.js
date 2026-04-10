@@ -10,6 +10,8 @@ import {
   get_inventory_state,
 } from './prompt_utils.js';
 import { createRolloutLogger } from './rollout_logger.js';
+import { saveCheckpoint, clearCheckpoint } from './checkpoint.js';
+import { executeCommand } from '../../src/agent/commands/index.js';
 
 const MAX_INNER_RETRIES = 5;
 
@@ -17,32 +19,42 @@ const MAX_INNER_RETRIES = 5;
  * Runs the Structured Prompting Loop for a primary task T.
  *
  * Flow:
- *   1. PTD  — build a full prerequisite dependency graph for T
+ *   1. PTD  — build a full prerequisite dependency graph for T (skipped on resume)
  *   2. SCSG — prune the graph to what is still needed given current inventory
  *   3. NTS  — pick the next immediate task from the pruned graph
  *   4. AM   — convert that task into a bot command and execute it
  *   Repeat from (2) until the SCSG signals all sinks are satisfied (r=2).
  *
- * @param {object} model  - Model instance with sendRequest(turns, systemMessage).
- * @param {object} agent  - The Mindcraft agent instance.
- * @param {string} T      - The primary task objective (e.g. "craft a diamond sword").
+ * @param {object} model   - Model instance with sendRequest(turns, systemMessage).
+ * @param {object} agent   - The Mindcraft agent instance.
+ * @param {string} T       - The primary task objective (e.g. "craft a diamond sword").
+ * @param {object} [G]     - Pre-built PTD graph. When provided (crash resume), Phase 1
+ *                           is skipped and the loop resumes from Phase 2 (SCSG) directly.
  */
-export async function structuredLoop(model, agent, T) {
+export async function structuredLoop(model, agent, T, G = null) {
   const log = createRolloutLogger(T);
 
   // ── Phase 1: Build the Prerequisite Task DAG (PTD) ───────────────────────
-  console.log('[SPL] Building PTD for:', T);
+  if (G) {
+    // Resuming from checkpoint — PTD graph already exists, skip the LLM call.
+    console.log('[SPL] Resuming from checkpoint, skipping PTD for:', T);
+    log.ptd('[loaded from checkpoint]', G);
+  } else {
+    console.log('[SPL] Building PTD for:', T);
+    const ptd_response = await model.sendRequest([], fill_ptd_prompt(T));
+    G = extract_json(ptd_response);
+    log.ptd(ptd_response, G);
 
-  const ptd_response = await model.sendRequest([], fill_ptd_prompt(T));
-  const G = extract_json(ptd_response);
-  log.ptd(ptd_response, G);
-
-  if (!G) {
-    console.error('[SPL] Failed to extract PTD graph from LLM response.');
-    log.complete('PTD extraction failed');
-    return;
+    if (!G) {
+      console.error('[SPL] Failed to extract PTD graph from LLM response.');
+      log.complete('PTD extraction failed');
+      return;
+    }
+    console.log('[SPL] PTD built.');
   }
-  console.log('[SPL] PTD built.');
+
+  // Persist objective + graph so a crash can resume from Phase 2.
+  saveCheckpoint(T, G);
 
   // ── Phase 2: Outer Loop ───────────────────────────────────────────────────
   while (true) {
@@ -65,6 +77,7 @@ export async function structuredLoop(model, agent, T) {
     // r=2 means all original sinks are already satisfied — task is done
     if (scsg_result.r === 2) {
       console.log('[SPL] Task complete — all sinks satisfied.');
+      clearCheckpoint();
       log.complete('all sinks satisfied');
       return;
     }
@@ -80,6 +93,7 @@ export async function structuredLoop(model, agent, T) {
 
     if (!subgraph.vertices || subgraph.vertices.length === 0) {
       console.log('[SPL] Task complete — subgraph is empty.');
+      clearCheckpoint();
       log.complete('subgraph empty');
       return;
     }
@@ -118,10 +132,9 @@ export async function structuredLoop(model, agent, T) {
         break;
       }
 
-      // Execute the action through the agent's existing command/action pipeline
-      await agent.handleMessage('system', action);
-
-      // Re-check via AM on next iteration — it will emit TASK_COMPLETE if done
+      // Execute the command directly — bypasses promptConvo and runs the action immediately
+      const result = await executeCommand(agent, action);
+      console.log('[SPL] Command result:', result);
     }
 
     if (status !== 'success') {
