@@ -245,10 +245,10 @@ Examples:
 - Do not mark a graph wrong solely because another valid graph could also satisfy the objective
 
 OBJECTIVE:
-`{INSERT OBJECTIVE}`
+`{{OBJECTIVE}}`
 
 CANDIDATE GRAPH:
 ```json
-{INSERT CANIDATE GRAPH}
+{{CANDIDATE GRAPH}}
 
 ```

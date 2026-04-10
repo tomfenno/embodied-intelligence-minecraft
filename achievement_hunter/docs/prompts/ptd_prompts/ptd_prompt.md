@@ -1,5 +1,5 @@
 ## Objective
-`O = "{INSERT OBJECTIVE}"`
+`O = "{{OBJECTIVE}}"`
 
 ---
 
@@ -279,9 +279,10 @@ Return exactly one JSON object `G` with this structure:
     {
       "from": "<vertex_id>",
       "to": "<vertex_id>",
-	   "type": "<crafting_input|smelting_input|fuel_input|item_dependency|tool_dependency|		   	      workstation_dependency>",
+	   "type": "<crafting_input|smelting_input|fuel_input|item_dependency|tool_dependency|workstation_dependency>",
       "qty": <integer>,
       "consumed": <true|false>
     }
   ]
 }
+```
