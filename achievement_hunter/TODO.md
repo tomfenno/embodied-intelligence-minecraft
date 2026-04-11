@@ -29,7 +29,6 @@
 > **Note:** If a recurring but hard-to-diagnose bug appears, run step 3 in the web browser so the self-refine LLMs can be probed more directly.
 
 
-Here is a clearer version of that TODO:
 
 #### SCSG Feedback and Refine Prompts
 
@@ -38,7 +37,6 @@ Here is a clearer version of that TODO:
   * move a condensed version of the original `SCSG prompt` into the prompt itself
   * replace the full `SCSG prompt` input with the `PTD graph` as the main input
 
-Here is a clearer version of that TODO:
 
 #### Next Task Selector (NTS)
 
@@ -53,7 +51,8 @@ Here is a clearer version of that TODO:
    * in no particular order, or
    * in a prioritized sequence
 
-Here is a clearer version of that TODO:
+>**BUG:** Need to have search handle abstract types.
+
 
 #### Action Mediator (AM)
 

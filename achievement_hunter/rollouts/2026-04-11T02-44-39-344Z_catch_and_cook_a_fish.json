@@ -1,0 +1,1834 @@
+{
+  "objective": "catch and cook a fish",
+  "started_at": "2026-04-11T02:44:39.344Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-11T02:45:29.853Z",
+      "stage": "PTD",
+      "raw": "{\n  \"objective\": \"catch and cook a fish\",\n  \"sinks\": [\"cooked_cod\"],\n  \"vertices\": [\n    {\n      \"id\": \"cooked_cod\",\n      \"qty\": 1,\n      \"item_type\": \"item\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"raw_cod\",\n      \"qty\": 1,\n      \"item_type\": \"resource\",\n      \"acquisition_dependency\": \"water_source\"\n    },\n    {\n      \"id\": \"furnace\",\n      \"qty\": 1,\n      \"item_type\": \"workstation\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"any_plank\",\n      \"qty\": 12,\n      \"item_type\": \"item\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"any_log\",\n      \"qty\": 3,\n      \"item_type\": \"resource\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"crafting_table\",\n      \"qty\": 1,\n      \"item_type\": \"workstation\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"wooden_pickaxe\",\n      \"qty\": 1,\n      \"item_type\": \"tool\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"stick\",\n      \"qty\": 8,\n      \"item_type\": \"item\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"string\",\n      \"qty\": 2,\n      \"item_type\": \"resource\",\n      \"acquisition_dependency\": \"mob\"\n    },\n    {\n      \"id\": \"cobblestone\",\n      \"qty\": 8,\n      \"item_type\": \"resource\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"fishing_rod\",\n      \"qty\": 1,\n      \"item_type\": \"tool\",\n      \"acquisition_dependency\": \"none\"\n    }\n  ],\n  \"edges\": [\n    {\n      \"from\": \"raw_cod\",\n      \"to\": \"cooked_cod\",\n      \"type\": \"smelting_input\",\n      \"qty\": 1,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"cooked_cod\",\n      \"type\": \"fuel_input\",\n      \"qty\": 1,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"furnace\",\n      \"to\": \"cooked_cod\",\n      \"type\": \"workstation_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    },\n    {\n      \"from\": \"fishing_rod\",\n      \"to\": \"raw_cod\",\n      \"type\": \"item_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    },\n    {\n      \"from\": \"any_log\",\n      \"to\": \"any_plank\",\n      \"type\": \"crafting_input\",\n      \"qty\": 3,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"crafting_table\",\n      \"type\": \"crafting_input\",\n      \"qty\": 4,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"crafting_table\",\n      \"to\": \"wooden_pickaxe\",\n      \"type\": \"workstation_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"wooden_pickaxe\",\n      \"type\": \"crafting_input\",\n      \"qty\": 3,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"stick\",\n      \"to\": \"wooden_pickaxe\",\n      \"type\": \"crafting_input\",\n      \"qty\": 2,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"crafting_table\",\n      \"to\": \"fishing_rod\",\n      \"type\": \"workstation_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    },\n    {\n      \"from\": \"stick\",\n      \"to\": \"fishing_rod\",\n      \"type\": \"crafting_input\",\n      \"qty\": 3,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"string\",\n      \"to\": \"fishing_rod\",\n      \"type\": \"crafting_input\",\n      \"qty\": 2,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"cobblestone\",\n      \"to\": \"furnace\",\n      \"type\": \"crafting_input\",\n      \"qty\": 8,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"wooden_pickaxe\",\n      \"to\": \"cobblestone\",\n      \"type\": \"tool_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    },\n    {\n      \"from\": \"crafting_table\",\n      \"to\": \"furnace\",\n      \"type\": \"workstation_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"stick\",\n      \"type\": \"crafting_input\",\n      \"qty\": 4,\n      \"consumed\": true\n    }\n  ]\n}",
+      "parsed": {
+        "objective": "catch and cook a fish",
+        "sinks": [
+          "cooked_cod"
+        ],
+        "vertices": [
+          {
+            "id": "cooked_cod",
+            "qty": 1,
+            "item_type": "item",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "raw_cod",
+            "qty": 1,
+            "item_type": "resource",
+            "acquisition_dependency": "water_source"
+          },
+          {
+            "id": "furnace",
+            "qty": 1,
+            "item_type": "workstation",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "any_plank",
+            "qty": 12,
+            "item_type": "item",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "any_log",
+            "qty": 3,
+            "item_type": "resource",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "crafting_table",
+            "qty": 1,
+            "item_type": "workstation",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "wooden_pickaxe",
+            "qty": 1,
+            "item_type": "tool",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "stick",
+            "qty": 8,
+            "item_type": "item",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "string",
+            "qty": 2,
+            "item_type": "resource",
+            "acquisition_dependency": "mob"
+          },
+          {
+            "id": "cobblestone",
+            "qty": 8,
+            "item_type": "resource",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "fishing_rod",
+            "qty": 1,
+            "item_type": "tool",
+            "acquisition_dependency": "none"
+          }
+        ],
+        "edges": [
+          {
+            "from": "raw_cod",
+            "to": "cooked_cod",
+            "type": "smelting_input",
+            "qty": 1,
+            "consumed": true
+          },
+          {
+            "from": "any_plank",
+            "to": "cooked_cod",
+            "type": "fuel_input",
+            "qty": 1,
+            "consumed": true
+          },
+          {
+            "from": "furnace",
+            "to": "cooked_cod",
+            "type": "workstation_dependency",
+            "qty": 1,
+            "consumed": false
+          },
+          {
+            "from": "fishing_rod",
+            "to": "raw_cod",
+            "type": "item_dependency",
+            "qty": 1,
+            "consumed": false
+          },
+          {
+            "from": "any_log",
+            "to": "any_plank",
+            "type": "crafting_input",
+            "qty": 3,
+            "consumed": true
+          },
+          {
+            "from": "any_plank",
+            "to": "crafting_table",
+            "type": "crafting_input",
+            "qty": 4,
+            "consumed": true
+          },
+          {
+            "from": "crafting_table",
+            "to": "wooden_pickaxe",
+            "type": "workstation_dependency",
+            "qty": 1,
+            "consumed": false
+          },
+          {
+            "from": "any_plank",
+            "to": "wooden_pickaxe",
+            "type": "crafting_input",
+            "qty": 3,
+            "consumed": true
+          },
+          {
+            "from": "stick",
+            "to": "wooden_pickaxe",
+            "type": "crafting_input",
+            "qty": 2,
+            "consumed": true
+          },
+          {
+            "from": "crafting_table",
+            "to": "fishing_rod",
+            "type": "workstation_dependency",
+            "qty": 1,
+            "consumed": false
+          },
+          {
+            "from": "stick",
+            "to": "fishing_rod",
+            "type": "crafting_input",
+            "qty": 3,
+            "consumed": true
+          },
+          {
+            "from": "string",
+            "to": "fishing_rod",
+            "type": "crafting_input",
+            "qty": 2,
+            "consumed": true
+          },
+          {
+            "from": "cobblestone",
+            "to": "furnace",
+            "type": "crafting_input",
+            "qty": 8,
+            "consumed": true
+          },
+          {
+            "from": "wooden_pickaxe",
+            "to": "cobblestone",
+            "type": "tool_dependency",
+            "qty": 1,
+            "consumed": false
+          },
+          {
+            "from": "crafting_table",
+            "to": "furnace",
+            "type": "workstation_dependency",
+            "qty": 1,
+            "consumed": false
+          },
+          {
+            "from": "any_plank",
+            "to": "stick",
+            "type": "crafting_input",
+            "qty": 4,
+            "consumed": true
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:45:38.042Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":1,\"why\":\"S.inventory==Nothing\",\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1},{\"id\":\"furnace\",\"qty\":1},{\"id\":\"any_plank\",\"qty\":12},{\"id\":\"any_log\",\"qty\":3},{\"id\":\"crafting_table\",\"qty\":1},{\"id\":\"wooden_pickaxe\",\"qty\":1},{\"id\":\"stick\",\"qty\":8},{\"id\":\"string\",\"qty\":2},{\"id\":\"cobblestone\",\"qty\":8},{\"id\":\"fishing_rod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"furnace\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"fishing_rod\",\"to\":\"raw_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"any_log\",\"to\":\"any_plank\",\"qty\":3,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"crafting_table\",\"qty\":4,\"consumed\":true},{\"from\":\"crafting_table\",\"to\":\"wooden_pickaxe\",\"qty\":1,\"consumed\":false},{\"from\":\"any_plank\",\"to\":\"wooden_pickaxe\",\"qty\":3,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_pickaxe\",\"qty\":2,\"consumed\":true},{\"from\":\"crafting_table\",\"to\":\"fishing_rod\",\"qty\":1,\"consumed\":false},{\"from\":\"stick\",\"to\":\"fishing_rod\",\"qty\":3,\"consumed\":true},{\"from\":\"string\",\"to\":\"fishing_rod\",\"qty\":2,\"consumed\":true},{\"from\":\"cobblestone\",\"to\":\"furnace\",\"qty\":8,\"consumed\":true},{\"from\":\"wooden_pickaxe\",\"to\":\"cobblestone\",\"qty\":1,\"consumed\":false},{\"from\":\"crafting_table\",\"to\":\"furnace\",\"qty\":1,\"consumed\":false},{\"from\":\"any_plank\",\"to\":\"stick\",\"qty\":4,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            },
+            {
+              "id": "furnace",
+              "qty": 1
+            },
+            {
+              "id": "any_plank",
+              "qty": 12
+            },
+            {
+              "id": "any_log",
+              "qty": 3
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1
+            },
+            {
+              "id": "stick",
+              "qty": 8
+            },
+            {
+              "id": "string",
+              "qty": 2
+            },
+            {
+              "id": "cobblestone",
+              "qty": 8
+            },
+            {
+              "id": "fishing_rod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "fishing_rod",
+              "to": "raw_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "fishing_rod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stick",
+              "to": "fishing_rod",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "string",
+              "to": "fishing_rod",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "qty": 4,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:45:47.054Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": null,\n    \"tool\": null\n  },\n  \"rationale\": \"any_log is a source node and a spruce_log is nearby, so collecting it is directly achievable now.\"\n}",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": null,
+          "tool": null
+        },
+        "rationale": "any_log is a source node and a spruce_log is nearby, so collecting it is directly achievable now."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:45:50.870Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"spruce_log\", 3)"
+    },
+    {
+      "timestamp": "2026-04-11T02:46:11.119Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T02:47:00.613Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1},{\"id\":\"furnace\",\"qty\":1},{\"id\":\"any_plank\",\"qty\":12},{\"id\":\"crafting_table\",\"qty\":1},{\"id\":\"wooden_pickaxe\",\"qty\":1},{\"id\":\"stick\",\"qty\":8},{\"id\":\"string\",\"qty\":2},{\"id\":\"cobblestone\",\"qty\":8},{\"id\":\"fishing_rod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"furnace\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"fishing_rod\",\"to\":\"raw_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"any_plank\",\"to\":\"crafting_table\",\"qty\":4,\"consumed\":true},{\"from\":\"crafting_table\",\"to\":\"wooden_pickaxe\",\"qty\":1,\"consumed\":false},{\"from\":\"any_plank\",\"to\":\"wooden_pickaxe\",\"qty\":3,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_pickaxe\",\"qty\":2,\"consumed\":true},{\"from\":\"crafting_table\",\"to\":\"fishing_rod\",\"qty\":1,\"consumed\":false},{\"from\":\"stick\",\"to\":\"fishing_rod\",\"qty\":3,\"consumed\":true},{\"from\":\"string\",\"to\":\"fishing_rod\",\"qty\":2,\"consumed\":true},{\"from\":\"cobblestone\",\"to\":\"furnace\",\"qty\":8,\"consumed\":true},{\"from\":\"wooden_pickaxe\",\"to\":\"cobblestone\",\"qty\":1,\"consumed\":false},{\"from\":\"crafting_table\",\"to\":\"furnace\",\"qty\":1,\"consumed\":false},{\"from\":\"any_plank\",\"to\":\"stick\",\"qty\":4,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            },
+            {
+              "id": "furnace",
+              "qty": 1
+            },
+            {
+              "id": "any_plank",
+              "qty": 12
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1
+            },
+            {
+              "id": "stick",
+              "qty": 8
+            },
+            {
+              "id": "string",
+              "qty": 2
+            },
+            {
+              "id": "cobblestone",
+              "qty": 8
+            },
+            {
+              "id": "fishing_rod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "fishing_rod",
+              "to": "raw_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "fishing_rod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stick",
+              "to": "fishing_rod",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "string",
+              "to": "fishing_rod",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "qty": 4,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:47:21.995Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"any_plank\",\n  \"qty\": 12,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      { \"item\": \"any_log\", \"qty\": 3 }\n    ],\n    \"workstation\": null\n  },\n  \"rationale\": \"Direct action: any_plank is a source node and spruce_planks are craftable now from your 3 spruce_logs, matching the satisfied input and requiring no workstation.\"\n}",
+      "parsed": {
+        "target_item": "any_plank",
+        "qty": 12,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_log",
+              "qty": 3
+            }
+          ],
+          "workstation": null
+        },
+        "rationale": "Direct action: any_plank is a source node and spruce_planks are craftable now from your 3 spruce_logs, matching the satisfied input and requiring no workstation."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:47:28.593Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"spruce_planks\", 3)"
+    },
+    {
+      "timestamp": "2026-04-11T02:47:37.442Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T02:48:16.675Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1},{\"id\":\"furnace\",\"qty\":1},{\"id\":\"crafting_table\",\"qty\":1},{\"id\":\"wooden_pickaxe\",\"qty\":1},{\"id\":\"stick\",\"qty\":8},{\"id\":\"string\",\"qty\":2},{\"id\":\"cobblestone\",\"qty\":8},{\"id\":\"fishing_rod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"furnace\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"fishing_rod\",\"to\":\"raw_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"crafting_table\",\"to\":\"wooden_pickaxe\",\"qty\":1,\"consumed\":false},{\"from\":\"stick\",\"to\":\"wooden_pickaxe\",\"qty\":2,\"consumed\":true},{\"from\":\"crafting_table\",\"to\":\"fishing_rod\",\"qty\":1,\"consumed\":false},{\"from\":\"stick\",\"to\":\"fishing_rod\",\"qty\":3,\"consumed\":true},{\"from\":\"string\",\"to\":\"fishing_rod\",\"qty\":2,\"consumed\":true},{\"from\":\"cobblestone\",\"to\":\"furnace\",\"qty\":8,\"consumed\":true},{\"from\":\"wooden_pickaxe\",\"to\":\"cobblestone\",\"qty\":1,\"consumed\":false},{\"from\":\"crafting_table\",\"to\":\"furnace\",\"qty\":1,\"consumed\":false}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            },
+            {
+              "id": "furnace",
+              "qty": 1
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1
+            },
+            {
+              "id": "stick",
+              "qty": 8
+            },
+            {
+              "id": "string",
+              "qty": 2
+            },
+            {
+              "id": "cobblestone",
+              "qty": 8
+            },
+            {
+              "id": "fishing_rod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "fishing_rod",
+              "to": "raw_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "fishing_rod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stick",
+              "to": "fishing_rod",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "string",
+              "to": "fishing_rod",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:48:41.296Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"crafting_table\",\n  \"qty\": 1,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      { \"item\": \"any_plank\", \"qty\": 4 }\n    ],\n    \"workstation\": null\n  },\n  \"rationale\": \"Direct action: 'crafting_table' is a source node and is craftable now, with its 4 any_plank input already satisfied by your spruce planks.\"\n}",
+      "parsed": {
+        "target_item": "crafting_table",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4
+            }
+          ],
+          "workstation": null
+        },
+        "rationale": "Direct action: 'crafting_table' is a source node and is craftable now, with its 4 any_plank input already satisfied by your spruce planks."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:48:46.257Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"crafting_table\", 1)"
+    },
+    {
+      "timestamp": "2026-04-11T02:48:49.456Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T02:49:40.284Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1},{\"id\":\"furnace\",\"qty\":1},{\"id\":\"wooden_pickaxe\",\"qty\":1},{\"id\":\"stick\",\"qty\":8},{\"id\":\"string\",\"qty\":2},{\"id\":\"cobblestone\",\"qty\":8},{\"id\":\"fishing_rod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"furnace\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"fishing_rod\",\"to\":\"raw_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"stick\",\"to\":\"wooden_pickaxe\",\"qty\":2,\"consumed\":true},{\"from\":\"stick\",\"to\":\"fishing_rod\",\"qty\":3,\"consumed\":true},{\"from\":\"string\",\"to\":\"fishing_rod\",\"qty\":2,\"consumed\":true},{\"from\":\"cobblestone\",\"to\":\"furnace\",\"qty\":8,\"consumed\":true},{\"from\":\"wooden_pickaxe\",\"to\":\"cobblestone\",\"qty\":1,\"consumed\":false}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            },
+            {
+              "id": "furnace",
+              "qty": 1
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1
+            },
+            {
+              "id": "stick",
+              "qty": 8
+            },
+            {
+              "id": "string",
+              "qty": 2
+            },
+            {
+              "id": "cobblestone",
+              "qty": 8
+            },
+            {
+              "id": "fishing_rod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "fishing_rod",
+              "to": "raw_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "fishing_rod",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "string",
+              "to": "fishing_rod",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:49:59.027Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"stick\",\n  \"qty\": 8,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      { \"item\": \"any_plank\", \"qty\": 4 }\n    ],\n    \"workstation\": null\n  },\n  \"rationale\": \"This is a direct action since stick is a source node and appears in craftable_items, and the required any_plank x4 is satisfied by the current planks inventory.\"\n}",
+      "parsed": {
+        "target_item": "stick",
+        "qty": 8,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4
+            }
+          ],
+          "workstation": null
+        },
+        "rationale": "This is a direct action since stick is a source node and appears in craftable_items, and the required any_plank x4 is satisfied by the current planks inventory."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:50:05.823Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"stick\", 2)"
+    },
+    {
+      "timestamp": "2026-04-11T02:50:07.769Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T02:51:29.767Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1},{\"id\":\"furnace\",\"qty\":1},{\"id\":\"wooden_pickaxe\",\"qty\":1},{\"id\":\"string\",\"qty\":2},{\"id\":\"cobblestone\",\"qty\":8},{\"id\":\"fishing_rod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"furnace\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"fishing_rod\",\"to\":\"raw_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"string\",\"to\":\"fishing_rod\",\"qty\":2,\"consumed\":true},{\"from\":\"cobblestone\",\"to\":\"furnace\",\"qty\":8,\"consumed\":true},{\"from\":\"wooden_pickaxe\",\"to\":\"cobblestone\",\"qty\":1,\"consumed\":false}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            },
+            {
+              "id": "furnace",
+              "qty": 1
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1
+            },
+            {
+              "id": "string",
+              "qty": 2
+            },
+            {
+              "id": "cobblestone",
+              "qty": 8
+            },
+            {
+              "id": "fishing_rod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "fishing_rod",
+              "to": "raw_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "string",
+              "to": "fishing_rod",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:52:27.544Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"string\",\n  \"qty\": 2,\n  \"action_type\": \"kill\",\n  \"parameters\": {\n    \"source_mob\": \"spider\",\n    \"weapon\": null\n  },\n  \"rationale\": \"Direct action: 'string' is a source node acquired from a mob, and a nearby spider provides an immediate source. Killing the spider now is supported by the current state and satisfies the vertex’s mob acquisition dependency.\"\n}",
+      "parsed": {
+        "target_item": "string",
+        "qty": 2,
+        "action_type": "kill",
+        "parameters": {
+          "source_mob": "spider",
+          "weapon": null
+        },
+        "rationale": "Direct action: 'string' is a source node acquired from a mob, and a nearby spider provides an immediate source. Killing the spider now is supported by the current state and satisfies the vertex’s mob acquisition dependency."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:52:33.792Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!attack(\"spider\")"
+    },
+    {
+      "timestamp": "2026-04-11T02:52:53.761Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!attack(\"spider\")"
+    },
+    {
+      "timestamp": "2026-04-11T02:53:07.603Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForEntity(\"spider\", 64)"
+    },
+    {
+      "timestamp": "2026-04-11T02:53:20.381Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T02:54:25.352Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1},{\"id\":\"furnace\",\"qty\":1},{\"id\":\"wooden_pickaxe\",\"qty\":1},{\"id\":\"cobblestone\",\"qty\":8},{\"id\":\"fishing_rod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"furnace\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"fishing_rod\",\"to\":\"raw_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"cobblestone\",\"to\":\"furnace\",\"qty\":8,\"consumed\":true},{\"from\":\"wooden_pickaxe\",\"to\":\"cobblestone\",\"qty\":1,\"consumed\":false}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            },
+            {
+              "id": "furnace",
+              "qty": 1
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1
+            },
+            {
+              "id": "cobblestone",
+              "qty": 8
+            },
+            {
+              "id": "fishing_rod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "fishing_rod",
+              "to": "raw_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:55:00.982Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"wooden_pickaxe\",\n  \"qty\": 1,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      { \"item\": \"any_plank\", \"qty\": 3 },\n      { \"item\": \"stick\", \"qty\": 2 }\n    ],\n    \"workstation\": \"crafting_table\"\n  },\n  \"rationale\": \"Direct action: craft wooden_pickaxe. It is a source node, appears in craftable_items, and you have the required planks, sticks, and a crafting_table.\"\n}",
+      "parsed": {
+        "target_item": "wooden_pickaxe",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 3
+            },
+            {
+              "item": "stick",
+              "qty": 2
+            }
+          ],
+          "workstation": "crafting_table"
+        },
+        "rationale": "Direct action: craft wooden_pickaxe. It is a source node, appears in craftable_items, and you have the required planks, sticks, and a crafting_table."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:55:06.193Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"wooden_pickaxe\", 1)"
+    },
+    {
+      "timestamp": "2026-04-11T02:55:16.511Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T02:57:01.781Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1},{\"id\":\"furnace\",\"qty\":1},{\"id\":\"cobblestone\",\"qty\":8},{\"id\":\"fishing_rod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"furnace\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"fishing_rod\",\"to\":\"raw_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"cobblestone\",\"to\":\"furnace\",\"qty\":8,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            },
+            {
+              "id": "furnace",
+              "qty": 1
+            },
+            {
+              "id": "cobblestone",
+              "qty": 8
+            },
+            {
+              "id": "fishing_rod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "fishing_rod",
+              "to": "raw_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "qty": 8,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:57:26.343Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"cobblestone\",\n  \"qty\": 8,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"stone\",\n    \"item_dependency\": null,\n    \"tool\": \"wooden_pickaxe\"\n  },\n  \"rationale\": \"Direct action on source node: cobblestone can be mined from nearby stone using the wooden_pickaxe already in inventory, satisfying its tool dependency.\"\n}",
+      "parsed": {
+        "target_item": "cobblestone",
+        "qty": 8,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "stone",
+          "item_dependency": null,
+          "tool": "wooden_pickaxe"
+        },
+        "rationale": "Direct action on source node: cobblestone can be mined from nearby stone using the wooden_pickaxe already in inventory, satisfying its tool dependency."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:57:33.623Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"stone\", 8)"
+    },
+    {
+      "timestamp": "2026-04-11T02:57:56.297Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T02:58:53.226Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1},{\"id\":\"furnace\",\"qty\":1},{\"id\":\"fishing_rod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"furnace\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":false},{\"from\":\"fishing_rod\",\"to\":\"raw_cod\",\"qty\":1,\"consumed\":false}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            },
+            {
+              "id": "furnace",
+              "qty": 1
+            },
+            {
+              "id": "fishing_rod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "fishing_rod",
+              "to": "raw_cod",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:59:19.517Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"furnace\",\n  \"qty\": 1,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      { \"item\": \"cobblestone\", \"qty\": 8 }\n    ],\n    \"workstation\": \"crafting_table\"\n  },\n  \"rationale\": \"Furnace is a source node and is directly craftable now, as it appears in craftable_items and its inputs (8 cobblestone at a crafting_table) are satisfied.\"\n}",
+      "parsed": {
+        "target_item": "furnace",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 8
+            }
+          ],
+          "workstation": "crafting_table"
+        },
+        "rationale": "Furnace is a source node and is directly craftable now, as it appears in craftable_items and its inputs (8 cobblestone at a crafting_table) are satisfied."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T02:59:24.753Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"furnace\", 1)"
+    },
+    {
+      "timestamp": "2026-04-11T02:59:33.434Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T03:01:00.823Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1},{\"id\":\"fishing_rod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true},{\"from\":\"fishing_rod\",\"to\":\"raw_cod\",\"qty\":1,\"consumed\":false}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            },
+            {
+              "id": "fishing_rod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "fishing_rod",
+              "to": "raw_cod",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:01:18.494Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"fishing_rod\",\n  \"qty\": 1,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      { \"item\": \"stick\", \"qty\": 3 },\n      { \"item\": \"string\", \"qty\": 2 }\n    ],\n    \"workstation\": \"crafting_table\"\n  },\n  \"rationale\": \"Fishing_rod is a source node and is directly craftable now (listed in craftable_items) with crafting_table available and required sticks and string in inventory.\"\n}",
+      "parsed": {
+        "target_item": "fishing_rod",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "stick",
+              "qty": 3
+            },
+            {
+              "item": "string",
+              "qty": 2
+            }
+          ],
+          "workstation": "crafting_table"
+        },
+        "rationale": "Fishing_rod is a source node and is directly craftable now (listed in craftable_items) with crafting_table available and required sticks and string in inventory."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:01:24.580Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"fishing_rod\", 1)"
+    },
+    {
+      "timestamp": "2026-04-11T03:01:33.445Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T03:03:19.579Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:03:48.134Z",
+      "stage": "NTS",
+      "raw": "{\n  \"action_type\": \"search\",\n  \"parameters\": {\n    \"targets\": [\n      { \"target\": \"water\" }\n    ],\n    \"radius_sequence\": [32, 64, 128]\n  },\n  \"rationale\": \"No source node is directly achievable since no nearby water is evidenced to collect raw_cod, though we have a fishing_rod and smelting context; search for water to fish.\"\n}",
+      "parsed": {
+        "action_type": "search",
+        "parameters": {
+          "targets": [
+            {
+              "target": "water"
+            }
+          ],
+          "radius_sequence": [
+            32,
+            64,
+            128
+          ]
+        },
+        "rationale": "No source node is directly achievable since no nearby water is evidenced to collect raw_cod, though we have a fishing_rod and smelting context; search for water to fish."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:03:53.728Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!searchForBlock(\"water\", 32)"
+    },
+    {
+      "timestamp": "2026-04-11T03:04:29.961Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T03:06:01.638Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:06:37.447Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"raw_cod\",\n  \"qty\": 1,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"water\",\n    \"item_dependency\": \"fishing_rod\",\n    \"tool\": null\n  },\n  \"rationale\": \"Direct action: raw_cod is a source node and can be collected by fishing because water is nearby and a fishing_rod is available per satisfied inputs.\"\n}",
+      "parsed": {
+        "target_item": "raw_cod",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "water",
+          "item_dependency": "fishing_rod",
+          "tool": null
+        },
+        "rationale": "Direct action: raw_cod is a source node and can be collected by fishing because water is nearby and a fishing_rod is available per satisfied inputs."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:06:46.798Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:07:06.050Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:07:17.159Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:07:24.791Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:07:34.564Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:08:43.407Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:09:06.670Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"raw_cod\",\n  \"qty\": 1,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"water\",\n    \"item_dependency\": \"fishing_rod\",\n    \"tool\": null\n  },\n  \"rationale\": \"Direct action: raw_cod is a source node, and it's collectible now because water is nearby and a fishing_rod is in inventory.\"\n}",
+      "parsed": {
+        "target_item": "raw_cod",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "water",
+          "item_dependency": "fishing_rod",
+          "tool": null
+        },
+        "rationale": "Direct action: raw_cod is a source node, and it's collectible now because water is nearby and a fishing_rod is in inventory."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:09:17.127Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:09:22.354Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:09:29.552Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:09:34.737Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:09:42.420Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:11:16.701Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:11:31.229Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"raw_cod\",\n  \"qty\": 1,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"water\",\n    \"item_dependency\": \"fishing_rod\",\n    \"tool\": null\n  },\n  \"rationale\": \"Direct action: raw_cod is a source node collected by fishing, and there is nearby water and a fishing_rod in inventory.\"\n}",
+      "parsed": {
+        "target_item": "raw_cod",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "water",
+          "item_dependency": "fishing_rod",
+          "tool": null
+        },
+        "rationale": "Direct action: raw_cod is a source node collected by fishing, and there is nearby water and a fishing_rod in inventory."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:11:40.457Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:11:50.560Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:11:57.077Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!useOn(\"fishing_rod\",\"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:12:20.424Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:12:50.529Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:13:58.532Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:14:24.024Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"raw_cod\",\n  \"qty\": 1,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"water\",\n    \"item_dependency\": \"fishing_rod\",\n    \"tool\": null\n  },\n  \"rationale\": \"This is a direct action on the source node raw_cod; nearby water and a fishing_rod in inventory make fishing immediately possible for this resource with a water_source dependency.\"\n}",
+      "parsed": {
+        "target_item": "raw_cod",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "water",
+          "item_dependency": "fishing_rod",
+          "tool": null
+        },
+        "rationale": "This is a direct action on the source node raw_cod; nearby water and a fishing_rod in inventory make fishing immediately possible for this resource with a water_source dependency."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:14:30.228Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:14:38.260Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:14:45.628Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:14:54.946Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:15:09.134Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:16:17.898Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:16:32.120Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"raw_cod\",\n  \"qty\": 1,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"water\",\n    \"item_dependency\": \"fishing_rod\",\n    \"tool\": null\n  },\n  \"rationale\": \"Direct action on source node raw_cod: water is nearby and a fishing_rod is available, so fishing is immediately executable.\"\n}",
+      "parsed": {
+        "target_item": "raw_cod",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "water",
+          "item_dependency": "fishing_rod",
+          "tool": null
+        },
+        "rationale": "Direct action on source node raw_cod: water is nearby and a fishing_rod is available, so fishing is immediately executable."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:16:39.273Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:16:49.500Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:17:00.905Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:17:11.204Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:17:20.665Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!useOn(\"fishing_rod\", \"water\")"
+    },
+    {
+      "timestamp": "2026-04-11T03:18:24.764Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"cooked_cod\"],\"final\":{\"vertices\":[{\"id\":\"cooked_cod\",\"qty\":1},{\"id\":\"raw_cod\",\"qty\":1}],\"edges\":[{\"from\":\"raw_cod\",\"to\":\"cooked_cod\",\"qty\":1,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_cod"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "cooked_cod",
+              "qty": 1
+            },
+            {
+              "id": "raw_cod",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_cod",
+              "to": "cooked_cod",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:18:49.899Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"raw_cod\",\n  \"qty\": 1,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"water\",\n    \"item_dependency\": \"fishing_rod\",\n    \"tool\": null\n  },\n  \"rationale\": \"Direct action: raw_cod is a source node resource; water is nearby and a fishing_rod is available, so we can fish now.\"\n}",
+      "parsed": {
+        "target_item": "raw_cod",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "water",
+          "item_dependency": "fishing_rod",
+          "tool": null
+        },
+        "rationale": "Direct action: raw_cod is a source node resource; water is nearby and a fishing_rod is available, so we can fish now."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:19:10.571Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T03:19:19.765Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":2,\"why\":\"all original sinks satisfied\",\"final\":{\"vertices\":[],\"edges\":[]}}",
+      "parsed": {
+        "r": 2,
+        "why": "all original sinks satisfied",
+        "final": {
+          "vertices": [],
+          "edges": []
+        }
+      }
+    }
+  ],
+  "completed_at": "2026-04-11T03:19:19.769Z",
+  "completion_reason": "all sinks satisfied"
+}

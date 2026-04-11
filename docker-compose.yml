@@ -15,6 +15,9 @@ services:
       - ./achievement_hunter/rollouts:/app/achievement_hunter/rollouts
       - ./achievement_hunter/src:/app/achievement_hunter/src
       - ./achievement_hunter/docs:/app/achievement_hunter/docs
+      - ./achievement_hunter/current_ptd.md:/app/achievement_hunter/current_ptd.md
+      - ./achievement_hunter/current_scsg.md:/app/achievement_hunter/current_scsg.md
+      - ./achievement_hunter/current_graphs.md:/app/achievement_hunter/current_graphs.md
     ports:
       - "3000-3003:3000-3003" # see the view from the camera mounted on your bot head: http://localhost:3000/
       - "8080:8080" # Mindserver port
