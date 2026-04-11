@@ -172,6 +172,397 @@
           }
         ]
       }
+    },
+    {
+      "timestamp": "2026-04-11T03:36:21.506Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"wooden_pickaxe\",\"wooden_axe\",\"wooden_shovel\",\"wooden_hoe\"],\"final\":{\"vertices\":[{\"id\":\"any_log\",\"qty\":5},{\"id\":\"any_plank\",\"qty\":13},{\"id\":\"stick\",\"qty\":6},{\"id\":\"wooden_axe\",\"qty\":1},{\"id\":\"wooden_shovel\",\"qty\":1},{\"id\":\"wooden_hoe\",\"qty\":1}],\"edges\":[{\"from\":\"any_log\",\"to\":\"any_plank\",\"qty\":5,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"stick\",\"qty\":4,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"wooden_axe\",\"qty\":3,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_axe\",\"qty\":2,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"wooden_shovel\",\"qty\":1,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_shovel\",\"qty\":2,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"wooden_hoe\",\"qty\":2,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_hoe\",\"qty\":2,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_shovel",
+          "wooden_hoe"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "any_log",
+              "qty": 5
+            },
+            {
+              "id": "any_plank",
+              "qty": 13
+            },
+            {
+              "id": "stick",
+              "qty": 6
+            },
+            {
+              "id": "wooden_axe",
+              "qty": 1
+            },
+            {
+              "id": "wooden_shovel",
+              "qty": 1
+            },
+            {
+              "id": "wooden_hoe",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "qty": 5,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_axe",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_axe",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_shovel",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_shovel",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_hoe",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_hoe",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:36:44.733Z",
+      "stage": "NTS",
+      "raw": "{\n  \"action_type\": \"search\",\n  \"parameters\": {\n    \"targets\": [\n      { \"target\": \"oak_log\" },\n      { \"target\": \"spruce_log\" }\n    ],\n    \"radius_sequence\": [32, 64, 128]\n  },\n  \"rationale\": \"No source-node action is directly achievable: the only source node any_log requires nearby logs, but none are in nearby_blocks; therefore search for oak_log or spruce_log.\"\n}",
+      "parsed": {
+        "action_type": "search",
+        "parameters": {
+          "targets": [
+            {
+              "target": "oak_log"
+            },
+            {
+              "target": "spruce_log"
+            }
+          ],
+          "radius_sequence": [
+            32,
+            64,
+            128
+          ]
+        },
+        "rationale": "No source-node action is directly achievable: the only source node any_log requires nearby logs, but none are in nearby_blocks; therefore search for oak_log or spruce_log."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:36:51.386Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!searchForBlock(\"oak_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-11T03:36:55.625Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"oak_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-11T03:36:59.779Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"oak_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-11T03:37:03.804Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"oak_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-11T03:37:08.648Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"oak_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-11T03:37:55.088Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"wooden_pickaxe\",\"wooden_axe\",\"wooden_shovel\",\"wooden_hoe\"],\"final\":{\"vertices\":[{\"id\":\"any_log\",\"qty\":5},{\"id\":\"any_plank\",\"qty\":13},{\"id\":\"stick\",\"qty\":6},{\"id\":\"wooden_axe\",\"qty\":1},{\"id\":\"wooden_shovel\",\"qty\":1},{\"id\":\"wooden_hoe\",\"qty\":1}],\"edges\":[{\"from\":\"any_log\",\"to\":\"any_plank\",\"qty\":5,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"stick\",\"qty\":4,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"wooden_axe\",\"qty\":3,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_axe\",\"qty\":2,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"wooden_shovel\",\"qty\":1,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_shovel\",\"qty\":2,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"wooden_hoe\",\"qty\":2,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_hoe\",\"qty\":2,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_shovel",
+          "wooden_hoe"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "any_log",
+              "qty": 5
+            },
+            {
+              "id": "any_plank",
+              "qty": 13
+            },
+            {
+              "id": "stick",
+              "qty": 6
+            },
+            {
+              "id": "wooden_axe",
+              "qty": 1
+            },
+            {
+              "id": "wooden_shovel",
+              "qty": 1
+            },
+            {
+              "id": "wooden_hoe",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "qty": 5,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_axe",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_axe",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_shovel",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_shovel",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_hoe",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_hoe",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:38:15.133Z",
+      "stage": "NTS",
+      "raw": "{\n  \"action_type\": \"search\",\n  \"parameters\": {\n    \"targets\": [\n      { \"target\": \"spruce_log\" }\n    ],\n    \"radius_sequence\": [32, 64, 128]\n  },\n  \"rationale\": \"any_log is the only source node, but no logs are evidenced in nearby_blocks; search for a spruce log to collect.\"\n}",
+      "parsed": {
+        "action_type": "search",
+        "parameters": {
+          "targets": [
+            {
+              "target": "spruce_log"
+            }
+          ],
+          "radius_sequence": [
+            32,
+            64,
+            128
+          ]
+        },
+        "rationale": "any_log is the only source node, but no logs are evidenced in nearby_blocks; search for a spruce log to collect."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:38:19.594Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!searchForBlock(\"spruce_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-11T03:38:49.689Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-11T03:39:35.528Z",
+      "stage": "SCSG",
+      "raw": "{\"r\":0,\"s\":[\"wooden_pickaxe\",\"wooden_axe\",\"wooden_shovel\",\"wooden_hoe\"],\"final\":{\"vertices\":[{\"id\":\"any_log\",\"qty\":5},{\"id\":\"any_plank\",\"qty\":13},{\"id\":\"stick\",\"qty\":6},{\"id\":\"wooden_axe\",\"qty\":1},{\"id\":\"wooden_shovel\",\"qty\":1},{\"id\":\"wooden_hoe\",\"qty\":1}],\"edges\":[{\"from\":\"any_log\",\"to\":\"any_plank\",\"qty\":5,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"stick\",\"qty\":4,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"wooden_axe\",\"qty\":3,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_axe\",\"qty\":2,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"wooden_shovel\",\"qty\":1,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_shovel\",\"qty\":2,\"consumed\":true},{\"from\":\"any_plank\",\"to\":\"wooden_hoe\",\"qty\":2,\"consumed\":true},{\"from\":\"stick\",\"to\":\"wooden_hoe\",\"qty\":2,\"consumed\":true}]}}",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_shovel",
+          "wooden_hoe"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "any_log",
+              "qty": 5
+            },
+            {
+              "id": "any_plank",
+              "qty": 13
+            },
+            {
+              "id": "stick",
+              "qty": 6
+            },
+            {
+              "id": "wooden_axe",
+              "qty": 1
+            },
+            {
+              "id": "wooden_shovel",
+              "qty": 1
+            },
+            {
+              "id": "wooden_hoe",
+              "qty": 1
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "qty": 5,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_axe",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_axe",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_shovel",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_shovel",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_hoe",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_hoe",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:40:05.911Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"any_log\",\n  \"qty\": 5,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": null,\n    \"tool\": null\n  },\n  \"rationale\": \"any_log is the only source node and spruce_log is nearby, so collecting logs is directly achievable now.\"\n}",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 5,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": null,
+          "tool": null
+        },
+        "rationale": "any_log is the only source node and spruce_log is nearby, so collecting logs is directly achievable now."
+      }
+    },
+    {
+      "timestamp": "2026-04-11T03:40:15.411Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"spruce_log\", 4)"
+    },
+    {
+      "timestamp": "2026-04-11T03:41:04.156Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
     }
   ]
 }

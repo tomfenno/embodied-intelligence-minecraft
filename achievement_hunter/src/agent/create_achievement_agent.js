@@ -2,6 +2,8 @@ import { registerAgent } from '../../../src/mindcraft/mindserver.js';
 import { getServer } from '../../../src/mindcraft/mcserver.js';
 import { AchievementAgentProcess } from './achievement_agent_process.js';
 
+const VIEWER_BASE_PORT = 3000;
+
 let agent_count = 0;
 
 /**
@@ -10,11 +12,13 @@ let agent_count = 0;
  *
  * @param {object} settings - The full settings object (must have settings.profile set).
  */
-export async function createAchievementAgent(settings) {
+export async function create_achievement_agent(settings) {
+    // Deep-clone to avoid mutating the caller's settings object.
     settings = JSON.parse(JSON.stringify(settings));
+
     const agent_name = settings.profile.name;
-    const agentIndex = agent_count++;
-    const viewer_port = 3000 + agentIndex;
+    const agent_index = agent_count++;
+    const viewer_port = VIEWER_BASE_PORT + agent_index;
 
     registerAgent(settings, viewer_port);
 
@@ -29,6 +33,6 @@ export async function createAchievementAgent(settings) {
         console.warn('Attempting to connect anyway...');
     }
 
-    const agentProcess = new AchievementAgentProcess(agent_name, settings.mindserver_port);
-    agentProcess.start(settings.load_memory || false, null, agentIndex);
+    const agent_process = new AchievementAgentProcess(agent_name, settings.mindserver_port);
+    agent_process.start(settings.load_memory || false, agent_index);
 }

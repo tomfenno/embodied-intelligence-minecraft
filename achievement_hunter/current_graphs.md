@@ -34,7 +34,30 @@ graph LR
 
 ---
 
-_SCSG not yet generated._
+# SCSG — Craft one type of every tool
+_Updated: 2026-04-11T03:39:35.530Z · r=0_
+
+```mermaid
+graph LR
+    any_log["any_log ×5"]
+    any_plank["any_plank ×13"]
+    stick["stick ×6"]
+    wooden_axe["wooden_axe ×1"]
+    wooden_shovel["wooden_shovel ×1"]
+    wooden_hoe["wooden_hoe ×1"]
+    any_log -->|"×5"| any_plank
+    any_plank -->|"×4"| stick
+    any_plank -->|"×3"| wooden_axe
+    stick -->|"×2"| wooden_axe
+    any_plank -->wooden_shovel
+    stick -->|"×2"| wooden_shovel
+    any_plank -->|"×2"| wooden_hoe
+    stick -->|"×2"| wooden_hoe
+    style wooden_pickaxe fill:#4CAF50,color:#fff,stroke:#388E3C
+    style wooden_axe fill:#4CAF50,color:#fff,stroke:#388E3C
+    style wooden_shovel fill:#4CAF50,color:#fff,stroke:#388E3C
+    style wooden_hoe fill:#4CAF50,color:#fff,stroke:#388E3C
+```
 
 ---
 
@@ -42,13 +65,33 @@ _SCSG not yet generated._
 <td width="50%" valign="top">
 
 ## Current Task
-_NTS not yet run._
+_Updated: 2026-04-11T03:40:05.913Z_
+
+```json
+{
+  "target_item": "any_log",
+  "qty": 5,
+  "action_type": "collect",
+  "parameters": {
+    "source_block": "spruce_log",
+    "item_dependency": null,
+    "tool": null
+  },
+  "rationale": "any_log is the only source node and spruce_log is nearby, so collecting logs is directly achievable now."
+}
+```
 
 </td>
 <td width="50%" valign="top">
 
-## Current Action
-_AM not yet run._
+## Current Action _(attempt 2)_
+_Updated: 2026-04-11T03:41:04.158Z_
+
+```json
+{
+  "status": "TASK_COMPLETE"
+}
+```
 
 </td>
 </tr></table>
