@@ -1,34 +1,33 @@
-# PTD — catch and cook a fish
-_Updated: 2026-04-11T02:45:29.854Z_
+# PTD — Craft one type of every tool
+_Updated: 2026-04-11T03:35:46.396Z_
 
 ```mermaid
 graph LR
-    cooked_cod["cooked_cod ×1<br/>[item]"]
-    raw_cod["raw_cod ×1<br/>[resource]"]
-    furnace["furnace ×1<br/>[workstation]"]
-    any_plank["any_plank ×12<br/>[item]"]
-    any_log["any_log ×3<br/>[resource]"]
+    any_log["any_log ×5<br/>[resource]"]
+    any_plank["any_plank ×20<br/>[item]"]
+    stick["stick ×8<br/>[item]"]
     crafting_table["crafting_table ×1<br/>[workstation]"]
     wooden_pickaxe["wooden_pickaxe ×1<br/>[tool]"]
-    stick["stick ×8<br/>[item]"]
-    string["string ×2<br/>[resource]"]
-    cobblestone["cobblestone ×8<br/>[resource]"]
-    fishing_rod["fishing_rod ×1<br/>[tool]"]
-    raw_cod -->cooked_cod
-    any_plank -->cooked_cod
-    furnace -->cooked_cod
-    fishing_rod -->raw_cod
-    any_log -->|"×3"| any_plank
+    wooden_axe["wooden_axe ×1<br/>[tool]"]
+    wooden_shovel["wooden_shovel ×1<br/>[tool]"]
+    wooden_hoe["wooden_hoe ×1<br/>[tool]"]
+    any_log -->|"×5"| any_plank
     any_plank -->|"×4"| crafting_table
-    crafting_table -->wooden_pickaxe
+    any_plank -->|"×4"| stick
     any_plank -->|"×3"| wooden_pickaxe
     stick -->|"×2"| wooden_pickaxe
-    crafting_table -->fishing_rod
-    stick -->|"×3"| fishing_rod
-    string -->|"×2"| fishing_rod
-    cobblestone -->|"×8"| furnace
-    wooden_pickaxe -->cobblestone
-    crafting_table -->furnace
-    any_plank -->|"×4"| stick
-    style cooked_cod fill:#4CAF50,color:#fff,stroke:#388E3C
+    crafting_table -->wooden_pickaxe
+    any_plank -->|"×3"| wooden_axe
+    stick -->|"×2"| wooden_axe
+    crafting_table -->wooden_axe
+    any_plank -->wooden_shovel
+    stick -->|"×2"| wooden_shovel
+    crafting_table -->wooden_shovel
+    any_plank -->|"×2"| wooden_hoe
+    stick -->|"×2"| wooden_hoe
+    crafting_table -->wooden_hoe
+    style wooden_pickaxe fill:#4CAF50,color:#fff,stroke:#388E3C
+    style wooden_axe fill:#4CAF50,color:#fff,stroke:#388E3C
+    style wooden_shovel fill:#4CAF50,color:#fff,stroke:#388E3C
+    style wooden_hoe fill:#4CAF50,color:#fff,stroke:#388E3C
 ```

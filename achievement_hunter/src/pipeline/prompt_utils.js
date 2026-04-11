@@ -2,8 +2,8 @@ import {mkdirSync, readFileSync, writeFileSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
-import convoManager from '../../src/agent/conversation.js';
-import {getBiomeName, getBlockAtPosition, getCraftableItems, getFirstBlockAboveHead, getInventoryCounts, getNearbyEntities, getNearbyPlayerNames, getNearestBlocks,} from '../../src/agent/library/world.js';
+import convoManager from '../../../src/agent/conversation.js';
+import {getBiomeName, getBlockAtPosition, getCraftableItems, getFirstBlockAboveHead, getInventoryCounts, getNearbyEntities, getNearbyPlayerNames, getNearestBlocks,} from '../../../src/agent/library/world.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -85,7 +85,7 @@ export function save_json(str, file_path) {
  *   const prompt = fill_ptd_prompt('Craft a stone pickaxe');
  */
 export function fill_ptd_prompt(objective) {
-  const template = _read_template('../docs/prompts/ptd_prompts/ptd_prompt.md');
+  const template = _read_template('../../docs/prompts/ptd_prompts/ptd_prompt.md');
   return _fill(template, {OBJECTIVE: objective});
 }
 
@@ -99,7 +99,7 @@ export function fill_ptd_prompt(objective) {
  */
 export function fill_ptd_feedback_prompt(objective, candidate_graph) {
   const template =
-      _read_template('../docs/prompts/ptd_prompts/ptd_feedback_prompt.md');
+      _read_template('../../docs/prompts/ptd_prompts/ptd_feedback_prompt.md');
   return _fill(
       template, {OBJECTIVE: objective, 'CANDIDATE GRAPH': candidate_graph});
 }
@@ -116,7 +116,7 @@ export function fill_ptd_feedback_prompt(objective, candidate_graph) {
 export function fill_ptd_refinement_prompt(
     objective, candidate_graph, validator_output) {
   const template =
-      _read_template('../docs/prompts/ptd_prompts/ptd_refinement_prompt.md');
+      _read_template('../../docs/prompts/ptd_prompts/ptd_refinement_prompt.md');
   return _fill(template, {
     OBJECTIVE: objective,
     'CANDIDATE GRAPH': candidate_graph,
@@ -211,7 +211,7 @@ export function trim_graph_for_scsg(graph) {
  */
 export function fill_scsg_prompt(graph, state) {
   const template =
-      _read_template('../docs/prompts/scsg_prompts/scsg_prompt.md');
+      _read_template('../../docs/prompts/scsg_prompts/scsg_prompt.md');
   return _fill(template, {GRAPH: graph, STATE: state});
 }
 
@@ -227,7 +227,7 @@ export function fill_scsg_prompt(graph, state) {
  */
 export function fill_scsg_feedback_prompt(task_prompt, candidate_answer) {
   const template =
-      _read_template('../docs/prompts/scsg_prompts/scsg_feedback_prompt.md');
+      _read_template('../../docs/prompts/scsg_prompts/scsg_feedback_prompt.md');
   return _fill(template, {
     'FULL TASK PROMPT WITH CONCRETE G AND S': task_prompt,
     'CANDIDATE JSON': candidate_answer,
@@ -243,7 +243,7 @@ export function fill_scsg_feedback_prompt(task_prompt, candidate_answer) {
  */
 export function fill_task_prompt(enriched_subgraph, state) {
   const template =
-      _read_template('../docs/prompts/task_prompts/task_prompt.md');
+      _read_template('../../docs/prompts/task_prompts/task_prompt.md');
   return _fill(
       template, {'ENRICHED_SUBGRAPH': enriched_subgraph, 'STATE': state});
 }
@@ -257,7 +257,7 @@ export function fill_task_prompt(enriched_subgraph, state) {
  */
 export function fill_action_mediator_prompt(task, state) {
   const template = _read_template(
-      '../docs/prompts/action_mediator_prompts/action_mediator.md');
+      '../../docs/prompts/action_mediator_prompts/action_mediator.md');
   return _fill(template, {'TASK': task, 'STATE': state});
 }
 
@@ -271,7 +271,7 @@ export function fill_action_mediator_prompt(task, state) {
  */
 export function fill_next_task_selector_prompt(enriched_subgraph, state) {
   const template = _read_template(
-      '../docs/prompts/next_task_selector_prompts/next_task_selector.md');
+      '../../docs/prompts/next_task_selector_prompts/next_task_selector.md');
   return _fill(
       template, {'ENRICHED_SUBGRAPH': enriched_subgraph, 'STATE': state});
 }
@@ -290,7 +290,7 @@ export function fill_next_task_selector_prompt(enriched_subgraph, state) {
 export function fill_scsg_refiner_prompt(
     task_prompt, previous_candidate, audit_report) {
   const template =
-      _read_template('../docs/prompts/scsg_prompts/scsg_refiner_prompt.md');
+      _read_template('../../docs/prompts/scsg_prompts/scsg_refiner_prompt.md');
   return _fill(template, {
     'FULL TASK PROMPT WITH CONCRETE G AND S': task_prompt,
     'PREVIOUS CANDIDATE JSON': previous_candidate,

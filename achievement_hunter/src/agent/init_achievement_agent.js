@@ -1,5 +1,5 @@
 import { AchievementAgent } from './achievement_agent.js';
-import { serverProxy } from '../../src/agent/mindserver_proxy.js';
+import { serverProxy } from '../../../src/agent/mindserver_proxy.js';
 import yargs from 'yargs';
 
 const args = process.argv.slice(2);

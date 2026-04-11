@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { logoutAgent } from '../../src/mindcraft/mindserver.js';
+import { logoutAgent } from '../../../src/mindcraft/mindserver.js';
 
 /**
  * AchievementAgentProcess mirrors AgentProcess but spawns
@@ -15,7 +15,7 @@ export class AchievementAgentProcess {
         this.count_id = count_id;
         this.running = true;
 
-        let args = ['achievement_hunter/src/init_achievement_agent.js'];
+        let args = ['achievement_hunter/src/agent/init_achievement_agent.js'];
         args.push('-n', this.name);
         args.push('-c', count_id);
         if (load_memory)

@@ -4,8 +4,8 @@ import { fileURLToPath } from 'url';
 import { extract_json } from './prompt_utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROLLOUTS_DIR = path.join(__dirname, '../rollouts');
-const LIVE_DIR = path.join(__dirname, '..');
+const ROLLOUTS_DIR = path.join(__dirname, '../../rollouts');
+const LIVE_DIR = path.join(__dirname, '../..');
 
 /**
  * Converts a graph { objective, sinks, vertices, edges } to a Mermaid LR diagram.

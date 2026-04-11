@@ -11,7 +11,7 @@ import {
 } from './prompt_utils.js';
 import { createRolloutLogger } from './rollout_logger.js';
 import { saveCheckpoint, clearCheckpoint } from './checkpoint.js';
-import { executeCommand } from '../../src/agent/commands/index.js';
+import { executeCommand } from '../../../src/agent/commands/index.js';
 
 const MAX_INNER_RETRIES = 5;
 

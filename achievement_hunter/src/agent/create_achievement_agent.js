@@ -1,5 +1,5 @@
-import { registerAgent } from '../../src/mindcraft/mindserver.js';
-import { getServer } from '../../src/mindcraft/mcserver.js';
+import { registerAgent } from '../../../src/mindcraft/mindserver.js';
+import { getServer } from '../../../src/mindcraft/mcserver.js';
 import { AchievementAgentProcess } from './achievement_agent_process.js';
 
 let agent_count = 0;

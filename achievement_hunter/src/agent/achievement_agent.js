@@ -1,5 +1,5 @@
-import { Agent } from '../../src/agent/agent.js';
-import { loadCheckpoint } from './checkpoint.js';
+import { Agent } from '../../../src/agent/agent.js';
+import { loadCheckpoint } from '../pipeline/checkpoint.js';
 
 /**
  * AchievementAgent extends the base Agent to implement the Structured Prompting Loop.
@@ -31,7 +31,7 @@ export class AchievementAgent extends Agent {
             this._waitingForObjective = false;
             console.log('[SPL] Checkpoint found — resuming:', checkpoint.objective, '(saved at', checkpoint.saved_at + ')');
             this.openChat(`Resuming previous task: "${checkpoint.objective}"`);
-            const { structuredLoop } = await import('./structured_loop.js');
+            const { structuredLoop } = await import('../pipeline/structured_loop.js');
             structuredLoop(this.prompter.chat_model, this, checkpoint.objective, checkpoint.graph)
                 .catch(err => {
                     console.error('[SPL] Structured loop crashed:', err);
@@ -56,7 +56,7 @@ export class AchievementAgent extends Agent {
         if (this._waitingForObjective && source !== 'system' && source !== this.name && !message.startsWith('!')) {
             this._waitingForObjective = false;
             console.log('[SPL] Received objective from', source, ':', message);
-            const { structuredLoop } = await import('./structured_loop.js');
+            const { structuredLoop } = await import('../pipeline/structured_loop.js');
             structuredLoop(this.prompter.chat_model, this, message)
                 .catch(err => {
                     console.error('[SPL] Structured loop crashed:', err);

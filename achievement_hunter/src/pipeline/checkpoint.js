@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Stored in rollouts/ — already mounted as a Docker volume
-const CHECKPOINT_PATH = path.join(__dirname, '../rollouts/checkpoint.json');
+const CHECKPOINT_PATH = path.join(__dirname, '../../rollouts/checkpoint.json');
 
 /**
  * Persists the current SPL objective and PTD graph to disk.
