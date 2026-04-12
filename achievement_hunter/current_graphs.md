@@ -2,20 +2,33 @@ _PTD not yet generated._
 
 ---
 
-# SCSG
-_Updated: 2026-04-12T06:41:14.082Z_
-
-**All sinks satisfied (r=2) — task complete.**
-
-
----
-
-# Candidates — do something
-_Updated: 2026-04-12T06:40:49.286Z · 1 source node(s)_
+# SCSG — ddddd
+_Updated: 2026-04-12T06:59:17.548Z · r=1_
 
 ```mermaid
 graph LR
     wooden_pickaxe["wooden_pickaxe ×1<br/>[tool]"]
+    crafting_table["crafting_table ×1<br/>[workstation]"]
+    stick["stick ×4<br/>[item]"]
+    any_plank["any_plank ×12<br/>[item]"]
+    any_log["any_log ×3<br/>[resource]"]
+    any_log -->|"×3"| any_plank
+    any_plank -->|"×4"| crafting_table
+    any_plank -->|"×2"| stick
+    any_plank -->|"×3"| wooden_pickaxe
+    stick -->|"×2"| wooden_pickaxe
+    crafting_table -->wooden_pickaxe
+    style wooden_pickaxe fill:#4CAF50,color:#fff,stroke:#388E3C
+```
+
+---
+
+# Candidates — ddddd
+_Updated: 2026-04-12T06:59:17.549Z · 1 source node(s)_
+
+```mermaid
+graph LR
+    any_log["any_log ×3<br/>[resource]"]
 ```
 
 ---
@@ -24,25 +37,17 @@ graph LR
 <td width="50%" valign="top">
 
 ## Current Task
-_Updated: 2026-04-12T06:40:56.881Z_
+_Updated: 2026-04-12T06:59:19.196Z_
 
 ```json
 {
-  "target_item": "wooden_pickaxe",
-  "qty": 1,
-  "action_type": "craft",
+  "target_item": "any_log",
+  "qty": 3,
+  "action_type": "collect",
   "parameters": {
-    "crafting_inputs": [
-      {
-        "item": "any_plank",
-        "qty": 3
-      },
-      {
-        "item": "stick",
-        "qty": 2
-      }
-    ],
-    "workstation": "crafting_table"
+    "source_block": "grass_block",
+    "item_dependency": "any_log",
+    "tool": null
   }
 }
 ```
@@ -50,13 +55,11 @@ _Updated: 2026-04-12T06:40:56.881Z_
 </td>
 <td width="50%" valign="top">
 
-## Current Action _(attempt 2)_
-_Updated: 2026-04-12T06:41:14.080Z_
+## Current Action _(attempt 7)_
+_Updated: 2026-04-12T06:59:17.526Z_
 
-```json
-{
-  "status": "TASK_COMPLETE"
-}
+```
+!searchForBlock("spruce_log", 32)
 ```
 
 </td>

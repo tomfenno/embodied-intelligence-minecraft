@@ -69,7 +69,10 @@ export class AchievementAgent extends Agent {
      * and notifies the player if the loop crashes.
      */
     _launch_spl(objective, graph = null) {
-        structuredLoop(this.prompter.chat_model, this, objective, graph)
+        structuredLoop(
+            {ptd: this.prompter.ptd_model, nts: this.prompter.nts_model, am: this.prompter.am_model},
+            this, objective, graph
+        )
             .catch(err => {
                 console.error('[SPL] Structured loop crashed:', err);
                 this._waiting_for_objective = true;

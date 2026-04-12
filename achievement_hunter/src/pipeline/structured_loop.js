@@ -7,7 +7,7 @@ import {enrich_subgraph_sources} from './graph_utils.js';
 import {extract_json} from './json_utils.js';
 import {fill_action_mediator_prompt, fill_next_task_selector_prompt, fill_ptd_prompt,} from './prompt_utils.js';
 import {createRolloutLogger} from './rollout_logger.js';
-import {compute_scsg} from './scsg.js';
+import {ABSTRACT_CLASS_MEMBERS, compute_scsg} from './scsg.js';
 import {get_am_state, get_nts_state, get_sgsg_state} from './state.js';
 
 const MAX_INNER_RETRIES = 5;
@@ -47,8 +47,8 @@ const ANY_LOG_SEARCH_TARGETS = [
  *           Repeat from (2) until the SCSG signals all sinks are satisfied
  *           (r=2).
  *
- * @param {object} model   - Model instance with sendRequest(turns,
- *     systemMessage).
+ * @param {{ptd: object, nts: object, am: object}} models
+ *                         - Per-stage model instances, each with sendRequest(turns, systemMessage).
  * @param {object} agent   - The Mindcraft agent instance.
  * @param {string} T       - The primary task objective (e.g. "craft a diamond
  *     sword").
@@ -57,11 +57,11 @@ const ANY_LOG_SEARCH_TARGETS = [
  *                           is skipped and the loop resumes from Phase 2 (SCSG)
  * directly.
  */
-export async function structuredLoop(model, agent, T, G = null) {
+export async function structuredLoop(models, agent, T, G = null) {
   const log = createRolloutLogger(T);
 
   // ── Phase 1: PTD ─────────────────────────────────────────────────────────
-  // G = await run_ptd(model, T, G, log);
+  // G = await run_ptd(models.ptd, T, G, log);
   G = await loadGraphFromFile(
       './achievement_hunter/docs/platonic_ptds/wooden_pickaxe.json');
   if (!G) return;
@@ -79,7 +79,7 @@ export async function structuredLoop(model, agent, T, G = null) {
     }
 
     // NTS
-    const task = await run_nts(model, scsg.candidates, agent, log);
+    const task = await run_nts(models.nts, scsg.candidates, agent, log);
     if (!task) {
       if (++consecutive_failures >= MAX_OUTER_RETRIES) {
         console.error('[SPL] Max outer retries exceeded. Aborting.');
@@ -90,7 +90,7 @@ export async function structuredLoop(model, agent, T, G = null) {
     }
     consecutive_failures = 0;
 
-    const am_status = await run_am(model, task, agent, log);
+    const am_status = await run_am(models.am, task, agent, log);
 
     if (am_status !== 'success') {
       console.log(
@@ -213,9 +213,17 @@ async function run_nts(model, candidates, agent, log) {
 async function run_am(model, task, agent, log) {
   for (let attempt = 0; attempt < MAX_INNER_RETRIES; attempt++) {
     const state = get_am_state(agent);
+
+    if (_task_complete(task, state)) {
+      console.log(
+          '[SPL] Task already complete (hardcoded check):',
+          task.target_item ?? task.action_type);
+      return 'success';
+    }
+
     const action =
         await model.sendRequest([], fill_action_mediator_prompt(task, state));
-    log.am(attempt + 1, action);
+    log.am(attempt + 1, action, state);
     console.log(
         `[SPL] Action (attempt ${attempt + 1}/${MAX_INNER_RETRIES}):`, action);
 
@@ -252,6 +260,32 @@ async function run_am(model, task, agent, log) {
   }
 
   return 'fail';
+}
+
+// ── Task Completion Check
+// ─────────────────────────────────────────────────
+
+/**
+ * Returns true if the task is already satisfied by the current inventory,
+ * without making an LLM call.
+ *
+ * Mirrors the AM prompt's completion rule:
+ *   - concrete target_item: inventory[target_item] >= qty
+ *   - abstract any_* target: sum of all concrete class members >= qty
+ */
+function _task_complete(task, state) {
+  const {target_item, qty} = task;
+  if (!target_item || qty == null) return false;
+
+  const inventory = state.inventory ?? {};
+
+  if (target_item.startsWith('any_')) {
+    const members = ABSTRACT_CLASS_MEMBERS[target_item] ?? [];
+    const total = members.reduce((sum, id) => sum + (inventory[id] ?? 0), 0);
+    return total >= qty;
+  }
+
+  return (inventory[target_item] ?? 0) >= qty;
 }
 
 // ── Search Helpers

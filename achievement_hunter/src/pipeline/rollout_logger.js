@@ -121,8 +121,8 @@ export function createRolloutLogger(objective) {
             live.nts = `## Current Task\n_Updated: ${ts}_\n\n${body}`;
             _write_combined(live);
         },
-        am(attempt, raw) {
-            push({ stage: 'AM', attempt, raw });
+        am(attempt, raw, state = null) {
+            push({ stage: 'AM', attempt, raw, ...(state && {state}) });
             const ts = new Date().toISOString();
             const parsed = extract_json(raw);
             const body = parsed

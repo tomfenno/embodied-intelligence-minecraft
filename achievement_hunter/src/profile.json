@@ -3,10 +3,21 @@
 
   "model": "gpt-5",
 
-  "skin": {
-    "model": "default",
-    "path": "https://www.minecraftskins.com/uploads/skins/2026/02/16/computer-23869410.png?v950"
-  },
+  "//": [
+    "Per-stage model overrides. Omit any field to fall back to 'model' above.",
+    "Available OpenAI models:",
+    "  gpt-5           — most capable, highest cost",
+    "  gpt-4o          — fast and capable, good default",
+    "  gpt-4o-mini     — lightweight, low cost, good for simple dispatch (am/nts)",
+    "  gpt-4-turbo     — previous generation flagship",
+    "  o3              — high reasoning, slow and expensive",
+    "  o3-mini         — fast reasoning, lower cost",
+    "  o1              — original reasoning model",
+    "  o1-mini         — lightweight reasoning"
+  ],
+  "ptd_model": "gpt-5",
+  "nts_model": "gpt-4o-mini",
+  "am_model": "gpt-4o-mini",
 
   "modes": {
     "self_preservation": true,
