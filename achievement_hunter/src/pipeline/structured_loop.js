@@ -4,7 +4,7 @@ import {executeCommand} from '../../../src/agent/commands/index.js';
 
 import {clearCheckpoint, saveCheckpoint} from './checkpoint.js';
 import {enrich_subgraph_sources} from './graph_utils.js';
-import {extract_json, strip_fences, to_snake_case} from './json_utils.js';
+import {extract_json, save_json, strip_fences, to_snake_case,} from './json_utils.js';
 import {fill_action_mediator_prompt, fill_next_task_selector_prompt, fill_ptd_prompt,} from './prompt_utils.js';
 import {createRolloutLogger} from './rollout_logger.js';
 import {ABSTRACT_CLASS_MEMBERS, compute_scsg} from './scsg.js';
@@ -38,6 +38,11 @@ const spl = {
   log: (...args) => console.log('[SPL]', ...args),
   warn: (...args) => console.warn('[SPL]', ...args),
   error: (...args) => console.error('[SPL]', ...args),
+};
+
+const LOG_SOURCE = {
+  LLM: 'llm',
+  SEARCH: 'search',
 };
 
 /**
@@ -122,7 +127,7 @@ async function run_ptd(model, T, existing_G, log) {
   }
 
   spl.log('Building PTD for:', T);
-  const response = await model.sendRequest([], fill_ptd_prompt(T));
+  const {response} = await timed_send_request(model, fill_ptd_prompt(T));
   const G = extract_json(response);
 
   log.ptd(response, G);
@@ -196,10 +201,11 @@ function run_scsg(G, agent, log) {
  */
 async function run_nts(model, candidates, agent, log) {
   const state = get_nts_state(agent);
-  const response = await model.sendRequest(
-      [], fill_next_task_selector_prompt(candidates, state));
+  const {response, latency_ms} = await timed_send_request(
+      model, fill_next_task_selector_prompt(candidates, state));
+
   const task = extract_json(response);
-  log.nts(response, task);
+  log.nts(response, task, {latency_ms});
 
   if (!task) {
     spl.error('Failed to extract task from NTS response.');
@@ -230,10 +236,14 @@ async function run_am(model, task, agent, log) {
       return 'success';
     }
 
-    const action = strip_fences(
-        await model.sendRequest([], fill_action_mediator_prompt(task, state)));
+    const {response, latency_ms} = await timed_send_request(
+        model, fill_action_mediator_prompt(task, state));
+
+    const action = strip_fences(response);
     const signal = extract_json(action);
-    log.am(attempt + 1, action, state);
+
+    log.am(attempt + 1, action, state, {latency_ms, source: LOG_SOURCE.LLM});
+
     spl.log(`Action (attempt ${attempt + 1}/${MAX_INNER_RETRIES}):`, action);
 
     if (signal?.status === 'TASK_COMPLETE')
@@ -257,6 +267,19 @@ async function run_am(model, task, agent, log) {
   }
 
   return 'fail';
+}
+
+// ── Timing Helpers
+// ────────────────────────────────────────────────────────────
+
+async function timed_send_request(model, prompt) {
+  const started_ms = Date.now();
+  const response = await model.sendRequest([], prompt);
+
+  return {
+    response,
+    latency_ms: Date.now() - started_ms,
+  };
 }
 
 // ── Task Completion
@@ -344,7 +367,8 @@ async function _run_search(target, state, agent, log, start_attempt) {
   for (const radius of SEARCH_RADII) {
     for (const item of concrete_items) {
       const command = make_search_command(item, radius);
-      log.am(++attempt, command);
+      log.am(++attempt, command, null, {source: LOG_SOURCE.SEARCH});
+
       if (await _execute_search_command(agent, item, radius, command))
         return true;
     }
@@ -381,7 +405,8 @@ async function _execute_search_command(agent, item, radius, command) {
 function expand_search_item(item) {
   if (item === 'any_log') return ANY_LOG_SEARCH_TARGETS;
   if (item.startsWith('any_')) {
-    throw new Error(`Unsupported abstract search target: "${item}". Add an expansion to expand_search_item.`);
+    throw new Error(`Unsupported abstract search target: "${
+        item}". Add an expansion to expand_search_item.`);
   }
   return [item];
 }
@@ -476,12 +501,15 @@ export function make_search_command(target, radius) {
   return `!searchForBlock("${target}", ${radius})`;
 }
 
-/** Loads a PTD graph from a JSON file. Throws with a clear message on failure. */
+/**
+ * Loads a PTD graph from a JSON file. Throws with a clear message on failure.
+ */
 async function loadGraphFromFile(file_path) {
   try {
     const text = await readFile(file_path, 'utf8');
     return JSON.parse(text);
   } catch (err) {
-    throw new Error(`Failed to load PTD graph from "${file_path}": ${err.message}`);
+    throw new Error(
+        `Failed to load PTD graph from "${file_path}": ${err.message}`);
   }
 }

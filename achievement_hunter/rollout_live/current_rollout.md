@@ -1,23 +1,44 @@
+<table width="100%" style="table-layout: fixed; border-collapse: separate; border-spacing: 0;"><tr>
+<td width="72%" valign="top" style="border: 1px solid #d0d7de; border-radius: 14px; padding: 18px 16px; box-sizing: border-box;">
+
 _PTD not yet generated._
+
+</td>
+<td width="2%"></td>
+<td width="26%" valign="top" style="border: 1px solid #d0d7de; border-radius: 14px; padding: 18px 16px; box-sizing: border-box;">
+
+<div align="center" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+<div style="font-size: 0.85em; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 0.6em;">Elapsed</div>
+<div style="font-size: 3.4em; font-weight: 800; line-height: 1; margin: 0 0 0.3em 0; white-space: nowrap;">41s</div>
+<div style="font-size: 0.95em; font-weight: 600;">Completed</div>
+</div>
+
+</td>
+</tr></table>
 
 ---
 
-# Completed — test
-_Updated: +44s_
+<div style="border: 1px solid #d0d7de; border-radius: 14px; padding: 18px 16px; box-sizing: border-box;">
+
+# Completed — TEST
 
 **Task complete.**
 
 - **Reason:** all sinks satisfied
-- **Total elapsed:** 44s
 
+
+</div>
 
 ---
 
-<table width="100%"><tr>
-<td width="50%" valign="top">
+<table width="100%" style="table-layout: fixed; border-collapse: separate; border-spacing: 0;"><tr>
+<td width="49%" valign="top" style="border: 1px solid #d0d7de; border-radius: 14px; padding: 18px 16px; box-sizing: border-box;">
 
 **Current Task**
-_Updated: +44s_
+
+**LLM latency**
+- **Current output:** 2.47 s
+- **Average output:** 1.96 s across 5 outputs
 
 ```json
 {
@@ -42,9 +63,14 @@ _Updated: +44s_
 ```
 
 </td>
-<td width="50%" valign="top">
+<td width="2%"></td>
+<td width="49%" valign="top" style="border: 1px solid #d0d7de; border-radius: 14px; padding: 18px 16px; box-sizing: border-box;">
 
-**Current Action** _(attempt 1 · +37s)_
+**Current Action** _(attempt 1)_
+
+**LLM latency**
+- **Current output:** 722 ms
+- **Average output:** 816 ms across 6 outputs
 
 ```
 !craftRecipe("wooden_pickaxe", 1)
@@ -52,11 +78,11 @@ _Updated: +44s_
 
 **Previous:**
 
-- _(attempt 1 · +32s)_ `!craftRecipe("stick", 1)`
-- _(attempt 1 · +28s)_ `!craftRecipe("crafting_table", 1)`
-- _(attempt 2 · +24s)_ `!craftRecipe("spruce_planks", 2)`
-- _(attempt 1 · +23s)_ `!craftRecipe("spruce_planks", 1)`
-- _(attempt 1 · +2s)_ `!collectBlocks("spruce_log", 3)`
+- _(attempt 1)_ `!craftRecipe("stick", 1)`
+- _(attempt 1)_ `!craftRecipe("crafting_table", 1)`
+- _(attempt 2)_ `!craftRecipe("spruce_planks", 1)`
+- _(attempt 1)_ `!craftRecipe("spruce_planks", 3)`
+- _(attempt 1)_ `!collectBlocks("spruce_log", 3)`
 
 </td>
 </tr></table>

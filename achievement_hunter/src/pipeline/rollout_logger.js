@@ -26,6 +26,11 @@ const STAGE = {
   AM_WARN: 'AM_WARN',
 };
 
+const SOURCE = {
+  LLM: 'llm',
+  SEARCH: 'search',
+};
+
 const LIVE_FILE = {
   PTD: 'current_ptd.md',
   SCSG: 'current_scsg.md',
@@ -61,8 +66,24 @@ function format_elapsed(start_ms) {
   return `${seconds}s`;
 }
 
+function format_latency(ms) {
+  if (ms == null) return 'n/a';
+  if (ms < 1000) return `${Math.round(ms)} ms`;
+  if (ms < 10000) return `${(ms / 1000).toFixed(2)} s`;
+  return `${(ms / 1000).toFixed(1)} s`;
+}
+
 function escape_markdown(value) {
   return String(value ?? '').replace(/([\\`*_{}[\]()#+\-.!|>])/g, '\\$1');
+}
+
+function escape_html(value) {
+  return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
 }
 
 function preview_text(value, max_length = 80) {
@@ -76,11 +97,10 @@ function inline_code(value) {
   return `\`${safe}\``;
 }
 
-function header(title, start_ms, note = null) {
-  const updated = `+${format_elapsed(start_ms)}`;
+function header(title, note = null) {
   const safe_title = escape_markdown(title);
-  const safe_note = note ? ` · ${escape_markdown(note)}` : '';
-  return `# ${safe_title}\n_Updated: ${updated}${safe_note}_\n\n`;
+  if (!note) return `# ${safe_title}\n\n`;
+  return `# ${safe_title}\n_${escape_markdown(note)}_\n\n`;
 }
 
 function json_block(obj) {
@@ -91,20 +111,68 @@ function code_block(text) {
   return `\`\`\`\n${String(text ?? '')}\n\`\`\``;
 }
 
+function create_metric_state() {
+  return {
+    count: 0,
+    total_ms: 0,
+  };
+}
+
+function note_metric(metric_state, latency_ms) {
+  if (latency_ms == null) return;
+  metric_state.count += 1;
+  metric_state.total_ms += latency_ms;
+}
+
+function average_metric_ms(metric_state) {
+  if (!metric_state || metric_state.count === 0) return null;
+  return metric_state.total_ms / metric_state.count;
+}
+
+function render_latency_block(
+    current_ms, metric_state, unavailable_note = null) {
+  const current_line = current_ms == null ?
+      `- **Current output:** n/a${
+          unavailable_note ? ` (${escape_markdown(unavailable_note)})` : ''}` :
+      `- **Current output:** ${format_latency(current_ms)}`;
+
+  const average_ms = average_metric_ms(metric_state);
+  const average_line = average_ms == null ?
+      '- **Average output:** n/a' :
+      `- **Average output:** ${format_latency(average_ms)} across ${
+          metric_state.count} output${metric_state.count === 1 ? '' : 's'}`;
+
+  return `**LLM latency**\n${current_line}\n${average_line}`;
+}
+
+function render_elapsed_panel(elapsed, status) {
+  const status_label = status === STATUS.COMPLETED ? 'Completed' : 'Running';
+
+  return [
+    '<div align="center" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">',
+    '<div style="font-size: 0.85em; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 0.6em;">Elapsed</div>',
+    `<div style="font-size: 3.4em; font-weight: 800; line-height: 1; margin: 0 0 0.3em 0; white-space: nowrap;">${
+        escape_html(elapsed)}</div>`,
+    `<div style="font-size: 0.95em; font-weight: 600;">${
+        escape_html(status_label)}</div>`,
+    '</div>',
+  ].join('\n');
+}
+
 // ── Renderers
 // ─────────────────────────────────────────────────────────────
 
 const stage_renderer = {
-  ptd(parsed, start_ms) {
+  ptd(parsed) {
     if (!parsed) return null;
 
     const objective = parsed.objective || 'unknown';
-    return header(`PTD — ${objective}`, start_ms) + graph_to_mermaid(parsed);
+    return header(`PTD — ${objective}`) + graph_to_mermaid(parsed);
   },
 
-  scsg(parsed, objective, start_ms) {
+  scsg(parsed, objective) {
     if (parsed?.r === 2) {
-      return header('SCSG', start_ms) +
+      return header('SCSG') +
           '**All sinks satisfied (r=2) — task complete.**\n';
     }
 
@@ -117,11 +185,11 @@ const stage_renderer = {
       edges: parsed.final.edges || [],
     };
 
-    return header(`SCSG — ${objective}`, start_ms, `r=${parsed.r}`) +
+    return header(`SCSG — ${objective}`, `r=${parsed.r}`) +
         graph_to_mermaid(graph);
   },
 
-  candidates(objective, candidates, start_ms) {
+  candidates(objective, candidates) {
     if (candidates === null) return null;
 
     const graph = {
@@ -132,41 +200,47 @@ const stage_renderer = {
     };
 
     return header(
-               `Candidates — ${objective}`, start_ms,
+               `Candidates — ${objective}`,
                `${candidates.length} source node(s)`) +
         graph_to_mermaid(graph);
   },
 
-  nts(nts_state, start_ms) {
+  nts(nts_state, metric_state) {
     if (!nts_state) return PLACEHOLDER.NTS;
 
     const body = nts_state.parsed ?
         json_block(nts_state.parsed) :
         `_NTS parse failed._\n\n${code_block(nts_state.raw)}`;
 
-    return `**Current Task**\n_Updated: +${format_elapsed(start_ms)}_\n\n${
-        body}`;
+    const metrics =
+        render_latency_block(nts_state.latency_ms ?? null, metric_state);
+
+    return `**Current Task**\n\n${metrics}\n\n${body}`;
   },
 
-  completion(objective, completion_state, start_ms) {
+  completion(objective, completion_state) {
     if (!completion_state) return null;
 
     const safe_reason = escape_markdown(completion_state.reason);
-    return header(`Completed — ${objective}`, start_ms) +
-        `**Task complete.**\n\n` +
-        `- **Reason:** ${safe_reason}\n` +
-        `- **Total elapsed:** ${completion_state.total_elapsed}\n`;
+    return header(`Completed — ${objective}`) + `**Task complete.**\n\n` +
+        `- **Reason:** ${safe_reason}\n`;
   },
 };
 
 const am_renderer = {
-  current(entry) {
+  current(entry, metric_state) {
     const body =
         entry.parsed ? json_block(entry.parsed) : code_block(entry.raw);
-    const when = entry.elapsed ? ` · +${entry.elapsed}` : '';
+    const source_note =
+        entry.source === SOURCE.SEARCH ? 'derived search command' : null;
+    const metrics = render_latency_block(
+        entry.latency_ms ?? null, metric_state, source_note);
 
-    let block =
-        `**Current Action** _(attempt ${entry.attempt}${when})_\n\n${body}`;
+    let title = `**Current Action** _(attempt ${entry.attempt}`;
+    if (entry.source === SOURCE.SEARCH) title += ' · search';
+    title += ')_';
+
+    let block = `${title}\n\n${metrics}\n\n${body}`;
 
     if (entry.warning) {
       block += `\n\n> **Warning:** ${escape_markdown(entry.warning)}`;
@@ -181,20 +255,20 @@ const am_renderer = {
                                 inline_code(JSON.stringify(entry.parsed)) :
                                 inline_code(preview_text(entry.raw));
 
-    const when = entry.elapsed ? ` · +${entry.elapsed}` : '';
+    const source = entry.source === SOURCE.SEARCH ? ' · search' : '';
     const warn =
         entry.warning ? ` _(warning: ${escape_markdown(entry.warning)})_` : '';
 
-    return `- _(attempt ${entry.attempt}${when})_ ${body}${warn}`;
+    return `- _(attempt ${entry.attempt}${source})_ ${body}${warn}`;
   },
 
-  panel(history) {
+  panel(history, metric_state) {
     if (history.length === 0) return PLACEHOLDER.AM;
 
     const current = history.at(-1);
     const previous = history.slice(0, -1).reverse();
 
-    let block = this.current(current);
+    let block = this.current(current, metric_state);
 
     if (previous.length > 0) {
       block += '\n\n**Previous:**\n\n' +
@@ -227,17 +301,42 @@ const live_writer = {
     this.cache.delete(filename);
   },
 
-  write_dashboard({sections, nts, am}) {
+  write_dashboard({ptd, elapsed_panel, scsg, candidates, nts, am}) {
     const divider = '\n\n---\n\n';
-    const non_empty_sections = sections.filter(Boolean);
+    const card_style =
+        'border: 1px solid #d0d7de; border-radius: 14px; padding: 18px 16px; box-sizing: border-box;';
+    const row_style =
+        'table-layout: fixed; border-collapse: separate; border-spacing: 0;';
 
-    const side_by_side = `<table width="100%"><tr>\n` +
-        `<td width="50%" valign="top">\n\n${nts}\n\n</td>\n` +
-        `<td width="50%" valign="top">\n\n${am}\n\n</td>\n` +
+    function wrap_card(content) {
+      if (!content) return null;
+      return `<div style="${card_style}">\n\n${content}\n\n</div>`;
+    }
+
+    const top_row = `<table width="100%" style="${row_style}"><tr>\n` +
+        `<td width="72%" valign="top" style="${card_style}">\n\n${
+                        ptd}\n\n</td>\n` +
+        `<td width="2%"></td>\n` +
+        `<td width="26%" valign="top" style="${card_style}">\n\n${
+                        elapsed_panel}\n\n</td>\n` +
         `</tr></table>`;
 
-    non_empty_sections.push(side_by_side);
-    this.write_file(LIVE_FILE.DASHBOARD, non_empty_sections.join(divider));
+    const bottom_row = `<table width="100%" style="${row_style}"><tr>\n` +
+        `<td width="49%" valign="top" style="${card_style}">\n\n${
+                           nts}\n\n</td>\n` +
+        `<td width="2%"></td>\n` +
+        `<td width="49%" valign="top" style="${card_style}">\n\n${
+                           am}\n\n</td>\n` +
+        `</tr></table>`;
+
+    const sections = [
+      top_row,
+      wrap_card(scsg),
+      wrap_card(candidates),
+      bottom_row,
+    ].filter(Boolean);
+
+    this.write_file(LIVE_FILE.DASHBOARD, sections.join(divider));
   },
 };
 
@@ -252,8 +351,8 @@ const live_writer = {
  *   log.ptd(raw_response, parsed_graph);
  *   log.scsg(raw_response, parsed_result);
  *   log.candidates(candidate_nodes);
- *   log.nts(raw_response, parsed_task);
- *   log.am(attempt, raw_response, state);
+ *   log.nts(raw_response, parsed_task, {latency_ms});
+ *   log.am(attempt, raw_response, state, {latency_ms, source: 'llm'});
  *   log.am_warn(message);
  *   log.complete(reason);
  */
@@ -282,6 +381,10 @@ export function createRolloutLogger(objective) {
     nts_result: null,
     am_history: [],
     completion: null,
+    metrics: {
+      nts: create_metric_state(),
+      am: create_metric_state(),
+    },
   };
 
   live_writer.remove_file(LIVE_FILE.LEGACY_DASHBOARD);
@@ -302,33 +405,41 @@ export function createRolloutLogger(objective) {
     flush_rollout();
   }
 
+  function current_elapsed() {
+    return rollout.status === STATUS.COMPLETED && rollout.total_elapsed ?
+        rollout.total_elapsed :
+        format_elapsed(started_ms);
+  }
+
   function render_live() {
     const ptd_content =
-        stage_renderer.ptd(live_state.ptd_graph, started_ms) || PLACEHOLDER.PTD;
+        stage_renderer.ptd(live_state.ptd_graph) || PLACEHOLDER.PTD;
+    const elapsed_panel =
+        render_elapsed_panel(current_elapsed(), rollout.status);
 
     const scsg_content = rollout.status === STATUS.COMPLETED ?
-        stage_renderer.completion(
-            objective, live_state.completion, started_ms) :
-        stage_renderer.scsg(live_state.scsg_result, objective, started_ms);
+        stage_renderer.completion(objective, live_state.completion) :
+        stage_renderer.scsg(live_state.scsg_result, objective);
 
     const candidates_content = rollout.status === STATUS.COMPLETED ?
         null :
-        stage_renderer.candidates(objective, live_state.candidates, started_ms);
+        stage_renderer.candidates(objective, live_state.candidates);
 
-    const nts_content = stage_renderer.nts(live_state.nts_result, started_ms);
-    const am_content = am_renderer.panel(live_state.am_history);
+    const nts_content =
+        stage_renderer.nts(live_state.nts_result, live_state.metrics.nts);
+
+    const am_content =
+        am_renderer.panel(live_state.am_history, live_state.metrics.am);
 
     live_writer.write_file(LIVE_FILE.PTD, ptd_content);
     live_writer.write_file(LIVE_FILE.SCSG, scsg_content || PLACEHOLDER.SCSG);
 
     live_writer.write_dashboard({
-      sections: [
-        ptd_content,
-        scsg_content || PLACEHOLDER.SCSG,
-        candidates_content ||
-            (rollout.status === STATUS.COMPLETED ? null :
-                                                   PLACEHOLDER.CANDIDATES),
-      ],
+      ptd: ptd_content,
+      elapsed_panel,
+      scsg: scsg_content || PLACEHOLDER.SCSG,
+      candidates: candidates_content ||
+          (rollout.status === STATUS.COMPLETED ? null : PLACEHOLDER.CANDIDATES),
       nts: nts_content,
       am: am_content,
     });
@@ -356,20 +467,46 @@ export function createRolloutLogger(objective) {
       render_live();
     },
 
-    nts(raw, parsed) {
-      record_stage({stage: STAGE.NTS, raw, parsed});
-      live_state.nts_result = {raw, parsed};
+    nts(raw, parsed, meta = {}) {
+      record_stage({
+        stage: STAGE.NTS,
+        raw,
+        parsed,
+        ...(Object.keys(meta).length > 0 ? {meta} : {}),
+      });
+
+      if (meta.latency_ms != null) {
+        note_metric(live_state.metrics.nts, meta.latency_ms);
+      }
+
+      live_state.nts_result = {
+        raw,
+        parsed,
+        latency_ms: meta.latency_ms ?? null,
+      };
+
       render_live();
     },
 
-    am(attempt, raw, state = null) {
-      record_stage({stage: STAGE.AM, attempt, raw, ...(state && {state})});
+    am(attempt, raw, state = null, meta = {}) {
+      record_stage({
+        stage: STAGE.AM,
+        attempt,
+        raw,
+        ...(state && {state}),
+        ...(Object.keys(meta).length > 0 ? {meta} : {}),
+      });
+
+      if (meta.source === SOURCE.LLM && meta.latency_ms != null) {
+        note_metric(live_state.metrics.am, meta.latency_ms);
+      }
 
       live_state.am_history.push({
         attempt,
         raw,
         parsed: extract_json(raw),
-        elapsed: format_elapsed(started_ms),
+        source: meta.source ?? SOURCE.LLM,
+        latency_ms: meta.latency_ms ?? null,
       });
 
       render_live();
@@ -393,7 +530,6 @@ export function createRolloutLogger(objective) {
 
       live_state.completion = {
         reason,
-        total_elapsed,
       };
 
       flush_rollout();
