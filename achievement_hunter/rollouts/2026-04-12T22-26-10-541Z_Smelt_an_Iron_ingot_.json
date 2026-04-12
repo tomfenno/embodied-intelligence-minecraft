@@ -1,0 +1,21 @@
+{
+  "objective": "Smelt an Iron ingot.",
+  "status": "completed",
+  "started_at": "2026-04-12T22:26:10.541Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-12T22:26:10.544Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {}
+      }
+    }
+  ],
+  "completed_at": "2026-04-12T22:26:10.547Z",
+  "total_elapsed": "0s",
+  "completion_reason": "subgraph empty"
+}

@@ -29,6 +29,7 @@ const STAGE = {
 const SOURCE = {
   LLM: 'llm',
   SEARCH: 'search',
+  CHECKPOINT: 'checkpoint',
 };
 
 const LIVE_FILE = {
@@ -69,8 +70,18 @@ function format_elapsed(start_ms) {
 function format_latency(ms) {
   if (ms == null) return 'n/a';
   if (ms < 1000) return `${Math.round(ms)} ms`;
-  if (ms < 10000) return `${(ms / 1000).toFixed(2)} s`;
-  return `${(ms / 1000).toFixed(1)} s`;
+
+  const total_seconds = ms / 1000;
+  if (total_seconds < 10) return `${total_seconds.toFixed(2)} s`;
+  if (total_seconds < 60) return `${total_seconds.toFixed(1)} s`;
+
+  const hours = Math.floor(total_seconds / 3600);
+  const minutes = Math.floor((total_seconds % 3600) / 60);
+  const seconds = total_seconds % 60;
+
+  if (hours > 0) return `${hours}h ${minutes}m ${pad2(Math.floor(seconds))}s`;
+  if (seconds < 10) return `${minutes}m ${seconds.toFixed(1)}s`;
+  return `${minutes}m ${Math.round(seconds)}s`;
 }
 
 function escape_markdown(value) {
@@ -145,6 +156,12 @@ function render_latency_block(
   return `**LLM latency**\n${current_line}\n${average_line}`;
 }
 
+function render_single_latency_block(label, latency_ms) {
+  if (latency_ms == null) return null;
+  return `**LLM latency**\n- **${escape_markdown(label)}:** ${
+      format_latency(latency_ms)}`;
+}
+
 function render_elapsed_panel(elapsed, status) {
   const status_label = status === STATUS.COMPLETED ? 'Completed' : 'Running';
 
@@ -163,11 +180,43 @@ function render_elapsed_panel(elapsed, status) {
 // ─────────────────────────────────────────────────────────────
 
 const stage_renderer = {
-  ptd(parsed) {
-    if (!parsed) return null;
+  ptd(ptd_state) {
+    if (!ptd_state || ptd_state.status === 'idle') return PLACEHOLDER.PTD;
 
-    const objective = parsed.objective || 'unknown';
-    return header(`PTD — ${objective}`) + graph_to_mermaid(parsed);
+    const objective = ptd_state.objective || 'unknown';
+
+    if (ptd_state.status === 'streaming') {
+      const body = ptd_state.raw ? code_block(ptd_state.raw) :
+                                   '_Awaiting first output chunk..._';
+
+      return header(`PTD — ${objective}`, 'streaming') +
+          '**Building prerequisite graph...**\n\n' + body;
+    }
+
+    if (ptd_state.status === 'failed') {
+      const latency =
+          render_single_latency_block('PTD generation', ptd_state.latency_ms);
+
+      const error_line = ptd_state.error ?
+          `**Status:** ${escape_markdown(ptd_state.error)}\n\n` :
+          '';
+
+      const body = ptd_state.raw ? code_block(ptd_state.raw) :
+                                   '_No model output captured._';
+
+      return header(`PTD — ${objective}`, 'failed') +
+          (latency ? `${latency}\n\n` : '') + error_line + body;
+    }
+
+    const latency =
+        render_single_latency_block('PTD generation', ptd_state.latency_ms);
+
+    const source_line = ptd_state.source === SOURCE.CHECKPOINT ?
+        '**Source:** loaded from checkpoint\n\n' :
+        '';
+
+    return header(`PTD — ${objective}`) + (latency ? `${latency}\n\n` : '') +
+        source_line + graph_to_mermaid(ptd_state.parsed);
   },
 
   scsg(parsed, objective) {
@@ -212,8 +261,9 @@ const stage_renderer = {
         json_block(nts_state.parsed) :
         `_NTS parse failed._\n\n${code_block(nts_state.raw)}`;
 
-    const metrics =
-        render_latency_block(nts_state.latency_ms ?? null, metric_state);
+    const metrics = render_latency_block(
+        nts_state.latency_ms ?? null, metric_state,
+        nts_state.current_note ?? null);
 
     return `**Current Task**\n\n${metrics}\n\n${body}`;
   },
@@ -223,7 +273,8 @@ const stage_renderer = {
 
     const safe_reason = escape_markdown(completion_state.reason);
     return header(`Completed — ${objective}`) + `**Task complete.**\n\n` +
-        `- **Reason:** ${safe_reason}\n`;
+        `- **Reason:** ${safe_reason}\n` +
+        `- **Total elapsed:** ${completion_state.total_elapsed}\n`;
   },
 };
 
@@ -231,8 +282,10 @@ const am_renderer = {
   current(entry, metric_state) {
     const body =
         entry.parsed ? json_block(entry.parsed) : code_block(entry.raw);
-    const source_note =
-        entry.source === SOURCE.SEARCH ? 'derived search command' : null;
+    const source_note = entry.source === SOURCE.SEARCH ?
+        'derived search command' :
+        entry.current_note ?? null;
+
     const metrics = render_latency_block(
         entry.latency_ms ?? null, metric_state, source_note);
 
@@ -345,16 +398,6 @@ const live_writer = {
 
 /**
  * Creates a new rollout log file for a single structured loop run.
- *
- * Usage:
- *   const log = createRolloutLogger('craft a diamond sword');
- *   log.ptd(raw_response, parsed_graph);
- *   log.scsg(raw_response, parsed_result);
- *   log.candidates(candidate_nodes);
- *   log.nts(raw_response, parsed_task, {latency_ms});
- *   log.am(attempt, raw_response, state, {latency_ms, source: 'llm'});
- *   log.am_warn(message);
- *   log.complete(reason);
  */
 export function createRolloutLogger(objective) {
   mkdirSync(ROLLOUTS_DIR, {recursive: true});
@@ -375,7 +418,15 @@ export function createRolloutLogger(objective) {
   };
 
   const live_state = {
-    ptd_graph: null,
+    ptd: {
+      status: 'idle',
+      objective,
+      raw: '',
+      parsed: null,
+      latency_ms: null,
+      error: null,
+      source: null,
+    },
     scsg_result: null,
     candidates: null,
     nts_result: null,
@@ -412,8 +463,7 @@ export function createRolloutLogger(objective) {
   }
 
   function render_live() {
-    const ptd_content =
-        stage_renderer.ptd(live_state.ptd_graph) || PLACEHOLDER.PTD;
+    const ptd_content = stage_renderer.ptd(live_state.ptd);
     const elapsed_panel =
         render_elapsed_panel(current_elapsed(), rollout.status);
 
@@ -449,9 +499,54 @@ export function createRolloutLogger(objective) {
   // ───────────────────────────────────────────────────────────
 
   return {
-    ptd(raw, parsed) {
-      record_stage({stage: STAGE.PTD, raw, parsed});
-      live_state.ptd_graph = parsed || null;
+    ptd_start() {
+      live_state.ptd = {
+        status: 'streaming',
+        objective,
+        raw: '',
+        parsed: null,
+        latency_ms: null,
+        error: null,
+        source: SOURCE.LLM,
+      };
+      render_live();
+    },
+
+    ptd_stream(raw) {
+      if (live_state.ptd.status !== 'streaming') {
+        live_state.ptd = {
+          status: 'streaming',
+          objective,
+          raw: '',
+          parsed: null,
+          latency_ms: null,
+          error: null,
+          source: SOURCE.LLM,
+        };
+      }
+
+      live_state.ptd.raw = raw ?? '';
+      render_live();
+    },
+
+    ptd(raw, parsed, meta = {}) {
+      record_stage({
+        stage: STAGE.PTD,
+        raw,
+        parsed,
+        ...(Object.keys(meta).length > 0 ? {meta} : {}),
+      });
+
+      live_state.ptd = {
+        status: parsed ? 'complete' : 'failed',
+        objective: parsed?.objective || objective,
+        raw: raw ?? live_state.ptd.raw ?? '',
+        parsed: parsed ?? null,
+        latency_ms: meta.latency_ms ?? null,
+        error: meta.error ?? null,
+        source: meta.source ?? SOURCE.LLM,
+      };
+
       render_live();
     },
 
@@ -475,7 +570,7 @@ export function createRolloutLogger(objective) {
         ...(Object.keys(meta).length > 0 ? {meta} : {}),
       });
 
-      if (meta.latency_ms != null) {
+      if (meta.latency_ms != null && meta.count_latency !== false) {
         note_metric(live_state.metrics.nts, meta.latency_ms);
       }
 
@@ -483,6 +578,7 @@ export function createRolloutLogger(objective) {
         raw,
         parsed,
         latency_ms: meta.latency_ms ?? null,
+        current_note: meta.current_note ?? null,
       };
 
       render_live();
@@ -497,7 +593,8 @@ export function createRolloutLogger(objective) {
         ...(Object.keys(meta).length > 0 ? {meta} : {}),
       });
 
-      if (meta.source === SOURCE.LLM && meta.latency_ms != null) {
+      if (meta.source === SOURCE.LLM && meta.latency_ms != null &&
+          meta.count_latency !== false) {
         note_metric(live_state.metrics.am, meta.latency_ms);
       }
 
@@ -507,6 +604,7 @@ export function createRolloutLogger(objective) {
         parsed: extract_json(raw),
         source: meta.source ?? SOURCE.LLM,
         latency_ms: meta.latency_ms ?? null,
+        current_note: meta.current_note ?? null,
       });
 
       render_live();
@@ -530,6 +628,7 @@ export function createRolloutLogger(objective) {
 
       live_state.completion = {
         reason,
+        total_elapsed,
       };
 
       flush_rollout();

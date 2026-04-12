@@ -50,24 +50,24 @@ const LOG_SOURCE = {
  *
  * Flow:
  *   1. PTD  — build a full prerequisite dependency graph for T (skipped on
- * resume)
+ *             resume)
  *   2. SCSG — prune the graph to what is still needed given current inventory
  *   3. NTS  — pick the next immediate task from the pruned graph
  *   4. AM   — convert that task into a bot command and execute it
- *              (!search(target) responses are intercepted and run as hardcoded
- *              searches; all other commands go to executeCommand)
- *           Repeat from (2) until the SCSG signals all sinks are satisfied
- * (r=2).
+ *             (!search(target) responses are intercepted and run as hardcoded
+ *             searches; all other commands go to executeCommand)
+ *          Repeat from (2) until the SCSG signals all sinks are satisfied
+ *          (r=2).
  *
- * @param {{ptd: object, nts: object, am: object}} models
- *   Per-stage model instances, each with sendRequest(turns, systemMessage).
- * @param {object} agent  The Mindcraft agent instance.
- * @param {string} T      The primary task objective (e.g. "craft a diamond
- *     sword").
- * @param {object} [G]    Pre-built PTD graph. When provided (crash resume),
- *     Phase 1
- *                        is skipped and the loop resumes from Phase 2 (SCSG)
- * directly.
+ * @param {{
+ *   ptd: {send_prompt: function(string): Promise<string|null>, stream_prompt?:
+ * function(string, object): Promise<object>}, nts: {send_prompt:
+ * function(string): Promise<string|null>}, am: {send_prompt: function(string):
+ * Promise<string|null>}
+ * }} models
+ * @param {object} agent
+ * @param {string} T
+ * @param {object} [G]
  */
 export async function structuredLoop(models, agent, T, G = null) {
   const log = createRolloutLogger(T);
@@ -75,7 +75,9 @@ export async function structuredLoop(models, agent, T, G = null) {
   // ── Phase 1: PTD ─────────────────────────────────────────────────────────
   // G = await run_ptd(models.ptd, T, G, log);
   G = await loadGraphFromFile(
-      './achievement_hunter/docs/ptd_jsons/wooden_pickaxe.json');
+      './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json');
+  if (!G) return;
+
   saveCheckpoint(T, G);
 
   // ── Phase 2+: Outer Loop ──────────────────────────────────────────────────
@@ -122,21 +124,38 @@ export async function structuredLoop(models, agent, T, G = null) {
 async function run_ptd(model, T, existing_G, log) {
   if (existing_G) {
     spl.log('Resuming from checkpoint, skipping PTD for:', T);
-    log.ptd('[loaded from checkpoint]', existing_G);
+    log.ptd('[loaded from checkpoint]', existing_G, {source: 'checkpoint'});
     return existing_G;
   }
 
   spl.log('Building PTD for:', T);
-  const {response} = await timed_send_request(model, fill_ptd_prompt(T));
+  log.ptd_start();
+
+  const progress = create_ptd_stream_progress_handler(log);
+  const {response, latency_ms, error} =
+      await streamed_send_request(model, fill_ptd_prompt(T), progress.push);
+
+  if (response !== null) {
+    progress.flush(response);
+  }
 
   if (response === null) {
     spl.error('PTD model call failed.');
+    log.ptd('', null, {
+      latency_ms,
+      error: error?.message ?? 'PTD model call failed',
+      source: LOG_SOURCE.LLM,
+    });
     log.complete('PTD model call failed');
     return null;
   }
 
   const G = extract_json(response);
-  log.ptd(response, G);
+  log.ptd(response, G, {
+    latency_ms,
+    error: G ? null : 'PTD extraction failed',
+    source: LOG_SOURCE.LLM,
+  });
 
   if (!G) {
     spl.error('Failed to extract PTD graph from LLM response.');
@@ -161,15 +180,12 @@ async function run_ptd(model, T, existing_G, log) {
  * it with metadata for NTS. No LLM call is made.
  *
  * @returns {{ status: 'complete', reason: string }}
- *            Task is finished — all sinks satisfied or subgraph is empty.
  * @returns {{ status: 'continue', candidates: object[] }}
- *            Normal case — enriched source candidates are ready for NTS.
  */
 function run_scsg(G, agent, log) {
   const {inventory} = get_sgsg_state(agent);
   const result = compute_scsg(G, inventory);
-  // Augment r=1 result with sinks so the logger can render them correctly
-  // (r=1 has no `s` field; r=0 does).
+
   log.scsg(
       '[deterministic]', result.r === 1 ? {...result, s: G.sinks} : result);
 
@@ -178,8 +194,6 @@ function run_scsg(G, agent, log) {
     return {status: 'complete', reason: 'all sinks satisfied'};
   }
 
-  // r=1: inventory is "Nothing" → use full original graph
-  // r=0: normal pruned subgraph
   const subgraph = {
     objective: G.objective,
     sinks: result.r === 1 ? G.sinks : result.s,
@@ -211,7 +225,7 @@ async function run_nts(model, candidates, agent, log) {
 
   if (response === null) {
     spl.error('NTS model call failed.');
-    log.nts('[model error]', null, {latency_ms});
+    log.nts('[model error]', null, {latency_ms, count_latency: false});
     return null;
   }
 
@@ -254,7 +268,7 @@ async function run_am(model, task, agent, log) {
       spl.warn('AM model call failed, retrying...');
       log.am(
           attempt + 1, '[model error]', state,
-          {latency_ms, source: LOG_SOURCE.LLM});
+          {latency_ms, source: LOG_SOURCE.LLM, count_latency: false});
       continue;
     }
 
@@ -301,17 +315,51 @@ async function timed_send_request(model, prompt) {
   };
 }
 
+async function streamed_send_request(model, prompt, on_text_delta = null) {
+  if (typeof model.stream_prompt === 'function') {
+    return await model.stream_prompt(prompt, {on_text_delta});
+  }
+
+  const {response, latency_ms} = await timed_send_request(model, prompt);
+  if (response !== null && on_text_delta) {
+    await on_text_delta(response, response);
+  }
+
+  return {
+    response,
+    latency_ms,
+    error: response === null ? new Error('model call failed') : null,
+  };
+}
+
+function create_ptd_stream_progress_handler(log) {
+  let last_render_ms = 0;
+  let last_render_length = 0;
+
+  return {
+    async push(_delta, full_text) {
+      const now = Date.now();
+      const should_render = now - last_render_ms >= 200 ||
+          full_text.length - last_render_length >= 160;
+
+      if (!should_render) return;
+
+      log.ptd_stream(full_text);
+      last_render_ms = now;
+      last_render_length = full_text.length;
+    },
+
+    flush(full_text) {
+      log.ptd_stream(full_text);
+      last_render_ms = Date.now();
+      last_render_length = full_text.length;
+    },
+  };
+}
+
 // ── Task Completion
 // ───────────────────────────────────────────────────────────
 
-/**
- * Returns true if the task is already satisfied by the current inventory,
- * without making an LLM call.
- *
- * Mirrors the AM prompt's completion rule:
- *   - concrete target_item: inventory[target_item] >= qty
- *   - abstract any_* target: sum of all concrete class members >= qty
- */
 function _task_complete(task, state) {
   const {target_item, qty} = task;
   if (!target_item || qty == null) return false;
@@ -353,28 +401,14 @@ function _handle_task_complete_signal(task, agent, log) {
 // ── Search Helpers
 // ────────────────────────────────────────────────────────────
 
-/**
- * Parses a !search("target") command string and returns the target string,
- * or null if the action is not a search command.
- */
 function _parse_search_command(action) {
   const match = action.trim().match(/^!search\("([^"]+)"\)$/);
   return match ? match[1] : null;
 }
 
-/**
- * Runs a hardcoded search for the given target across expanding radii.
- * Expands abstract targets (e.g. any_log → all overworld log variants).
- * Returns true as soon as any concrete target is found; false if all radii
- * are exhausted without success.
- *
- * Uses the state snapshot passed in for the fast-path check only — commands
- * are executed live against the agent.
- */
 async function _run_search(target, state, agent, log, start_attempt) {
   const concrete_items = expand_search_item(target);
 
-  // Fast-path: already visible in the current state snapshot
   for (const item of concrete_items) {
     if (check_search_complete(item, state)) {
       spl.log(`Search fast-path: "${item}" already in state.`);
@@ -396,9 +430,6 @@ async function _run_search(target, state, agent, log, start_attempt) {
   return false;
 }
 
-/**
- * Executes a single search command and returns true if the target was found.
- */
 async function _execute_search_command(agent, item, radius, command) {
   spl.log(`Search (${item} r=${radius}):`, command);
   const result = await executeCommand(agent, command);
@@ -414,13 +445,6 @@ async function _execute_search_command(agent, item, radius, command) {
   return found;
 }
 
-/**
- * Expands a single search target into concrete world targets.
- *
- * any_log expands to all overworld log blocks (crimson/warped stems excluded —
- * they are Nether wood types). Unknown any_* abstracts throw rather than
- * silently pass through.
- */
 function expand_search_item(item) {
   if (item === 'any_log') return ANY_LOG_SEARCH_TARGETS;
   if (item.startsWith('any_')) {
@@ -430,10 +454,7 @@ function expand_search_item(item) {
   return [item];
 }
 
-// Mob names that can appear as concrete search targets from PTD graphs.
-// Everything not in this set is treated as a block target.
 const MOB_SEARCH_TARGETS = new Set([
-  // Overworld hostile
   'skeleton',
   'stray',
   'wither_skeleton',
@@ -460,7 +481,6 @@ const MOB_SEARCH_TARGETS = new Set([
   'evoker',
   'pillager',
   'ravager',
-  // Overworld passive / neutral
   'cow',
   'mooshroom',
   'sheep',
@@ -487,21 +507,10 @@ const MOB_SEARCH_TARGETS = new Set([
   'armadillo',
 ]);
 
-/**
- * Returns true if the concrete search target should use !searchForEntity.
- * Returns false if it should use !searchForBlock.
- */
 export function is_entity_target(target) {
   return MOB_SEARCH_TARGETS.has(target);
 }
 
-/**
- * Returns true if the concrete target is already evidenced in the current
- * state snapshot — equivalent to the AM's TASK_COMPLETE check for search.
- *
- * Block targets: present in state.nearby_blocks.
- * Entity targets: present with count > 0 in state.nearby_entities.mobs.
- */
 export function check_search_complete(target, state) {
   if (is_entity_target(target)) {
     return state.nearby_entities?.mobs?.includes(target) ?? false;
@@ -509,10 +518,6 @@ export function check_search_complete(target, state) {
   return state.nearby_blocks?.includes(target) ?? false;
 }
 
-/**
- * Builds the bot command string for a concrete search target at a given
- * radius. No LLM involved — command family is determined by is_entity_target.
- */
 export function make_search_command(target, radius) {
   if (is_entity_target(target)) {
     return `!searchForEntity("${target}", ${radius})`;
@@ -520,9 +525,6 @@ export function make_search_command(target, radius) {
   return `!searchForBlock("${target}", ${radius})`;
 }
 
-/**
- * Loads a PTD graph from a JSON file. Throws with a clear message on failure.
- */
 async function loadGraphFromFile(file_path) {
   try {
     const text = await readFile(file_path, 'utf8');

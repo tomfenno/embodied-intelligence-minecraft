@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 
 import { Agent } from '../../../src/agent/agent.js';
 import { loadCheckpoint } from '../pipeline/checkpoint.js';
+import { init_ah_modes } from './ah_modes.js';
 import { SplGpt } from '../pipeline/spl_gpt.js';
 import { structuredLoop } from '../pipeline/structured_loop.js';
 
@@ -28,6 +29,9 @@ export class AchievementAgent extends Agent {
         this.openChat = async () => {};
         await super._setupEventHandlers(save_data, null);
         this.openChat = orig_open_chat;
+
+        // Replace base modes with our patched version (ah_modes.js).
+        init_ah_modes(this);
 
         this._silence_chat_listeners();
 

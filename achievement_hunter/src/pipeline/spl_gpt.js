@@ -5,12 +5,8 @@ import {getKey, hasKey} from '../../../src/utils/keys.js';
 /**
  * Thin OpenAI client for the Structured Prompting Loop.
  *
- * Unlike the base GPT class (src/models/gpt.js), this is a single-turn,
- * prompt-in / text-out interface. There are no conversation turns, stop
- * sequences, vision requests, or embeddings.
- *
- * Each call sends the fully rendered prompt as the Responses API `input`
- * and returns the aggregated text output from `response.output_text`.
+ * This is a single-turn, prompt-in / text-out interface with optional
+ * streaming support for long-running generations like PTD.
  */
 export class SplGpt {
   constructor(model_name) {
@@ -25,8 +21,8 @@ export class SplGpt {
   }
 
   /**
-   * Sends a single prompt to the model and returns the response text.
-   * Returns null on error so callers can handle failure gracefully.
+   * Sends a single prompt to the model and returns the aggregated response
+   * text. Returns null on error so callers can handle failure gracefully.
    *
    * @param {string} prompt
    * @returns {Promise<string|null>}
@@ -47,6 +43,64 @@ export class SplGpt {
     } catch (err) {
       console.error('[SPL] Model error:', err);
       return null;
+    }
+  }
+
+  /**
+   * Streams a single prompt to the model and reports incremental text deltas.
+   * Returns the aggregated final text, latency, and any error encountered.
+   *
+   * @param {string} prompt
+   * @param {{on_text_delta?: function(string, string, object):
+   *     (void|Promise<void>)}} [handlers]
+   * @returns {Promise<{response: string|null, latency_ms: number, error:
+   *     Error|null}>}
+   */
+  async stream_prompt(prompt, handlers = {}) {
+    const model = this.model_name || 'gpt-4o-mini';
+    const started_ms = Date.now();
+
+    let full_text = '';
+
+    try {
+      console.log('[SPL] Awaiting streamed response from', model);
+
+      const stream = await this.openai.responses.create({
+        model,
+        input: prompt,
+        stream: true,
+      });
+
+      for await (const event of stream) {
+        if (event.type === 'response.output_text.delta') {
+          const delta = event.delta ?? '';
+          if (!delta) continue;
+
+          full_text += delta;
+
+          if (handlers.on_text_delta) {
+            await handlers.on_text_delta(delta, full_text, event);
+          }
+        } else if (
+            event.type === 'response.completed' && !full_text &&
+            event.response?.output_text) {
+          full_text = event.response.output_text;
+        }
+      }
+
+      console.log('[SPL] Stream complete.');
+      return {
+        response: full_text || null,
+        latency_ms: Date.now() - started_ms,
+        error: null,
+      };
+    } catch (err) {
+      console.error('[SPL] Stream error:', err);
+      return {
+        response: full_text || null,
+        latency_ms: Date.now() - started_ms,
+        error: err,
+      };
     }
   }
 }

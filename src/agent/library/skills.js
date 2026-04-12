@@ -446,8 +446,10 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
     movements.dontMineUnderFallingBlock = false;
     movements.dontCreateFlow = true;
 
-    // Blocks to ignore safety for, usually next to lava/water
-    const unsafeBlocks = ['obsidian'];
+    // Blocks to ignore safety for, usually next to lava/water.
+    // Workstations are included because the bot places them deliberately and
+    // must always recover them, even if they end up adjacent to water/lava.
+    const unsafeBlocks = ['obsidian', 'crafting_table', 'furnace'];
 
     for (let i=0; i<num; i++) {
         let blocks = world.getNearestBlocksWhere(bot, block => {

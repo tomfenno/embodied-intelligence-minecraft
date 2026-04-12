@@ -9,7 +9,7 @@ _PTD not yet generated._
 
 <div align="center" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
 <div style="font-size: 0.85em; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; margin-bottom: 0.6em;">Elapsed</div>
-<div style="font-size: 3.4em; font-weight: 800; line-height: 1; margin: 0 0 0.3em 0; white-space: nowrap;">38s</div>
+<div style="font-size: 3.4em; font-weight: 800; line-height: 1; margin: 0 0 0.3em 0; white-space: nowrap;">2m 12s</div>
 <div style="font-size: 0.95em; font-weight: 600;">Completed</div>
 </div>
 
@@ -20,11 +20,12 @@ _PTD not yet generated._
 
 <div style="border: 1px solid #d0d7de; border-radius: 14px; padding: 18px 16px; box-sizing: border-box;">
 
-# Completed — super testt
+# Completed — d
 
 **Task complete.**
 
 - **Reason:** all sinks satisfied
+- **Total elapsed:** 2m 12s
 
 
 </div>
@@ -37,27 +38,28 @@ _PTD not yet generated._
 **Current Task**
 
 **LLM latency**
-- **Current output:** 2.04 s
-- **Average output:** 2.42 s across 5 outputs
+- **Current output:** 1.21 s
+- **Average output:** 1.00 s across 11 outputs
 
 ```json
 {
-  "goal_item": "wooden_pickaxe",
-  "target_item": "wooden_pickaxe",
+  "target_item": "iron_ingot",
   "qty": 1,
-  "action_type": "craft",
+  "action_type": "smelt",
   "parameters": {
-    "crafting_inputs": [
+    "smelting_inputs": [
       {
-        "item": "any_plank",
-        "qty": 3
-      },
-      {
-        "item": "stick",
-        "qty": 2
+        "item": "raw_iron",
+        "qty": 1
       }
     ],
-    "workstation": "crafting_table"
+    "fuel_inputs": [
+      {
+        "item": "any_plank",
+        "qty": 1
+      }
+    ],
+    "workstation": "furnace"
   }
 }
 ```
@@ -69,20 +71,58 @@ _PTD not yet generated._
 **Current Action** _(attempt 1)_
 
 **LLM latency**
-- **Current output:** 473 ms
-- **Average output:** 697 ms across 6 outputs
+- **Current output:** 567 ms
+- **Average output:** 1.03 s across 18 outputs
 
 ```
-!craftRecipe("wooden_pickaxe", 1)
+!smeltItem("raw_iron", 1)
 ```
 
 **Previous:**
 
-- _(attempt 1)_ `!craftRecipe("stick", 1)`
+- _(attempt 3)_ `!collectBlocks("iron_ore", 1)`
+- _(attempt 3 · search)_ `!searchForBlock("iron_ore", 32)`
+- _(attempt 2)_ `!search("iron_ore")`
+- _(attempt 1)_ `'!search("iron_ore")'`
+- _(attempt 10 · search)_ `!searchForBlock("raw_iron", 512)`
+- _(attempt 9 · search)_ `!searchForBlock("raw_iron", 256)`
+- _(attempt 8 · search)_ `!searchForBlock("raw_iron", 128)`
+- _(attempt 7 · search)_ `!searchForBlock("raw_iron", 64)`
+- _(attempt 6 · search)_ `!searchForBlock("raw_iron", 32)`
+- _(attempt 5)_ `!search("raw_iron")`
+- _(attempt 9 · search)_ `!searchForBlock("raw_iron", 512)`
+- _(attempt 8 · search)_ `!searchForBlock("raw_iron", 256)`
+- _(attempt 7 · search)_ `!searchForBlock("raw_iron", 128)`
+- _(attempt 6 · search)_ `!searchForBlock("raw_iron", 64)`
+- _(attempt 5 · search)_ `!searchForBlock("raw_iron", 32)`
+- _(attempt 4)_ `!search("raw_iron")`
+- _(attempt 8 · search)_ `!searchForBlock("raw_iron", 512)`
+- _(attempt 7 · search)_ `!searchForBlock("raw_iron", 256)`
+- _(attempt 6 · search)_ `!searchForBlock("raw_iron", 128)`
+- _(attempt 5 · search)_ `!searchForBlock("raw_iron", 64)`
+- _(attempt 4 · search)_ `!searchForBlock("raw_iron", 32)`
+- _(attempt 3)_ `!search("raw_iron")`
+- _(attempt 7 · search)_ `!searchForBlock("raw_iron", 512)`
+- _(attempt 6 · search)_ `!searchForBlock("raw_iron", 256)`
+- _(attempt 5 · search)_ `!searchForBlock("raw_iron", 128)`
+- _(attempt 4 · search)_ `!searchForBlock("raw_iron", 64)`
+- _(attempt 3 · search)_ `!searchForBlock("raw_iron", 32)`
+- _(attempt 2)_ `!search("raw_iron")`
+- _(attempt 6 · search)_ `!searchForBlock("raw_iron", 512)`
+- _(attempt 5 · search)_ `!searchForBlock("raw_iron", 256)`
+- _(attempt 4 · search)_ `!searchForBlock("raw_iron", 128)`
+- _(attempt 3 · search)_ `!searchForBlock("raw_iron", 64)`
+- _(attempt 2 · search)_ `!searchForBlock("raw_iron", 32)`
+- _(attempt 1)_ `!search("raw_iron")`
+- _(attempt 1)_ `!craftRecipe("stone_pickaxe", 1)`
+- _(attempt 1)_ `!craftRecipe("furnace", 1)`
+- _(attempt 1)_ `!collectBlocks("stone", 11)`
+- _(attempt 1)_ `!craftRecipe("wooden_pickaxe", 1)`
 - _(attempt 1)_ `!craftRecipe("crafting_table", 1)`
-- _(attempt 2)_ `!craftRecipe("spruce_planks", 2)`
-- _(attempt 1)_ `!craftRecipe("spruce_planks", 3)`
-- _(attempt 1)_ `!collectBlocks("spruce_log", 3)`
+- _(attempt 1)_ `!craftRecipe("stick", 1)`
+- _(attempt 2)_ `!craftRecipe("oak_planks", 1)`
+- _(attempt 1)_ `!craftRecipe("oak_planks", 3)`
+- _(attempt 1)_ `!collectBlocks("oak_log", 3)`
 
 </td>
 </tr></table>
