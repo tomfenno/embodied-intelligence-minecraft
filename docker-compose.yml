@@ -3,6 +3,7 @@ services:
     build: .
     stdin_open: true
     tty: true
+    command: sh -c "rm -f /app/achievement_hunter/rollouts/checkpoint.json && npm start"
     environment:
       SETTINGS_JSON: |
         {"auto_open_ui": false}

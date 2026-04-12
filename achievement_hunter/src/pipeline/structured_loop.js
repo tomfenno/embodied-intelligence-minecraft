@@ -1,15 +1,12 @@
-import { extract_json } from './json_utils.js';
-import { get_state, get_inventory_state } from './state.js';
-import { enrich_subgraph, trim_graph_for_scsg } from './graph_utils.js';
-import {
-  fill_ptd_prompt,
-  fill_scsg_prompt,
-  fill_next_task_selector_prompt,
-  fill_action_mediator_prompt,
-} from './prompt_utils.js';
-import { createRolloutLogger } from './rollout_logger.js';
-import { saveCheckpoint, clearCheckpoint } from './checkpoint.js';
-import { executeCommand } from '../../../src/agent/commands/index.js';
+import {executeCommand} from '../../../src/agent/commands/index.js';
+
+import {clearCheckpoint, saveCheckpoint} from './checkpoint.js';
+import {enrich_subgraph} from './graph_utils.js';
+import {extract_json} from './json_utils.js';
+import {fill_action_mediator_prompt, fill_next_task_selector_prompt, fill_ptd_prompt,} from './prompt_utils.js';
+import {createRolloutLogger} from './rollout_logger.js';
+import {compute_scsg} from './scsg.js';
+import {get_inventory_state, get_state} from './state.js';
 
 const MAX_INNER_RETRIES = 5;
 const MAX_OUTER_RETRIES = 10;
@@ -18,10 +15,10 @@ const MAX_OUTER_RETRIES = 10;
 const SEARCH_RADII = [32, 64, 128, 256, 512];
 
 // Overworld log blocks for Java Edition 1.21.6.
-// Crimson/warped stems are excluded — they are Nether wood types, not overworld logs.
-// pale_oak was added in 1.21.2 and is included here.
-// src/utils/mcdata.js WOOD_TYPES is not reused because it predates pale_oak and
-// carries the full mineflayer import chain.
+// Crimson/warped stems are excluded — they are Nether wood types, not overworld
+// logs. pale_oak was added in 1.21.2 and is included here. src/utils/mcdata.js
+// WOOD_TYPES is not reused because it predates pale_oak and carries the full
+// mineflayer import chain.
 const ANY_LOG_SEARCH_TARGETS = [
   'oak_log',
   'spruce_log',
@@ -38,18 +35,24 @@ const ANY_LOG_SEARCH_TARGETS = [
  * Runs the Structured Prompting Loop for a primary task T.
  *
  * Flow:
- *   1. PTD  — build a full prerequisite dependency graph for T (skipped on resume)
+ *   1. PTD  — build a full prerequisite dependency graph for T (skipped on
+ * resume)
  *   2. SCSG — prune the graph to what is still needed given current inventory
  *   3. NTS  — pick the next immediate task from the pruned graph
  *   4. AM   — convert that task into a bot command and execute it
- *              (search tasks are expanded before reaching AM — see run_expanded_search_tasks)
- *   Repeat from (2) until the SCSG signals all sinks are satisfied (r=2).
+ *              (search tasks are expanded before reaching AM — see
+ * run_expanded_search_tasks) Repeat from (2) until the SCSG signals all sinks
+ * are satisfied (r=2).
  *
- * @param {object} model   - Model instance with sendRequest(turns, systemMessage).
+ * @param {object} model   - Model instance with sendRequest(turns,
+ *     systemMessage).
  * @param {object} agent   - The Mindcraft agent instance.
- * @param {string} T       - The primary task objective (e.g. "craft a diamond sword").
- * @param {object} [G]     - Pre-built PTD graph. When provided (crash resume), Phase 1
- *                           is skipped and the loop resumes from Phase 2 (SCSG) directly.
+ * @param {string} T       - The primary task objective (e.g. "craft a diamond
+ *     sword").
+ * @param {object} [G]     - Pre-built PTD graph. When provided (crash resume),
+ *     Phase 1
+ *                           is skipped and the loop resumes from Phase 2 (SCSG)
+ * directly.
  */
 export async function structuredLoop(model, agent, T, G = null) {
   const log = createRolloutLogger(T);
@@ -62,21 +65,12 @@ export async function structuredLoop(model, agent, T, G = null) {
   // ── Phase 2+: Outer Loop ──────────────────────────────────────────────────
   let consecutive_failures = 0;
   while (true) {
-
-    // SCSG
-    const scsg = await run_scsg(model, G, agent, log);
+    // SCSG (deterministic — never retries)
+    const scsg = run_scsg(G, agent, log);
     if (scsg.status === 'complete') {
       clearCheckpoint();
       log.complete(scsg.reason);
       return;
-    }
-    if (scsg.status === 'retry') {
-      if (++consecutive_failures >= MAX_OUTER_RETRIES) {
-        console.error('[SPL] Max outer retries exceeded. Aborting.');
-        log.complete('max outer retries exceeded');
-        return;
-      }
-      continue;
     }
 
     // NTS
@@ -91,20 +85,23 @@ export async function structuredLoop(model, agent, T, G = null) {
     }
     consecutive_failures = 0;
 
-    // AM — search tasks are expanded into concrete mediator calls before reaching AM.
-    // Non-search tasks go directly to AM via run_am.
-    const am_status = task.action_type === 'search'
-      ? await run_expanded_search_tasks(model, task, agent, log)
-      : await run_am(model, task, agent, log);
+    // AM — search tasks are expanded into concrete mediator calls before
+    // reaching AM. Non-search tasks go directly to AM via run_am.
+    const am_status = task.action_type === 'search' ?
+        await run_expanded_search_tasks(model, task, agent, log) :
+        await run_am(model, task, agent, log);
 
     if (am_status !== 'success') {
-      console.log('[SPL] Task failed after max retries, re-evaluating state...');
-      // Outer loop continues: re-query inventory and re-run SCSG to pick a new sub-task
+      console.log(
+          '[SPL] Task failed after max retries, re-evaluating state...');
+      // Outer loop continues: re-query inventory and re-run SCSG to pick a new
+      // sub-task
     }
   }
 }
 
-// ── Stage Helpers ─────────────────────────────────────────────────────────────
+// ── Stage Helpers
+// ─────────────────────────────────────────────────────────────
 
 /**
  * Phase 1 — Prerequisite Task DAG (PTD).
@@ -141,32 +138,22 @@ async function run_ptd(model, T, existing_G, log) {
  * Phase 2 — State-Conditioned Subgraph (SCSG).
  *
  * Prunes the PTD graph to the subgraph still needed given the bot's current
- * inventory, then enriches it with metadata for NTS.
+ * inventory using the deterministic compute_scsg algorithm, then enriches
+ * it with metadata for NTS. No LLM call is made.
  *
  * @returns {{ status: 'complete', reason: string }}
  *            Task is finished — all sinks satisfied or subgraph is empty.
- * @returns {{ status: 'retry' }}
- *            LLM response could not be parsed — caller should retry.
  * @returns {{ status: 'continue', enriched: object }}
  *            Normal case — enriched subgraph is ready for NTS.
  */
-async function run_scsg(model, G, agent, log) {
-  const { inventory } = get_inventory_state(agent);
-  const response = await model.sendRequest(
-    [],
-    fill_scsg_prompt(trim_graph_for_scsg(G), { inventory })
-  );
-  const result = extract_json(response);
-  log.scsg(response, result);
-
-  if (!result) {
-    console.error('[SPL] Failed to extract SCSG result from LLM response, retrying...');
-    return { status: 'retry' };
-  }
+function run_scsg(G, agent, log) {
+  const {inventory} = get_inventory_state(agent);
+  const result = compute_scsg(G, inventory);
+  log.scsg('[deterministic]', result);
 
   if (result.r === 2) {
     console.log('[SPL] Task complete — all sinks satisfied.');
-    return { status: 'complete', reason: 'all sinks satisfied' };
+    return {status: 'complete', reason: 'all sinks satisfied'};
   }
 
   // r=1: inventory is "Nothing" → use full original graph
@@ -179,10 +166,10 @@ async function run_scsg(model, G, agent, log) {
 
   if (!subgraph.vertices || subgraph.vertices.length === 0) {
     console.log('[SPL] Task complete — subgraph is empty.');
-    return { status: 'complete', reason: 'subgraph empty' };
+    return {status: 'complete', reason: 'subgraph empty'};
   }
 
-  return { status: 'continue', enriched: enrich_subgraph(subgraph, G) };
+  return {status: 'continue', enriched: enrich_subgraph(subgraph, G)};
 }
 
 /**
@@ -195,7 +182,8 @@ async function run_scsg(model, G, agent, log) {
  */
 async function run_nts(model, enriched, agent, log) {
   const state = get_state(agent);
-  const response = await model.sendRequest([], fill_next_task_selector_prompt(enriched, state));
+  const response = await model.sendRequest(
+      [], fill_next_task_selector_prompt(enriched, state));
   const task = extract_json(response);
   log.nts(response, task);
 
@@ -220,19 +208,23 @@ async function run_nts(model, enriched, agent, log) {
 async function run_am(model, task, agent, log) {
   for (let attempt = 0; attempt < MAX_INNER_RETRIES; attempt++) {
     const state = get_state(agent);
-    const action = await model.sendRequest([], fill_action_mediator_prompt(task, state));
+    const action =
+        await model.sendRequest([], fill_action_mediator_prompt(task, state));
     log.am(attempt + 1, action);
-    console.log(`[SPL] Action (attempt ${attempt + 1}/${MAX_INNER_RETRIES}):`, action);
+    console.log(
+        `[SPL] Action (attempt ${attempt + 1}/${MAX_INNER_RETRIES}):`, action);
 
     // AM signals completion when inventory already satisfies the task
     const signal = extract_json(action);
     if (signal?.status === 'TASK_COMPLETE') {
-      console.log('[SPL] AM reports task already complete:', task.target_item ?? task.action_type);
+      console.log(
+          '[SPL] AM reports task already complete:',
+          task.target_item ?? task.action_type);
       return 'success';
     }
 
-    // executeCommand returns a string only on error (bad format, unknown command, etc.)
-    // Any non-string result means the command ran successfully
+    // executeCommand returns a string only on error (bad format, unknown
+    // command, etc.) Any non-string result means the command ran successfully
     const result = await executeCommand(agent, action);
     console.log('[SPL] Command result:', result);
     if (typeof result !== 'string') return 'success';
@@ -246,13 +238,13 @@ async function run_am(model, task, agent, log) {
  * Phase 4 — Action Mediator (AM), search-expansion path.
  *
  * NTS emits planner-level search tasks that may contain abstract targets
- * (e.g. any_log) or multiple targets in a targets[] array. AM requires
- * exactly one concrete target and one search_radius per call. This function
- * bridges that contract by:
+ * (e.g. any_log) or multiple targets in a targets[] array. This function
+ * bridges the NTS→AM contract by:
  *   1. Normalizing the NTS targets into a flat ordered list
  *   2. Expanding abstract items (any_log → all overworld log variants)
- *   3. Trying each concrete target at increasing radii via AM + executeCommand
- *   4. Stopping immediately after the first successful command execution
+ *   3. Dispatching !searchForBlock or !searchForEntity directly (no LLM)
+ *   4. Falling back to AM when the hardcoded command is rejected as invalid
+ *   5. Stopping immediately after the first successful execution
  *
  * State is snapshotted once before the loop — no refresh between attempts —
  * because all attempts target the same planner task and a state refresh
@@ -260,11 +252,12 @@ async function run_am(model, task, agent, log) {
  *
  * @returns {'success'|'fail'}
  */
-async function run_expanded_search_tasks(model, task, agent, log) {
+export async function run_expanded_search_tasks(model, task, agent, log) {
   const search_items = normalize_search_items(task);
 
   if (search_items.length === 0) {
-    console.error('[SPL] Search task has no targets — NTS output may be malformed.');
+    console.error(
+        '[SPL] Search task has no targets — NTS output may be malformed.');
     return 'fail';
   }
 
@@ -278,24 +271,53 @@ async function run_expanded_search_tasks(model, task, agent, log) {
 
       for (const concrete_item of concrete_items) {
         const search_task = create_search_task(concrete_item, radius, task);
-        const action = await model.sendRequest([], fill_action_mediator_prompt(search_task, state));
-        log.am(++attempt, action);
-        console.log(`[SPL] Search action (${concrete_item} r=${radius}):`, action);
 
-        // AM may signal the target is already present — honour it before executing a command
-        const signal = extract_json(action);
-        if (signal?.status === 'TASK_COMPLETE') {
-          console.log(`[SPL] Search already complete: ${concrete_item} found in current state.`);
+        // Fast-path: target already visible in current state snapshot
+        if (check_search_complete(concrete_item, state)) {
+          console.log(
+              `[SPL] Search already complete: ${concrete_item} found in current state.`);
           return 'success';
         }
 
-        const result = await executeCommand(agent, action);
+        // Hardcoded dispatch — no LLM call
+        const command = make_search_command(concrete_item, radius);
+        log.am(++attempt, command);
+        console.log(`[SPL] Search action (${concrete_item} r=${radius}):`, command);
+
+        let result = await executeCommand(agent, command);
         console.log('[SPL] Search result:', result);
 
-        // executeCommand returns a string only on error.
-        // A non-string result means the command executed — stop all loops immediately.
-        if (typeof result !== 'string') {
-          console.log(`[SPL] Search succeeded: ${concrete_item} at radius ${radius}.`);
+        // If executeCommand rejected the command before the skill ran (bad
+        // block/mob name, wrong arg count, etc.) it returns a plain error
+        // string without the "Action output:" prefix. Fall back to AM so the
+        // LLM can choose a valid command for this target.
+        if (typeof result === 'string' && !result.startsWith('Action output:')) {
+          console.warn(
+              `[SPL] Invalid search command for "${concrete_item}", delegating to AM.`);
+          const action = await model.sendRequest(
+              [], fill_action_mediator_prompt(search_task, state));
+          log.am(++attempt, action);
+          console.log(`[SPL] AM fallback action (${concrete_item} r=${radius}):`, action);
+
+          const signal = extract_json(action);
+          if (signal?.status === 'TASK_COMPLETE') {
+            console.log(
+                `[SPL] AM: search already complete for ${concrete_item}.`);
+            return 'success';
+          }
+
+          result = await executeCommand(agent, action);
+          console.log('[SPL] AM fallback result:', result);
+        }
+
+        // runAsAction returns undefined when interrupted; otherwise returns
+        // "Action output:\n<bot log>". Success = ran and did NOT log "Could
+        // not find".
+        if (typeof result !== 'string' ||
+            (result.startsWith('Action output:') &&
+             !result.includes('Could not find'))) {
+          console.log(
+              `[SPL] Search succeeded: ${concrete_item} at radius ${radius}.`);
           return 'success';
         }
         console.warn('[SPL] Search failed:', result);
@@ -306,7 +328,8 @@ async function run_expanded_search_tasks(model, task, agent, log) {
   return 'fail';
 }
 
-// ── Search Expansion Helpers ──────────────────────────────────────────────────
+// ── Search Expansion Helpers
+// ──────────────────────────────────────────────────
 
 /**
  * Reads the planner-level targets from an NTS search task and returns a flat,
@@ -340,7 +363,8 @@ function normalize_search_items(task) {
 function expand_search_item(item) {
   if (item === 'any_log') return ANY_LOG_SEARCH_TARGETS;
   if (item.startsWith('any_')) {
-    throw new Error(`[SPL] Unsupported abstract search item: "${item}". Add an expansion to expand_search_item.`);
+    throw new Error(`[SPL] Unsupported abstract search item: "${
+        item}". Add an expansion to expand_search_item.`);
   }
   return [item];
 }
@@ -353,7 +377,59 @@ function expand_search_item(item) {
 function create_search_task(target, search_radius, base_task) {
   return {
     action_type: 'search',
-    parameters: { target, search_radius },
+    parameters: {target, search_radius},
     rationale: base_task.rationale,
   };
+}
+
+// Mob names that can appear as concrete search targets from PTD graphs.
+// Everything not in this set is treated as a block target.
+const MOB_SEARCH_TARGETS = new Set([
+  // Overworld hostile
+  'skeleton', 'stray', 'wither_skeleton',
+  'zombie', 'zombie_villager', 'drowned', 'husk', 'zombified_piglin',
+  'creeper', 'spider', 'cave_spider',
+  'enderman', 'witch', 'slime', 'magma_cube',
+  'blaze', 'ghast', 'phantom',
+  'silverfish', 'shulker', 'guardian', 'elder_guardian',
+  'vindicator', 'evoker', 'pillager', 'ravager',
+  // Overworld passive / neutral
+  'cow', 'mooshroom', 'sheep', 'pig', 'chicken',
+  'rabbit', 'squid', 'glow_squid', 'fox', 'wolf',
+  'llama', 'trader_llama', 'horse', 'donkey', 'mule',
+  'bee', 'panda', 'polar_bear', 'turtle',
+  'axolotl', 'goat', 'frog', 'sniffer', 'armadillo',
+]);
+
+/**
+ * Returns true if the concrete search target should use !searchForEntity.
+ * Returns false if it should use !searchForBlock.
+ */
+export function is_entity_target(target) {
+  return MOB_SEARCH_TARGETS.has(target);
+}
+
+/**
+ * Returns true if the concrete target is already evidenced in the current
+ * state snapshot — equivalent to the AM's TASK_COMPLETE check for search.
+ *
+ * Block targets: present in state.nearby_blocks.
+ * Entity targets: present with count > 0 in state.nearby_entities.mobs.
+ */
+export function check_search_complete(target, state) {
+  if (is_entity_target(target)) {
+    return (state.nearby_entities?.mobs?.[target] ?? 0) > 0;
+  }
+  return state.nearby_blocks?.includes(target) ?? false;
+}
+
+/**
+ * Builds the bot command string for a concrete search target at a given
+ * radius. No LLM involved — command family is determined by is_entity_target.
+ */
+export function make_search_command(target, radius) {
+  if (is_entity_target(target)) {
+    return `!searchForEntity("${target}", ${radius})`;
+  }
+  return `!searchForBlock("${target}", ${radius})`;
 }

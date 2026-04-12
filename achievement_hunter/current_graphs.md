@@ -1,5 +1,5 @@
 # PTD — Smelt an iron ingot.
-_Updated: 2026-04-11T23:53:51.187Z_
+_Updated: 2026-04-12T01:29:37.053Z_
 
 ```mermaid
 graph LR
@@ -23,10 +23,10 @@ graph LR
     stick -->|"×2"| stone_pickaxe
     crafting_table -->stone_pickaxe
     wooden_pickaxe -->cobblestone
+    any_plank -->|"×2"| stick
     any_plank -->|"×3"| wooden_pickaxe
     stick -->|"×2"| wooden_pickaxe
     crafting_table -->wooden_pickaxe
-    any_plank -->|"×2"| stick
     any_plank -->|"×4"| crafting_table
     any_log -->|"×3"| any_plank
     style iron_ingot fill:#4CAF50,color:#fff,stroke:#388E3C
@@ -34,16 +34,11 @@ graph LR
 
 ---
 
-# SCSG — Smelt an iron ingot.
-_Updated: 2026-04-12T00:15:04.380Z · r=0_
+# SCSG
+_Updated: 2026-04-12T01:29:37.055Z_
 
-```mermaid
-graph LR
-    iron_ingot["iron_ingot ×1"]
-    raw_iron["raw_iron ×1"]
-    raw_iron -->iron_ingot
-    style iron_ingot fill:#4CAF50,color:#fff,stroke:#388E3C
-```
+**All sinks satisfied (r=2) — task complete.**
+
 
 ---
 
@@ -51,31 +46,13 @@ graph LR
 <td width="50%" valign="top">
 
 ## Current Task
-_Updated: 2026-04-12T00:15:25.136Z_
-
-```json
-{
-  "target_item": "raw_iron",
-  "qty": 1,
-  "action_type": "collect",
-  "parameters": {
-    "source_block": "iron_ore",
-    "item_dependency": null,
-    "tool": "stone_pickaxe"
-  },
-  "rationale": "Direct: raw_iron is a source node and iron_ore is nearby while a stone_pickaxe (as per satisfied_inputs) is in inventory, so collecting it now is achievable."
-}
-```
+_NTS not yet run._
 
 </td>
 <td width="50%" valign="top">
 
-## Current Action _(attempt 1)_
-_Updated: 2026-04-12T00:15:30.117Z_
-
-```
-!collectBlocks("iron_ore", 1)
-```
+## Current Action
+_AM not yet run._
 
 </td>
 </tr></table>
