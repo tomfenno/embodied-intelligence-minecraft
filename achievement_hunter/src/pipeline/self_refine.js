@@ -1,22 +1,4 @@
-/**
- * Implements the Self-Refine LLM algorithm with Transcript Logging.
- *
- * Each phase is a fresh, independent model call — all context is embedded
- * in the filled prompt, not accumulated as conversation turns.
- *
- * @param {object}   model          - Any model instance with a
- *     sendRequest(turns, systemMessage) method (e.g. GPT, Claude, Gemini).
- * @param {string}   taskPrompt     - Filled system prompt for the initial
- *     generation (e.g. fill_ptd_prompt(objective)).
- * @param {Function} feedbackPrompt - Function (answer) => string that returns
- *     the filled feedback/critique system prompt for a given candidate answer.
- * @param {Function} refinePrompt   - Function (answer, feedback) => string that
- *     returns the filled refinement system prompt given a candidate and
- * feedback.
- * @param {number}   [n=3]         - Maximum number of critique/refine rounds.
- * @param {boolean}  [verbose=false]
- * @returns {{ finalResult: string, transcript: Array, totalRounds: number }}
- */
+import { extract_json } from './json_utils.js';
 import {
   fill_ptd_prompt,
   fill_ptd_feedback_prompt,
@@ -36,7 +18,7 @@ import {
  * @returns {{ finalResult: string, transcript: Array, totalRounds: number }}
  */
 export async function ptd_self_refine(model, objective, n = 3, verbose = false) {
-  return sendRefinedRequest(
+  return _send_refined_request(
       model,
       fill_ptd_prompt(objective),
       (answer) => fill_ptd_feedback_prompt(objective, answer),
@@ -56,10 +38,9 @@ export async function ptd_self_refine(model, objective, n = 3, verbose = false) 
  * @param {boolean} [verbose=false]
  * @returns {{ finalResult: string, transcript: Array, totalRounds: number }}
  */
-export async function scsg_self_refine(
-    model, graph, state, n = 3, verbose = false) {
+export async function scsg_self_refine(model, graph, state, n = 3, verbose = false) {
   const taskPrompt = fill_scsg_prompt(graph, state);
-  return sendRefinedRequest(
+  return _send_refined_request(
       model,
       taskPrompt,
       (answer) => fill_scsg_feedback_prompt(taskPrompt, answer),
@@ -69,10 +50,26 @@ export async function scsg_self_refine(
   );
 }
 
-export async function sendRefinedRequest(
+/**
+ * Core Self-Refine loop. Generates an initial answer, then iterates through
+ * up to n rounds of feedback + refinement. Exits early when the feedback
+ * contains a {"verdict":"pass"} signal.
+ *
+ * Each phase is a fresh, independent model call — all context is embedded
+ * in the filled prompt, not accumulated as conversation turns.
+ *
+ * @param {object}   model          - Any model instance with sendRequest(turns, systemMessage).
+ * @param {string}   taskPrompt     - Filled system prompt for the initial generation.
+ * @param {Function} feedbackPrompt - (answer) => string — critique prompt for a candidate.
+ * @param {Function} refinePrompt   - (answer, feedback) => string — refinement prompt.
+ * @param {number}   [n=3]          - Maximum critique/refine rounds.
+ * @param {boolean}  [verbose=false]
+ * @returns {{ finalResult: string, transcript: Array, totalRounds: number }}
+ */
+async function _send_refined_request(
     model, taskPrompt, feedbackPrompt, refinePrompt, n = 3, verbose = false) {
   const log = verbose ? console.log.bind(console) : () => {};
-  let transcript = [];
+  const transcript = [];
 
   log('Generating initial response...');
   let r = await model.sendRequest([], taskPrompt);
@@ -82,7 +79,7 @@ export async function sendRefinedRequest(
     log(`Starting Feedback Round ${i + 1}...`);
 
     // 1. Feedback Phase — fresh request with candidate embedded in the prompt
-    let feedback = await model.sendRequest([], feedbackPrompt(r));
+    const feedback = await model.sendRequest([], feedbackPrompt(r));
     transcript.push({stage: `Feedback Round ${i + 1}`, content: feedback});
 
     log(`Starting Refinement Round ${i + 1}...`);
@@ -91,8 +88,8 @@ export async function sendRefinedRequest(
     const refined = await model.sendRequest([], refinePrompt(r, feedback));
     transcript.push({stage: `Refined Output Round ${i + 1}`, content: refined});
 
-    if (feedback.toLowerCase().includes('"verdict":"pass"') ||
-        feedback.toLowerCase().includes('"verdict": "pass"')) {
+    const verdict_obj = extract_json(feedback);
+    if (verdict_obj?.verdict?.toLowerCase() === 'pass') {
       log(`Refinement passed after ${i + 1} rounds.`);
       return {finalResult: refined, transcript, totalRounds: i + 1};
     }
@@ -103,3 +100,7 @@ export async function sendRefinedRequest(
   log('Max refinement rounds reached.');
   return {finalResult: r, transcript, totalRounds: n};
 }
+
+// Re-export for callers that depend on the public name.
+// After Phase 3, this alias can be removed once all callers are updated.
+export { _send_refined_request as sendRefinedRequest };

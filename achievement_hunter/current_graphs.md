@@ -1,62 +1,48 @@
-# PTD — Craft one type of every tool
-_Updated: 2026-04-11T03:35:46.396Z_
+# PTD — Smelt an iron ingot.
+_Updated: 2026-04-11T23:53:51.187Z_
 
 ```mermaid
 graph LR
-    any_log["any_log ×5<br/>[resource]"]
-    any_plank["any_plank ×20<br/>[item]"]
-    stick["stick ×8<br/>[item]"]
-    crafting_table["crafting_table ×1<br/>[workstation]"]
+    iron_ingot["iron_ingot ×1<br/>[item]"]
+    raw_iron["raw_iron ×1<br/>[resource]"]
+    furnace["furnace ×1<br/>[workstation]"]
+    stone_pickaxe["stone_pickaxe ×1<br/>[tool]"]
+    cobblestone["cobblestone ×11<br/>[resource]"]
     wooden_pickaxe["wooden_pickaxe ×1<br/>[tool]"]
-    wooden_axe["wooden_axe ×1<br/>[tool]"]
-    wooden_shovel["wooden_shovel ×1<br/>[tool]"]
-    wooden_hoe["wooden_hoe ×1<br/>[tool]"]
-    any_log -->|"×5"| any_plank
-    any_plank -->|"×4"| crafting_table
-    any_plank -->|"×4"| stick
+    stick["stick ×4<br/>[item]"]
+    crafting_table["crafting_table ×1<br/>[workstation]"]
+    any_plank["any_plank ×12<br/>[item]"]
+    any_log["any_log ×3<br/>[resource]"]
+    raw_iron -->iron_ingot
+    any_plank -->iron_ingot
+    furnace -->iron_ingot
+    stone_pickaxe -->raw_iron
+    cobblestone -->|"×8"| furnace
+    crafting_table -->furnace
+    cobblestone -->|"×3"| stone_pickaxe
+    stick -->|"×2"| stone_pickaxe
+    crafting_table -->stone_pickaxe
+    wooden_pickaxe -->cobblestone
     any_plank -->|"×3"| wooden_pickaxe
     stick -->|"×2"| wooden_pickaxe
     crafting_table -->wooden_pickaxe
-    any_plank -->|"×3"| wooden_axe
-    stick -->|"×2"| wooden_axe
-    crafting_table -->wooden_axe
-    any_plank -->wooden_shovel
-    stick -->|"×2"| wooden_shovel
-    crafting_table -->wooden_shovel
-    any_plank -->|"×2"| wooden_hoe
-    stick -->|"×2"| wooden_hoe
-    crafting_table -->wooden_hoe
-    style wooden_pickaxe fill:#4CAF50,color:#fff,stroke:#388E3C
-    style wooden_axe fill:#4CAF50,color:#fff,stroke:#388E3C
-    style wooden_shovel fill:#4CAF50,color:#fff,stroke:#388E3C
-    style wooden_hoe fill:#4CAF50,color:#fff,stroke:#388E3C
+    any_plank -->|"×2"| stick
+    any_plank -->|"×4"| crafting_table
+    any_log -->|"×3"| any_plank
+    style iron_ingot fill:#4CAF50,color:#fff,stroke:#388E3C
 ```
 
 ---
 
-# SCSG — Craft one type of every tool
-_Updated: 2026-04-11T03:39:35.530Z · r=0_
+# SCSG — Smelt an iron ingot.
+_Updated: 2026-04-12T00:15:04.380Z · r=0_
 
 ```mermaid
 graph LR
-    any_log["any_log ×5"]
-    any_plank["any_plank ×13"]
-    stick["stick ×6"]
-    wooden_axe["wooden_axe ×1"]
-    wooden_shovel["wooden_shovel ×1"]
-    wooden_hoe["wooden_hoe ×1"]
-    any_log -->|"×5"| any_plank
-    any_plank -->|"×4"| stick
-    any_plank -->|"×3"| wooden_axe
-    stick -->|"×2"| wooden_axe
-    any_plank -->wooden_shovel
-    stick -->|"×2"| wooden_shovel
-    any_plank -->|"×2"| wooden_hoe
-    stick -->|"×2"| wooden_hoe
-    style wooden_pickaxe fill:#4CAF50,color:#fff,stroke:#388E3C
-    style wooden_axe fill:#4CAF50,color:#fff,stroke:#388E3C
-    style wooden_shovel fill:#4CAF50,color:#fff,stroke:#388E3C
-    style wooden_hoe fill:#4CAF50,color:#fff,stroke:#388E3C
+    iron_ingot["iron_ingot ×1"]
+    raw_iron["raw_iron ×1"]
+    raw_iron -->iron_ingot
+    style iron_ingot fill:#4CAF50,color:#fff,stroke:#388E3C
 ```
 
 ---
@@ -65,32 +51,30 @@ graph LR
 <td width="50%" valign="top">
 
 ## Current Task
-_Updated: 2026-04-11T03:40:05.913Z_
+_Updated: 2026-04-12T00:15:25.136Z_
 
 ```json
 {
-  "target_item": "any_log",
-  "qty": 5,
+  "target_item": "raw_iron",
+  "qty": 1,
   "action_type": "collect",
   "parameters": {
-    "source_block": "spruce_log",
+    "source_block": "iron_ore",
     "item_dependency": null,
-    "tool": null
+    "tool": "stone_pickaxe"
   },
-  "rationale": "any_log is the only source node and spruce_log is nearby, so collecting logs is directly achievable now."
+  "rationale": "Direct: raw_iron is a source node and iron_ore is nearby while a stone_pickaxe (as per satisfied_inputs) is in inventory, so collecting it now is achievable."
 }
 ```
 
 </td>
 <td width="50%" valign="top">
 
-## Current Action _(attempt 2)_
-_Updated: 2026-04-11T03:41:04.158Z_
+## Current Action _(attempt 1)_
+_Updated: 2026-04-12T00:15:30.117Z_
 
-```json
-{
-  "status": "TASK_COMPLETE"
-}
+```
+!collectBlocks("iron_ore", 1)
 ```
 
 </td>

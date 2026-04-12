@@ -12,7 +12,7 @@ Return **exactly one output**:
 * **one executable bot command** that best advances the task right now, or
 * **one parseable completion signal** if the task is already complete
 
-Assume the current state contains all information needed for command selection and is refreshed frequently enough to rely on as current.
+Assume the current state contains all information needed for command selection and is refreshed frequently enough to rely on as current. This version aligns the mediator with the updated planner contract. 
 
 ---
 
@@ -25,7 +25,7 @@ A task is complete if the current state already satisfies its required outcome.
 Use these rules:
 
 * `collect`, `kill`, `craft`, `smelt` are complete if `inventory[target_item] >= qty`
-* `search` is complete as soon as at least one listed search target is explicitly evidenced in immediate current state
+* `search` is complete as soon as its single concrete search target is explicitly evidenced in immediate current state
 
 For `search`, use explicit state evidence only:
 
@@ -35,7 +35,7 @@ For `search`, use explicit state evidence only:
 
 ### Abstract ids
 
-The task may use abstract ids such as `any_log` or `any_plank`.
+Non-search tasks may use abstract ids such as `any_log` or `any_plank`.
 
 Do not emit abstract ids as command arguments. Resolve them to concrete Minecraft item or block names before constructing the command.
 
@@ -49,6 +49,8 @@ Examples:
 
 * `any_log` → `oak_log`
 * `any_plank` → `oak_planks`
+
+Search tasks are already concrete and should not require abstract-id resolution.
 
 ---
 
@@ -110,7 +112,7 @@ Use double quotes for string arguments.
 * `!goToCoordinates(x: number, y: number, z: number, closeness: number)`
 * `!goToPlayer(player_name: string, closeness: number)`
 * `!followPlayer(player_name: string, follow_dist: number)`
-* `!searchForBlock(type: string, search_range: number)` — minimum range 32
+* `!searchForBlock(type: string, search_range: number)`
 * `!searchForEntity(type: string, search_range: number)`
 * `!moveAway(distance: number)`
 * `!goToRememberedPlace(name: string)`
@@ -174,6 +176,11 @@ Identify:
 * `qty` if present
 * action-specific fields inside `parameters`
 
+For `search`, read:
+
+* `parameters.target`
+* `parameters.search_radius`
+
 ### 2. Check completion first
 
 If the task is already complete, return:
@@ -203,7 +210,7 @@ Prefer, in order:
 
 ### 4. Derive command arguments by action type
 
-Pull argument values from task parameters first, then resolve any abstract ids.
+Pull argument values from task parameters first, then resolve any abstract ids when needed.
 
 #### A. `collect`
 
@@ -211,19 +218,18 @@ Pull argument values from task parameters first, then resolve any abstract ids.
 * If `source_block` is directly usable now, use `!collectBlocks(source_block, qty)`
 * If the task is environmental collection with a reusable dependency, use `!useOn(tool_name, target)` when appropriate
 * For `!useOn(tool_name, target)`, use the reusable dependency item from the task, such as `bucket`
-* If direct collection is not currently executable, use `!searchForBlock(concrete_target, radius)`
+* If direct collection is not currently executable, use `!searchForBlock(concrete_target, search_radius)` only if a concrete search radius is supplied by the task or surrounding system; otherwise choose the best available single setup/search command consistent with the task
 
 Examples:
 
 * `any_log` with `source_block = oak_log` and nearby logs → `!collectBlocks("oak_log", 1)`
 * `water_bucket` with `item_dependency = bucket` and nearby water → `!useOn("bucket", "water")`
-* same task without nearby water → `!searchForBlock("water", r)`
 
 #### B. `kill`
 
 * Use `source_mob` from the task
 * If the mob is nearby, use `!attack(source_mob)`
-* Otherwise use `!searchForEntity(source_mob, radius)`
+* Otherwise use `!searchForEntity(source_mob, search_radius)` only if a concrete search radius is supplied by the task or surrounding system; otherwise choose the best available single setup/search command consistent with the task
 
 #### C. `craft`
 
@@ -245,12 +251,18 @@ Examples:
 
 #### E. `search`
 
-* Use the first entry in `parameters.targets`
-* Use the first entry in `parameters.radius_sequence`
+* Use `parameters.target`
+* Use `parameters.search_radius`
+* Search targets are already concrete
 * Treat mob names as entity targets
 * Treat blocks and environmental sources such as `water` and `lava` as block-search targets
-* If the target is a mob, use `!searchForEntity(target, radius)`
-* Otherwise use `!searchForBlock(target, max(radius, 32))`
+* If the target is a mob, use `!searchForEntity(target, search_radius)`
+* Otherwise use `!searchForBlock(target, search_radius)`
+
+Examples:
+
+* `target = "water", search_radius = 64` → `!searchForBlock("water", 64)`
+* `target = "skeleton", search_radius = 64` → `!searchForEntity("skeleton", 64)`
 
 ### 5. Recipe-yield handling
 
@@ -283,8 +295,8 @@ No prose. No explanation. No markdown fences.
 * Use task parameters as the primary source of command arguments.
 * For `!smeltItem`, pass the smelting input item, not the output item.
 * For `!craftRecipe`, pass craft count, not output item count.
-* For `search`, use the first listed target and the first radius in `radius_sequence`.
-* For block search, the effective radius must be at least 32.
+* For `search`, use `parameters.target` and `parameters.search_radius`.
+* Search targets received by the mediator are concrete.
 * Prefer the most specific executable command supported by the task and current state.
 
 ---
