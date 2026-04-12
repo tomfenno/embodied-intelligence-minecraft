@@ -128,8 +128,14 @@ async function run_ptd(model, T, existing_G, log) {
 
   spl.log('Building PTD for:', T);
   const {response} = await timed_send_request(model, fill_ptd_prompt(T));
-  const G = extract_json(response);
 
+  if (response === null) {
+    spl.error('PTD model call failed.');
+    log.complete('PTD model call failed');
+    return null;
+  }
+
+  const G = extract_json(response);
   log.ptd(response, G);
 
   if (!G) {
@@ -138,7 +144,6 @@ async function run_ptd(model, T, existing_G, log) {
     return null;
   }
 
-  // Save ptd for later use.
   const file_path =
       'achievement_hunter/docs/ptd_jsons/' + to_snake_case(T) + '.json';
 
@@ -204,6 +209,12 @@ async function run_nts(model, candidates, agent, log) {
   const {response, latency_ms} = await timed_send_request(
       model, fill_next_task_selector_prompt(candidates, state));
 
+  if (response === null) {
+    spl.error('NTS model call failed.');
+    log.nts('[model error]', null, {latency_ms});
+    return null;
+  }
+
   const task = extract_json(response);
   log.nts(response, task, {latency_ms});
 
@@ -238,6 +249,14 @@ async function run_am(model, task, agent, log) {
 
     const {response, latency_ms} = await timed_send_request(
         model, fill_action_mediator_prompt(task, state));
+
+    if (response === null) {
+      spl.warn('AM model call failed, retrying...');
+      log.am(
+          attempt + 1, '[model error]', state,
+          {latency_ms, source: LOG_SOURCE.LLM});
+      continue;
+    }
 
     const action = strip_fences(response);
     const signal = extract_json(action);
@@ -274,7 +293,7 @@ async function run_am(model, task, agent, log) {
 
 async function timed_send_request(model, prompt) {
   const started_ms = Date.now();
-  const response = await model.sendRequest([], prompt);
+  const response = await model.send_prompt(prompt);
 
   return {
     response,

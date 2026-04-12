@@ -28,6 +28,8 @@ export function strip_fences(str) {
 }
 
 export function extract_json(str) {
+  if (str == null) return null;
+
   // strip markdown code fences if present
   const fenced = str.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (fenced) str = fenced[1];

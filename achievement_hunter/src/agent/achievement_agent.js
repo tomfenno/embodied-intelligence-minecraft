@@ -1,6 +1,14 @@
+import { readFileSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 import { Agent } from '../../../src/agent/agent.js';
 import { loadCheckpoint } from '../pipeline/checkpoint.js';
+import { SplGpt } from '../pipeline/spl_gpt.js';
 import { structuredLoop } from '../pipeline/structured_loop.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 /**
@@ -13,6 +21,8 @@ import { structuredLoop } from '../pipeline/structured_loop.js';
  */
 export class AchievementAgent extends Agent {
     async _setupEventHandlers(save_data, init_message) {
+        this._init_spl_models();
+
         // Suppress the default "Hello world" greeting, run base setup, then restore.
         const orig_open_chat = this.openChat.bind(this);
         this.openChat = async () => {};
@@ -69,11 +79,19 @@ export class AchievementAgent extends Agent {
      * from a pre-built PTD graph (crash recovery). Resets to the waiting state
      * and notifies the player if the loop crashes.
      */
+    _init_spl_models() {
+        const profile = JSON.parse(
+            readFileSync(path.join(__dirname, '../profile.json'), 'utf8'));
+        const fallback = profile.model || 'gpt-4o-mini';
+        this._spl_models = {
+            ptd: new SplGpt(profile.ptd_model || fallback),
+            nts: new SplGpt(profile.nts_model || fallback),
+            am:  new SplGpt(profile.am_model  || fallback),
+        };
+    }
+
     _launch_spl(objective, graph = null) {
-        structuredLoop(
-            {ptd: this.prompter.ptd_model, nts: this.prompter.nts_model, am: this.prompter.am_model},
-            this, objective, graph
-        )
+        structuredLoop(this._spl_models, this, objective, graph)
             .catch(err => {
                 console.error('[SPL] Structured loop crashed:', err);
                 this._waiting_for_objective = true;
