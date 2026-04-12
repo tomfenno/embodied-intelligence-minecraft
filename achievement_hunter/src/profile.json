@@ -15,9 +15,9 @@
     "  o1              — original reasoning model",
     "  o1-mini         — lightweight reasoning"
   ],
-  "ptd_model": "gpt-5",
-  "nts_model": "gpt-4o-mini",
-  "am_model": "gpt-4o-mini",
+  "ptd_model": "",
+  "nts_model": "gpt-5",
+  "am_model": "",
 
   "modes": {
     "self_preservation": true,

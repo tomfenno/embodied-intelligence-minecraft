@@ -1,5 +1,5 @@
 {
-  "objective": "ddddd",
+  "objective": "www",
   "graph": {
     "objective": "Make a wooden pickaxe",
     "sinks": [
@@ -82,5 +82,5 @@
       }
     ]
   },
-  "saved_at": "2026-04-12T06:58:43.258Z"
+  "saved_at": "2026-04-12T14:10:00.675Z"
 }
