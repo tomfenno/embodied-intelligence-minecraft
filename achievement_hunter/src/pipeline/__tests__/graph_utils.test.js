@@ -5,7 +5,7 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 
-import { trim_graph_for_scsg, enrich_subgraph } from '../graph_utils.js';
+import { trim_graph_for_scsg, enrich_subgraph, enrich_subgraph_sources } from '../graph_utils.js';
 
 // Shared fixture: a minimal but realistic PTD graph
 const PTD_GRAPH = {
@@ -160,6 +160,249 @@ describe('enrich_subgraph', () => {
     expect(warn_spy).toHaveBeenCalledWith(expect.stringContaining('ghost_item'));
     // Original vertex is returned unchanged
     expect(enriched.vertices[0]).toEqual({ id: 'ghost_item', qty: 1 });
+    warn_spy.mockRestore();
+  });
+});
+
+// ── enrich_subgraph_sources ─────────────────────────────────────────────────
+//
+// Fixtures are taken directly from the "Make a wooden pickaxe" rollout
+// (2026-04-12T03-42-17-820Z). The PTD is the full prerequisite graph;
+// the two SCSG snapshots represent (a) nothing pruned yet and (b) any_log
+// already satisfied by the bot's inventory.
+
+const WOODEN_PICKAXE_PTD = {
+  objective: 'Make a wooden pickaxe',
+  sinks: ['wooden_pickaxe'],
+  vertices: [
+    { id: 'wooden_pickaxe', qty: 1, item_type: 'tool',        acquisition_dependency: 'none' },
+    { id: 'crafting_table', qty: 1, item_type: 'workstation', acquisition_dependency: 'none' },
+    { id: 'stick',          qty: 4, item_type: 'item',        acquisition_dependency: 'none' },
+    { id: 'any_plank',      qty: 12, item_type: 'item',       acquisition_dependency: 'none' },
+    { id: 'any_log',        qty: 3, item_type: 'resource',    acquisition_dependency: 'none' },
+  ],
+  edges: [
+    { from: 'any_log',       to: 'any_plank',      type: 'crafting_input',        qty: 3, consumed: true  },
+    { from: 'any_plank',     to: 'crafting_table',  type: 'crafting_input',        qty: 4, consumed: true  },
+    { from: 'any_plank',     to: 'stick',           type: 'crafting_input',        qty: 2, consumed: true  },
+    { from: 'any_plank',     to: 'wooden_pickaxe',  type: 'crafting_input',        qty: 3, consumed: true  },
+    { from: 'stick',         to: 'wooden_pickaxe',  type: 'crafting_input',        qty: 2, consumed: true  },
+    { from: 'crafting_table', to: 'wooden_pickaxe', type: 'workstation_dependency', qty: 1, consumed: false },
+  ],
+};
+
+// SCSG r=1 "Nothing" — full graph, no vertices pruned.
+// Source node: any_log (no vertex in the subgraph points to it).
+const SCSG_FULL = {
+  objective: 'Make a wooden pickaxe',
+  sinks: ['wooden_pickaxe'],
+  vertices: [
+    { id: 'wooden_pickaxe', qty: 1 },
+    { id: 'crafting_table', qty: 1 },
+    { id: 'stick',          qty: 4 },
+    { id: 'any_plank',      qty: 12 },
+    { id: 'any_log',        qty: 3 },
+  ],
+  edges: [
+    { from: 'any_log',        to: 'any_plank',      qty: 3, consumed: true  },
+    { from: 'any_plank',      to: 'crafting_table',  qty: 4, consumed: true  },
+    { from: 'any_plank',      to: 'stick',           qty: 2, consumed: true  },
+    { from: 'any_plank',      to: 'wooden_pickaxe',  qty: 3, consumed: true  },
+    { from: 'stick',          to: 'wooden_pickaxe',  qty: 2, consumed: true  },
+    { from: 'crafting_table', to: 'wooden_pickaxe',  qty: 1, consumed: false },
+  ],
+};
+
+// SCSG r=0 with any_log pruned — bot already has logs in inventory.
+// Source node: any_plank (any_log was pruned, so any_plank has no incoming
+// subgraph edges; its satisfied_inputs should reference the pruned any_log edge).
+const SCSG_PRUNED = {
+  objective: 'Make a wooden pickaxe',
+  sinks: ['wooden_pickaxe'],
+  vertices: [
+    { id: 'wooden_pickaxe', qty: 1 },
+    { id: 'crafting_table', qty: 1 },
+    { id: 'stick',          qty: 4 },
+    { id: 'any_plank',      qty: 12 },
+    // any_log absent — satisfied by inventory
+  ],
+  edges: [
+    { from: 'any_plank',      to: 'crafting_table',  qty: 4, consumed: true  },
+    { from: 'any_plank',      to: 'stick',           qty: 2, consumed: true  },
+    { from: 'any_plank',      to: 'wooden_pickaxe',  qty: 3, consumed: true  },
+    { from: 'stick',          to: 'wooden_pickaxe',  qty: 2, consumed: true  },
+    { from: 'crafting_table', to: 'wooden_pickaxe',  qty: 1, consumed: false },
+  ],
+};
+
+describe('enrich_subgraph_sources', () => {
+  describe('full SCSG (nothing pruned) — source is any_log', () => {
+    it('returns exactly one source vertex', () => {
+      const sources = enrich_subgraph_sources(SCSG_FULL, WOODEN_PICKAXE_PTD);
+      expect(sources).toHaveLength(1);
+    });
+
+    it('source vertex is any_log', () => {
+      const sources = enrich_subgraph_sources(SCSG_FULL, WOODEN_PICKAXE_PTD);
+      expect(sources[0].id).toBe('any_log');
+    });
+
+    it('restores item_type from PTD', () => {
+      const sources = enrich_subgraph_sources(SCSG_FULL, WOODEN_PICKAXE_PTD);
+      expect(sources[0].item_type).toBe('resource');
+    });
+
+    it('restores acquisition_dependency from PTD', () => {
+      const sources = enrich_subgraph_sources(SCSG_FULL, WOODEN_PICKAXE_PTD);
+      expect(sources[0].acquisition_dependency).toBe('none');
+    });
+
+    it('has no satisfied_inputs because nothing was pruned', () => {
+      const sources = enrich_subgraph_sources(SCSG_FULL, WOODEN_PICKAXE_PTD);
+      expect(sources[0].satisfied_inputs).toEqual([]);
+    });
+
+    it('snapshot — log output for visual inspection', () => {
+      const sources = enrich_subgraph_sources(SCSG_FULL, WOODEN_PICKAXE_PTD);
+      console.log('\n[enrich_subgraph_sources] FULL SCSG sources:',
+          JSON.stringify(sources, null, 2));
+    });
+  });
+
+  describe('pruned SCSG (any_log satisfied) — source is any_plank', () => {
+    it('returns exactly one source vertex', () => {
+      const sources = enrich_subgraph_sources(SCSG_PRUNED, WOODEN_PICKAXE_PTD);
+      expect(sources).toHaveLength(1);
+    });
+
+    it('source vertex is any_plank', () => {
+      const sources = enrich_subgraph_sources(SCSG_PRUNED, WOODEN_PICKAXE_PTD);
+      expect(sources[0].id).toBe('any_plank');
+    });
+
+    it('restores item_type from PTD', () => {
+      const sources = enrich_subgraph_sources(SCSG_PRUNED, WOODEN_PICKAXE_PTD);
+      expect(sources[0].item_type).toBe('item');
+    });
+
+    it('satisfied_inputs contains the pruned any_log → any_plank edge', () => {
+      const sources = enrich_subgraph_sources(SCSG_PRUNED, WOODEN_PICKAXE_PTD);
+      const si = sources[0].satisfied_inputs;
+      expect(si).toHaveLength(1);
+      expect(si[0]).toEqual({
+        from: 'any_log',
+        type: 'crafting_input',
+        qty: 3,
+        consumed: true,
+      });
+    });
+
+    it('non-source vertices (crafting_table, stick, wooden_pickaxe) are excluded', () => {
+      const sources = enrich_subgraph_sources(SCSG_PRUNED, WOODEN_PICKAXE_PTD);
+      const ids = sources.map(v => v.id);
+      expect(ids).not.toContain('crafting_table');
+      expect(ids).not.toContain('stick');
+      expect(ids).not.toContain('wooden_pickaxe');
+    });
+
+    it('does not mutate the original subgraph or PTD', () => {
+      const sub_snap = JSON.stringify(SCSG_PRUNED);
+      const ptd_snap = JSON.stringify(WOODEN_PICKAXE_PTD);
+      enrich_subgraph_sources(SCSG_PRUNED, WOODEN_PICKAXE_PTD);
+      expect(JSON.stringify(SCSG_PRUNED)).toBe(sub_snap);
+      expect(JSON.stringify(WOODEN_PICKAXE_PTD)).toBe(ptd_snap);
+    });
+
+    it('snapshot — log output for visual inspection', () => {
+      const sources = enrich_subgraph_sources(SCSG_PRUNED, WOODEN_PICKAXE_PTD);
+      console.log('\n[enrich_subgraph_sources] PRUNED SCSG sources:',
+          JSON.stringify(sources, null, 2));
+    });
+  });
+
+  describe('heavily pruned SCSG (any_log + any_plank satisfied) — two source nodes', () => {
+    // Bot already has logs AND planks in inventory. Only the three downstream
+    // nodes remain: wooden_pickaxe (sink), crafting_table, and stick.
+    // Neither crafting_table nor stick has an incoming edge from within the
+    // remaining subgraph, so both are sources.
+    //
+    // Expected satisfied_inputs:
+    //   crafting_table ← any_plank (qty:4, crafting_input, consumed)
+    //   stick          ← any_plank (qty:2, crafting_input, consumed)
+    const SCSG_TWO_SOURCES = {
+      objective: 'Make a wooden pickaxe',
+      sinks: ['wooden_pickaxe'],
+      vertices: [
+        { id: 'wooden_pickaxe', qty: 1 },
+        { id: 'crafting_table', qty: 1 },
+        { id: 'stick',          qty: 4 },
+        // any_log and any_plank absent — both satisfied by inventory
+      ],
+      edges: [
+        { from: 'stick',          to: 'wooden_pickaxe', qty: 2, consumed: true  },
+        { from: 'crafting_table', to: 'wooden_pickaxe', qty: 1, consumed: false },
+        // any_plank edges removed because any_plank is pruned
+      ],
+    };
+
+    it('returns exactly two source vertices', () => {
+      const sources = enrich_subgraph_sources(SCSG_TWO_SOURCES, WOODEN_PICKAXE_PTD);
+      expect(sources).toHaveLength(2);
+    });
+
+    it('source ids are crafting_table and stick (in any order)', () => {
+      const sources = enrich_subgraph_sources(SCSG_TWO_SOURCES, WOODEN_PICKAXE_PTD);
+      const ids = sources.map(v => v.id).sort();
+      expect(ids).toEqual(['crafting_table', 'stick']);
+    });
+
+    it('wooden_pickaxe is not a source (has incoming edges from both sources)', () => {
+      const sources = enrich_subgraph_sources(SCSG_TWO_SOURCES, WOODEN_PICKAXE_PTD);
+      expect(sources.map(v => v.id)).not.toContain('wooden_pickaxe');
+    });
+
+    it('crafting_table has satisfied_inputs from pruned any_plank', () => {
+      const sources = enrich_subgraph_sources(SCSG_TWO_SOURCES, WOODEN_PICKAXE_PTD);
+      const ct = sources.find(v => v.id === 'crafting_table');
+      expect(ct.satisfied_inputs).toEqual([
+        { from: 'any_plank', type: 'crafting_input', qty: 4, consumed: true },
+      ]);
+    });
+
+    it('stick has satisfied_inputs from pruned any_plank', () => {
+      const sources = enrich_subgraph_sources(SCSG_TWO_SOURCES, WOODEN_PICKAXE_PTD);
+      const stick = sources.find(v => v.id === 'stick');
+      expect(stick.satisfied_inputs).toEqual([
+        { from: 'any_plank', type: 'crafting_input', qty: 2, consumed: true },
+      ]);
+    });
+
+    it('each source has correct item_type restored from PTD', () => {
+      const sources = enrich_subgraph_sources(SCSG_TWO_SOURCES, WOODEN_PICKAXE_PTD);
+      const ct    = sources.find(v => v.id === 'crafting_table');
+      const stick = sources.find(v => v.id === 'stick');
+      expect(ct.item_type).toBe('workstation');
+      expect(stick.item_type).toBe('item');
+    });
+
+    it('snapshot — log output for visual inspection', () => {
+      const sources = enrich_subgraph_sources(SCSG_TWO_SOURCES, WOODEN_PICKAXE_PTD);
+      console.log('\n[enrich_subgraph_sources] TWO-SOURCE SCSG sources:',
+          JSON.stringify(sources, null, 2));
+    });
+  });
+
+  it('warns and passes through vertex when id is not in PTD', () => {
+    const warn_spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const subgraph_with_ghost = {
+      objective: 'test',
+      sinks: ['ghost'],
+      vertices: [{ id: 'ghost', qty: 1 }],
+      edges: [],
+    };
+    const sources = enrich_subgraph_sources(subgraph_with_ghost, WOODEN_PICKAXE_PTD);
+    expect(warn_spy).toHaveBeenCalledWith(expect.stringContaining('ghost'));
+    expect(sources[0]).toEqual({ id: 'ghost', qty: 1 });
     warn_spy.mockRestore();
   });
 });

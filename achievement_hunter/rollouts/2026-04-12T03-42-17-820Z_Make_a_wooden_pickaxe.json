@@ -1,0 +1,666 @@
+{
+  "objective": "Make a wooden pickaxe",
+  "started_at": "2026-04-12T03:42:17.820Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-12T03:42:54.530Z",
+      "stage": "PTD",
+      "raw": "{\n  \"objective\": \"Make a wooden pickaxe\",\n  \"sinks\": [\"wooden_pickaxe\"],\n  \"vertices\": [\n    {\n      \"id\": \"wooden_pickaxe\",\n      \"qty\": 1,\n      \"item_type\": \"tool\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"crafting_table\",\n      \"qty\": 1,\n      \"item_type\": \"workstation\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"stick\",\n      \"qty\": 4,\n      \"item_type\": \"item\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"any_plank\",\n      \"qty\": 12,\n      \"item_type\": \"item\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"any_log\",\n      \"qty\": 3,\n      \"item_type\": \"resource\",\n      \"acquisition_dependency\": \"none\"\n    }\n  ],\n  \"edges\": [\n    {\n      \"from\": \"any_log\",\n      \"to\": \"any_plank\",\n      \"type\": \"crafting_input\",\n      \"qty\": 3,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"crafting_table\",\n      \"type\": \"crafting_input\",\n      \"qty\": 4,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"stick\",\n      \"type\": \"crafting_input\",\n      \"qty\": 2,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"wooden_pickaxe\",\n      \"type\": \"crafting_input\",\n      \"qty\": 3,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"stick\",\n      \"to\": \"wooden_pickaxe\",\n      \"type\": \"crafting_input\",\n      \"qty\": 2,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"crafting_table\",\n      \"to\": \"wooden_pickaxe\",\n      \"type\": \"workstation_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    }\n  ]\n}",
+      "parsed": {
+        "objective": "Make a wooden pickaxe",
+        "sinks": [
+          "wooden_pickaxe"
+        ],
+        "vertices": [
+          {
+            "id": "wooden_pickaxe",
+            "qty": 1,
+            "item_type": "tool",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "crafting_table",
+            "qty": 1,
+            "item_type": "workstation",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "stick",
+            "qty": 4,
+            "item_type": "item",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "any_plank",
+            "qty": 12,
+            "item_type": "item",
+            "acquisition_dependency": "none"
+          },
+          {
+            "id": "any_log",
+            "qty": 3,
+            "item_type": "resource",
+            "acquisition_dependency": "none"
+          }
+        ],
+        "edges": [
+          {
+            "from": "any_log",
+            "to": "any_plank",
+            "type": "crafting_input",
+            "qty": 3,
+            "consumed": true
+          },
+          {
+            "from": "any_plank",
+            "to": "crafting_table",
+            "type": "crafting_input",
+            "qty": 4,
+            "consumed": true
+          },
+          {
+            "from": "any_plank",
+            "to": "stick",
+            "type": "crafting_input",
+            "qty": 2,
+            "consumed": true
+          },
+          {
+            "from": "any_plank",
+            "to": "wooden_pickaxe",
+            "type": "crafting_input",
+            "qty": 3,
+            "consumed": true
+          },
+          {
+            "from": "stick",
+            "to": "wooden_pickaxe",
+            "type": "crafting_input",
+            "qty": 2,
+            "consumed": true
+          },
+          {
+            "from": "crafting_table",
+            "to": "wooden_pickaxe",
+            "type": "workstation_dependency",
+            "qty": 1,
+            "consumed": false
+          }
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:42:54.536Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:43:07.147Z",
+      "stage": "NTS",
+      "raw": "{\n  \"action_type\": \"search\",\n  \"parameters\": {\n    \"targets\": [\n      {\n        \"target\": \"any_log\",\n        \"match_mode\": \"abstract_class\"\n      }\n    ]\n  },\n  \"rationale\": \"No source node is directly achievable since no logs are in nearby_blocks, so search for any_log.\"\n}",
+      "parsed": {
+        "action_type": "search",
+        "parameters": {
+          "targets": [
+            {
+              "target": "any_log",
+              "match_mode": "abstract_class"
+            }
+          ]
+        },
+        "rationale": "No source node is directly achievable since no logs are in nearby_blocks, so search for any_log."
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:43:07.209Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!searchForBlock(\"oak_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T03:43:07.226Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"spruce_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T03:43:17.638Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:43:26.930Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": null,\n    \"tool\": null\n  },\n  \"rationale\": \"Direct: any_log is a source node and a spruce_log is nearby, so collecting logs now without tools is supported.\"\n}",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": null,
+          "tool": null
+        },
+        "rationale": "Direct: any_log is a source node and a spruce_log is nearby, so collecting logs now without tools is supported."
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:43:30.367Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"spruce_log\", 3)"
+    },
+    {
+      "timestamp": "2026-04-12T03:43:46.973Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-12T03:43:46.974Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:44:25.757Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"any_plank\",\n  \"qty\": 12,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      {\n        \"item\": \"any_log\",\n        \"qty\": 3\n      }\n    ],\n    \"workstation\": null\n  },\n  \"rationale\": \"Direct craft: any_plank is a source node and 3 spruce_log in inventory satisfy the any_log input in satisfied_inputs (spruce_planks craftable), so we can craft planks now.\"\n}",
+      "parsed": {
+        "target_item": "any_plank",
+        "qty": 12,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_log",
+              "qty": 3
+            }
+          ],
+          "workstation": null
+        },
+        "rationale": "Direct craft: any_plank is a source node and 3 spruce_log in inventory satisfy the any_log input in satisfied_inputs (spruce_planks craftable), so we can craft planks now."
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:44:29.967Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"spruce_planks\", 3)"
+    },
+    {
+      "timestamp": "2026-04-12T03:44:37.107Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!craftRecipe(\"spruce_planks\", 1)"
+    },
+    {
+      "timestamp": "2026-04-12T03:44:42.051Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-12T03:44:42.053Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:44:58.022Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"crafting_table\",\n  \"qty\": 1,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      {\n        \"item\": \"any_plank\",\n        \"qty\": 4\n      }\n    ],\n    \"workstation\": null\n  },\n  \"rationale\": \"Direct: crafting_table is a source node and is craftable now (listed in craftable_items) using any_plank x4 per satisfied_inputs, so crafting is the appropriate action.\"\n}",
+      "parsed": {
+        "target_item": "crafting_table",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4
+            }
+          ],
+          "workstation": null
+        },
+        "rationale": "Direct: crafting_table is a source node and is craftable now (listed in craftable_items) using any_plank x4 per satisfied_inputs, so crafting is the appropriate action."
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:45:01.400Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"crafting_table\", 1)"
+    },
+    {
+      "timestamp": "2026-04-12T03:45:03.861Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-12T03:45:03.863Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:45:17.437Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"stick\",\n  \"qty\": 4,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      {\n        \"item\": \"any_plank\",\n        \"qty\": 2\n      }\n    ],\n    \"workstation\": null\n  },\n  \"rationale\": \"Direct craft: 'stick' is a source node and is craftable now (craftable_items includes stick) using satisfied_inputs any_plank x2 covered by inventory spruce_planks.\"\n}",
+      "parsed": {
+        "target_item": "stick",
+        "qty": 4,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 2
+            }
+          ],
+          "workstation": null
+        },
+        "rationale": "Direct craft: 'stick' is a source node and is craftable now (craftable_items includes stick) using satisfied_inputs any_plank x2 covered by inventory spruce_planks."
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:45:25.573Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"stick\", 1)"
+    },
+    {
+      "timestamp": "2026-04-12T03:45:27.428Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-12T03:45:27.431Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe"
+        ],
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:45:34.899Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"wooden_pickaxe\",\n  \"qty\": 1,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      { \"item\": \"any_plank\", \"qty\": 3 },\n      { \"item\": \"stick\", \"qty\": 2 }\n    ],\n    \"workstation\": \"crafting_table\"\n  },\n  \"rationale\": \"Direct craft: the source node wooden_pickaxe is in craftable_items and the inventory provides any_plank x3 and stick x2 with a crafting_table available.\"\n}",
+      "parsed": {
+        "target_item": "wooden_pickaxe",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 3
+            },
+            {
+              "item": "stick",
+              "qty": 2
+            }
+          ],
+          "workstation": "crafting_table"
+        },
+        "rationale": "Direct craft: the source node wooden_pickaxe is in craftable_items and the inventory provides any_plank x3 and stick x2 with a crafting_table available."
+      }
+    },
+    {
+      "timestamp": "2026-04-12T03:45:40.419Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"wooden_pickaxe\", 1)"
+    },
+    {
+      "timestamp": "2026-04-12T03:46:08.996Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!craftRecipe(\"wooden_pickaxe\", 1)"
+    },
+    {
+      "timestamp": "2026-04-12T03:46:14.032Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "{\"status\":\"TASK_COMPLETE\"}"
+    },
+    {
+      "timestamp": "2026-04-12T03:46:14.034Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 2,
+        "why": "all original sinks satisfied",
+        "final": {
+          "vertices": [],
+          "edges": []
+        }
+      }
+    }
+  ],
+  "completed_at": "2026-04-12T03:46:14.038Z",
+  "completion_reason": "all sinks satisfied"
+}

@@ -1,0 +1,86 @@
+{
+  "objective": "Make an iron pickaxe",
+  "graph": {
+    "objective": "Make a wooden pickaxe",
+    "sinks": [
+      "wooden_pickaxe"
+    ],
+    "vertices": [
+      {
+        "id": "wooden_pickaxe",
+        "qty": 1,
+        "item_type": "tool",
+        "acquisition_dependency": "none"
+      },
+      {
+        "id": "crafting_table",
+        "qty": 1,
+        "item_type": "workstation",
+        "acquisition_dependency": "none"
+      },
+      {
+        "id": "stick",
+        "qty": 4,
+        "item_type": "item",
+        "acquisition_dependency": "none"
+      },
+      {
+        "id": "any_plank",
+        "qty": 12,
+        "item_type": "item",
+        "acquisition_dependency": "none"
+      },
+      {
+        "id": "any_log",
+        "qty": 3,
+        "item_type": "resource",
+        "acquisition_dependency": "none"
+      }
+    ],
+    "edges": [
+      {
+        "from": "any_log",
+        "to": "any_plank",
+        "type": "crafting_input",
+        "qty": 3,
+        "consumed": true
+      },
+      {
+        "from": "any_plank",
+        "to": "crafting_table",
+        "type": "crafting_input",
+        "qty": 4,
+        "consumed": true
+      },
+      {
+        "from": "any_plank",
+        "to": "stick",
+        "type": "crafting_input",
+        "qty": 2,
+        "consumed": true
+      },
+      {
+        "from": "any_plank",
+        "to": "wooden_pickaxe",
+        "type": "crafting_input",
+        "qty": 3,
+        "consumed": true
+      },
+      {
+        "from": "stick",
+        "to": "wooden_pickaxe",
+        "type": "crafting_input",
+        "qty": 2,
+        "consumed": true
+      },
+      {
+        "from": "crafting_table",
+        "to": "wooden_pickaxe",
+        "type": "workstation_dependency",
+        "qty": 1,
+        "consumed": false
+      }
+    ]
+  },
+  "saved_at": "2026-04-12T03:51:25.514Z"
+}

@@ -1,3 +1,5 @@
+import {readFile} from 'fs/promises';
+
 import {executeCommand} from '../../../src/agent/commands/index.js';
 
 import {clearCheckpoint, saveCheckpoint} from './checkpoint.js';
@@ -58,7 +60,9 @@ export async function structuredLoop(model, agent, T, G = null) {
   const log = createRolloutLogger(T);
 
   // ── Phase 1: PTD ─────────────────────────────────────────────────────────
-  G = await run_ptd(model, T, G, log);
+  // G = await run_ptd(model, T, G, log);
+  G = await loadGraphFromFile(
+      './achievement_hunter/docs/platonic_ptds/wooden_pickaxe.json');
   if (!G) return;
   saveCheckpoint(T, G);
 
@@ -274,15 +278,16 @@ export async function run_expanded_search_tasks(model, task, agent, log) {
 
         // Fast-path: target already visible in current state snapshot
         if (check_search_complete(concrete_item, state)) {
-          console.log(
-              `[SPL] Search already complete: ${concrete_item} found in current state.`);
+          console.log(`[SPL] Search already complete: ${
+              concrete_item} found in current state.`);
           return 'success';
         }
 
         // Hardcoded dispatch — no LLM call
         const command = make_search_command(concrete_item, radius);
         log.am(++attempt, command);
-        console.log(`[SPL] Search action (${concrete_item} r=${radius}):`, command);
+        console.log(
+            `[SPL] Search action (${concrete_item} r=${radius}):`, command);
 
         let result = await executeCommand(agent, command);
         console.log('[SPL] Search result:', result);
@@ -291,13 +296,16 @@ export async function run_expanded_search_tasks(model, task, agent, log) {
         // block/mob name, wrong arg count, etc.) it returns a plain error
         // string without the "Action output:" prefix. Fall back to AM so the
         // LLM can choose a valid command for this target.
-        if (typeof result === 'string' && !result.startsWith('Action output:')) {
-          console.warn(
-              `[SPL] Invalid search command for "${concrete_item}", delegating to AM.`);
+        if (typeof result === 'string' &&
+            !result.startsWith('Action output:')) {
+          console.warn(`[SPL] Invalid search command for "${
+              concrete_item}", delegating to AM.`);
           const action = await model.sendRequest(
               [], fill_action_mediator_prompt(search_task, state));
           log.am(++attempt, action);
-          console.log(`[SPL] AM fallback action (${concrete_item} r=${radius}):`, action);
+          console.log(
+              `[SPL] AM fallback action (${concrete_item} r=${radius}):`,
+              action);
 
           const signal = extract_json(action);
           if (signal?.status === 'TASK_COMPLETE') {
@@ -386,19 +394,57 @@ function create_search_task(target, search_radius, base_task) {
 // Everything not in this set is treated as a block target.
 const MOB_SEARCH_TARGETS = new Set([
   // Overworld hostile
-  'skeleton', 'stray', 'wither_skeleton',
-  'zombie', 'zombie_villager', 'drowned', 'husk', 'zombified_piglin',
-  'creeper', 'spider', 'cave_spider',
-  'enderman', 'witch', 'slime', 'magma_cube',
-  'blaze', 'ghast', 'phantom',
-  'silverfish', 'shulker', 'guardian', 'elder_guardian',
-  'vindicator', 'evoker', 'pillager', 'ravager',
+  'skeleton',
+  'stray',
+  'wither_skeleton',
+  'zombie',
+  'zombie_villager',
+  'drowned',
+  'husk',
+  'zombified_piglin',
+  'creeper',
+  'spider',
+  'cave_spider',
+  'enderman',
+  'witch',
+  'slime',
+  'magma_cube',
+  'blaze',
+  'ghast',
+  'phantom',
+  'silverfish',
+  'shulker',
+  'guardian',
+  'elder_guardian',
+  'vindicator',
+  'evoker',
+  'pillager',
+  'ravager',
   // Overworld passive / neutral
-  'cow', 'mooshroom', 'sheep', 'pig', 'chicken',
-  'rabbit', 'squid', 'glow_squid', 'fox', 'wolf',
-  'llama', 'trader_llama', 'horse', 'donkey', 'mule',
-  'bee', 'panda', 'polar_bear', 'turtle',
-  'axolotl', 'goat', 'frog', 'sniffer', 'armadillo',
+  'cow',
+  'mooshroom',
+  'sheep',
+  'pig',
+  'chicken',
+  'rabbit',
+  'squid',
+  'glow_squid',
+  'fox',
+  'wolf',
+  'llama',
+  'trader_llama',
+  'horse',
+  'donkey',
+  'mule',
+  'bee',
+  'panda',
+  'polar_bear',
+  'turtle',
+  'axolotl',
+  'goat',
+  'frog',
+  'sniffer',
+  'armadillo',
 ]);
 
 /**
@@ -432,4 +478,12 @@ export function make_search_command(target, radius) {
     return `!searchForEntity("${target}", ${radius})`;
   }
   return `!searchForBlock("${target}", ${radius})`;
+}
+/**
+ * Used to manually load in PTDs.
+ *
+ */
+async function loadGraphFromFile(path) {
+  const text = await readFile(path, 'utf8');
+  return JSON.parse(text);
 }

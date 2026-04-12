@@ -17,8 +17,9 @@ export function trim_graph_for_scsg(graph) {
   return {
     objective: graph.objective,
     sinks: graph.sinks,
-    vertices: graph.vertices.map(({ id, qty }) => ({ id, qty })),
-    edges: graph.edges.map(({ from, to, qty, consumed }) => ({ from, to, qty, consumed })),
+    vertices: graph.vertices.map(({id, qty}) => ({id, qty})),
+    edges: graph.edges.map(
+        ({from, to, qty, consumed}) => ({from, to, qty, consumed})),
   };
 }
 
@@ -39,20 +40,26 @@ export function trim_graph_for_scsg(graph) {
 export function enrich_subgraph(subgraph, original_graph) {
   const vertex_map = new Map(original_graph.vertices.map(v => [v.id, v]));
   const edge_map = new Map(
-    original_graph.edges.map(e => [`${e.from}->${e.to}:${e.consumed}`, e])
-  );
+      original_graph.edges.map(e => [`${e.from}->${e.to}:${e.consumed}`, e]));
   const subgraph_ids = new Set(subgraph.vertices.map(v => v.id));
 
   const vertices = subgraph.vertices.map(v => {
     const original = vertex_map.get(v.id);
     if (!original) {
-      console.warn(`enrich_subgraph: no original vertex found for id "${v.id}"`);
+      console.warn(
+          `enrich_subgraph: no original vertex found for id "${v.id}"`);
       return v;
     }
 
-    const satisfied_inputs = original_graph.edges
-      .filter(e => e.to === v.id && !subgraph_ids.has(e.from))
-      .map(e => ({ from: e.from, type: e.type, qty: e.qty, consumed: e.consumed }));
+    const satisfied_inputs =
+        original_graph.edges
+            .filter(e => e.to === v.id && !subgraph_ids.has(e.from))
+            .map(e => ({
+                   from: e.from,
+                   type: e.type,
+                   qty: e.qty,
+                   consumed: e.consumed
+                 }));
 
     return {
       ...v,
@@ -65,21 +72,75 @@ export function enrich_subgraph(subgraph, original_graph) {
   const edges = subgraph.edges.map(e => {
     const original = edge_map.get(`${e.from}->${e.to}:${e.consumed}`);
     if (!original) {
-      console.warn(
-        `enrich_subgraph: no original edge found for (${e.from} -> ${e.to}, consumed=${e.consumed})`
-      );
+      console.warn(`enrich_subgraph: no original edge found for (${e.from} -> ${
+          e.to}, consumed=${e.consumed})`);
       return e;
     }
-    return { ...e, type: original.type };
+    return {...e, type: original.type};
   });
 
-  return { ...subgraph, vertices, edges };
+  return {...subgraph, vertices, edges};
 }
 
 /**
- * Converts a graph { objective, sinks, vertices, edges } to a Mermaid LR diagram.
- * Edges are stored as from→to (from is a prerequisite of to), so we display them
- * left-to-right: raw materials on the left, goal sinks on the right.
+ * Returns only the enriched source vertices from a pruned SCSG subgraph.
+ *
+ * A "source" vertex is any vertex in the subgraph with no incoming edge
+ * from another vertex that is still present in the subgraph.
+ *
+ * Enrichment:
+ *   - Restores item_type and acquisition_dependency from the original graph
+ *   - Adds satisfied_inputs: edges from the original graph that pointed TO
+ *     that vertex but whose from-vertex was pruned
+ *
+ * Example:
+ *   const trimmed = trim_graph_for_scsg(ptd_graph);
+ *   // ... run scsg to get subgraph ...
+ *   const enriched_sources = enrich_subgraph_sources(subgraph, ptd_graph);
+ */
+export function enrich_subgraph_sources(subgraph, original_graph) {
+  const vertex_map = new Map(original_graph.vertices.map(v => [v.id, v]));
+  const subgraph_ids = new Set(subgraph.vertices.map(v => v.id));
+
+  // Find all vertices in the subgraph that have an incoming edge
+  // from another vertex still present in the subgraph.
+  const non_source_ids = new Set(
+      subgraph.edges
+          .filter(e => subgraph_ids.has(e.from) && subgraph_ids.has(e.to))
+          .map(e => e.to));
+
+  return subgraph.vertices.filter(v => !non_source_ids.has(v.id)).map(v => {
+    const original = vertex_map.get(v.id);
+    if (!original) {
+      console.warn(
+          `enrich_subgraph_sources: no original vertex found for id "${v.id}"`);
+      return v;
+    }
+
+    const satisfied_inputs =
+        original_graph.edges
+            .filter(e => e.to === v.id && !subgraph_ids.has(e.from))
+            .map(e => ({
+                   from: e.from,
+                   type: e.type,
+                   qty: e.qty,
+                   consumed: e.consumed,
+                 }));
+
+    return {
+      ...v,
+      item_type: original.item_type,
+      acquisition_dependency: original.acquisition_dependency,
+      satisfied_inputs,
+    };
+  });
+}
+
+/**
+ * Converts a graph { objective, sinks, vertices, edges } to a Mermaid LR
+ * diagram. Edges are stored as from→to (from is a prerequisite of to), so we
+ * display them left-to-right: raw materials on the left, goal sinks on the
+ * right.
  */
 export function graph_to_mermaid(graph) {
   if (!graph || !graph.vertices || graph.vertices.length === 0) {
@@ -101,7 +162,8 @@ export function graph_to_mermaid(graph) {
 
   if (graph.sinks) {
     for (const sink of graph.sinks) {
-      lines.push(`    style ${_safe_id(sink)} fill:#4CAF50,color:#fff,stroke:#388E3C`);
+      lines.push(
+          `    style ${_safe_id(sink)} fill:#4CAF50,color:#fff,stroke:#388E3C`);
     }
   }
 
