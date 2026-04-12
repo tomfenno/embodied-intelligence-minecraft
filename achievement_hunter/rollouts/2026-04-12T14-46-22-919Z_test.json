@@ -1,0 +1,230 @@
+{
+  "objective": "test",
+  "started_at": "2026-04-12T14:46:22.920Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-12T14:46:22.923Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T14:46:22.925Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T14:46:24.800Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"null\",\n    \"item_dependency\": \"any_log\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "null",
+          "item_dependency": "any_log",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T14:46:25.665Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"any_log\")",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "ice",
+          "water"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "salmon"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T14:46:25.666Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"oak_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T14:46:25.716Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"spruce_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T14:46:25.765Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"birch_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T14:46:25.808Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"jungle_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T14:46:25.848Z",
+      "stage": "AM",
+      "attempt": 6,
+      "raw": "!searchForBlock(\"acacia_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T14:46:25.892Z",
+      "stage": "AM",
+      "attempt": 7,
+      "raw": "!searchForBlock(\"dark_oak_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T14:46:25.935Z",
+      "stage": "AM",
+      "attempt": 8,
+      "raw": "!searchForBlock(\"mangrove_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T14:46:25.978Z",
+      "stage": "AM",
+      "attempt": 9,
+      "raw": "!searchForBlock(\"cherry_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T14:46:26.022Z",
+      "stage": "AM",
+      "attempt": 10,
+      "raw": "!searchForBlock(\"pale_oak_log\", 32)"
+    },
+    {
+      "timestamp": "2026-04-12T14:46:26.062Z",
+      "stage": "AM",
+      "attempt": 11,
+      "raw": "!searchForBlock(\"oak_log\", 64)"
+    },
+    {
+      "timestamp": "2026-04-12T14:46:44.103Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!collectBlocks(\"oak_log\", 3)",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "water",
+          "spruce_stairs",
+          "spruce_planks",
+          "oak_stairs",
+          "oak_planks",
+          "chest",
+          "oak_log",
+          "oak_trapdoor",
+          "dirt",
+          "spruce_fence"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "salmon"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -6,9 +6,9 @@
   "//": [
     "Per-stage model overrides. Omit any field to fall back to 'model' above.",
     "Available OpenAI models:",
-    "  gpt-5           — most capable, highest cost",
-    "  gpt-4o          — fast and capable, good default",
-    "  gpt-4o-mini     — lightweight, low cost, good for simple dispatch (am/nts)",
+    "  gpt-5           — most capable, highest cost (ptd)",
+    "  gpt-4o          — fast and capable, good default (am)",
+    "  gpt-4o-mini     — lightweight, low cost, good for simple dispatch (nts)",
     "  gpt-4-turbo     — previous generation flagship",
     "  o3              — high reasoning, slow and expensive",
     "  o3-mini         — fast reasoning, lower cost",
@@ -16,8 +16,8 @@
     "  o1-mini         — lightweight reasoning"
   ],
   "ptd_model": "",
-  "nts_model": "gpt-5",
-  "am_model": "",
+  "nts_model": "gpt-4o-mini",
+  "am_model": "gpt-4o",
 
   "modes": {
     "self_preservation": true,

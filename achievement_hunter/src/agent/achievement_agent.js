@@ -2,7 +2,6 @@ import { Agent } from '../../../src/agent/agent.js';
 import { loadCheckpoint } from '../pipeline/checkpoint.js';
 import { structuredLoop } from '../pipeline/structured_loop.js';
 
-const AUTO_MESSAGE_PREFIX = '(AUTO MESSAGE)';
 
 /**
  * AchievementAgent extends the base Agent to implement the Structured Prompting Loop.
@@ -50,11 +49,13 @@ export class AchievementAgent extends Agent {
             return true;
         }
 
-        // Suppress auto-messages from safety modes (self_preservation, unstuck, etc.)
-        // while the SPL is running. The modes still act physically — we just prevent
-        // them from hijacking control flow. The outer loop re-evaluates on the next iteration.
-        if (!this._waiting_for_objective && message.startsWith(AUTO_MESSAGE_PREFIX)) {
-            console.log('[SPL] Mode auto-message suppressed:', message.slice(0, 100));
+        // While the SPL is running, suppress ALL incoming messages.
+        // The base agent's response path (super.handleMessage → promptConvo → chat_model)
+        // runs independently of the SPL and would execute conflicting commands via
+        // executeCommand, causing erratic behavior with per-stage model assignment.
+        // Modes still act physically via bot.modes.update() — this only blocks the LLM path.
+        if (!this._waiting_for_objective) {
+            console.log('[SPL] Message suppressed while SPL is running:', source, '-', message.slice(0, 80));
             return true;
         }
 
