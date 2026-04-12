@@ -1,0 +1,6145 @@
+{
+  "objective": "TEST",
+  "started_at": "2026-04-12T18:05:23.645Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-12T18:05:23.649Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:23.653Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:25.359Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:25.617Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:25.861Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:26.117Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:26.435Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:26.677Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:26.678Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:26.679Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:30.227Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:30.428Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:30.661Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:30.880Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:31.125Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:31.358Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:31.360Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:31.361Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:32.893Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": null,\n    \"tool\": null\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": null,
+          "tool": null
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:33.132Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:33.399Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:33.625Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:33.859Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:34.105Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:34.107Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:34.109Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:35.798Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:36.050Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:36.278Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:36.472Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:36.713Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:36.932Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:36.933Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:36.934Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:38.752Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:38.964Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:39.197Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:39.433Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:39.638Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:39.838Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:39.840Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:39.841Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:42.413Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:42.660Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:42.879Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:43.080Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:43.303Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:43.504Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:43.506Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:43.507Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:45.382Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:45.582Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:45.787Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:45.982Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:46.179Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:46.373Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:46.374Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:46.375Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:47.815Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:48.054Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:48.266Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:48.473Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:48.668Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:48.905Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:48.909Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:48.911Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:50.692Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:50.915Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:51.134Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:51.342Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:51.624Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:51.840Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:51.846Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:51.861Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:55.649Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:55.926Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:56.161Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:56.369Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:56.584Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:56.776Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:56.778Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:56.779Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:05:58.692Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:58.900Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:59.114Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:59.483Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:59.693Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:59.916Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:59.918Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:05:59.919Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:01.916Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:02.143Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:02.384Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:02.627Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:02.834Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:03.078Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:03.082Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:03.084Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:04.804Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:05.018Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:05.209Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:05.413Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:05.642Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:05.885Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:05.887Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:05.889Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:10.089Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:10.306Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:10.566Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:10.841Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:11.063Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:11.301Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:11.304Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:11.305Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:13.129Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:13.342Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:13.550Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:13.750Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:13.987Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:14.207Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:14.208Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:14.210Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:15.857Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:16.063Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:16.266Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:16.478Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:16.681Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:16.918Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:16.920Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:16.922Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:18.463Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:18.674Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:18.897Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:19.149Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:19.358Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:19.579Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:19.581Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:19.582Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:21.229Z",
+      "stage": "NTS",
+      "raw": "{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:22.577Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:22.815Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:23.043Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:23.261Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:23.475Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:23.477Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:23.478Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:25.789Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:26.022Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:26.223Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:26.422Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:26.671Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:26.904Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:26.906Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:26.908Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:29.827Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:30.619Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:30.884Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:31.085Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:31.267Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:31.563Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:31.567Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:31.569Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:33.204Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:33.435Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:33.668Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:33.889Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:34.098Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:34.327Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:34.330Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:34.332Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:36.456Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:36.666Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:36.862Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:37.082Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:37.282Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:37.476Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:37.479Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:37.480Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:39.411Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:39.624Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:39.858Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:40.064Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:40.310Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:41.505Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:41.509Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:41.511Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:43.646Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:43.859Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:44.087Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:44.283Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:44.531Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:44.741Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:44.743Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:44.745Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:46.538Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:46.820Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:47.031Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:47.261Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:47.469Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:47.661Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:47.663Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:47.664Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:49.627Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:49.968Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:50.183Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:50.402Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:50.621Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:50.826Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:50.827Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:50.828Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:52.631Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:52.862Z",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:53.072Z",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:53.475Z",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:54.903Z",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:55.116Z",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "My brain disconnected, try again.",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "spruce_leaves",
+          "stone",
+          "brown_mushroom",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:55.119Z",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-04-12T18:06:55.120Z",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": []
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-12T18:06:56.759Z",
+      "stage": "NTS",
+      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"spruce_log\",\n    \"item_dependency\": \"null\",\n    \"tool\": \"null\"\n  }\n}\n```",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": "null",
+          "tool": "null"
+        }
+      }
+    }
+  ]
+}

@@ -4,7 +4,7 @@ import {executeCommand} from '../../../src/agent/commands/index.js';
 
 import {clearCheckpoint, saveCheckpoint} from './checkpoint.js';
 import {enrich_subgraph_sources} from './graph_utils.js';
-import {extract_json} from './json_utils.js';
+import {extract_json, strip_fences, to_snake_case} from './json_utils.js';
 import {fill_action_mediator_prompt, fill_next_task_selector_prompt, fill_ptd_prompt,} from './prompt_utils.js';
 import {createRolloutLogger} from './rollout_logger.js';
 import {ABSTRACT_CLASS_MEMBERS, compute_scsg} from './scsg.js';
@@ -33,6 +33,13 @@ const ANY_LOG_SEARCH_TARGETS = [
   'pale_oak_log',
 ];
 
+// Prefixed console wrapper — keeps [SPL] tag out of logic code.
+const spl = {
+  log: (...args) => console.log('[SPL]', ...args),
+  warn: (...args) => console.warn('[SPL]', ...args),
+  error: (...args) => console.error('[SPL]', ...args),
+};
+
 /**
  * Runs the Structured Prompting Loop for a primary task T.
  *
@@ -45,16 +52,16 @@ const ANY_LOG_SEARCH_TARGETS = [
  *              (!search(target) responses are intercepted and run as hardcoded
  *              searches; all other commands go to executeCommand)
  *           Repeat from (2) until the SCSG signals all sinks are satisfied
- *           (r=2).
+ * (r=2).
  *
  * @param {{ptd: object, nts: object, am: object}} models
- *                         - Per-stage model instances, each with sendRequest(turns, systemMessage).
- * @param {object} agent   - The Mindcraft agent instance.
- * @param {string} T       - The primary task objective (e.g. "craft a diamond
+ *   Per-stage model instances, each with sendRequest(turns, systemMessage).
+ * @param {object} agent  The Mindcraft agent instance.
+ * @param {string} T      The primary task objective (e.g. "craft a diamond
  *     sword").
- * @param {object} [G]     - Pre-built PTD graph. When provided (crash resume),
+ * @param {object} [G]    Pre-built PTD graph. When provided (crash resume),
  *     Phase 1
- *                           is skipped and the loop resumes from Phase 2 (SCSG)
+ *                        is skipped and the loop resumes from Phase 2 (SCSG)
  * directly.
  */
 export async function structuredLoop(models, agent, T, G = null) {
@@ -63,14 +70,13 @@ export async function structuredLoop(models, agent, T, G = null) {
   // ── Phase 1: PTD ─────────────────────────────────────────────────────────
   // G = await run_ptd(models.ptd, T, G, log);
   G = await loadGraphFromFile(
-      './achievement_hunter/docs/platonic_ptds/wooden_pickaxe.json');
+      './achievement_hunter/docs/ptd_jsons/wooden_pickaxe.json');
   if (!G) return;
   saveCheckpoint(T, G);
 
   // ── Phase 2+: Outer Loop ──────────────────────────────────────────────────
   let consecutive_failures = 0;
   while (true) {
-    // SCSG (deterministic — never retries)
     const scsg = run_scsg(G, agent, log);
     if (scsg.status === 'complete') {
       clearCheckpoint();
@@ -78,11 +84,10 @@ export async function structuredLoop(models, agent, T, G = null) {
       return;
     }
 
-    // NTS
     const task = await run_nts(models.nts, scsg.candidates, agent, log);
     if (!task) {
       if (++consecutive_failures >= MAX_OUTER_RETRIES) {
-        console.error('[SPL] Max outer retries exceeded. Aborting.');
+        spl.error('Max outer retries exceeded. Aborting.');
         log.complete('max outer retries exceeded');
         return;
       }
@@ -91,13 +96,8 @@ export async function structuredLoop(models, agent, T, G = null) {
     consecutive_failures = 0;
 
     const am_status = await run_am(models.am, task, agent, log);
-
-    if (am_status !== 'success') {
-      console.log(
-          '[SPL] Task failed after max retries, re-evaluating state...');
-      // Outer loop continues: re-query inventory and re-run SCSG to pick a new
-      // sub-task
-    }
+    if (am_status !== 'success')
+      spl.log('Task failed after max retries, re-evaluating state...');
   }
 }
 
@@ -115,23 +115,30 @@ export async function structuredLoop(models, agent, T, G = null) {
  */
 async function run_ptd(model, T, existing_G, log) {
   if (existing_G) {
-    console.log('[SPL] Resuming from checkpoint, skipping PTD for:', T);
+    spl.log('Resuming from checkpoint, skipping PTD for:', T);
     log.ptd('[loaded from checkpoint]', existing_G);
     return existing_G;
   }
 
-  console.log('[SPL] Building PTD for:', T);
+  spl.log('Building PTD for:', T);
   const response = await model.sendRequest([], fill_ptd_prompt(T));
   const G = extract_json(response);
+
   log.ptd(response, G);
 
   if (!G) {
-    console.error('[SPL] Failed to extract PTD graph from LLM response.');
+    spl.error('Failed to extract PTD graph from LLM response.');
     log.complete('PTD extraction failed');
     return null;
   }
 
-  console.log('[SPL] PTD built.');
+  // Save ptd for later use.
+  const file_path =
+      'achievement_hunter/docs/ptd_jsons/' + to_snake_case(T) + '.json';
+
+  save_json(G, file_path);
+
+  spl.log('PTD built.');
   return G;
 }
 
@@ -152,10 +159,11 @@ function run_scsg(G, agent, log) {
   const result = compute_scsg(G, inventory);
   // Augment r=1 result with sinks so the logger can render them correctly
   // (r=1 has no `s` field; r=0 does).
-  log.scsg('[deterministic]', result.r === 1 ? {...result, s: G.sinks} : result);
+  log.scsg(
+      '[deterministic]', result.r === 1 ? {...result, s: G.sinks} : result);
 
   if (result.r === 2) {
-    console.log('[SPL] Task complete — all sinks satisfied.');
+    spl.log('Task complete — all sinks satisfied.');
     return {status: 'complete', reason: 'all sinks satisfied'};
   }
 
@@ -168,7 +176,7 @@ function run_scsg(G, agent, log) {
   };
 
   if (!subgraph.vertices || subgraph.vertices.length === 0) {
-    console.log('[SPL] Task complete — subgraph is empty.');
+    spl.log('Task complete — subgraph is empty.');
     return {status: 'complete', reason: 'subgraph empty'};
   }
 
@@ -193,16 +201,16 @@ async function run_nts(model, candidates, agent, log) {
   log.nts(response, task);
 
   if (!task) {
-    console.error('[SPL] Failed to extract task from NTS response.');
+    spl.error('Failed to extract task from NTS response.');
     return null;
   }
 
-  console.log('[SPL] Next task:', JSON.stringify(task));
+  spl.log('Next task:', JSON.stringify(task));
   return task;
 }
 
 /**
- * Phase 4 — Action Mediator (AM), non-search path.
+ * Phase 4 — Action Mediator (AM).
  *
  * Converts the selected task into a bot command and executes it, retrying
  * up to MAX_INNER_RETRIES times. Exits early if the AM signals the task is
@@ -215,55 +223,42 @@ async function run_am(model, task, agent, log) {
     const state = get_am_state(agent);
 
     if (_task_complete(task, state)) {
-      console.log(
-          '[SPL] Task already complete (hardcoded check):',
+      spl.log(
+          'Task already complete (hardcoded check):',
           task.target_item ?? task.action_type);
       return 'success';
     }
 
-    const action =
-        await model.sendRequest([], fill_action_mediator_prompt(task, state));
+    const action = strip_fences(
+        await model.sendRequest([], fill_action_mediator_prompt(task, state)));
     log.am(attempt + 1, action, state);
-    console.log(
-        `[SPL] Action (attempt ${attempt + 1}/${MAX_INNER_RETRIES}):`, action);
+    spl.log(`Action (attempt ${attempt + 1}/${MAX_INNER_RETRIES}):`, action);
 
-    // AM signals completion when inventory already satisfies the task
-    const signal = extract_json(action);
-    if (signal?.status === 'TASK_COMPLETE') {
-      console.log(
-          '[SPL] AM reports task already complete:',
-          task.target_item ?? task.action_type);
-      return 'success';
-    }
+    if (extract_json(action)?.status === 'TASK_COMPLETE')
+      return _handle_task_complete_signal(task, agent, log);
 
-    // Intercept !search(target) — run hardcoded search expansion, no LLM.
-    // On return, continue the loop so AM gets fresh state on the next attempt.
     const search_target = _parse_search_command(action);
     if (search_target !== null) {
-      const found = await _run_search(search_target, state, agent, log, attempt + 1);
-      if (found) {
-        console.log(
-            `[SPL] Search found "${search_target}", re-running AM with fresh state.`);
-      } else {
-        console.warn(
-            `[SPL] Search exhausted all radii for "${search_target}", re-evaluating.`);
-      }
+      const found =
+          await _run_search(search_target, state, agent, log, attempt + 1);
+      found ? spl.log(`Search found "${
+                  search_target}", re-running AM with fresh state.`) :
+              spl.warn(`Search exhausted all radii for "${
+                  search_target}", re-evaluating.`);
       continue;
     }
 
-    // executeCommand returns a string only on error (bad format, unknown
-    // command, etc.) Any non-string result means the command ran successfully
     const result = await executeCommand(agent, action);
-    console.log('[SPL] Command result:', result);
+    spl.log('Command result:', result);
     if (typeof result !== 'string') return 'success';
-    console.warn('[SPL] Command error:', result);
+    spl.warn('Command error:', result);
   }
 
   return 'fail';
 }
 
-// ── Task Completion Check
-// ─────────────────────────────────────────────────
+// ── Task Completion
+// ───────────────────────────────────────────────────────────
 
 /**
  * Returns true if the task is already satisfied by the current inventory,
@@ -286,6 +281,29 @@ function _task_complete(task, state) {
   }
 
   return (inventory[target_item] ?? 0) >= qty;
+}
+
+/**
+ * Handles a TASK_COMPLETE signal from the AM. Validates the signal against
+ * a fresh inventory check and logs a warning if the two disagree.
+ *
+ * @returns {'success'}
+ */
+function _handle_task_complete_signal(task, agent, log) {
+  const fresh_state = get_am_state(agent);
+  if (!_task_complete(task, fresh_state)) {
+    const label = task.target_item ?? task.action_type;
+    const inv = JSON.stringify(fresh_state.inventory);
+    spl.warn(
+        'AM claimed TASK_COMPLETE but inventory check disagrees:', label,
+        '| inventory:', inv);
+    log.am_warn(
+        `TASK_COMPLETE claimed but inventory disagrees — ${label}: ${inv}`);
+  }
+  spl.log(
+      'AM reports task already complete:',
+      task.target_item ?? task.action_type);
+  return 'success';
 }
 
 // ── Search Helpers
@@ -315,7 +333,7 @@ async function _run_search(target, state, agent, log, start_attempt) {
   // Fast-path: already visible in the current state snapshot
   for (const item of concrete_items) {
     if (check_search_complete(item, state)) {
-      console.log(`[SPL] Search fast-path: "${item}" already in state.`);
+      spl.log(`Search fast-path: "${item}" already in state.`);
       return true;
     }
   }
@@ -325,23 +343,30 @@ async function _run_search(target, state, agent, log, start_attempt) {
     for (const item of concrete_items) {
       const command = make_search_command(item, radius);
       log.am(++attempt, command);
-      console.log(`[SPL] Search (${item} r=${radius}):`, command);
-
-      const result = await executeCommand(agent, command);
-      console.log('[SPL] Search result:', result);
-
-      // Success: command ran and did not report "Could not find"
-      if (typeof result !== 'string' ||
-          (result.startsWith('Action output:') &&
-           !result.includes('Could not find'))) {
-        console.log(`[SPL] Search succeeded: "${item}" at radius ${radius}.`);
+      if (await _execute_search_command(agent, item, radius, command))
         return true;
-      }
-      console.warn(`[SPL] Search failed: "${item}" at radius ${radius}.`);
     }
   }
 
   return false;
+}
+
+/**
+ * Executes a single search command and returns true if the target was found.
+ */
+async function _execute_search_command(agent, item, radius, command) {
+  spl.log(`Search (${item} r=${radius}):`, command);
+  const result = await executeCommand(agent, command);
+  spl.log('Search result:', result);
+
+  const found = typeof result !== 'string' ||
+      (result.startsWith('Action output:') &&
+       !result.includes('Could not find'));
+
+  found ? spl.log(`Search succeeded: "${item}" at radius ${radius}.`) :
+          spl.warn(`Search failed: "${item}" at radius ${radius}.`);
+
+  return found;
 }
 
 /**
@@ -449,10 +474,8 @@ export function make_search_command(target, radius) {
   }
   return `!searchForBlock("${target}", ${radius})`;
 }
-/**
- * Used to manually load in PTDs.
- *
- */
+
+/** Used to manually load in PTDs. */
 async function loadGraphFromFile(path) {
   const text = await readFile(path, 'utf8');
   return JSON.parse(text);
