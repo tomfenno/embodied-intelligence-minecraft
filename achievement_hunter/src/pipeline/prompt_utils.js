@@ -110,7 +110,7 @@ export function fill_next_task_selector_prompt(enriched_subgraph, state) {
   const template = _read_template(
       '../../docs/prompts/next_task_selector_prompts/next_task_selector.md');
   return _fill(
-      template, {'ENRICHED_SUBGRAPH': enriched_subgraph, 'STATE': state});
+      template, {'CANDIDATE_TARGETS': enriched_subgraph, 'STATE': state});
 }
 
 /**

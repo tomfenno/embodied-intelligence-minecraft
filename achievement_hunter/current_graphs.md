@@ -2,22 +2,20 @@ _PTD not yet generated._
 
 ---
 
-# SCSG — Make an iron pickaxe
-_Updated: 2026-04-12T04:44:50.998Z · r=1_
+# SCSG
+_Updated: 2026-04-12T06:41:14.082Z_
+
+**All sinks satisfied (r=2) — task complete.**
+
+
+---
+
+# Candidates — do something
+_Updated: 2026-04-12T06:40:49.286Z · 1 source node(s)_
 
 ```mermaid
 graph LR
     wooden_pickaxe["wooden_pickaxe ×1<br/>[tool]"]
-    crafting_table["crafting_table ×1<br/>[workstation]"]
-    stick["stick ×4<br/>[item]"]
-    any_plank["any_plank ×12<br/>[item]"]
-    any_log["any_log ×3<br/>[resource]"]
-    any_log -->|"×3"| any_plank
-    any_plank -->|"×4"| crafting_table
-    any_plank -->|"×2"| stick
-    any_plank -->|"×3"| wooden_pickaxe
-    stick -->|"×2"| wooden_pickaxe
-    crafting_table -->wooden_pickaxe
 ```
 
 ---
@@ -26,20 +24,26 @@ graph LR
 <td width="50%" valign="top">
 
 ## Current Task
-_Updated: 2026-04-12T04:44:49.912Z_
+_Updated: 2026-04-12T06:40:56.881Z_
 
 ```json
 {
-  "action_type": "search",
+  "target_item": "wooden_pickaxe",
+  "qty": 1,
+  "action_type": "craft",
   "parameters": {
-    "targets": [
+    "crafting_inputs": [
       {
-        "target": "any_log",
-        "match_mode": "abstract_class"
+        "item": "any_plank",
+        "qty": 3
+      },
+      {
+        "item": "stick",
+        "qty": 2
       }
-    ]
-  },
-  "rationale": "Search, because no source node is directly achievable: inventory is empty and nearby blocks show no logs, so locate any_log first."
+    ],
+    "workstation": "crafting_table"
+  }
 }
 ```
 
@@ -47,10 +51,12 @@ _Updated: 2026-04-12T04:44:49.912Z_
 <td width="50%" valign="top">
 
 ## Current Action _(attempt 2)_
-_Updated: 2026-04-12T04:44:49.983Z_
+_Updated: 2026-04-12T06:41:14.080Z_
 
-```
-!searchForBlock("spruce_log", 32)
+```json
+{
+  "status": "TASK_COMPLETE"
+}
 ```
 
 </td>

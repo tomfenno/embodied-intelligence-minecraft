@@ -16,7 +16,7 @@
 // Used by state_satisfied_vertices to sum inventory quantities across a class.
 // Add entries here when the PTD prompt introduces new abstract ids.
 
-const ABSTRACT_CLASS_MEMBERS = {
+export const ABSTRACT_CLASS_MEMBERS = {
   any_log: [
     'oak_log', 'spruce_log', 'birch_log', 'jungle_log',
     'acacia_log', 'dark_oak_log', 'mangrove_log', 'cherry_log', 'pale_oak_log',

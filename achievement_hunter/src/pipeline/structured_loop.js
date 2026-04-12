@@ -3,12 +3,12 @@ import {readFile} from 'fs/promises';
 import {executeCommand} from '../../../src/agent/commands/index.js';
 
 import {clearCheckpoint, saveCheckpoint} from './checkpoint.js';
-import {enrich_subgraph} from './graph_utils.js';
+import {enrich_subgraph_sources} from './graph_utils.js';
 import {extract_json} from './json_utils.js';
 import {fill_action_mediator_prompt, fill_next_task_selector_prompt, fill_ptd_prompt,} from './prompt_utils.js';
 import {createRolloutLogger} from './rollout_logger.js';
 import {compute_scsg} from './scsg.js';
-import {get_inventory_state, get_state} from './state.js';
+import {get_am_state, get_nts_state, get_sgsg_state} from './state.js';
 
 const MAX_INNER_RETRIES = 5;
 const MAX_OUTER_RETRIES = 10;
@@ -42,9 +42,10 @@ const ANY_LOG_SEARCH_TARGETS = [
  *   2. SCSG — prune the graph to what is still needed given current inventory
  *   3. NTS  — pick the next immediate task from the pruned graph
  *   4. AM   — convert that task into a bot command and execute it
- *              (search tasks are expanded before reaching AM — see
- * run_expanded_search_tasks) Repeat from (2) until the SCSG signals all sinks
- * are satisfied (r=2).
+ *              (!search(target) responses are intercepted and run as hardcoded
+ *              searches; all other commands go to executeCommand)
+ *           Repeat from (2) until the SCSG signals all sinks are satisfied
+ *           (r=2).
  *
  * @param {object} model   - Model instance with sendRequest(turns,
  *     systemMessage).
@@ -78,7 +79,7 @@ export async function structuredLoop(model, agent, T, G = null) {
     }
 
     // NTS
-    const task = await run_nts(model, scsg.enriched, agent, log);
+    const task = await run_nts(model, scsg.candidates, agent, log);
     if (!task) {
       if (++consecutive_failures >= MAX_OUTER_RETRIES) {
         console.error('[SPL] Max outer retries exceeded. Aborting.');
@@ -89,11 +90,7 @@ export async function structuredLoop(model, agent, T, G = null) {
     }
     consecutive_failures = 0;
 
-    // AM — search tasks are expanded into concrete mediator calls before
-    // reaching AM. Non-search tasks go directly to AM via run_am.
-    const am_status = task.action_type === 'search' ?
-        await run_expanded_search_tasks(model, task, agent, log) :
-        await run_am(model, task, agent, log);
+    const am_status = await run_am(model, task, agent, log);
 
     if (am_status !== 'success') {
       console.log(
@@ -147,13 +144,15 @@ async function run_ptd(model, T, existing_G, log) {
  *
  * @returns {{ status: 'complete', reason: string }}
  *            Task is finished — all sinks satisfied or subgraph is empty.
- * @returns {{ status: 'continue', enriched: object }}
- *            Normal case — enriched subgraph is ready for NTS.
+ * @returns {{ status: 'continue', candidates: object[] }}
+ *            Normal case — enriched source candidates are ready for NTS.
  */
 function run_scsg(G, agent, log) {
-  const {inventory} = get_inventory_state(agent);
+  const {inventory} = get_sgsg_state(agent);
   const result = compute_scsg(G, inventory);
-  log.scsg('[deterministic]', result);
+  // Augment r=1 result with sinks so the logger can render them correctly
+  // (r=1 has no `s` field; r=0 does).
+  log.scsg('[deterministic]', result.r === 1 ? {...result, s: G.sinks} : result);
 
   if (result.r === 2) {
     console.log('[SPL] Task complete — all sinks satisfied.');
@@ -173,7 +172,9 @@ function run_scsg(G, agent, log) {
     return {status: 'complete', reason: 'subgraph empty'};
   }
 
-  return {status: 'continue', enriched: enrich_subgraph(subgraph, G)};
+  const candidates = enrich_subgraph_sources(subgraph, G);
+  log.candidates(candidates);
+  return {status: 'continue', candidates};
 }
 
 /**
@@ -184,10 +185,10 @@ function run_scsg(G, agent, log) {
  *
  * @returns {object|null} The selected task object, or null if parsing failed.
  */
-async function run_nts(model, enriched, agent, log) {
-  const state = get_state(agent);
+async function run_nts(model, candidates, agent, log) {
+  const state = get_nts_state(agent);
   const response = await model.sendRequest(
-      [], fill_next_task_selector_prompt(enriched, state));
+      [], fill_next_task_selector_prompt(candidates, state));
   const task = extract_json(response);
   log.nts(response, task);
 
@@ -211,7 +212,7 @@ async function run_nts(model, enriched, agent, log) {
  */
 async function run_am(model, task, agent, log) {
   for (let attempt = 0; attempt < MAX_INNER_RETRIES; attempt++) {
-    const state = get_state(agent);
+    const state = get_am_state(agent);
     const action =
         await model.sendRequest([], fill_action_mediator_prompt(task, state));
     log.am(attempt + 1, action);
@@ -227,6 +228,21 @@ async function run_am(model, task, agent, log) {
       return 'success';
     }
 
+    // Intercept !search(target) — run hardcoded search expansion, no LLM.
+    // On return, continue the loop so AM gets fresh state on the next attempt.
+    const search_target = _parse_search_command(action);
+    if (search_target !== null) {
+      const found = await _run_search(search_target, state, agent, log, attempt + 1);
+      if (found) {
+        console.log(
+            `[SPL] Search found "${search_target}", re-running AM with fresh state.`);
+      } else {
+        console.warn(
+            `[SPL] Search exhausted all radii for "${search_target}", re-evaluating.`);
+      }
+      continue;
+    }
+
     // executeCommand returns a string only on error (bad format, unknown
     // command, etc.) Any non-string result means the command ran successfully
     const result = await executeCommand(agent, action);
@@ -238,156 +254,76 @@ async function run_am(model, task, agent, log) {
   return 'fail';
 }
 
-/**
- * Phase 4 — Action Mediator (AM), search-expansion path.
- *
- * NTS emits planner-level search tasks that may contain abstract targets
- * (e.g. any_log) or multiple targets in a targets[] array. This function
- * bridges the NTS→AM contract by:
- *   1. Normalizing the NTS targets into a flat ordered list
- *   2. Expanding abstract items (any_log → all overworld log variants)
- *   3. Dispatching !searchForBlock or !searchForEntity directly (no LLM)
- *   4. Falling back to AM when the hardcoded command is rejected as invalid
- *   5. Stopping immediately after the first successful execution
- *
- * State is snapshotted once before the loop — no refresh between attempts —
- * because all attempts target the same planner task and a state refresh
- * would add latency with no benefit for sequential search probes.
- *
- * @returns {'success'|'fail'}
- */
-export async function run_expanded_search_tasks(model, task, agent, log) {
-  const search_items = normalize_search_items(task);
+// ── Search Helpers
+// ────────────────────────────────────────────────────────────
 
-  if (search_items.length === 0) {
-    console.error(
-        '[SPL] Search task has no targets — NTS output may be malformed.');
-    return 'fail';
+/**
+ * Parses a !search("target") command string and returns the target string,
+ * or null if the action is not a search command.
+ */
+function _parse_search_command(action) {
+  const match = action.trim().match(/^!search\("([^"]+)"\)$/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Runs a hardcoded search for the given target across expanding radii.
+ * Expands abstract targets (e.g. any_log → all overworld log variants).
+ * Returns true as soon as any concrete target is found; false if all radii
+ * are exhausted without success.
+ *
+ * Uses the state snapshot passed in for the fast-path check only — commands
+ * are executed live against the agent.
+ */
+async function _run_search(target, state, agent, log, start_attempt) {
+  const concrete_items = expand_search_item(target);
+
+  // Fast-path: already visible in the current state snapshot
+  for (const item of concrete_items) {
+    if (check_search_complete(item, state)) {
+      console.log(`[SPL] Search fast-path: "${item}" already in state.`);
+      return true;
+    }
   }
 
-  // Snapshot state once for all search attempts
-  const state = get_state(agent);
-  let attempt = 0;
-
+  let attempt = start_attempt;
   for (const radius of SEARCH_RADII) {
-    for (const item of search_items) {
-      const concrete_items = expand_search_item(item);
+    for (const item of concrete_items) {
+      const command = make_search_command(item, radius);
+      log.am(++attempt, command);
+      console.log(`[SPL] Search (${item} r=${radius}):`, command);
 
-      for (const concrete_item of concrete_items) {
-        const search_task = create_search_task(concrete_item, radius, task);
+      const result = await executeCommand(agent, command);
+      console.log('[SPL] Search result:', result);
 
-        // Fast-path: target already visible in current state snapshot
-        if (check_search_complete(concrete_item, state)) {
-          console.log(`[SPL] Search already complete: ${
-              concrete_item} found in current state.`);
-          return 'success';
-        }
-
-        // Hardcoded dispatch — no LLM call
-        const command = make_search_command(concrete_item, radius);
-        log.am(++attempt, command);
-        console.log(
-            `[SPL] Search action (${concrete_item} r=${radius}):`, command);
-
-        let result = await executeCommand(agent, command);
-        console.log('[SPL] Search result:', result);
-
-        // If executeCommand rejected the command before the skill ran (bad
-        // block/mob name, wrong arg count, etc.) it returns a plain error
-        // string without the "Action output:" prefix. Fall back to AM so the
-        // LLM can choose a valid command for this target.
-        if (typeof result === 'string' &&
-            !result.startsWith('Action output:')) {
-          console.warn(`[SPL] Invalid search command for "${
-              concrete_item}", delegating to AM.`);
-          const action = await model.sendRequest(
-              [], fill_action_mediator_prompt(search_task, state));
-          log.am(++attempt, action);
-          console.log(
-              `[SPL] AM fallback action (${concrete_item} r=${radius}):`,
-              action);
-
-          const signal = extract_json(action);
-          if (signal?.status === 'TASK_COMPLETE') {
-            console.log(
-                `[SPL] AM: search already complete for ${concrete_item}.`);
-            return 'success';
-          }
-
-          result = await executeCommand(agent, action);
-          console.log('[SPL] AM fallback result:', result);
-        }
-
-        // runAsAction returns undefined when interrupted; otherwise returns
-        // "Action output:\n<bot log>". Success = ran and did NOT log "Could
-        // not find".
-        if (typeof result !== 'string' ||
-            (result.startsWith('Action output:') &&
-             !result.includes('Could not find'))) {
-          console.log(
-              `[SPL] Search succeeded: ${concrete_item} at radius ${radius}.`);
-          return 'success';
-        }
-        console.warn('[SPL] Search failed:', result);
+      // Success: command ran and did not report "Could not find"
+      if (typeof result !== 'string' ||
+          (result.startsWith('Action output:') &&
+           !result.includes('Could not find'))) {
+        console.log(`[SPL] Search succeeded: "${item}" at radius ${radius}.`);
+        return true;
       }
+      console.warn(`[SPL] Search failed: "${item}" at radius ${radius}.`);
     }
   }
 
-  return 'fail';
-}
-
-// ── Search Expansion Helpers
-// ──────────────────────────────────────────────────
-
-/**
- * Reads the planner-level targets from an NTS search task and returns a flat,
- * deduplicated, ordered list of search item strings.
- *
- * NTS emits: { parameters: { targets: [{ target, match_mode }] } }
- */
-function normalize_search_items(task) {
-  const targets = task.parameters?.targets ?? [];
-  const seen = new Set();
-  const result = [];
-  for (const t of targets) {
-    if (!seen.has(t.target)) {
-      seen.add(t.target);
-      result.push(t.target);
-    }
-  }
-  return result;
+  return false;
 }
 
 /**
- * Expands a single planner-level search item into concrete world targets.
+ * Expands a single search target into concrete world targets.
  *
- * any_log expands to all overworld log blocks. Stems (crimson_stem,
- * warped_stem) are excluded because they are Nether wood types, not valid
- * overworld log search targets in 1.21.6.
- *
- * Unknown any_* abstracts are rejected — AM must never receive an abstract
- * target, and silently passing one through would violate the search contract.
+ * any_log expands to all overworld log blocks (crimson/warped stems excluded —
+ * they are Nether wood types). Unknown any_* abstracts throw rather than
+ * silently pass through.
  */
 function expand_search_item(item) {
   if (item === 'any_log') return ANY_LOG_SEARCH_TARGETS;
   if (item.startsWith('any_')) {
-    throw new Error(`[SPL] Unsupported abstract search item: "${
+    throw new Error(`[SPL] Unsupported abstract search target: "${
         item}". Add an expansion to expand_search_item.`);
   }
   return [item];
-}
-
-/**
- * Builds a mediator-level search task with exactly one concrete target and
- * one search_radius. AM expects this flat shape — no targets array, no
- * match_mode, no abstract ids.
- */
-function create_search_task(target, search_radius, base_task) {
-  return {
-    action_type: 'search',
-    parameters: {target, search_radius},
-    rationale: base_task.rationale,
-  };
 }
 
 // Mob names that can appear as concrete search targets from PTD graphs.
@@ -464,7 +400,7 @@ export function is_entity_target(target) {
  */
 export function check_search_complete(target, state) {
   if (is_entity_target(target)) {
-    return (state.nearby_entities?.mobs?.[target] ?? 0) > 0;
+    return state.nearby_entities?.mobs?.includes(target) ?? false;
   }
   return state.nearby_blocks?.includes(target) ?? false;
 }

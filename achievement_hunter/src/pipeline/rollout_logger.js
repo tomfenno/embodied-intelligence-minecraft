@@ -22,7 +22,8 @@ function _write_combined(live) {
         `<td width="50%" valign="top">\n\n${live.am}\n\n</td>\n` +
         `</tr></table>`;
     _write_live('current_graphs.md',
-        live.ptd + divider + live.scsg + divider + side_by_side
+        live.ptd + divider + live.scsg + divider +
+        live.candidates + divider + side_by_side
     );
 }
 
@@ -55,6 +56,7 @@ export function createRolloutLogger(objective) {
     const live = {
         ptd: '_PTD not yet generated._',
         scsg: '_SCSG not yet generated._',
+        candidates: '_Candidates not yet computed._',
         nts: '## Current Task\n_NTS not yet run._',
         am: '## Current Action\n_AM not yet run._',
     };
@@ -95,6 +97,19 @@ export function createRolloutLogger(objective) {
                 live.scsg = header + graph_to_mermaid(graph);
             }
             _write_live('current_scsg.md', live.scsg);
+            _write_combined(live);
+        },
+        candidates(candidates) {
+            push({ stage: 'CANDIDATES', candidates });
+            const ts = new Date().toISOString();
+            const header = `# Candidates — ${rollout.objective}\n_Updated: ${ts} · ${candidates.length} source node(s)_\n\n`;
+            const graph = {
+                objective: rollout.objective,
+                sinks: [],
+                vertices: candidates,
+                edges: [],
+            };
+            live.candidates = header + graph_to_mermaid(graph);
             _write_combined(live);
         },
         nts(raw, parsed) {
