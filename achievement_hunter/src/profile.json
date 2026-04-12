@@ -8,7 +8,7 @@
     "Available OpenAI models:",
     "  gpt-5           — most capable, highest cost (ptd)",
     "  gpt-5.4-mini    - most capable mini model",
-    "  gpt-5.4-nano    -  cheapest 5.4 model for simple high volume tasks ",
+    "  gpt-5.4-nano    - cheapest 5.4 model for simple high volume tasks ",
     "  gpt-4o          — fast and capable, good default (am)",
     "  gpt-4o-mini     — lightweight, low cost, good for simple dispatch (nts)",
     "  gpt-4-turbo     — previous generation flagship",

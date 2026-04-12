@@ -86,7 +86,10 @@ export function compute_scsg(G, inventory) {
   }
 
   // Steps 3–5: fixed-point pruning loop on a mutable deep copy.
+  // Pre-pass: reduce vertex and edge quantities to reflect partial inventory
+  // satisfaction before the fixed-point loop runs.
   let g_prime = _deep_copy_graph(G);
+  _update_quantities_from_state(g_prime, inventory);
 
   while (true) {
     // 5a: vertices whose inventory requirement is already met.
@@ -182,18 +185,60 @@ export function update_quantities_and_prune(V_rm, G) {
 // ── Internal Helpers ──────────────────────────────────────────────────────────
 
 /**
+ * Returns how many units of vertex.id are present in inventory.
+ * Handles abstract any_* ids by summing all concrete class members.
+ * Unknown any_* classes return 0 (conservatively treated as unsatisfied).
+ */
+function _inventory_count(id, inventory) {
+  if (id.startsWith('any_')) {
+    const members = ABSTRACT_CLASS_MEMBERS[id] ?? [];
+    return members.reduce((sum, item) => sum + (inventory[item] ?? 0), 0);
+  }
+  return inventory[id] ?? 0;
+}
+
+/**
  * Returns true if the inventory satisfies a single vertex's qty requirement.
- * Handles abstract any_* ids via ABSTRACT_CLASS_MEMBERS; unknown any_* ids
- * are conservatively treated as unsatisfied.
  */
 function _inventory_satisfies(vertex, inventory) {
-  if (vertex.id.startsWith('any_')) {
-    const members = ABSTRACT_CLASS_MEMBERS[vertex.id];
-    if (!members) return false; // Unknown abstract class — treat as unsatisfied.
-    const total = members.reduce((sum, item) => sum + (inventory[item] ?? 0), 0);
-    return total >= vertex.qty;
+  return _inventory_count(vertex.id, inventory) >= vertex.qty;
+}
+
+/**
+ * Pre-pass: updates vertex and edge quantities on the working graph copy to
+ * reflect partial inventory satisfaction before the fixed-point loop runs.
+ *
+ * For each vertex that is partially satisfied (inventory covers some but not
+ * all of the required qty):
+ *   1. Reduces the vertex qty by the amount already held.
+ *   2. Scales each incoming consumed edge qty proportionally (ceiling).
+ *   3. Reduces the upstream vertex qty by the amount no longer needed.
+ *
+ * This ensures that, for example, holding 4 of 12 needed planks correctly
+ * reduces the upstream log requirement from 3 to 2 rather than leaving it
+ * at the full original value.
+ *
+ * Mutates G in place — call only on a deep copy.
+ */
+function _update_quantities_from_state(G, inventory) {
+  for (const vertex of G.vertices) {
+    const have = _inventory_count(vertex.id, inventory);
+    if (have <= 0 || have >= vertex.qty) continue; // fully unsatisfied or fully satisfied
+
+    const original_qty = vertex.qty;
+    vertex.qty -= have;
+    const scale = vertex.qty / original_qty; // fraction of the requirement still outstanding
+
+    for (const edge of G.edges) {
+      if (edge.to !== vertex.id || !edge.consumed) continue;
+
+      const original_edge_qty = edge.qty;
+      edge.qty = Math.ceil(original_edge_qty * scale);
+
+      const upstream = G.vertices.find(v => v.id === edge.from);
+      if (upstream) upstream.qty -= (original_edge_qty - edge.qty);
+    }
   }
-  return (inventory[vertex.id] ?? 0) >= vertex.qty;
 }
 
 /**

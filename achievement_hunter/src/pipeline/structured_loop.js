@@ -71,7 +71,6 @@ export async function structuredLoop(models, agent, T, G = null) {
   // G = await run_ptd(models.ptd, T, G, log);
   G = await loadGraphFromFile(
       './achievement_hunter/docs/ptd_jsons/wooden_pickaxe.json');
-  if (!G) return;
   saveCheckpoint(T, G);
 
   // ── Phase 2+: Outer Loop ──────────────────────────────────────────────────
@@ -86,19 +85,21 @@ export async function structuredLoop(models, agent, T, G = null) {
 
     const task = await run_nts(models.nts, scsg.candidates, agent, log);
     if (!task) {
-      if (++consecutive_failures >= MAX_OUTER_RETRIES) {
-        spl.error('Max outer retries exceeded. Aborting.');
-        log.complete('max outer retries exceeded');
-        return;
-      }
+      if (++consecutive_failures >= MAX_OUTER_RETRIES) break;
       continue;
     }
-    consecutive_failures = 0;
 
     const am_status = await run_am(models.am, task, agent, log);
-    if (am_status !== 'success')
+    if (am_status === 'success') {
+      consecutive_failures = 0;
+    } else {
       spl.log('Task failed after max retries, re-evaluating state...');
+      if (++consecutive_failures >= MAX_OUTER_RETRIES) break;
+    }
   }
+
+  spl.error('Max outer retries exceeded. Aborting.');
+  log.complete('max outer retries exceeded');
 }
 
 // ── Stage Helpers
@@ -231,10 +232,11 @@ async function run_am(model, task, agent, log) {
 
     const action = strip_fences(
         await model.sendRequest([], fill_action_mediator_prompt(task, state)));
+    const signal = extract_json(action);
     log.am(attempt + 1, action, state);
     spl.log(`Action (attempt ${attempt + 1}/${MAX_INNER_RETRIES}):`, action);
 
-    if (extract_json(action)?.status === 'TASK_COMPLETE')
+    if (signal?.status === 'TASK_COMPLETE')
       return _handle_task_complete_signal(task, agent, log);
 
     const search_target = _parse_search_command(action);
@@ -379,8 +381,7 @@ async function _execute_search_command(agent, item, radius, command) {
 function expand_search_item(item) {
   if (item === 'any_log') return ANY_LOG_SEARCH_TARGETS;
   if (item.startsWith('any_')) {
-    throw new Error(`[SPL] Unsupported abstract search target: "${
-        item}". Add an expansion to expand_search_item.`);
+    throw new Error(`Unsupported abstract search target: "${item}". Add an expansion to expand_search_item.`);
   }
   return [item];
 }
@@ -475,8 +476,12 @@ export function make_search_command(target, radius) {
   return `!searchForBlock("${target}", ${radius})`;
 }
 
-/** Used to manually load in PTDs. */
-async function loadGraphFromFile(path) {
-  const text = await readFile(path, 'utf8');
-  return JSON.parse(text);
+/** Loads a PTD graph from a JSON file. Throws with a clear message on failure. */
+async function loadGraphFromFile(file_path) {
+  try {
+    const text = await readFile(file_path, 'utf8');
+    return JSON.parse(text);
+  } catch (err) {
+    throw new Error(`Failed to load PTD graph from "${file_path}": ${err.message}`);
+  }
 }
