@@ -176,11 +176,12 @@ async function run_ptd(model, T, existing_G, log) {
  * @returns {{ status: 'continue', candidates: object[] }}
  */
 function run_scsg(G, agent, log) {
-  const {inventory} = get_sgsg_state(agent);
-  const result = compute_scsg(G, inventory);
+  const sgsg_state = get_sgsg_state(agent);
+  const result = compute_scsg(G, sgsg_state.inventory);
 
   log.scsg(
-      '[deterministic]', result.r === 1 ? {...result, s: G.sinks} : result);
+      '[deterministic]', result.r === 1 ? {...result, s: G.sinks} : result,
+      sgsg_state);
 
   if (result.r === 2) {
     spl.log('Task complete — all sinks satisfied.');

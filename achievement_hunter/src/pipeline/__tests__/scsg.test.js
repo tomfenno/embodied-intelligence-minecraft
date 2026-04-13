@@ -153,6 +153,163 @@ describe('update_quantities_and_prune', () => {
   });
 });
 
+// Minimal wooden-pickaxe graph used by the pre-pass partial-satisfaction tests.
+// any_log → any_plank → wooden_pickaxe; stick → wooden_pickaxe
+const WOODEN_PICKAXE_GRAPH = {
+  objective: 'craft wooden pickaxe',
+  sinks: ['wooden_pickaxe'],
+  vertices: [
+    { id: 'wooden_pickaxe', qty: 1, item_type: 'tool' },
+    { id: 'any_plank',      qty: 3, item_type: 'craft' },
+    { id: 'stick',          qty: 2, item_type: 'craft' },
+    { id: 'any_log',        qty: 1, item_type: 'resource' },
+  ],
+  edges: [
+    { from: 'any_plank', to: 'wooden_pickaxe', qty: 3, consumed: true,  type: 'crafting_input' },
+    { from: 'stick',     to: 'wooden_pickaxe', qty: 2, consumed: true,  type: 'crafting_input' },
+    { from: 'any_log',   to: 'any_plank',      qty: 1, consumed: true,  type: 'crafting_input' },
+  ],
+};
+
+// Graph used to test upstream scaling: any_log(3) → any_plank(12) → output(1).
+// With 8 planks already held the pre-pass should scale the log requirement from
+// 3 down to 1 (need 4 more planks = 1 log × 4 planks/log).
+const UPSTREAM_SCALING_GRAPH = {
+  objective: 'gather planks',
+  sinks: ['output'],
+  vertices: [
+    { id: 'output',    qty: 1,  item_type: 'craft' },
+    { id: 'any_plank', qty: 12, item_type: 'craft' },
+    { id: 'any_log',   qty: 3,  item_type: 'resource' },
+  ],
+  edges: [
+    { from: 'any_plank', to: 'output',    qty: 12, consumed: true, type: 'crafting_input' },
+    { from: 'any_log',   to: 'any_plank', qty: 3,  consumed: true, type: 'crafting_input' },
+  ],
+};
+
+// ── compute_scsg — partial inventory / pre-pass ───────────────────────────────
+
+describe('compute_scsg — partial inventory pre-pass', () => {
+  // ── Regression: the double-counting bug ──────────────────────────────────────
+  //
+  // Bug: the pre-pass reduced any_plank.qty from 3 → 1 to signal "need 1 more".
+  // The fixed-point then checked inventory_count(spruce_planks=2) >= qty(1) → true
+  // and falsely pruned any_plank, making wooden_pickaxe appear craftable without
+  // the required 3 planks.
+  //
+  // Trigger condition: have > (original_qty - have), i.e. have > qty/2.
+  // Here: have=2, qty=3 → 2 > 1 → bug triggers.
+
+  it('does not prune any_plank when have=2 of 3 needed (regression: pre-pass double-counting)', () => {
+    const result = compute_scsg(WOODEN_PICKAXE_GRAPH, { spruce_planks: 2, stick: 13 });
+    expect(result.r).toBe(0);
+    const ids = result.final.vertices.map(v => v.id);
+    expect(ids).toContain('any_plank');
+    expect(ids).toContain('wooden_pickaxe');
+  });
+
+  it('does not expose wooden_pickaxe as a source candidate when any_plank is unsatisfied', () => {
+    // wooden_pickaxe still has any_plank as an unmet input, so it must not
+    // appear as a leaf/source in the pruned subgraph.
+    const result = compute_scsg(WOODEN_PICKAXE_GRAPH, { spruce_planks: 2, stick: 13 });
+    const sources = result.final.vertices.filter(v => {
+      const has_incoming = result.final.edges.some(e => e.to === v.id);
+      return !has_incoming;
+    });
+    const source_ids = sources.map(v => v.id);
+    expect(source_ids).not.toContain('wooden_pickaxe');
+  });
+
+  // ── have < qty/2 (bug would not have triggered, but should still be correct) ─
+
+  it('does not prune any_plank when have=1 of 3 needed', () => {
+    const result = compute_scsg(WOODEN_PICKAXE_GRAPH, { spruce_planks: 1, stick: 13 });
+    expect(result.r).toBe(0);
+    expect(result.final.vertices.map(v => v.id)).toContain('any_plank');
+  });
+
+  // ── Fully satisfied: vertex must be pruned ────────────────────────────────────
+
+  it('prunes any_plank when inventory exactly meets the required qty', () => {
+    // have=3, qty=3 → satisfied → pruned. any_log also disappears (no longer
+    // needed). Only wooden_pickaxe remains — all prerequisites are met but the
+    // item still needs to be crafted, so r=0 not r=2.
+    const result = compute_scsg(WOODEN_PICKAXE_GRAPH, { spruce_planks: 3, stick: 13 });
+    expect(result.r).toBe(0);
+    const ids = result.final.vertices.map(v => v.id);
+    expect(ids).not.toContain('any_plank');
+    expect(ids).not.toContain('any_log');
+    expect(ids).toContain('wooden_pickaxe');
+  });
+
+  it('prunes any_plank when inventory exceeds the required qty', () => {
+    const result = compute_scsg(WOODEN_PICKAXE_GRAPH, { spruce_planks: 10, stick: 13 });
+    expect(result.r).toBe(0);
+    const ids = result.final.vertices.map(v => v.id);
+    expect(ids).not.toContain('any_plank');
+    expect(ids).toContain('wooden_pickaxe');
+  });
+
+  it('returns r=2 when the sink item itself is already in inventory', () => {
+    const result = compute_scsg(WOODEN_PICKAXE_GRAPH, { wooden_pickaxe: 1 });
+    expect(result.r).toBe(2);
+  });
+
+  // ── Concrete (non-abstract) items exhibit the same behaviour ─────────────────
+
+  it('does not prune oak_planks (concrete) when have=2 of 3 needed', () => {
+    const G = {
+      objective: 'craft wooden pickaxe',
+      sinks: ['wooden_pickaxe'],
+      vertices: [
+        { id: 'wooden_pickaxe', qty: 1 },
+        { id: 'oak_planks',     qty: 3 },
+        { id: 'stick',          qty: 2 },
+      ],
+      edges: [
+        { from: 'oak_planks', to: 'wooden_pickaxe', qty: 3, consumed: true },
+        { from: 'stick',      to: 'wooden_pickaxe', qty: 2, consumed: true },
+      ],
+    };
+    const result = compute_scsg(G, { oak_planks: 2, stick: 13 });
+    expect(result.r).toBe(0);
+    expect(result.final.vertices.map(v => v.id)).toContain('oak_planks');
+  });
+
+  // ── Pre-pass upstream scaling ─────────────────────────────────────────────────
+  //
+  // With 8 of 12 planks already held (need 4 more = 1 log), the pre-pass should
+  // scale the any_log requirement from 3 down to 1. Holding 1 log in inventory
+  // should then be enough to satisfy any_log and prune it, leaving any_plank as
+  // the next candidate rather than any_log.
+
+  it('scales upstream any_log requirement down when planks are partially held', () => {
+    // have spruce_planks=8 (need 4 more), spruce_log=1.
+    // After pre-pass, any_log.qty should be 1 → satisfied by spruce_log → pruned.
+    const result = compute_scsg(UPSTREAM_SCALING_GRAPH, { spruce_planks: 8, spruce_log: 1 });
+    expect(result.r).toBe(0);
+    const ids = result.final.vertices.map(v => v.id);
+    expect(ids).not.toContain('any_log');   // scaled down + satisfied → pruned
+    expect(ids).toContain('any_plank');     // still needs 4 more planks
+    expect(ids).toContain('output');
+  });
+
+  it('keeps any_log when holding partial planks but no logs', () => {
+    const result = compute_scsg(UPSTREAM_SCALING_GRAPH, { spruce_planks: 8 });
+    expect(result.r).toBe(0);
+    const ids = result.final.vertices.map(v => v.id);
+    expect(ids).toContain('any_log');
+    expect(ids).toContain('any_plank');
+  });
+
+  it('does not mutate the original graph during partial-inventory computation', () => {
+    const snapshot = JSON.stringify(WOODEN_PICKAXE_GRAPH);
+    compute_scsg(WOODEN_PICKAXE_GRAPH, { spruce_planks: 2, stick: 13 });
+    expect(JSON.stringify(WOODEN_PICKAXE_GRAPH)).toBe(snapshot);
+  });
+});
+
 // ── compute_scsg ──────────────────────────────────────────────────────────────
 
 describe('compute_scsg', () => {

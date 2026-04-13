@@ -166,6 +166,7 @@ For Tier 3:
 ### `collect`
 
 `source_block` is the world source block to pursue for this collect task.
+- `source_block` must directly yield `target_item`
 - In Tier 2, use a concrete nearby source block evidenced in `S.nearby_blocks`
 - In Tier 3, if no concrete nearby source block is evidenced, use the canonical required source block for the target
 - For `collect`, `parameters.source_block` must name the world block to pursue.

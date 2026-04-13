@@ -205,18 +205,20 @@ function _inventory_satisfies(vertex, inventory) {
 }
 
 /**
- * Pre-pass: updates vertex and edge quantities on the working graph copy to
- * reflect partial inventory satisfaction before the fixed-point loop runs.
+ * Pre-pass: scales upstream edge and vertex quantities to reflect partial
+ * inventory satisfaction before the fixed-point loop runs.
  *
  * For each vertex that is partially satisfied (inventory covers some but not
- * all of the required qty):
- *   1. Reduces the vertex qty by the amount already held.
- *   2. Scales each incoming consumed edge qty proportionally (ceiling).
- *   3. Reduces the upstream vertex qty by the amount no longer needed.
+ * all of the required qty), scales each incoming consumed edge proportionally
+ * and reduces the upstream vertex qty by the amount no longer needed.
  *
  * This ensures that, for example, holding 4 of 12 needed planks correctly
  * reduces the upstream log requirement from 3 to 2 rather than leaving it
  * at the full original value.
+ *
+ * vertex.qty is intentionally NOT modified — the fixed-point checks the same
+ * raw inventory against vertex.qty, so reducing it here would cause
+ * double-counting and false positives in state_satisfied_vertices.
  *
  * Mutates G in place — call only on a deep copy.
  */
@@ -225,9 +227,11 @@ function _update_quantities_from_state(G, inventory) {
     const have = _inventory_count(vertex.id, inventory);
     if (have <= 0 || have >= vertex.qty) continue; // fully unsatisfied or fully satisfied
 
-    const original_qty = vertex.qty;
-    vertex.qty -= have;
-    const scale = vertex.qty / original_qty; // fraction of the requirement still outstanding
+    // Do NOT reduce vertex.qty here. The fixed-point uses the same raw inventory
+    // to check satisfaction, so reducing qty would cause double-counting: e.g.
+    // need 3, have 2 → qty becomes 1, fixed-point sees 2 >= 1 → falsely pruned.
+    // Only scale upstream edges/vertices to reflect the reduced downstream need.
+    const scale = (vertex.qty - have) / vertex.qty;
 
     for (const edge of G.edges) {
       if (edge.to !== vertex.id || !edge.consumed) continue;

@@ -500,8 +500,13 @@ export function createRolloutLogger(objective) {
       render_live();
     },
 
-    scsg(raw, parsed) {
-      record_stage({stage: STAGE.SCSG, raw, parsed});
+    scsg(raw, parsed, state = null) {
+      record_stage({
+        stage: STAGE.SCSG,
+        raw,
+        parsed,
+        ...(state && {state}),
+      });
       live_state.scsg_result = parsed || null;
       render_live();
     },
