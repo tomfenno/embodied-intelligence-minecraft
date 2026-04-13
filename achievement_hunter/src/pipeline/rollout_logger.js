@@ -185,14 +185,6 @@ const stage_renderer = {
 
     const objective = ptd_state.objective || 'unknown';
 
-    if (ptd_state.status === 'streaming') {
-      const body = ptd_state.raw ? code_block(ptd_state.raw) :
-                                   '_Awaiting first output chunk..._';
-
-      return header(`PTD — ${objective}`, 'streaming') +
-          '**Building prerequisite graph...**\n\n' + body;
-    }
-
     if (ptd_state.status === 'failed') {
       const latency =
           render_single_latency_block('PTD generation', ptd_state.latency_ms);
@@ -361,32 +353,20 @@ const live_writer = {
     const row_style =
         'table-layout: fixed; border-collapse: separate; border-spacing: 0;';
 
-    function wrap_card(content) {
-      if (!content) return null;
-      return `<div style="${card_style}">\n\n${content}\n\n</div>`;
+    function make_row(left, right, left_width = '50%', right_width = '50%') {
+      return `<table width="100%" style="${row_style}"><tr>\n` +
+          `<td width="${left_width}" valign="top" style="${card_style}">\n\n${
+                 left}\n\n</td>\n` +
+          `<td width="2%"></td>\n` +
+          `<td width="${right_width}" valign="top" style="${card_style}">\n\n${
+                 right}\n\n</td>\n` +
+          `</tr></table>`;
     }
 
-    const top_row = `<table width="100%" style="${row_style}"><tr>\n` +
-        `<td width="72%" valign="top" style="${card_style}">\n\n${
-                        ptd}\n\n</td>\n` +
-        `<td width="2%"></td>\n` +
-        `<td width="26%" valign="top" style="${card_style}">\n\n${
-                        elapsed_panel}\n\n</td>\n` +
-        `</tr></table>`;
-
-    const bottom_row = `<table width="100%" style="${row_style}"><tr>\n` +
-        `<td width="49%" valign="top" style="${card_style}">\n\n${
-                           nts}\n\n</td>\n` +
-        `<td width="2%"></td>\n` +
-        `<td width="49%" valign="top" style="${card_style}">\n\n${
-                           am}\n\n</td>\n` +
-        `</tr></table>`;
-
     const sections = [
-      top_row,
-      wrap_card(scsg),
-      wrap_card(candidates),
-      bottom_row,
+      make_row(ptd, elapsed_panel, '72%', '26%'),
+      make_row(scsg, candidates || PLACEHOLDER.CANDIDATES),
+      make_row(nts, am),
     ].filter(Boolean);
 
     this.write_file(LIVE_FILE.DASHBOARD, sections.join(divider));
@@ -499,36 +479,6 @@ export function createRolloutLogger(objective) {
   // ───────────────────────────────────────────────────────────
 
   return {
-    ptd_start() {
-      live_state.ptd = {
-        status: 'streaming',
-        objective,
-        raw: '',
-        parsed: null,
-        latency_ms: null,
-        error: null,
-        source: SOURCE.LLM,
-      };
-      render_live();
-    },
-
-    ptd_stream(raw) {
-      if (live_state.ptd.status !== 'streaming') {
-        live_state.ptd = {
-          status: 'streaming',
-          objective,
-          raw: '',
-          parsed: null,
-          latency_ms: null,
-          error: null,
-          source: SOURCE.LLM,
-        };
-      }
-
-      live_state.ptd.raw = raw ?? '';
-      render_live();
-    },
-
     ptd(raw, parsed, meta = {}) {
       record_stage({
         stage: STAGE.PTD,
@@ -540,7 +490,7 @@ export function createRolloutLogger(objective) {
       live_state.ptd = {
         status: parsed ? 'complete' : 'failed',
         objective: parsed?.objective || objective,
-        raw: raw ?? live_state.ptd.raw ?? '',
+        raw: raw ?? '',
         parsed: parsed ?? null,
         latency_ms: meta.latency_ms ?? null,
         error: meta.error ?? null,

@@ -60,10 +60,9 @@ const LOG_SOURCE = {
  *          (r=2).
  *
  * @param {{
- *   ptd: {send_prompt: function(string): Promise<string|null>, stream_prompt?:
- * function(string, object): Promise<object>}, nts: {send_prompt:
- * function(string): Promise<string|null>}, am: {send_prompt: function(string):
- * Promise<string|null>}
+ *   ptd: {send_prompt: function(string): Promise<string|null>},
+ *   nts: {send_prompt: function(string): Promise<string|null>},
+ *   am: {send_prompt: function(string): Promise<string|null>}
  * }} models
  * @param {object} agent
  * @param {string} T
@@ -73,9 +72,9 @@ export async function structuredLoop(models, agent, T, G = null) {
   const log = createRolloutLogger(T);
 
   // ── Phase 1: PTD ─────────────────────────────────────────────────────────
-  // G = await run_ptd(models.ptd, T, G, log);
-  G = await loadGraphFromFile(
-      './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json');
+  G = await run_ptd(models.ptd, T, G, log);
+  // G = await loadGraphFromFile(
+  //     './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json');
   if (!G) return;
 
   saveCheckpoint(T, G);
@@ -129,21 +128,15 @@ async function run_ptd(model, T, existing_G, log) {
   }
 
   spl.log('Building PTD for:', T);
-  log.ptd_start();
 
-  const progress = create_ptd_stream_progress_handler(log);
-  const {response, latency_ms, error} =
-      await streamed_send_request(model, fill_ptd_prompt(T), progress.push);
-
-  if (response !== null) {
-    progress.flush(response);
-  }
+  const {response, latency_ms} =
+      await timed_send_request(model, fill_ptd_prompt(T));
 
   if (response === null) {
     spl.error('PTD model call failed.');
     log.ptd('', null, {
       latency_ms,
-      error: error?.message ?? 'PTD model call failed',
+      error: 'PTD model call failed',
       source: LOG_SOURCE.LLM,
     });
     log.complete('PTD model call failed');
@@ -312,48 +305,6 @@ async function timed_send_request(model, prompt) {
   return {
     response,
     latency_ms: Date.now() - started_ms,
-  };
-}
-
-async function streamed_send_request(model, prompt, on_text_delta = null) {
-  if (typeof model.stream_prompt === 'function') {
-    return await model.stream_prompt(prompt, {on_text_delta});
-  }
-
-  const {response, latency_ms} = await timed_send_request(model, prompt);
-  if (response !== null && on_text_delta) {
-    await on_text_delta(response, response);
-  }
-
-  return {
-    response,
-    latency_ms,
-    error: response === null ? new Error('model call failed') : null,
-  };
-}
-
-function create_ptd_stream_progress_handler(log) {
-  let last_render_ms = 0;
-  let last_render_length = 0;
-
-  return {
-    async push(_delta, full_text) {
-      const now = Date.now();
-      const should_render = now - last_render_ms >= 200 ||
-          full_text.length - last_render_length >= 160;
-
-      if (!should_render) return;
-
-      log.ptd_stream(full_text);
-      last_render_ms = now;
-      last_render_length = full_text.length;
-    },
-
-    flush(full_text) {
-      log.ptd_stream(full_text);
-      last_render_ms = Date.now();
-      last_render_length = full_text.length;
-    },
   };
 }
 

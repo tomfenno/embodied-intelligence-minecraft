@@ -78,6 +78,12 @@ For acquisition targets:
 - `acquisition_dependency = mob` → `kill`
 - otherwise → `collect`
 
+Hard rules:
+- never return `collect` for a target whose acquisition dependency is `mob`
+- never return `kill` for a target whose acquisition dependency is not `mob`
+- for `collect`, `parameters.source_block` must not be a mob
+- for `kill`, `parameters.source_mob` must be a mob
+
 `water_source`, `lava_source`, and `none` do not create separate action types.
 
 ### Abstract `any_` classes
@@ -162,6 +168,9 @@ For Tier 3:
 `source_block` is the world source block to pursue for this collect task.
 - In Tier 2, use a concrete nearby source block evidenced in `S.nearby_blocks`
 - In Tier 3, if no concrete nearby source block is evidenced, use the canonical required source block for the target
+- For `collect`, `parameters.source_block` must name the world block to pursue.
+- Never use the collected drop item as `source_block` unless that item is itself the actual block name.
+
 - If the target is abstract and no concrete source is evidenced, preserve the abstract class in `source_block`
 
 `item_dependency` is the satisfied reusable item dependency for this collect task.

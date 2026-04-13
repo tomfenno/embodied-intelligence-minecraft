@@ -49,8 +49,10 @@ export class AchievementAgent extends Agent {
 
     async update(delta) {
         // Skip self_prompter.update() — the structured loop manages its own execution.
+        // Skip checkTaskDone() — the base implementation calls killAll()/serverProxy.shutdown()
+        // when a task completes, which disconnects the bot. The SPL manages its own completion
+        // lifecycle and we want the agent to stay connected and wait for the next objective.
         await this.bot.modes.update();
-        await this.checkTaskDone();
     }
 
     async handleMessage(source, message, max_responses = null) {
@@ -76,6 +78,12 @@ export class AchievementAgent extends Agent {
         return super.handleMessage(source, message, max_responses);
     }
 
+    // Suppress the post-smelt restart — the SPL re-reads inventory each iteration.
+    cleanKill(msg = 'Killing agent process...', code = 1) {
+        if (msg === 'Safely restarting to update inventory.') return;
+        super.cleanKill(msg, code);
+    }
+
     // ── Private helpers ───────────────────────────────────────────────────────
 
     /**
@@ -96,6 +104,10 @@ export class AchievementAgent extends Agent {
 
     _launch_spl(objective, graph = null) {
         structuredLoop(this._spl_models, this, objective, graph)
+            .then(() => {
+                this._waiting_for_objective = true;
+                this.openChat('Task complete! Send me a new objective.');
+            })
             .catch(err => {
                 console.error('[SPL] Structured loop crashed:', err);
                 this._waiting_for_objective = true;

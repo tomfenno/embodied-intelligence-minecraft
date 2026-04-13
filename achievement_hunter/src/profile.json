@@ -27,7 +27,7 @@
   ],
 
   "ptd_model": "",
-  "nts_model": "gpt-5.4-mini",
+  "nts_model": "gpt-4o",
   "am_model": "gpt-4o",
 
   "modes": {
