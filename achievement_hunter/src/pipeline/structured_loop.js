@@ -72,9 +72,9 @@ export async function structuredLoop(models, agent, T, G = null) {
   const log = createRolloutLogger(T);
 
   // ── Phase 1: PTD ─────────────────────────────────────────────────────────
-  G = await run_ptd(models.ptd, T, G, log);
-  // G = await loadGraphFromFile(
-  //     './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json');
+  // G = await run_ptd(models.ptd, T, G, log);
+  G = await loadGraphFromFile(
+      './achievement_hunter/docs/ptd_jsons/obtain_one_obsidian.json');
   if (!G) return;
 
   saveCheckpoint(T, G);

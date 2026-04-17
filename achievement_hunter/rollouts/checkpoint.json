@@ -1,5 +1,5 @@
 {
-  "objective": "Obtain one obsidian. ",
+  "objective": "Test",
   "graph": {
     "objective": "Obtain one obsidian.",
     "sinks": [
@@ -315,5 +315,5 @@
       }
     ]
   },
-  "saved_at": "2026-04-13T01:31:38.411Z"
+  "saved_at": "2026-04-13T02:41:23.282Z"
 }
