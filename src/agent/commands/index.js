@@ -14,6 +14,13 @@ export function getCommand(name) {
     return commandMap[name];
 }
 
+export function registerCommands(commands) {
+    for (const command of commands) {
+        commandMap[command.name] = command;
+        commandList.push(command);
+    }
+}
+
 export function blacklistCommands(commands) {
     const unblockable = ['!stop', '!stats', '!inventory', '!goal'];
     for (let command_name of commands) {

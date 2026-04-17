@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { Agent } from '../../../src/agent/agent.js';
+import './commands.js'; // registers ah_commands into the base command map
 import { loadCheckpoint } from '../pipeline/checkpoint.js';
 import { init_ah_modes } from './ah_modes.js';
 import { SplGpt } from '../pipeline/spl_gpt.js';

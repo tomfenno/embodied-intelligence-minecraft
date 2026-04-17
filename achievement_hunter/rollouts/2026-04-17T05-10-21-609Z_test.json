@@ -1,170 +1,11 @@
 {
-  "objective": "Cook a porkchop.",
+  "objective": "test",
   "status": "completed",
-  "started_at": "2026-04-13T00:39:51.700Z",
+  "started_at": "2026-04-17T05:10:21.609Z",
   "stages": [
     {
-      "timestamp": "2026-04-13T00:40:47.204Z",
-      "elapsed": "55s",
-      "stage": "PTD",
-      "raw": "{\n  \"objective\": \"Cook a porkchop.\",\n  \"sinks\": [\"cooked_porkchop\"],\n  \"vertices\": [\n    {\n      \"id\": \"cooked_porkchop\",\n      \"qty\": 1,\n      \"item_type\": \"item\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"porkchop\",\n      \"qty\": 1,\n      \"item_type\": \"resource\",\n      \"acquisition_dependency\": \"mob\"\n    },\n    {\n      \"id\": \"furnace\",\n      \"qty\": 1,\n      \"item_type\": \"workstation\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"cobblestone\",\n      \"qty\": 8,\n      \"item_type\": \"resource\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"wooden_pickaxe\",\n      \"qty\": 1,\n      \"item_type\": \"tool\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"stick\",\n      \"qty\": 4,\n      \"item_type\": \"item\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"any_plank\",\n      \"qty\": 12,\n      \"item_type\": \"item\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"any_log\",\n      \"qty\": 3,\n      \"item_type\": \"resource\",\n      \"acquisition_dependency\": \"none\"\n    },\n    {\n      \"id\": \"crafting_table\",\n      \"qty\": 1,\n      \"item_type\": \"workstation\",\n      \"acquisition_dependency\": \"none\"\n    }\n  ],\n  \"edges\": [\n    {\n      \"from\": \"porkchop\",\n      \"to\": \"cooked_porkchop\",\n      \"type\": \"smelting_input\",\n      \"qty\": 1,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"cooked_porkchop\",\n      \"type\": \"fuel_input\",\n      \"qty\": 1,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"furnace\",\n      \"to\": \"cooked_porkchop\",\n      \"type\": \"workstation_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    },\n    {\n      \"from\": \"cobblestone\",\n      \"to\": \"furnace\",\n      \"type\": \"crafting_input\",\n      \"qty\": 8,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"crafting_table\",\n      \"to\": \"furnace\",\n      \"type\": \"workstation_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    },\n    {\n      \"from\": \"wooden_pickaxe\",\n      \"to\": \"cobblestone\",\n      \"type\": \"tool_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    },\n    {\n      \"from\": \"stick\",\n      \"to\": \"wooden_pickaxe\",\n      \"type\": \"crafting_input\",\n      \"qty\": 2,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"wooden_pickaxe\",\n      \"type\": \"crafting_input\",\n      \"qty\": 3,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"crafting_table\",\n      \"to\": \"wooden_pickaxe\",\n      \"type\": \"workstation_dependency\",\n      \"qty\": 1,\n      \"consumed\": false\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"stick\",\n      \"type\": \"crafting_input\",\n      \"qty\": 2,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"any_log\",\n      \"to\": \"any_plank\",\n      \"type\": \"crafting_input\",\n      \"qty\": 3,\n      \"consumed\": true\n    },\n    {\n      \"from\": \"any_plank\",\n      \"to\": \"crafting_table\",\n      \"type\": \"crafting_input\",\n      \"qty\": 4,\n      \"consumed\": true\n    }\n  ]\n}",
-      "parsed": {
-        "objective": "Cook a porkchop.",
-        "sinks": [
-          "cooked_porkchop"
-        ],
-        "vertices": [
-          {
-            "id": "cooked_porkchop",
-            "qty": 1,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-          },
-          {
-            "id": "porkchop",
-            "qty": 1,
-            "item_type": "resource",
-            "acquisition_dependency": "mob"
-          },
-          {
-            "id": "furnace",
-            "qty": 1,
-            "item_type": "workstation",
-            "acquisition_dependency": "none"
-          },
-          {
-            "id": "cobblestone",
-            "qty": 8,
-            "item_type": "resource",
-            "acquisition_dependency": "none"
-          },
-          {
-            "id": "wooden_pickaxe",
-            "qty": 1,
-            "item_type": "tool",
-            "acquisition_dependency": "none"
-          },
-          {
-            "id": "stick",
-            "qty": 4,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-          },
-          {
-            "id": "any_plank",
-            "qty": 12,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-          },
-          {
-            "id": "any_log",
-            "qty": 3,
-            "item_type": "resource",
-            "acquisition_dependency": "none"
-          },
-          {
-            "id": "crafting_table",
-            "qty": 1,
-            "item_type": "workstation",
-            "acquisition_dependency": "none"
-          }
-        ],
-        "edges": [
-          {
-            "from": "porkchop",
-            "to": "cooked_porkchop",
-            "type": "smelting_input",
-            "qty": 1,
-            "consumed": true
-          },
-          {
-            "from": "any_plank",
-            "to": "cooked_porkchop",
-            "type": "fuel_input",
-            "qty": 1,
-            "consumed": true
-          },
-          {
-            "from": "furnace",
-            "to": "cooked_porkchop",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-          },
-          {
-            "from": "cobblestone",
-            "to": "furnace",
-            "type": "crafting_input",
-            "qty": 8,
-            "consumed": true
-          },
-          {
-            "from": "crafting_table",
-            "to": "furnace",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-          },
-          {
-            "from": "wooden_pickaxe",
-            "to": "cobblestone",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
-          },
-          {
-            "from": "stick",
-            "to": "wooden_pickaxe",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
-          },
-          {
-            "from": "any_plank",
-            "to": "wooden_pickaxe",
-            "type": "crafting_input",
-            "qty": 3,
-            "consumed": true
-          },
-          {
-            "from": "crafting_table",
-            "to": "wooden_pickaxe",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-          },
-          {
-            "from": "any_plank",
-            "to": "stick",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
-          },
-          {
-            "from": "any_log",
-            "to": "any_plank",
-            "type": "crafting_input",
-            "qty": 3,
-            "consumed": true
-          },
-          {
-            "from": "any_plank",
-            "to": "crafting_table",
-            "type": "crafting_input",
-            "qty": 4,
-            "consumed": true
-          }
-        ]
-      },
-      "meta": {
-        "latency_ms": 55498,
-        "error": null,
-        "source": "llm"
-      }
-    },
-    {
-      "timestamp": "2026-04-13T00:40:47.212Z",
-      "elapsed": "55s",
+      "timestamp": "2026-04-17T05:10:21.613Z",
+      "elapsed": "0s",
       "stage": "SCSG",
       "raw": "[deterministic]",
       "parsed": {
@@ -317,11 +158,14 @@
         "s": [
           "cooked_porkchop"
         ]
+      },
+      "state": {
+        "inventory": "Nothing"
       }
     },
     {
-      "timestamp": "2026-04-13T00:40:47.213Z",
-      "elapsed": "55s",
+      "timestamp": "2026-04-17T05:10:21.686Z",
+      "elapsed": "0s",
       "stage": "CANDIDATES",
       "candidates": [
         {
@@ -329,112 +173,76 @@
           "qty": 1,
           "item_type": "resource",
           "acquisition_dependency": "mob",
-          "satisfied_inputs": []
+          "satisfied_inputs": [],
+          "source_hint": "pig",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
         },
         {
           "id": "any_log",
           "qty": 3,
           "item_type": "resource",
           "acquisition_dependency": "none",
-          "satisfied_inputs": []
+          "satisfied_inputs": [],
+          "source_hint": "any_log",
+          "source_kind": "block",
+          "grounded_nearby_source": "spruce_log"
         }
       ]
     },
     {
-      "timestamp": "2026-04-13T00:40:48.199Z",
-      "elapsed": "56s",
+      "timestamp": "2026-04-17T05:10:21.726Z",
+      "elapsed": "0s",
       "stage": "NTS",
-      "raw": "```json\n{\n  \"target_item\": \"any_log\",\n  \"qty\": 3,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"any_log\",\n    \"item_dependency\": null,\n    \"tool\": null\n  }\n}\n```",
+      "raw": "[deterministic]",
       "parsed": {
         "target_item": "any_log",
         "qty": 3,
         "action_type": "collect",
         "parameters": {
-          "source_block": "any_log",
+          "source_block": "spruce_log",
           "item_dependency": null,
           "tool": null
         }
       },
       "meta": {
-        "latency_ms": 913
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:40:49.097Z",
-      "elapsed": "57s",
+      "timestamp": "2026-04-17T05:10:21.763Z",
+      "elapsed": "0s",
       "stage": "AM",
       "attempt": 1,
-      "raw": "!search(\"any_log\")",
-      "state": {
-        "inventory": {},
-        "craftable_items": [],
-        "nearby_blocks": [
-          "sand",
-          "sandstone",
-          "stone",
-          "andesite"
-        ],
-        "nearby_entities": {
-          "mobs": []
-        }
-      },
-      "meta": {
-        "latency_ms": 845,
-        "source": "llm"
-      }
-    },
-    {
-      "timestamp": "2026-04-13T00:40:49.099Z",
-      "elapsed": "57s",
-      "stage": "AM",
-      "attempt": 2,
-      "raw": "!searchForBlock(\"oak_log\", 32)",
-      "meta": {
-        "source": "search"
-      }
-    },
-    {
-      "timestamp": "2026-04-13T00:40:49.139Z",
-      "elapsed": "57s",
-      "stage": "AM",
-      "attempt": 3,
-      "raw": "!searchForBlock(\"spruce_log\", 32)",
-      "meta": {
-        "source": "search"
-      }
-    },
-    {
-      "timestamp": "2026-04-13T00:40:52.219Z",
-      "elapsed": "1m 00s",
-      "stage": "AM",
-      "attempt": 2,
       "raw": "!collectBlocks(\"spruce_log\", 3)",
       "state": {
         "inventory": {},
         "craftable_items": [],
         "nearby_blocks": [
-          "sand",
-          "grass_block",
-          "dirt",
-          "spruce_log",
-          "sandstone",
           "stone",
-          "coal_ore",
+          "grass_block",
+          "mossy_cobblestone",
+          "dirt",
+          "podzol",
           "fern",
-          "spruce_leaves"
+          "spruce_log",
+          "short_grass",
+          "spruce_leaves",
+          "coal_ore",
+          "lapis_ore",
+          "granite"
         ],
         "nearby_entities": {
           "mobs": []
         }
       },
       "meta": {
-        "latency_ms": 697,
-        "source": "llm"
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:12.056Z",
-      "elapsed": "1m 20s",
+      "timestamp": "2026-04-17T05:10:45.507Z",
+      "elapsed": "23s",
       "stage": "SCSG",
       "raw": "[deterministic]",
       "parsed": {
@@ -443,6 +251,10 @@
           "cooked_porkchop"
         ],
         "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
           "vertices": [
             {
               "id": "cooked_porkchop",
@@ -476,13 +288,13 @@
             },
             {
               "id": "stick",
-              "qty": 4,
+              "qty": 2,
               "item_type": "item",
               "acquisition_dependency": "none"
             },
             {
               "id": "any_plank",
-              "qty": 12,
+              "qty": 10,
               "item_type": "item",
               "acquisition_dependency": "none"
             },
@@ -573,11 +385,16 @@
             }
           ]
         }
+      },
+      "state": {
+        "inventory": {
+          "spruce_log": 3
+        }
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:12.057Z",
-      "elapsed": "1m 20s",
+      "timestamp": "2026-04-17T05:10:45.552Z",
+      "elapsed": "23s",
       "stage": "CANDIDATES",
       "candidates": [
         {
@@ -585,32 +402,38 @@
           "qty": 1,
           "item_type": "resource",
           "acquisition_dependency": "mob",
-          "satisfied_inputs": []
+          "satisfied_inputs": [],
+          "source_hint": "pig",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
         },
         {
           "id": "any_plank",
-          "qty": 12,
+          "qty": 10,
           "item_type": "item",
           "acquisition_dependency": "none",
           "satisfied_inputs": [
             {
-              "from": "any_log",
-              "type": "crafting_input",
+              "item": "any_log",
               "qty": 3,
+              "type": "crafting_input",
               "consumed": true
             }
-          ]
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
         }
       ]
     },
     {
-      "timestamp": "2026-04-13T00:41:13.188Z",
-      "elapsed": "1m 21s",
+      "timestamp": "2026-04-17T05:10:45.589Z",
+      "elapsed": "23s",
       "stage": "NTS",
-      "raw": "```json\n{\n  \"target_item\": \"spruce_planks\",\n  \"qty\": 12,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      {\n        \"item\": \"any_log\",\n        \"qty\": 3\n      }\n    ],\n    \"workstation\": null\n  }\n}\n```",
+      "raw": "[deterministic]",
       "parsed": {
         "target_item": "spruce_planks",
-        "qty": 12,
+        "qty": 10,
         "action_type": "craft",
         "parameters": {
           "crafting_inputs": [
@@ -623,12 +446,12 @@
         }
       },
       "meta": {
-        "latency_ms": 1076
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:14.028Z",
-      "elapsed": "1m 22s",
+      "timestamp": "2026-04-17T05:10:45.627Z",
+      "elapsed": "24s",
       "stage": "AM",
       "attempt": 1,
       "raw": "!craftRecipe(\"spruce_planks\", 3)",
@@ -641,67 +464,27 @@
         ],
         "nearby_blocks": [
           "dirt",
-          "sand",
           "grass_block",
+          "spruce_leaves",
           "fern",
           "spruce_log",
-          "coal_ore",
+          "podzol",
           "stone",
-          "sandstone",
-          "diorite",
-          "spruce_leaves"
+          "short_grass",
+          "mossy_cobblestone",
+          "copper_ore"
         ],
         "nearby_entities": {
           "mobs": []
         }
       },
       "meta": {
-        "latency_ms": 761,
-        "source": "llm"
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:14.693Z",
-      "elapsed": "1m 22s",
-      "stage": "AM",
-      "attempt": 2,
-      "raw": "{\"status\":\"TASK_COMPLETE\"}",
-      "state": {
-        "inventory": {
-          "spruce_log": 1,
-          "spruce_planks": 8
-        },
-        "craftable_items": [
-          "spruce_planks",
-          "crafting_table",
-          "spruce_button",
-          "spruce_pressure_plate",
-          "stick"
-        ],
-        "nearby_blocks": [
-          "dirt",
-          "sand",
-          "grass_block",
-          "fern",
-          "spruce_log",
-          "coal_ore",
-          "stone",
-          "sandstone",
-          "diorite",
-          "spruce_leaves"
-        ],
-        "nearby_entities": {
-          "mobs": []
-        }
-      },
-      "meta": {
-        "latency_ms": 590,
-        "source": "llm"
-      }
-    },
-    {
-      "timestamp": "2026-04-13T00:41:14.764Z",
-      "elapsed": "1m 23s",
+      "timestamp": "2026-04-17T05:10:46.387Z",
+      "elapsed": "24s",
       "stage": "SCSG",
       "raw": "[deterministic]",
       "parsed": {
@@ -710,6 +493,10 @@
           "cooked_porkchop"
         ],
         "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
           "vertices": [
             {
               "id": "cooked_porkchop",
@@ -743,7 +530,7 @@
             },
             {
               "id": "stick",
-              "qty": 4,
+              "qty": 2,
               "item_type": "item",
               "acquisition_dependency": "none"
             },
@@ -806,11 +593,16 @@
             }
           ]
         }
+      },
+      "state": {
+        "inventory": {
+          "spruce_planks": 12
+        }
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:14.766Z",
-      "elapsed": "1m 23s",
+      "timestamp": "2026-04-17T05:10:46.439Z",
+      "elapsed": "24s",
       "stage": "CANDIDATES",
       "candidates": [
         {
@@ -818,21 +610,27 @@
           "qty": 1,
           "item_type": "resource",
           "acquisition_dependency": "mob",
-          "satisfied_inputs": []
+          "satisfied_inputs": [],
+          "source_hint": "pig",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
         },
         {
           "id": "stick",
-          "qty": 4,
+          "qty": 2,
           "item_type": "item",
           "acquisition_dependency": "none",
           "satisfied_inputs": [
             {
-              "from": "any_plank",
-              "type": "crafting_input",
+              "item": "any_plank",
               "qty": 2,
+              "type": "crafting_input",
               "consumed": true
             }
-          ]
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
         },
         {
           "id": "crafting_table",
@@ -841,20 +639,222 @@
           "acquisition_dependency": "none",
           "satisfied_inputs": [
             {
-              "from": "any_plank",
-              "type": "crafting_input",
+              "item": "any_plank",
               "qty": 4,
+              "type": "crafting_input",
               "consumed": true
             }
-          ]
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
         }
       ]
     },
     {
-      "timestamp": "2026-04-13T00:41:15.715Z",
-      "elapsed": "1m 24s",
+      "timestamp": "2026-04-17T05:10:46.479Z",
+      "elapsed": "24s",
       "stage": "NTS",
-      "raw": "```json\n{\n  \"target_item\": \"crafting_table\",\n  \"qty\": 1,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      {\n        \"item\": \"any_plank\",\n        \"qty\": 4\n      }\n    ],\n    \"workstation\": null\n  }\n}\n```",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "stick",
+        "qty": 2,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 2
+            }
+          ],
+          "workstation": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-17T05:10:46.518Z",
+      "elapsed": "24s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"stick\", 1)",
+      "state": {
+        "inventory": {
+          "spruce_planks": 12
+        },
+        "craftable_items": [
+          "crafting_table",
+          "spruce_button",
+          "spruce_pressure_plate",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "grass_block",
+          "spruce_leaves",
+          "fern",
+          "spruce_log",
+          "podzol",
+          "stone",
+          "short_grass",
+          "mossy_cobblestone",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-17T05:10:47.278Z",
+      "elapsed": "25s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_porkchop"
+        ],
+        "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
+          "vertices": [
+            {
+              "id": "cooked_porkchop",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "porkchop",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 8,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "porkchop",
+              "to": "cooked_porkchop",
+              "type": "smelting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "cooked_porkchop",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "spruce_planks": 10,
+          "stick": 4
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-17T05:10:47.343Z",
+      "elapsed": "25s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "porkchop",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [],
+          "source_hint": "pig",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "crafting_table",
+          "qty": 1,
+          "item_type": "workstation",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-17T05:10:47.382Z",
+      "elapsed": "25s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
       "parsed": {
         "target_item": "crafting_table",
         "qty": 1,
@@ -870,18 +870,19 @@
         }
       },
       "meta": {
-        "latency_ms": 879
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:16.250Z",
-      "elapsed": "1m 24s",
+      "timestamp": "2026-04-17T05:10:47.418Z",
+      "elapsed": "25s",
       "stage": "AM",
       "attempt": 1,
       "raw": "!craftRecipe(\"crafting_table\", 1)",
       "state": {
         "inventory": {
-          "spruce_planks": 12
+          "spruce_planks": 10,
+          "stick": 4
         },
         "craftable_items": [
           "crafting_table",
@@ -891,28 +892,27 @@
         ],
         "nearby_blocks": [
           "dirt",
-          "sand",
           "grass_block",
+          "spruce_leaves",
           "fern",
           "spruce_log",
-          "coal_ore",
+          "podzol",
           "stone",
-          "sandstone",
-          "diorite",
-          "spruce_leaves"
+          "short_grass",
+          "mossy_cobblestone",
+          "copper_ore"
         ],
         "nearby_entities": {
           "mobs": []
         }
       },
       "meta": {
-        "latency_ms": 463,
-        "source": "llm"
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:16.318Z",
-      "elapsed": "1m 24s",
+      "timestamp": "2026-04-17T05:10:48.177Z",
+      "elapsed": "26s",
       "stage": "SCSG",
       "raw": "[deterministic]",
       "parsed": {
@@ -921,6 +921,10 @@
           "cooked_porkchop"
         ],
         "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
           "vertices": [
             {
               "id": "cooked_porkchop",
@@ -950,12 +954,6 @@
               "id": "wooden_pickaxe",
               "qty": 1,
               "item_type": "tool",
-              "acquisition_dependency": "none"
-            },
-            {
-              "id": "stick",
-              "qty": 4,
-              "item_type": "item",
               "acquisition_dependency": "none"
             }
           ],
@@ -987,193 +985,21 @@
               "type": "tool_dependency",
               "qty": 1,
               "consumed": false
-            },
-            {
-              "from": "stick",
-              "to": "wooden_pickaxe",
-              "type": "crafting_input",
-              "qty": 2,
-              "consumed": true
             }
           ]
-        }
-      }
-    },
-    {
-      "timestamp": "2026-04-13T00:41:16.320Z",
-      "elapsed": "1m 24s",
-      "stage": "CANDIDATES",
-      "candidates": [
-        {
-          "id": "porkchop",
-          "qty": 1,
-          "item_type": "resource",
-          "acquisition_dependency": "mob",
-          "satisfied_inputs": []
-        },
-        {
-          "id": "stick",
-          "qty": 4,
-          "item_type": "item",
-          "acquisition_dependency": "none",
-          "satisfied_inputs": [
-            {
-              "from": "any_plank",
-              "type": "crafting_input",
-              "qty": 2,
-              "consumed": true
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "timestamp": "2026-04-13T00:41:17.348Z",
-      "elapsed": "1m 25s",
-      "stage": "NTS",
-      "raw": "```json\n{\n  \"target_item\": \"stick\",\n  \"qty\": 4,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      {\n        \"item\": \"any_plank\",\n        \"qty\": 2\n      }\n    ],\n    \"workstation\": null\n  }\n}\n```",
-      "parsed": {
-        "target_item": "stick",
-        "qty": 4,
-        "action_type": "craft",
-        "parameters": {
-          "crafting_inputs": [
-            {
-              "item": "any_plank",
-              "qty": 2
-            }
-          ],
-          "workstation": null
         }
       },
-      "meta": {
-        "latency_ms": 967
-      }
-    },
-    {
-      "timestamp": "2026-04-13T00:41:17.904Z",
-      "elapsed": "1m 26s",
-      "stage": "AM",
-      "attempt": 1,
-      "raw": "!craftRecipe(\"stick\", 1)",
       "state": {
         "inventory": {
-          "spruce_planks": 8,
+          "spruce_planks": 6,
+          "stick": 4,
           "crafting_table": 1
-        },
-        "craftable_items": [
-          "spruce_slab",
-          "chest",
-          "crafting_table",
-          "spruce_stairs",
-          "spruce_button",
-          "spruce_pressure_plate",
-          "spruce_door",
-          "spruce_trapdoor",
-          "spruce_boat",
-          "bowl",
-          "stick"
-        ],
-        "nearby_blocks": [
-          "dirt",
-          "sand",
-          "grass_block",
-          "fern",
-          "spruce_log",
-          "coal_ore",
-          "stone",
-          "sandstone",
-          "diorite",
-          "spruce_leaves"
-        ],
-        "nearby_entities": {
-          "mobs": []
-        }
-      },
-      "meta": {
-        "latency_ms": 481,
-        "source": "llm"
-      }
-    },
-    {
-      "timestamp": "2026-04-13T00:41:17.969Z",
-      "elapsed": "1m 26s",
-      "stage": "SCSG",
-      "raw": "[deterministic]",
-      "parsed": {
-        "r": 0,
-        "s": [
-          "cooked_porkchop"
-        ],
-        "final": {
-          "vertices": [
-            {
-              "id": "cooked_porkchop",
-              "qty": 1,
-              "item_type": "item",
-              "acquisition_dependency": "none"
-            },
-            {
-              "id": "porkchop",
-              "qty": 1,
-              "item_type": "resource",
-              "acquisition_dependency": "mob"
-            },
-            {
-              "id": "furnace",
-              "qty": 1,
-              "item_type": "workstation",
-              "acquisition_dependency": "none"
-            },
-            {
-              "id": "cobblestone",
-              "qty": 8,
-              "item_type": "resource",
-              "acquisition_dependency": "none"
-            },
-            {
-              "id": "wooden_pickaxe",
-              "qty": 1,
-              "item_type": "tool",
-              "acquisition_dependency": "none"
-            }
-          ],
-          "edges": [
-            {
-              "from": "porkchop",
-              "to": "cooked_porkchop",
-              "type": "smelting_input",
-              "qty": 1,
-              "consumed": true
-            },
-            {
-              "from": "furnace",
-              "to": "cooked_porkchop",
-              "type": "workstation_dependency",
-              "qty": 1,
-              "consumed": false
-            },
-            {
-              "from": "cobblestone",
-              "to": "furnace",
-              "type": "crafting_input",
-              "qty": 8,
-              "consumed": true
-            },
-            {
-              "from": "wooden_pickaxe",
-              "to": "cobblestone",
-              "type": "tool_dependency",
-              "qty": 1,
-              "consumed": false
-            }
-          ]
         }
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:17.971Z",
-      "elapsed": "1m 26s",
+      "timestamp": "2026-04-17T05:10:48.229Z",
+      "elapsed": "26s",
       "stage": "CANDIDATES",
       "candidates": [
         {
@@ -1181,7 +1007,10 @@
           "qty": 1,
           "item_type": "resource",
           "acquisition_dependency": "mob",
-          "satisfied_inputs": []
+          "satisfied_inputs": [],
+          "source_hint": "pig",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
         },
         {
           "id": "wooden_pickaxe",
@@ -1190,32 +1019,35 @@
           "acquisition_dependency": "none",
           "satisfied_inputs": [
             {
-              "from": "stick",
-              "type": "crafting_input",
+              "item": "stick",
               "qty": 2,
-              "consumed": true
-            },
-            {
-              "from": "any_plank",
               "type": "crafting_input",
-              "qty": 3,
               "consumed": true
             },
             {
-              "from": "crafting_table",
-              "type": "workstation_dependency",
+              "item": "any_plank",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
               "qty": 1,
+              "type": "workstation_dependency",
               "consumed": false
             }
-          ]
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
         }
       ]
     },
     {
-      "timestamp": "2026-04-13T00:41:19.153Z",
-      "elapsed": "1m 27s",
+      "timestamp": "2026-04-17T05:10:48.269Z",
+      "elapsed": "26s",
       "stage": "NTS",
-      "raw": "```json\n{\n  \"target_item\": \"wooden_pickaxe\",\n  \"qty\": 1,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      {\"item\": \"stick\", \"qty\": 2},\n      {\"item\": \"any_plank\", \"qty\": 3}\n    ],\n    \"workstation\": \"crafting_table\"\n  }\n}\n```",
+      "raw": "[deterministic]",
       "parsed": {
         "target_item": "wooden_pickaxe",
         "qty": 1,
@@ -1235,20 +1067,20 @@
         }
       },
       "meta": {
-        "latency_ms": 1123
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:20.422Z",
-      "elapsed": "1m 28s",
+      "timestamp": "2026-04-17T05:10:48.309Z",
+      "elapsed": "26s",
       "stage": "AM",
       "attempt": 1,
       "raw": "!craftRecipe(\"wooden_pickaxe\", 1)",
       "state": {
         "inventory": {
           "spruce_planks": 6,
-          "crafting_table": 1,
-          "stick": 4
+          "stick": 4,
+          "crafting_table": 1
         },
         "craftable_items": [
           "spruce_slab",
@@ -1272,28 +1104,27 @@
         ],
         "nearby_blocks": [
           "dirt",
-          "sand",
           "grass_block",
+          "spruce_leaves",
           "fern",
           "spruce_log",
-          "coal_ore",
+          "podzol",
           "stone",
-          "sandstone",
-          "diorite",
-          "spruce_leaves"
+          "short_grass",
+          "mossy_cobblestone",
+          "copper_ore"
         ],
         "nearby_entities": {
           "mobs": []
         }
       },
       "meta": {
-        "latency_ms": 1193,
-        "source": "llm"
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:27.933Z",
-      "elapsed": "1m 36s",
+      "timestamp": "2026-04-17T05:10:57.852Z",
+      "elapsed": "36s",
       "stage": "SCSG",
       "raw": "[deterministic]",
       "parsed": {
@@ -1302,6 +1133,10 @@
           "cooked_porkchop"
         ],
         "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
           "vertices": [
             {
               "id": "cooked_porkchop",
@@ -1352,11 +1187,19 @@
             }
           ]
         }
+      },
+      "state": {
+        "inventory": {
+          "spruce_planks": 3,
+          "wooden_pickaxe": 1,
+          "stick": 2,
+          "crafting_table": 1
+        }
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:27.934Z",
-      "elapsed": "1m 36s",
+      "timestamp": "2026-04-17T05:10:57.904Z",
+      "elapsed": "36s",
       "stage": "CANDIDATES",
       "candidates": [
         {
@@ -1364,7 +1207,10 @@
           "qty": 1,
           "item_type": "resource",
           "acquisition_dependency": "mob",
-          "satisfied_inputs": []
+          "satisfied_inputs": [],
+          "source_hint": "pig",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
         },
         {
           "id": "cobblestone",
@@ -1373,20 +1219,23 @@
           "acquisition_dependency": "none",
           "satisfied_inputs": [
             {
-              "from": "wooden_pickaxe",
-              "type": "tool_dependency",
+              "item": "wooden_pickaxe",
               "qty": 1,
+              "type": "tool_dependency",
               "consumed": false
             }
-          ]
+          ],
+          "source_hint": "stone",
+          "source_kind": "block",
+          "grounded_nearby_source": "stone"
         }
       ]
     },
     {
-      "timestamp": "2026-04-13T00:41:28.815Z",
-      "elapsed": "1m 37s",
+      "timestamp": "2026-04-17T05:10:57.945Z",
+      "elapsed": "36s",
       "stage": "NTS",
-      "raw": "```json\n{\n  \"target_item\": \"cobblestone\",\n  \"qty\": 8,\n  \"action_type\": \"collect\",\n  \"parameters\": {\n    \"source_block\": \"stone\",\n    \"item_dependency\": null,\n    \"tool\": \"wooden_pickaxe\"\n  }\n}\n```",
+      "raw": "[deterministic]",
       "parsed": {
         "target_item": "cobblestone",
         "qty": 8,
@@ -1398,19 +1247,19 @@
         }
       },
       "meta": {
-        "latency_ms": 826
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:29.529Z",
-      "elapsed": "1m 37s",
+      "timestamp": "2026-04-17T05:10:57.985Z",
+      "elapsed": "36s",
       "stage": "AM",
       "attempt": 1,
       "raw": "!collectBlocks(\"stone\", 8)",
       "state": {
         "inventory": {
-          "wooden_pickaxe": 1,
           "spruce_planks": 3,
+          "wooden_pickaxe": 1,
           "stick": 2,
           "crafting_table": 1
         },
@@ -1428,28 +1277,27 @@
         ],
         "nearby_blocks": [
           "dirt",
-          "sand",
           "grass_block",
+          "spruce_leaves",
           "fern",
           "spruce_log",
-          "coal_ore",
+          "podzol",
           "stone",
-          "sandstone",
-          "diorite",
-          "spruce_leaves"
+          "short_grass",
+          "mossy_cobblestone",
+          "copper_ore"
         ],
         "nearby_entities": {
           "mobs": []
         }
       },
       "meta": {
-        "latency_ms": 636,
-        "source": "llm"
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:55.135Z",
-      "elapsed": "2m 03s",
+      "timestamp": "2026-04-17T05:11:27.732Z",
+      "elapsed": "1m 06s",
       "stage": "SCSG",
       "raw": "[deterministic]",
       "parsed": {
@@ -1458,6 +1306,10 @@
           "cooked_porkchop"
         ],
         "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
           "vertices": [
             {
               "id": "cooked_porkchop",
@@ -1495,11 +1347,21 @@
             }
           ]
         }
+      },
+      "state": {
+        "inventory": {
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "spruce_planks": 3,
+          "dirt": 2,
+          "cobblestone": 11
+        }
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:55.137Z",
-      "elapsed": "2m 03s",
+      "timestamp": "2026-04-17T05:11:27.795Z",
+      "elapsed": "1m 06s",
       "stage": "CANDIDATES",
       "candidates": [
         {
@@ -1507,7 +1369,10 @@
           "qty": 1,
           "item_type": "resource",
           "acquisition_dependency": "mob",
-          "satisfied_inputs": []
+          "satisfied_inputs": [],
+          "source_hint": "pig",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
         },
         {
           "id": "furnace",
@@ -1516,26 +1381,29 @@
           "acquisition_dependency": "none",
           "satisfied_inputs": [
             {
-              "from": "cobblestone",
-              "type": "crafting_input",
+              "item": "cobblestone",
               "qty": 8,
+              "type": "crafting_input",
               "consumed": true
             },
             {
-              "from": "crafting_table",
-              "type": "workstation_dependency",
+              "item": "crafting_table",
               "qty": 1,
+              "type": "workstation_dependency",
               "consumed": false
             }
-          ]
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
         }
       ]
     },
     {
-      "timestamp": "2026-04-13T00:41:56.119Z",
-      "elapsed": "2m 04s",
+      "timestamp": "2026-04-17T05:11:27.837Z",
+      "elapsed": "1m 06s",
       "stage": "NTS",
-      "raw": "```json\n{\n  \"target_item\": \"furnace\",\n  \"qty\": 1,\n  \"action_type\": \"craft\",\n  \"parameters\": {\n    \"crafting_inputs\": [\n      {\n        \"item\": \"cobblestone\",\n        \"qty\": 8\n      }\n    ],\n    \"workstation\": \"crafting_table\"\n  }\n}\n```",
+      "raw": "[deterministic]",
       "parsed": {
         "target_item": "furnace",
         "qty": 1,
@@ -1551,12 +1419,12 @@
         }
       },
       "meta": {
-        "latency_ms": 946
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:41:56.956Z",
-      "elapsed": "2m 05s",
+      "timestamp": "2026-04-17T05:11:27.877Z",
+      "elapsed": "1m 06s",
       "stage": "AM",
       "attempt": 1,
       "raw": "!craftRecipe(\"furnace\", 1)",
@@ -1566,8 +1434,8 @@
           "crafting_table": 1,
           "wooden_pickaxe": 1,
           "spruce_planks": 3,
-          "dirt": 4,
-          "cobblestone": 8
+          "dirt": 2,
+          "cobblestone": 11
         },
         "craftable_items": [
           "spruce_slab",
@@ -1593,28 +1461,30 @@
         ],
         "nearby_blocks": [
           "stone",
-          "gravel",
-          "sandstone",
-          "coal_ore",
-          "dirt",
-          "sand",
+          "mossy_cobblestone",
           "grass_block",
-          "diorite",
+          "dirt",
+          "podzol",
+          "fern",
+          "coal_ore",
+          "lapis_ore",
+          "spruce_leaves",
+          "short_grass",
+          "granite",
           "copper_ore",
-          "fern"
+          "spruce_log"
         ],
         "nearby_entities": {
           "mobs": []
         }
       },
       "meta": {
-        "latency_ms": 796,
-        "source": "llm"
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:42:18.690Z",
-      "elapsed": "2m 26s",
+      "timestamp": "2026-04-17T05:11:34.733Z",
+      "elapsed": "1m 13s",
       "stage": "SCSG",
       "raw": "[deterministic]",
       "parsed": {
@@ -1623,6 +1493,10 @@
           "cooked_porkchop"
         ],
         "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
           "vertices": [
             {
               "id": "cooked_porkchop",
@@ -1647,11 +1521,22 @@
             }
           ]
         }
+      },
+      "state": {
+        "inventory": {
+          "furnace": 1,
+          "stick": 2,
+          "cobblestone": 4,
+          "wooden_pickaxe": 1,
+          "spruce_planks": 3,
+          "dirt": 2,
+          "crafting_table": 1
+        }
       }
     },
     {
-      "timestamp": "2026-04-13T00:42:18.691Z",
-      "elapsed": "2m 26s",
+      "timestamp": "2026-04-17T05:11:34.794Z",
+      "elapsed": "1m 13s",
       "stage": "CANDIDATES",
       "candidates": [
         {
@@ -1659,15 +1544,18 @@
           "qty": 1,
           "item_type": "resource",
           "acquisition_dependency": "mob",
-          "satisfied_inputs": []
+          "satisfied_inputs": [],
+          "source_hint": "pig",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
         }
       ]
     },
     {
-      "timestamp": "2026-04-13T00:42:20.160Z",
-      "elapsed": "2m 28s",
+      "timestamp": "2026-04-17T05:11:34.839Z",
+      "elapsed": "1m 13s",
       "stage": "NTS",
-      "raw": "```json\n{\n  \"target_item\": \"porkchop\",\n  \"qty\": 1,\n  \"action_type\": \"kill\",\n  \"parameters\": {\n    \"source_mob\": \"pig\",\n    \"weapon\": null\n  }\n}\n```",
+      "raw": "[deterministic]",
       "parsed": {
         "target_item": "porkchop",
         "qty": 1,
@@ -1678,26 +1566,29 @@
         }
       },
       "meta": {
-        "latency_ms": 1432
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:42:20.910Z",
-      "elapsed": "2m 29s",
+      "timestamp": "2026-04-17T05:11:34.879Z",
+      "elapsed": "1m 13s",
       "stage": "AM",
       "attempt": 1,
       "raw": "!search(\"pig\")",
       "state": {
         "inventory": {
-          "stick": 2,
           "furnace": 1,
+          "stick": 2,
+          "cobblestone": 4,
           "wooden_pickaxe": 1,
           "spruce_planks": 3,
-          "dirt": 3,
+          "dirt": 2,
           "crafting_table": 1
         },
         "craftable_items": [
           "spruce_slab",
+          "cobblestone_slab",
+          "lever",
           "spruce_button",
           "spruce_pressure_plate",
           "bowl",
@@ -1706,32 +1597,39 @@
           "wooden_pickaxe",
           "wooden_axe",
           "wooden_hoe",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
           "stick"
         ],
         "nearby_blocks": [
           "stone",
-          "dirt",
-          "gravel",
-          "sandstone",
-          "coal_ore",
-          "sand",
+          "mossy_cobblestone",
           "grass_block",
-          "diorite",
+          "dirt",
+          "podzol",
+          "fern",
+          "coal_ore",
+          "lapis_ore",
+          "spruce_leaves",
+          "short_grass",
+          "granite",
           "copper_ore",
-          "fern"
+          "spruce_log"
         ],
         "nearby_entities": {
           "mobs": []
         }
       },
       "meta": {
-        "latency_ms": 704,
-        "source": "llm"
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:42:20.912Z",
-      "elapsed": "2m 29s",
+      "timestamp": "2026-04-17T05:11:34.880Z",
+      "elapsed": "1m 13s",
       "stage": "AM",
       "attempt": 2,
       "raw": "!searchForEntity(\"pig\", 32)",
@@ -1740,8 +1638,8 @@
       }
     },
     {
-      "timestamp": "2026-04-13T00:42:20.914Z",
-      "elapsed": "2m 29s",
+      "timestamp": "2026-04-17T05:11:34.881Z",
+      "elapsed": "1m 13s",
       "stage": "AM",
       "attempt": 3,
       "raw": "!searchForEntity(\"pig\", 64)",
@@ -1750,23 +1648,25 @@
       }
     },
     {
-      "timestamp": "2026-04-13T00:42:40.151Z",
-      "elapsed": "2m 48s",
+      "timestamp": "2026-04-17T05:11:44.437Z",
+      "elapsed": "1m 22s",
       "stage": "AM",
       "attempt": 2,
       "raw": "!attack(\"pig\")",
       "state": {
         "inventory": {
-          "stick": 2,
           "furnace": 1,
+          "stick": 2,
+          "cobblestone": 4,
           "wooden_pickaxe": 1,
           "spruce_planks": 3,
-          "dirt": 1,
-          "crafting_table": 1,
-          "sandstone": 1
+          "dirt": 2,
+          "crafting_table": 1
         },
         "craftable_items": [
           "spruce_slab",
+          "cobblestone_slab",
+          "lever",
           "spruce_button",
           "spruce_pressure_plate",
           "bowl",
@@ -1775,38 +1675,40 @@
           "wooden_pickaxe",
           "wooden_axe",
           "wooden_hoe",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
           "stick"
         ],
         "nearby_blocks": [
-          "large_fern",
-          "grass_block",
           "fern",
-          "dirt",
-          "spruce_leaves",
           "short_grass",
-          "mossy_cobblestone",
+          "grass_block",
+          "dirt",
           "stone",
-          "podzol",
           "spruce_log",
-          "brown_mushroom",
-          "gravel",
-          "copper_ore"
+          "spruce_leaves",
+          "andesite",
+          "mossy_cobblestone",
+          "copper_ore",
+          "podzol",
+          "dead_bush"
         ],
         "nearby_entities": {
           "mobs": [
-            "wolf",
             "pig"
           ]
         }
       },
       "meta": {
-        "latency_ms": 737,
-        "source": "llm"
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:42:51.714Z",
-      "elapsed": "3m 00s",
+      "timestamp": "2026-04-17T05:11:50.449Z",
+      "elapsed": "1m 28s",
       "stage": "SCSG",
       "raw": "[deterministic]",
       "parsed": {
@@ -1815,6 +1717,10 @@
           "cooked_porkchop"
         ],
         "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
           "vertices": [
             {
               "id": "cooked_porkchop",
@@ -1825,11 +1731,23 @@
           ],
           "edges": []
         }
+      },
+      "state": {
+        "inventory": {
+          "stick": 2,
+          "cobblestone": 4,
+          "wooden_pickaxe": 1,
+          "spruce_planks": 3,
+          "dirt": 2,
+          "crafting_table": 1,
+          "furnace": 1,
+          "porkchop": 1
+        }
       }
     },
     {
-      "timestamp": "2026-04-13T00:42:51.716Z",
-      "elapsed": "3m 00s",
+      "timestamp": "2026-04-17T05:11:50.497Z",
+      "elapsed": "1m 28s",
       "stage": "CANDIDATES",
       "candidates": [
         {
@@ -1839,32 +1757,35 @@
           "acquisition_dependency": "none",
           "satisfied_inputs": [
             {
-              "from": "porkchop",
+              "item": "porkchop",
+              "qty": 1,
               "type": "smelting_input",
-              "qty": 1,
               "consumed": true
             },
             {
-              "from": "any_plank",
+              "item": "any_plank",
+              "qty": 1,
               "type": "fuel_input",
-              "qty": 1,
               "consumed": true
             },
             {
-              "from": "furnace",
-              "type": "workstation_dependency",
+              "item": "furnace",
               "qty": 1,
+              "type": "workstation_dependency",
               "consumed": false
             }
-          ]
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
         }
       ]
     },
     {
-      "timestamp": "2026-04-13T00:42:52.927Z",
-      "elapsed": "3m 01s",
+      "timestamp": "2026-04-17T05:11:50.536Z",
+      "elapsed": "1m 28s",
       "stage": "NTS",
-      "raw": "```json\n{\n  \"target_item\": \"cooked_porkchop\",\n  \"qty\": 1,\n  \"action_type\": \"smelt\",\n  \"parameters\": {\n    \"smelting_inputs\": [\n      {\n        \"item\": \"porkchop\",\n        \"qty\": 1\n      }\n    ],\n    \"fuel_inputs\": [\n      {\n        \"item\": \"any_plank\",\n        \"qty\": 1\n      }\n    ],\n    \"workstation\": \"furnace\"\n  }\n}\n```",
+      "raw": "[deterministic]",
       "parsed": {
         "target_item": "cooked_porkchop",
         "qty": 1,
@@ -1886,28 +1807,30 @@
         }
       },
       "meta": {
-        "latency_ms": 1178
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:42:53.720Z",
-      "elapsed": "3m 02s",
+      "timestamp": "2026-04-17T05:11:50.576Z",
+      "elapsed": "1m 28s",
       "stage": "AM",
       "attempt": 1,
-      "raw": "!smeltItem(\"porkchop\", 1)",
+      "raw": "!smelt_item(\"porkchop\", 1, \"spruce_planks\")",
       "state": {
         "inventory": {
           "stick": 2,
-          "furnace": 1,
+          "cobblestone": 4,
           "wooden_pickaxe": 1,
           "spruce_planks": 3,
-          "dirt": 1,
+          "dirt": 2,
           "crafting_table": 1,
-          "sandstone": 1,
-          "porkchop": 3
+          "furnace": 1,
+          "porkchop": 1
         },
         "craftable_items": [
           "spruce_slab",
+          "cobblestone_slab",
+          "lever",
           "spruce_button",
           "spruce_pressure_plate",
           "bowl",
@@ -1916,35 +1839,36 @@
           "wooden_pickaxe",
           "wooden_axe",
           "wooden_hoe",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
           "stick"
         ],
         "nearby_blocks": [
+          "sand",
+          "dead_bush",
+          "dirt",
+          "grass_block",
+          "sandstone",
+          "stone",
           "podzol",
           "fern",
-          "grass_block",
-          "dirt",
-          "spruce_leaves",
-          "stone",
-          "short_grass",
           "spruce_log",
-          "large_fern",
-          "gravel"
+          "large_fern"
         ],
         "nearby_entities": {
-          "mobs": [
-            "wolf",
-            "chicken"
-          ]
+          "mobs": []
         }
       },
       "meta": {
-        "latency_ms": 745,
-        "source": "llm"
+        "source": "deterministic"
       }
     },
     {
-      "timestamp": "2026-04-13T00:43:09.966Z",
-      "elapsed": "3m 18s",
+      "timestamp": "2026-04-17T05:12:07.463Z",
+      "elapsed": "1m 45s",
       "stage": "SCSG",
       "raw": "[deterministic]",
       "parsed": {
@@ -1954,10 +1878,22 @@
           "vertices": [],
           "edges": []
         }
+      },
+      "state": {
+        "inventory": {
+          "spruce_planks": 2,
+          "cooked_porkchop": 1,
+          "stick": 2,
+          "cobblestone": 4,
+          "wooden_pickaxe": 1,
+          "furnace": 1,
+          "dirt": 2,
+          "crafting_table": 1
+        }
       }
     }
   ],
-  "completed_at": "2026-04-13T00:43:09.969Z",
-  "total_elapsed": "3m 18s",
+  "completed_at": "2026-04-17T05:12:07.468Z",
+  "total_elapsed": "1m 45s",
   "completion_reason": "all sinks satisfied"
 }
