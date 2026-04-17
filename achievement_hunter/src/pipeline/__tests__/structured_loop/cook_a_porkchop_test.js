@@ -46,34 +46,42 @@ vi.mock('../../state.js', () => ({
 
 import {get_item_batch_size} from '../../mc_utils.js';
 import {
-  build_incoming_edge_map,
-  check_search_complete,
-  edge_in_subgraph,
-  edge_key,
-  expand_search_item,
   get_canonical_block_source,
   get_canonical_mob_source,
-  get_command_failure_signature,
+  is_environmental_use_target,
+  resolve_fallback_block_source,
+  resolve_nearby_block_source,
+  resolve_nearby_mob_source,
+} from '../../mc_sources.js';
+import {
+  build_incoming_edge_map,
+  edge_in_subgraph,
+  edge_key,
   get_satisfied_inputs_by_type,
   get_single_satisfied_input_item,
-  is_craft_command,
+  resolve_concrete_craft_target,
+} from '../../structured_loop_graph.js';
+import {
+  check_search_complete,
+  expand_search_item,
   is_entity_target,
-  is_environmental_use_target,
-  is_successful_command_result,
-  make_fallback_acquisition_task,
   make_search_command,
+  parse_search_command,
+} from '../../structured_loop_search.js';
+import {
+  get_command_failure_signature,
+  is_craft_command,
+  is_successful_command_result,
   mediate_collect,
   mediate_craft,
   mediate_kill,
   mediate_smelt,
-  parse_search_command,
-  resolve_concrete_craft_target,
-  resolve_fallback_block_source,
-  resolve_nearby_block_source,
-  resolve_nearby_mob_source,
   resolve_smelt_fuel_name,
-  select_next_task,
   should_abort_repeated_failure,
+} from '../../structured_loop_actions.js';
+import {
+  make_fallback_acquisition_task,
+  select_next_task,
   try_make_craft_task,
   try_make_immediate_acquisition_task,
   try_make_smelt_task,
