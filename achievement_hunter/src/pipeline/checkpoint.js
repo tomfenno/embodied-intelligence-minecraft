@@ -1,6 +1,6 @@
-import { readFileSync, writeFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
+import {existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync} from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,13 +13,13 @@ const CHECKPOINT_PATH = path.join(__dirname, '../../rollouts/checkpoint.json');
  * can resume from the outer SCSG loop without rebuilding the graph.
  */
 export function saveCheckpoint(objective, graph) {
-    mkdirSync(path.dirname(CHECKPOINT_PATH), { recursive: true });
-    writeFileSync(
-        CHECKPOINT_PATH,
-        JSON.stringify({ objective, graph, saved_at: new Date().toISOString() }, null, 2),
-        'utf8'
-    );
-    console.log('[SPL] Checkpoint saved.');
+  mkdirSync(path.dirname(CHECKPOINT_PATH), {recursive: true});
+  writeFileSync(
+      CHECKPOINT_PATH,
+      JSON.stringify(
+          {objective, graph, saved_at: new Date().toISOString()}, null, 2),
+      'utf8');
+  console.log('[SPL] Checkpoint saved.');
 }
 
 /**
@@ -27,23 +27,23 @@ export function saveCheckpoint(objective, graph) {
  * Returns { objective, graph, saved_at } or null if none exists.
  */
 export function loadCheckpoint() {
-    if (!existsSync(CHECKPOINT_PATH)) return null;
-    try {
-        const data = JSON.parse(readFileSync(CHECKPOINT_PATH, 'utf8'));
-        if (!data.objective || !data.graph) return null;
-        return data;
-    } catch (err) {
-        console.warn('[SPL] Failed to parse checkpoint, ignoring:', err.message);
-        return null;
-    }
+  if (!existsSync(CHECKPOINT_PATH)) return null;
+  try {
+    const data = JSON.parse(readFileSync(CHECKPOINT_PATH, 'utf8'));
+    if (!data.objective || !data.graph) return null;
+    return data;
+  } catch (err) {
+    console.warn('[SPL] Failed to parse checkpoint, ignoring:', err.message);
+    return null;
+  }
 }
 
 /**
  * Deletes the checkpoint file on successful task completion.
  */
 export function clearCheckpoint() {
-    if (existsSync(CHECKPOINT_PATH)) {
-        unlinkSync(CHECKPOINT_PATH);
-        console.log('[SPL] Checkpoint cleared.');
-    }
+  if (existsSync(CHECKPOINT_PATH)) {
+    unlinkSync(CHECKPOINT_PATH);
+    console.log('[SPL] Checkpoint cleared.');
+  }
 }

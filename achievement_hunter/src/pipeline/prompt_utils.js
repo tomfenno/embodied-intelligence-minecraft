@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import {readFileSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
@@ -14,7 +14,8 @@ const __dirname = path.dirname(__filename);
  *   const prompt = fill_ptd_prompt('Craft a stone pickaxe');
  */
 export function fill_ptd_prompt(objective) {
-  const template = _read_template('../../docs/prompts/ptd_prompts/ptd_prompt.md');
+  const template =
+      _read_template('../../docs/prompts/ptd_prompts/ptd_prompt.md');
   return _fill(template, {OBJECTIVE: objective});
 }
 
@@ -118,7 +119,9 @@ const _template_cache = new Map();
  */
 function _read_template(relative_path) {
   if (!_template_cache.has(relative_path)) {
-    _template_cache.set(relative_path, readFileSync(path.join(__dirname, relative_path), 'utf8'));
+    _template_cache.set(
+        relative_path,
+        readFileSync(path.join(__dirname, relative_path), 'utf8'));
   }
   return _template_cache.get(relative_path);
 }
@@ -142,4 +145,3 @@ function _fill(template, inputs) {
   }
   return result;
 }
-

@@ -1,8 +1,8 @@
 import {executeCommand as execute_command} from '../../../../src/agent/commands/index.js';
-
-import {get_item_batch_size} from '../recipe_utils.js';
-import {ABSTRACT_CLASS_MEMBERS, is_environmental_use_target} from '../mc_sources.js';
 import {get_am_state} from '../agent_state.js';
+import {ABSTRACT_CLASS_MEMBERS, is_environmental_use_target} from '../mc_sources.js';
+import {get_item_batch_size} from '../recipe_utils.js';
+
 import {parse_search_command, run_search} from './search.js';
 
 const spl = {
@@ -192,13 +192,16 @@ export function serialize_am_output(action) {
 }
 
 export function is_successful_command_result(result) {
-  return result != null && typeof result === 'object' && result.success === true;
+  return result != null && typeof result === 'object' &&
+      result.success === true;
 }
 
 export function get_command_failure_signature(command, result) {
   if (is_successful_command_result(result)) return null;
   const message = (result?.message ?? String(result ?? ''))
-      .replace(/\d+ms/g, '<TIMEOUT>').replace(/\s+/g, ' ').trim();
+                      .replace(/\d+ms/g, '<TIMEOUT>')
+                      .replace(/\s+/g, ' ')
+                      .trim();
   return message ? `${command} || ${message}` : null;
 }
 

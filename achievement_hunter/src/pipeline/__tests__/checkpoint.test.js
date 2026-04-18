@@ -7,24 +7,25 @@
  * lost. A future improvement is to make the path configurable so tests can use
  * a temp directory.
  */
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
+import {existsSync, readFileSync, unlinkSync, writeFileSync} from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import { saveCheckpoint, loadCheckpoint, clearCheckpoint } from '../checkpoint.js';
+import {clearCheckpoint, loadCheckpoint, saveCheckpoint} from '../checkpoint.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Mirrors the path resolution inside checkpoint.js:
 //   __dirname of checkpoint.js = achievement_hunter/src/pipeline
 //   ../../rollouts = achievement_hunter/rollouts
-const CHECKPOINT_PATH = path.resolve(__dirname, '../../../rollouts/checkpoint.json');
+const CHECKPOINT_PATH =
+    path.resolve(__dirname, '../../../rollouts/checkpoint.json');
 
 const OBJECTIVE = '__vitest_checkpoint_objective__';
 const GRAPH = {
   objective: OBJECTIVE,
   sinks: ['test_item'],
-  vertices: [{ id: 'test_item', qty: 1 }],
+  vertices: [{id: 'test_item', qty: 1}],
   edges: [],
 };
 
@@ -32,9 +33,9 @@ let saved_prior = null;
 
 beforeEach(() => {
   // Preserve any real checkpoint that may already exist
-  saved_prior = existsSync(CHECKPOINT_PATH)
-    ? readFileSync(CHECKPOINT_PATH, 'utf8')
-    : null;
+  saved_prior = existsSync(CHECKPOINT_PATH) ?
+      readFileSync(CHECKPOINT_PATH, 'utf8') :
+      null;
 });
 
 afterEach(() => {
@@ -69,7 +70,7 @@ describe('saveCheckpoint', () => {
 
   it('overwrites an existing checkpoint', () => {
     saveCheckpoint(OBJECTIVE, GRAPH);
-    const updated_graph = { ...GRAPH, sinks: ['different_item'] };
+    const updated_graph = {...GRAPH, sinks: ['different_item']};
     saveCheckpoint(OBJECTIVE, updated_graph);
     const data = JSON.parse(readFileSync(CHECKPOINT_PATH, 'utf8'));
     expect(data.graph.sinks).toEqual(['different_item']);
@@ -98,22 +99,24 @@ describe('loadCheckpoint', () => {
   });
 
   it('returns null when objective field is missing', () => {
-    writeFileSync(CHECKPOINT_PATH, JSON.stringify({ graph: GRAPH }), 'utf8');
+    writeFileSync(CHECKPOINT_PATH, JSON.stringify({graph: GRAPH}), 'utf8');
     expect(loadCheckpoint()).toBeNull();
   });
 
   it('returns null when graph field is missing', () => {
-    writeFileSync(CHECKPOINT_PATH, JSON.stringify({ objective: OBJECTIVE }), 'utf8');
+    writeFileSync(
+        CHECKPOINT_PATH, JSON.stringify({objective: OBJECTIVE}), 'utf8');
     expect(loadCheckpoint()).toBeNull();
   });
 
-  it('returns null and emits a warning when the file contains invalid JSON', () => {
-    const warn_spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    writeFileSync(CHECKPOINT_PATH, 'this is not json', 'utf8');
-    expect(loadCheckpoint()).toBeNull();
-    expect(warn_spy).toHaveBeenCalled();
-    warn_spy.mockRestore();
-  });
+  it('returns null and emits a warning when the file contains invalid JSON',
+     () => {
+       const warn_spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+       writeFileSync(CHECKPOINT_PATH, 'this is not json', 'utf8');
+       expect(loadCheckpoint()).toBeNull();
+       expect(warn_spy).toHaveBeenCalled();
+       warn_spy.mockRestore();
+     });
 });
 
 // ── clearCheckpoint ─────────────────────────────────────────────────────────

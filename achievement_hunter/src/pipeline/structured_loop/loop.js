@@ -25,7 +25,7 @@ const log_source = {
 };
 
 // Runs the full structured task loop.
-async function structured_loop(models, agent, task_name, graph = null) {
+export async function structured_loop(models, agent, task_name, graph = null) {
   const log = create_rollout_logger(task_name);
 
   // This hard coded option to load a graph is intended. Do not remove.
@@ -33,9 +33,9 @@ async function structured_loop(models, agent, task_name, graph = null) {
   const graph_file_path =
       './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
   // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
-  graph = load_graph ?
-      await load_graph_from_file(graph_file_path) :
-      await generate_primary_task_dag_self_refined(models, task_name, graph, log);
+  graph = load_graph ? await load_graph_from_file(graph_file_path) :
+                       await generate_primary_task_dag_self_refined(
+                           models, task_name, graph, log);
   if (!graph) return;
 
   save_checkpoint(task_name, graph);
@@ -79,7 +79,6 @@ async function structured_loop(models, agent, task_name, graph = null) {
   log.complete('max outer retries exceeded');
 }
 
-export {structured_loop as structuredLoop};
 
 function build_state_conditioned_subgraph(graph, agent, log) {
   const scsg_state = get_sgsg_state(agent);

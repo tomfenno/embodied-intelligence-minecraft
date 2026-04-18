@@ -1,5 +1,4 @@
 import {executeCommand as execute_command} from '../../../../src/agent/commands/index.js';
-
 import {any_log_search_targets, mob_search_targets} from '../mc_sources.js';
 
 const spl = {
@@ -46,8 +45,8 @@ async function execute_search_command(agent, item, radius, command) {
   const result = await execute_command(agent, command);
   spl.log('Search result:', result);
 
-  const found = result?.success === true &&
-      !result.message?.includes('Could not find');
+  const found =
+      result?.success === true && !result.message?.includes('Could not find');
 
   found ? spl.log(`Search succeeded: "${item}" at radius ${radius}.`) :
           spl.warn(`Search failed: "${item}" at radius ${radius}.`);

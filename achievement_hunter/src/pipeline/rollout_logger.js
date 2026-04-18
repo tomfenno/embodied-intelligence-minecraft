@@ -202,15 +202,17 @@ const stage_renderer = {
           const icon = vo.verdict === 'pass' ? '✅' : '❌';
           parts.push(`**Verdict:** ${icon} ${escape_markdown(vo.verdict)}\n`);
           if (vo.definite_issues?.length > 0) {
-            parts.push('**Definite issues:**\n' +
-                vo.definite_issues.map(i => `- ${escape_markdown(i)}`).join(
-                    '\n') +
+            parts.push(
+                '**Definite issues:**\n' +
+                vo.definite_issues.map(i => `- ${escape_markdown(i)}`)
+                    .join('\n') +
                 '\n');
           }
           if (vo.possible_issues?.length > 0) {
-            parts.push('**Possible issues:**\n' +
-                vo.possible_issues.map(i => `- ${escape_markdown(i)}`).join(
-                    '\n') +
+            parts.push(
+                '**Possible issues:**\n' +
+                vo.possible_issues.map(i => `- ${escape_markdown(i)}`)
+                    .join('\n') +
                 '\n');
           }
           if (vo.summary) {
