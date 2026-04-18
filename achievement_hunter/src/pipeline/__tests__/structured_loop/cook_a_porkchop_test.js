@@ -454,15 +454,15 @@ describe('expand_search_item', () => {
 
 describe('is_successful_command_result', () => {
   it('returns true for a non-string result (object)', () => {
-    expect(is_successful_command_result({ok: true})).toBe(true);
+    expect(is_successful_command_result({success: true, message: 'Action output:\n'})).toBe(true);
   });
 
-  it('returns true for a non-string result (null)', () => {
-    expect(is_successful_command_result(null)).toBe(true);
+  it('returns false for a non-string result (null)', () => {
+    expect(is_successful_command_result(null)).toBe(false);
   });
 
-  it('returns true for a clean Action output string', () => {
-    expect(is_successful_command_result('Action output: collected 3 spruce_log')).toBe(true);
+  it('returns true for a clean Action output result object', () => {
+    expect(is_successful_command_result({success: true, message: 'Action output: collected 3 spruce_log'})).toBe(true);
   });
 
   it('returns false for a string containing "Error:"', () => {
@@ -488,7 +488,7 @@ describe('get_command_failure_signature', () => {
   it('returns null for a successful result', () => {
     expect(get_command_failure_signature(
         '!craftRecipe("stick", 1)',
-        'Action output: crafted 4 stick',
+        {success: true, message: 'Action output: crafted 4 stick'},
     )).toBeNull();
   });
 
@@ -525,7 +525,7 @@ describe('get_command_failure_signature', () => {
 // ── should_abort_repeated_failure ─────────────────────────────────────────────
 
 describe('should_abort_repeated_failure', () => {
-  const SLOT_TIMEOUT = 'Action output: Error: Event updateSlot:0 did not fire within timeout 250ms';
+  const SLOT_TIMEOUT = {success: false, message: 'Action output: Error: Event updateSlot:0 did not fire within timeout 250ms'};
   const CRAFT_CMD = '!craftRecipe("stick", 1)';
   const STUB_TASK = {};
 

@@ -193,24 +193,21 @@ export function serialize_am_output(action) {
 }
 
 export function is_successful_command_result(result) {
-  return typeof result !== 'string' ||
-      (result.startsWith('Action output:') &&
-       !result.includes('!!Code threw exception!!') &&
-       !result.includes('Error:') && !result.includes('Could not find'));
+  return result != null && typeof result === 'object' && result.success === true;
 }
 
 export function get_command_failure_signature(command, result) {
-  return typeof result === 'string' && !is_successful_command_result(result) ?
-      `${command} || ${
-          result.replace(/\d+ms/g, '<TIMEOUT>').replace(/\s+/g, ' ').trim()}` :
-      null;
+  if (is_successful_command_result(result)) return null;
+  const message = (result?.message ?? String(result ?? ''))
+      .replace(/\d+ms/g, '<TIMEOUT>').replace(/\s+/g, ' ').trim();
+  return message ? `${command} || ${message}` : null;
 }
 
 export function should_abort_repeated_failure(
     task, command, result, repeated_count) {
-  if (typeof result !== 'string') return false;
+  const message = result?.message ?? '';
   return command.startsWith('!craftRecipe(') &&
-      result.includes('Event updateSlot:0 did not fire within timeout') &&
+      message.includes('Event updateSlot:0 did not fire within timeout') &&
       repeated_count >= 2;
 }
 
