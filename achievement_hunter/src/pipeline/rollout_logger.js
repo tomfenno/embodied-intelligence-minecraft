@@ -34,6 +34,7 @@ const SOURCE = {
 
 const LIVE_FILE = {
   PTD: 'current_ptd.md',
+  PTD_REFINEMENT: 'current_ptd_refinement.md',
   SCSG: 'current_scsg.md',
   DASHBOARD: 'current_rollout.md',
   LEGACY_DASHBOARD: 'current_graphs.md',
@@ -41,6 +42,7 @@ const LIVE_FILE = {
 
 const PLACEHOLDER = {
   PTD: '_PTD not yet generated._',
+  PTD_REFINEMENT: '_PTD self-refine not yet started._',
   SCSG: '_SCSG not yet generated._',
   CANDIDATES: '_Candidates not yet computed._',
   NTS: '**Current Task**\n\n_NTS not yet run._',
@@ -175,6 +177,62 @@ const stage_renderer = {
 
     return header(`PTD — ${objective}`) + (latency ? `${latency}\n\n` : '') +
         source_line + graph_to_mermaid(ptd_state.parsed);
+  },
+
+  ptd_refinement(rounds, objective) {
+    if (!rounds || rounds.length === 0) return PLACEHOLDER.PTD_REFINEMENT;
+
+    const parts = [header(`PTD Self-Refine — ${objective}`)];
+
+    for (const entry of rounds) {
+      const stage_label =
+          entry.stage.charAt(0).toUpperCase() + entry.stage.slice(1);
+      parts.push(`## Round ${entry.round} · ${escape_markdown(stage_label)}\n`);
+
+      if (entry.latency_ms != null) {
+        parts.push(`**Latency:** ${format_latency(entry.latency_ms)}\n`);
+      }
+
+      if (entry.error) {
+        parts.push(`**Error:** ${escape_markdown(entry.error)}\n`);
+        if (entry.raw) parts.push(code_block(entry.raw));
+      } else if (entry.stage === 'validate') {
+        const vo = entry.validator_output;
+        if (vo) {
+          const icon = vo.verdict === 'pass' ? '✅' : '❌';
+          parts.push(`**Verdict:** ${icon} ${escape_markdown(vo.verdict)}\n`);
+          if (vo.definite_issues?.length > 0) {
+            parts.push('**Definite issues:**\n' +
+                vo.definite_issues.map(i => `- ${escape_markdown(i)}`).join(
+                    '\n') +
+                '\n');
+          }
+          if (vo.possible_issues?.length > 0) {
+            parts.push('**Possible issues:**\n' +
+                vo.possible_issues.map(i => `- ${escape_markdown(i)}`).join(
+                    '\n') +
+                '\n');
+          }
+          if (vo.summary) {
+            parts.push(`**Summary:** ${escape_markdown(vo.summary)}\n`);
+          }
+        } else {
+          parts.push('_Validator output unavailable._\n');
+          if (entry.raw) parts.push(code_block(entry.raw));
+        }
+      } else {
+        if (entry.graph) {
+          parts.push(graph_to_mermaid(entry.graph));
+        } else {
+          parts.push('_Graph extraction failed._\n');
+          if (entry.raw) parts.push(code_block(entry.raw));
+        }
+      }
+
+      parts.push('\n---\n');
+    }
+
+    return parts.join('\n');
   },
 
   scsg(parsed, objective) {
@@ -363,6 +421,7 @@ export function createRolloutLogger(objective) {
       error: null,
       source: null,
     },
+    ptd_refinement_rounds: [],
     scsg_result: null,
     candidates: null,
     nts_result: null,
@@ -371,6 +430,7 @@ export function createRolloutLogger(objective) {
   };
 
   live_writer.remove_file(LIVE_FILE.LEGACY_DASHBOARD);
+  live_writer.write_file(LIVE_FILE.PTD_REFINEMENT, PLACEHOLDER.PTD_REFINEMENT);
 
   // ── Private helpers
   // ───────────────────────────────────────────────────────────
@@ -436,6 +496,30 @@ export function createRolloutLogger(objective) {
         parsed,
         ...(Object.keys(meta).length > 0 ? {meta} : {}),
       });
+
+      if (meta.stage) {
+        const entry = {
+          stage: meta.stage,
+          round: meta.round ?? 0,
+          latency_ms: meta.latency_ms ?? null,
+          raw: raw ?? '',
+          error: meta.error ?? null,
+        };
+
+        if (meta.stage === 'validate') {
+          entry.validator_output = parsed;
+        } else {
+          entry.graph = parsed;
+        }
+
+        live_state.ptd_refinement_rounds.push(entry);
+        live_writer.write_file(
+            LIVE_FILE.PTD_REFINEMENT,
+            stage_renderer.ptd_refinement(
+                live_state.ptd_refinement_rounds, objective));
+
+        if (meta.stage === 'validate') return;
+      }
 
       live_state.ptd = {
         status: parsed ? 'complete' : 'failed',

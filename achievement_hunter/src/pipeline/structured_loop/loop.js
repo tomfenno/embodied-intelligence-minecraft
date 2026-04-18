@@ -2,11 +2,10 @@ import {readFile as read_file} from 'fs/promises';
 
 import {get_nts_state as get_state_for_candidates, get_sgsg_state} from '../agent_state.js';
 import {clearCheckpoint as clear_checkpoint, saveCheckpoint as save_checkpoint,} from '../checkpoint.js';
-import {extract_json, save_json, to_snake_case} from '../json_utils.js';
 import {get_canonical_mob_source, get_canonical_source_for_target, get_grounded_nearby_source, get_source_kind_for_target, resolve_fallback_block_source, resolve_nearby_block_source, resolve_nearby_mob_source,} from '../mc_sources.js';
-import {fill_ptd_prompt} from '../prompt_utils.js';
 import {createRolloutLogger as create_rollout_logger} from '../rollout_logger.js';
 import {compute_scsg} from '../scsg.js';
+import {generate_primary_task_dag_self_refined} from '../self_refine.js';
 
 import {execute_task_action} from './actions.js';
 import {build_incoming_edge_map, edge_in_subgraph, edge_key, get_satisfied_inputs_by_type, get_single_satisfied_input_item, resolve_concrete_craft_target,} from './graph.js';
@@ -36,7 +35,7 @@ async function structured_loop(models, agent, task_name, graph = null) {
   // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
   graph = load_graph ?
       await load_graph_from_file(graph_file_path) :
-      await generate_primary_task_dag(models.ptd, task_name, graph, log);
+      await generate_primary_task_dag_self_refined(models, task_name, graph, log);
   if (!graph) return;
 
   save_checkpoint(task_name, graph);
@@ -81,51 +80,6 @@ async function structured_loop(models, agent, task_name, graph = null) {
 }
 
 export {structured_loop as structuredLoop};
-
-// Builds or resumes the prerequisite task graph.
-async function generate_primary_task_dag(
-    model, task_name, existing_graph, log) {
-  if (existing_graph) {
-    spl.log('Resuming from checkpoint, skipping PTD for:', task_name);
-    log.ptd('[loaded from checkpoint]', existing_graph, {source: 'checkpoint'});
-    return existing_graph;
-  }
-
-  spl.log('Building PTD for:', task_name);
-
-  const {response, latency_ms} =
-      await timed_send_request(model, fill_ptd_prompt(task_name));
-
-  if (response === null) {
-    spl.error('PTD model call failed.');
-    log.ptd('', null, {
-      latency_ms,
-      error: 'PTD model call failed',
-      source: log_source.llm,
-    });
-    log.complete('PTD model call failed');
-    return null;
-  }
-
-  const graph = extract_json(response);
-  log.ptd(response, graph, {
-    latency_ms,
-    error: graph ? null : 'PTD extraction failed',
-    source: log_source.llm,
-  });
-
-  if (!graph) {
-    spl.error('Failed to extract PTD graph from LLM response.');
-    log.complete('PTD extraction failed');
-    return null;
-  }
-
-  save_json(
-      graph,
-      `achievement_hunter/docs/ptd_jsons/${to_snake_case(task_name)}.json`);
-  spl.log('PTD built.');
-  return graph;
-}
 
 function build_state_conditioned_subgraph(graph, agent, log) {
   const scsg_state = get_sgsg_state(agent);
@@ -344,13 +298,4 @@ async function load_graph_from_file(file_path) {
     throw new Error(
         `Failed to load PTD graph from "${file_path}": ${error.message}`);
   }
-}
-
-// Times a model request.
-async function timed_send_request(model, prompt) {
-  const started_ms = Date.now();
-  return {
-    response: await model.send_prompt(prompt),
-    latency_ms: Date.now() - started_ms,
-  };
 }

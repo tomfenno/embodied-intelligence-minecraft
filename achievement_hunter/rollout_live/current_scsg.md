@@ -1,6 +1,6 @@
-# Completed — Obtain one type of each type of golden tool\.
+# Completed — Get one type of each diamond tool, armor and weapon\.
 
 **Task complete.**
 
-- **Reason:** all sinks satisfied
-- **Total elapsed:** 11m 32s
+- **Reason:** PTD accepted after validation round 0
+- **Total elapsed:** 3m 00s

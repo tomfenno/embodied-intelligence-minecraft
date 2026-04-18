@@ -1,83 +1,96 @@
 import { describe, it, expect, vi } from 'vitest';
 
-import {
-  ptd_self_refine,
-  scsg_self_refine,
-} from '../self_refine.js';
+import { generate_self_refined_ptd } from '../self_refine.js';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Creates a mock model whose sendRequest resolves each call with the next
- * string in the responses array (cycling if exhausted).
- */
 function make_model(responses) {
   let i = 0;
   return {
-    sendRequest: vi.fn(async () => responses[i++ % responses.length]),
+    send_prompt: vi.fn(async () => responses[i++ % responses.length]),
   };
 }
 
-const PASS_VERDICT    = '{"verdict":"pass"}';
-const PASS_VERDICT_SP = '{"verdict": "pass"}';        // space after colon — current passing case
-const FAIL_VERDICT    = '{"verdict":"fail","issues":["missing oak_log"]}';
-const INITIAL_ANSWER  = '{"vertices":[],"edges":[]}';
-const REFINED_ANSWER  = '{"vertices":[{"id":"oak_log","qty":4}],"edges":[]}';
+function make_models(ptd_responses, feedback_responses, refinement_responses = null) {
+  return {
+    ptd: make_model(ptd_responses),
+    ptd_feedback: make_model(feedback_responses),
+    ptd_refinement: make_model(refinement_responses ?? ptd_responses),
+  };
+}
 
-// ── ptd_self_refine (smoke test) ─────────────────────────────────────────────
-
-describe('ptd_self_refine', () => {
-  it('calls sendRequest at least once with a non-empty string', async () => {
-    const model = make_model([INITIAL_ANSWER, PASS_VERDICT, REFINED_ANSWER]);
-    await ptd_self_refine(model, 'craft a wooden pickaxe', 1);
-    expect(model.sendRequest).toHaveBeenCalled();
-    const [, systemMsg] = model.sendRequest.mock.calls[0];
-    expect(typeof systemMsg).toBe('string');
-    expect(systemMsg.length).toBeGreaterThan(0);
-  });
-
-  it('embeds the objective in the initial prompt', async () => {
-    const model = make_model([INITIAL_ANSWER, PASS_VERDICT, REFINED_ANSWER]);
-    const objective = 'craft a golden helmet';
-    await ptd_self_refine(model, objective, 1);
-    const [, systemMsg] = model.sendRequest.mock.calls[0];
-    expect(systemMsg).toContain(objective);
-  });
-
-  it('returns finalResult and transcript', async () => {
-    const model = make_model([INITIAL_ANSWER, PASS_VERDICT, REFINED_ANSWER]);
-    const result = await ptd_self_refine(model, 'mine 10 diamonds', 1);
-    expect(result).toHaveProperty('finalResult');
-    expect(result).toHaveProperty('transcript');
-    expect(result).toHaveProperty('totalRounds');
-  });
+const VALID_GRAPH = JSON.stringify({
+  objective: 'craft a wooden pickaxe',
+  sinks: ['wooden_pickaxe'],
+  vertices: [
+    { id: 'wooden_pickaxe', qty: 1, item_type: 'item', acquisition_dependency: 'craft' },
+    { id: 'oak_log', qty: 3, item_type: 'resource', acquisition_dependency: 'mine' },
+  ],
+  edges: [
+    { from: 'oak_log', to: 'wooden_pickaxe', type: 'crafting_input', qty: 3, consumed: true },
+  ],
 });
 
-// ── scsg_self_refine (smoke test) ─────────────────────────────────────────────
+const PASS_VERDICT = JSON.stringify({
+  verdict: 'pass',
+  definite_issues: [],
+  possible_issues: [],
+  summary: 'looks good',
+});
 
-describe('scsg_self_refine', () => {
-  const MOCK_GRAPH = {
-    objective: 'craft diamond sword',
-    sinks: ['diamond_sword'],
-    vertices: [{ id: 'diamond_sword', qty: 1 }, { id: 'diamond', qty: 2 }],
-    edges: [{ from: 'diamond', to: 'diamond_sword', qty: 2, consumed: true }],
-  };
-  const MOCK_STATE = { inventory: { diamond: 2 } };
+const FAIL_VERDICT = JSON.stringify({
+  verdict: 'fail',
+  definite_issues: ['missing oak_log'],
+  possible_issues: [],
+  summary: 'incomplete graph',
+});
 
-  it('calls sendRequest at least once with a non-empty string', async () => {
-    const model = make_model([INITIAL_ANSWER, PASS_VERDICT, REFINED_ANSWER]);
-    await scsg_self_refine(model, MOCK_GRAPH, MOCK_STATE, 1);
-    expect(model.sendRequest).toHaveBeenCalled();
-    const [, systemMsg] = model.sendRequest.mock.calls[0];
-    expect(typeof systemMsg).toBe('string');
-    expect(systemMsg.length).toBeGreaterThan(0);
+const DEFAULT_OPTS = { max_rounds: 1, save_final_json: false };
+
+// ── generate_self_refined_ptd ─────────────────────────────────────────────────
+
+describe('generate_self_refined_ptd', () => {
+  it('calls send_prompt at least once with a non-empty string', async () => {
+    const models = make_models([VALID_GRAPH], [PASS_VERDICT]);
+    await generate_self_refined_ptd(models, 'craft a wooden pickaxe', null, null, DEFAULT_OPTS);
+    expect(models.ptd.send_prompt).toHaveBeenCalled();
+    const [prompt] = models.ptd.send_prompt.mock.calls[0];
+    expect(typeof prompt).toBe('string');
+    expect(prompt.length).toBeGreaterThan(0);
   });
 
-  it('returns finalResult and transcript', async () => {
-    const model = make_model([INITIAL_ANSWER, PASS_VERDICT, REFINED_ANSWER]);
-    const result = await scsg_self_refine(model, MOCK_GRAPH, MOCK_STATE, 1);
-    expect(result).toHaveProperty('finalResult');
-    expect(result).toHaveProperty('transcript');
-    expect(result).toHaveProperty('totalRounds');
+  it('embeds the task name in the initial prompt', async () => {
+    const models = make_models([VALID_GRAPH], [PASS_VERDICT]);
+    const task_name = 'craft a golden helmet';
+    await generate_self_refined_ptd(models, task_name, null, null, DEFAULT_OPTS);
+    const [prompt] = models.ptd.send_prompt.mock.calls[0];
+    expect(prompt).toContain(task_name);
+  });
+
+  it('returns ok:true with graph and trace when validator passes', async () => {
+    const models = make_models([VALID_GRAPH], [PASS_VERDICT]);
+    const result = await generate_self_refined_ptd(models, 'mine 10 diamonds', null, null, DEFAULT_OPTS);
+    expect(result.ok).toBe(true);
+    expect(result.graph).not.toBeNull();
+    expect(typeof result.rounds_used).toBe('number');
+    expect(Array.isArray(result.trace)).toBe(true);
+    expect(result.failure_reason).toBeNull();
+  });
+
+  it('returns ok:false when validator always fails within max_rounds', async () => {
+    const models = make_models([VALID_GRAPH, VALID_GRAPH], [FAIL_VERDICT, FAIL_VERDICT]);
+    const result = await generate_self_refined_ptd(models, 'mine 10 diamonds', null, null, DEFAULT_OPTS);
+    expect(result.ok).toBe(false);
+    expect(result.graph).toBeNull();
+    expect(typeof result.failure_reason).toBe('string');
+  });
+
+  it('skips generation and returns existing graph when one is provided', async () => {
+    const existing = JSON.parse(VALID_GRAPH);
+    const models = make_models([VALID_GRAPH], [PASS_VERDICT]);
+    const result = await generate_self_refined_ptd(models, 'craft a wooden pickaxe', existing, null, DEFAULT_OPTS);
+    expect(result.ok).toBe(true);
+    expect(result.graph).toBe(existing);
+    expect(models.ptd.send_prompt).not.toHaveBeenCalled();
   });
 });

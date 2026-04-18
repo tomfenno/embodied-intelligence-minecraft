@@ -110,8 +110,8 @@ export class AchievementAgent extends Agent {
     const fallback = profile.model || 'gpt-4o-mini';
     this._spl_models = {
       ptd: new LlmClient(profile.ptd_model || fallback),
-      nts: new LlmClient(profile.nts_model || fallback),
-      am: new LlmClient(profile.am_model || fallback),
+      ptd_feedback: new LlmClient(profile.ptd_feedback_model || profile.ptd_model || fallback),
+      ptd_refinement: new LlmClient(profile.ptd_refinement_model || profile.ptd_model || fallback),
     };
   }
 

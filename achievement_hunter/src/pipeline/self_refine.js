@@ -1,5 +1,5 @@
-import {extract_json, save_json, to_snake_case} from '../json_utils.js';
-import {fill_ptd_feedback_prompt, fill_ptd_prompt, fill_ptd_refinement_prompt,} from '../prompt_utils.js';
+import {extract_json, save_json, to_snake_case} from './json_utils.js';
+import {fill_ptd_feedback_prompt, fill_ptd_prompt, fill_ptd_refinement_prompt,} from './prompt_utils.js';
 
 const DEFAULT_OPTIONS = Object.freeze({
   max_rounds: 3,
@@ -103,7 +103,6 @@ export async function generate_self_refined_ptd(
       persist_final_graph_if_enabled(current_graph, task_name, opts);
       const success_message = `PTD accepted after validation round ${round}`;
       spl.log(success_message);
-      safe_log_complete(log, success_message);
 
       return {
         ok: true,

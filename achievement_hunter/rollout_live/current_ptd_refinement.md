@@ -1,7 +1,9 @@
-# PTD — Get one type of each diamond tool, armor and weapon\.
+# PTD Self\-Refine — Get one type of each diamond tool, armor and weapon\.
 
-**LLM latency**
-- **PTD generation:** 2m 5.8s
+
+## Round 0 · Generate
+
+**Latency:** 2m 5.8s
 
 ```mermaid
 graph LR
@@ -79,3 +81,16 @@ graph LR
     style diamond_leggings fill:#4CAF50,color:#fff,stroke:#388E3C
     style diamond_boots fill:#4CAF50,color:#fff,stroke:#388E3C
 ```
+
+---
+
+## Round 0 · Validate
+
+**Latency:** 54.8 s
+
+**Verdict:** ✅ pass
+
+**Summary:** Graph is well\-formed and executable: valid JSON; acyclic; sinks match the objective and have no outgoing edges; all edge endpoints exist; correct use of crafting, smelting, workstation, and tool dependencies; smelting includes input, fuel, and furnace; quantities are consistent \(inputs cover consumed outputs\) with only batch\-forced overproduction\. No material defects found\.
+
+
+---
