@@ -2,13 +2,7 @@ import OpenAI from 'openai';
 
 import {getKey, hasKey} from '../../../src/utils/keys.js';
 
-/**
- * Thin OpenAI client for the Structured Prompting Loop.
- *
- * This is a single-turn, prompt-in / text-out interface with optional
- * streaming support for long-running generations like PTD.
- */
-export class SplGpt {
+export class LlmClient {
   constructor(model_name) {
     this.model_name = model_name;
 
@@ -20,13 +14,6 @@ export class SplGpt {
     this.openai = new OpenAI(config);
   }
 
-  /**
-   * Sends a single prompt to the model and returns the aggregated response
-   * text. Returns null on error so callers can handle failure gracefully.
-   *
-   * @param {string} prompt
-   * @returns {Promise<string|null>}
-   */
   async send_prompt(prompt) {
     const model = this.model_name || 'gpt-4o-mini';
 
@@ -45,5 +32,4 @@ export class SplGpt {
       return null;
     }
   }
-
 }

@@ -1,8 +1,5 @@
 import {getCraftableItems, getInventoryCounts, getNearbyEntities, getNearestBlocks,} from '../../../src/agent/library/world.js';
 
-/**
- * Returns a plain {item: count} object for all items with count > 0.
- */
 function _get_inventory_counts(bot) {
   const raw = getInventoryCounts(bot);
   const result = {};
@@ -12,10 +9,6 @@ function _get_inventory_counts(bot) {
   return result;
 }
 
-/**
- * Returns the four armor slot objects [helmet, chestplate, leggings, boots].
- * Slots are null when empty.
- */
 function _get_armor_slots(bot) {
   return [
     bot.inventory.slots[5],
@@ -25,14 +18,6 @@ function _get_armor_slots(bot) {
   ];
 }
 
-/**
- * Returns the state object for the Action Mediator (AM) prompt.
- *
- * Example:
- *   import { get_am_state } from './state.js';
- *   const state = get_am_state(agent);
- *   // { inventory, craftable_items, nearby_blocks, nearby_entities: { mobs } }
- */
 export function get_am_state(agent) {
   const bot = agent.bot;
 
@@ -60,18 +45,6 @@ export function get_am_state(agent) {
   };
 }
 
-/**
- * Returns a minimal state object for the Next Task Selector (NTS) prompt.
- *
- * Example:
- *   import { nts_state } from './state.js';
- *   const state = nts_state(agent);
- *   // {
- *   //   craftable_items: ["acacia_slab", "stick"],
- *   //   nearby_blocks: ["water", "oak_log"],
- *   //   nearby_entities: { mobs: ["skeleton"] }
- *   // }
- */
 export function get_nts_state(agent) {
   const bot = agent.bot;
 
@@ -96,15 +69,6 @@ export function get_nts_state(agent) {
   };
 }
 
-/**
- * Returns the bot's inventory and worn equipment as a plain JS object —
- * the data behind !inventoryState.
- *
- * Example:
- *   import { get_inventory_state } from './state.js';
- *   const inv = get_inventory_state(agent);
- *   // { inventory: { oak_log: 3, ... } } or { inventory: 'Nothing' }
- */
 export function get_sgsg_state(agent) {
   const bot = agent.bot;
   const inventory = _get_inventory_counts(bot);

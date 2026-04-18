@@ -1,6 +1,6 @@
-import {executeCommand as execute_command} from '../../../src/agent/commands/index.js';
+import {executeCommand as execute_command} from '../../../../src/agent/commands/index.js';
 
-import {any_log_search_targets} from './mc_sources.js';
+import {any_log_search_targets, mob_search_targets} from '../mc_sources.js';
 
 const spl = {
   log: (...args) => console.log('[SPL]', ...args),
@@ -13,59 +13,6 @@ const log_source = {
 };
 
 const search_radii = [32, 64, 128, 256, 511];
-
-const mob_search_targets = new Set([
-  'skeleton',
-  'stray',
-  'wither_skeleton',
-  'zombie',
-  'zombie_villager',
-  'drowned',
-  'husk',
-  'zombified_piglin',
-  'creeper',
-  'spider',
-  'cave_spider',
-  'enderman',
-  'witch',
-  'slime',
-  'magma_cube',
-  'blaze',
-  'ghast',
-  'phantom',
-  'silverfish',
-  'shulker',
-  'guardian',
-  'elder_guardian',
-  'vindicator',
-  'evoker',
-  'pillager',
-  'ravager',
-  'cow',
-  'mooshroom',
-  'sheep',
-  'pig',
-  'chicken',
-  'rabbit',
-  'squid',
-  'glow_squid',
-  'fox',
-  'wolf',
-  'llama',
-  'trader_llama',
-  'horse',
-  'donkey',
-  'mule',
-  'bee',
-  'panda',
-  'polar_bear',
-  'turtle',
-  'axolotl',
-  'goat',
-  'frog',
-  'sniffer',
-  'armadillo',
-]);
 
 export function parse_search_command(action) {
   const match = action.trim().match(/^!search\("([^"]+)"\)$/);
@@ -99,9 +46,8 @@ async function execute_search_command(agent, item, radius, command) {
   const result = await execute_command(agent, command);
   spl.log('Search result:', result);
 
-  const found = typeof result !== 'string' ||
-      (result.startsWith('Action output:') &&
-       !result.includes('Could not find'));
+  const found = result?.success === true &&
+      !result.message?.includes('Could not find');
 
   found ? spl.log(`Search succeeded: "${item}" at radius ${radius}.`) :
           spl.warn(`Search failed: "${item}" at radius ${radius}.`);

@@ -125,8 +125,9 @@ const ah_commands = [
             const result = await agent.actions.runAction('action:smelt_item', async () => {
                 await smelt_item(agent.bot, item_name, num, fuel);
             });
-            if (result.interrupted && !result.timedout) return;
-            return result.message;
+            if (result.interrupted && !result.timedout)
+                return { success: false, message: '' };
+            return { success: result.success, message: result.message };
         }
     }
 ];

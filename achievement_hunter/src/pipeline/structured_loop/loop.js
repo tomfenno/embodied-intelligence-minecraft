@@ -1,7 +1,7 @@
 import {readFile as read_file} from 'fs/promises';
 
-import {clearCheckpoint as clear_checkpoint, saveCheckpoint as save_checkpoint,} from './checkpoint.js';
-import {extract_json, save_json, to_snake_case} from './json_utils.js';
+import {clearCheckpoint as clear_checkpoint, saveCheckpoint as save_checkpoint,} from '../checkpoint.js';
+import {extract_json, save_json, to_snake_case} from '../json_utils.js';
 import {
   get_canonical_mob_source,
   get_canonical_source_for_target,
@@ -10,12 +10,12 @@ import {
   resolve_fallback_block_source,
   resolve_nearby_block_source,
   resolve_nearby_mob_source,
-} from './mc_sources.js';
-import {fill_ptd_prompt} from './prompt_utils.js';
-import {createRolloutLogger as create_rollout_logger} from './rollout_logger.js';
-import {compute_scsg} from './scsg.js';
-import {get_nts_state as get_state_for_candidates, get_sgsg_state} from './state.js';
-import {execute_task_action} from './structured_loop_actions.js';
+} from '../mc_sources.js';
+import {fill_ptd_prompt} from '../prompt_utils.js';
+import {createRolloutLogger as create_rollout_logger} from '../rollout_logger.js';
+import {compute_scsg} from '../scsg.js';
+import {get_nts_state as get_state_for_candidates, get_sgsg_state} from '../agent_state.js';
+import {execute_task_action} from './actions.js';
 import {
   build_incoming_edge_map,
   edge_in_subgraph,
@@ -23,7 +23,7 @@ import {
   get_satisfied_inputs_by_type,
   get_single_satisfied_input_item,
   resolve_concrete_craft_target,
-} from './structured_loop_graph.js';
+} from './graph.js';
 
 const max_outer_retries = 10;
 const itemish_types = new Set(['item', 'tool', 'workstation']);

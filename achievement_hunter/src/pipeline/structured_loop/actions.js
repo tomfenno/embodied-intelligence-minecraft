@@ -1,10 +1,9 @@
-import {executeCommand as execute_command} from '../../../src/agent/commands/index.js';
+import {executeCommand as execute_command} from '../../../../src/agent/commands/index.js';
 
-import {get_item_batch_size} from './mc_utils.js';
-import {is_environmental_use_target} from './mc_sources.js';
-import {ABSTRACT_CLASS_MEMBERS} from './scsg.js';
-import {get_am_state} from './state.js';
-import {parse_search_command, run_search} from './structured_loop_search.js';
+import {get_item_batch_size} from '../recipe_utils.js';
+import {ABSTRACT_CLASS_MEMBERS, is_environmental_use_target} from '../mc_sources.js';
+import {get_am_state} from '../agent_state.js';
+import {parse_search_command, run_search} from './search.js';
 
 const spl = {
   log: (...args) => console.log('[SPL]', ...args),

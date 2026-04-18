@@ -26,7 +26,7 @@ vi.mock('../../json_utils.js', () => ({
   save_json: vi.fn(),
   to_snake_case: vi.fn(),
 }));
-vi.mock('../../mc_utils.js', () => ({get_item_batch_size: vi.fn()}));
+vi.mock('../../recipe_utils.js', () => ({get_item_batch_size: vi.fn()}));
 vi.mock('../../prompt_utils.js', () => ({fill_ptd_prompt: vi.fn()}));
 vi.mock('../../rollout_logger.js', () => ({
   createRolloutLogger: vi.fn(() => ({
@@ -38,13 +38,13 @@ vi.mock('../../rollout_logger.js', () => ({
     complete: vi.fn(),
   })),
 }));
-vi.mock('../../state.js', () => ({
+vi.mock('../../agent_state.js', () => ({
   get_am_state: vi.fn(),
   get_nts_state: vi.fn(),
   get_sgsg_state: vi.fn(),
 }));
 
-import {get_item_batch_size} from '../../mc_utils.js';
+import {get_item_batch_size} from '../../recipe_utils.js';
 import {
   get_canonical_block_source,
   get_canonical_mob_source,
@@ -60,14 +60,14 @@ import {
   get_satisfied_inputs_by_type,
   get_single_satisfied_input_item,
   resolve_concrete_craft_target,
-} from '../../structured_loop_graph.js';
+} from '../../structured_loop/graph.js';
 import {
   check_search_complete,
   expand_search_item,
   is_entity_target,
   make_search_command,
   parse_search_command,
-} from '../../structured_loop_search.js';
+} from '../../structured_loop/search.js';
 import {
   get_command_failure_signature,
   is_craft_command,
@@ -78,14 +78,14 @@ import {
   mediate_smelt,
   resolve_smelt_fuel_name,
   should_abort_repeated_failure,
-} from '../../structured_loop_actions.js';
+} from '../../structured_loop/actions.js';
 import {
   make_fallback_acquisition_task,
   select_next_task,
   try_make_craft_task,
   try_make_immediate_acquisition_task,
   try_make_smelt_task,
-} from '../../structured_loop.js';
+} from '../../structured_loop/loop.js';
 
 // ── Rollout-derived fixtures ──────────────────────────────────────────────────
 
@@ -499,7 +499,7 @@ describe('get_command_failure_signature', () => {
   it('returns a string signature for a failure result', () => {
     const sig = get_command_failure_signature(
         '!craftRecipe("stick", 1)',
-        'Action output: Error: slot timeout 250ms',
+        {success: false, message: 'Action output: Error: slot timeout 250ms'},
     );
     expect(typeof sig).toBe('string');
     expect(sig).toContain('!craftRecipe("stick", 1)');
@@ -507,15 +507,15 @@ describe('get_command_failure_signature', () => {
 
   it('normalizes different timeout durations to the same signature', () => {
     const cmd = '!craftRecipe("stick", 1)';
-    const result_a = 'Action output: Error: Event updateSlot:0 did not fire within timeout 250ms';
-    const result_b = 'Action output: Error: Event updateSlot:0 did not fire within timeout 300ms';
+    const result_a = {success: false, message: 'Action output: Error: Event updateSlot:0 did not fire within timeout 250ms'};
+    const result_b = {success: false, message: 'Action output: Error: Event updateSlot:0 did not fire within timeout 300ms'};
     expect(get_command_failure_signature(cmd, result_a)).toBe(
         get_command_failure_signature(cmd, result_b),
     );
   });
 
   it('produces different signatures for different commands', () => {
-    const result = 'Action output: Error: Could not find';
+    const result = {success: false, message: 'Action output: Error: Could not find'};
     const sig_a = get_command_failure_signature('!craftRecipe("stick", 1)', result);
     const sig_b = get_command_failure_signature('!craftRecipe("furnace", 1)', result);
     expect(sig_a).not.toBe(sig_b);
@@ -547,11 +547,11 @@ describe('should_abort_repeated_failure', () => {
 
   it('returns false for craftRecipe without the slot-timeout error message', () => {
     expect(should_abort_repeated_failure(
-        STUB_TASK, CRAFT_CMD, 'Action output: Error: Could not find', 2,
+        STUB_TASK, CRAFT_CMD, {success: false, message: 'Action output: Error: Could not find'}, 2,
     )).toBe(false);
   });
 
-  it('returns false when result is not a string', () => {
+  it('returns false when result is null', () => {
     expect(should_abort_repeated_failure(STUB_TASK, CRAFT_CMD, null, 5)).toBe(false);
   });
 });

@@ -1,62 +1,4 @@
-export const ABSTRACT_CLASS_MEMBERS = {
-  any_log: [
-    'oak_log',
-    'spruce_log',
-    'birch_log',
-    'jungle_log',
-    'acacia_log',
-    'dark_oak_log',
-    'mangrove_log',
-    'cherry_log',
-    'pale_oak_log',
-  ],
-  any_plank: [
-    'oak_planks',
-    'spruce_planks',
-    'birch_planks',
-    'jungle_planks',
-    'acacia_planks',
-    'dark_oak_planks',
-    'mangrove_planks',
-    'cherry_planks',
-    'pale_oak_planks',
-    'bamboo_planks',
-    'crimson_planks',
-    'warped_planks',
-  ],
-  any_wood_slab: [
-    'oak_slab',
-    'spruce_slab',
-    'birch_slab',
-    'jungle_slab',
-    'acacia_slab',
-    'dark_oak_slab',
-    'mangrove_slab',
-    'cherry_slab',
-    'pale_oak_slab',
-    'bamboo_slab',
-    'crimson_slab',
-    'warped_slab',
-  ],
-  any_wool: [
-    'white_wool',
-    'orange_wool',
-    'magenta_wool',
-    'light_blue_wool',
-    'yellow_wool',
-    'lime_wool',
-    'pink_wool',
-    'gray_wool',
-    'light_gray_wool',
-    'cyan_wool',
-    'purple_wool',
-    'blue_wool',
-    'brown_wool',
-    'green_wool',
-    'red_wool',
-    'black_wool',
-  ],
-};
+import {ABSTRACT_CLASS_MEMBERS} from './mc_sources.js';
 
 // Compute the remaining-work subgraph for the current inventory state.
 export function compute_scsg(graph, inventory) {
@@ -104,14 +46,14 @@ export function compute_scsg(graph, inventory) {
 }
 
 // Return vertices with no outgoing edges.
-export function get_sinks(graph) {
+function get_sinks(graph) {
   const has_outgoing = new Set();
   for (const {from} of graph.edges) has_outgoing.add(from);
   return graph.vertices.filter(({id}) => !has_outgoing.has(id));
 }
 
 // Return vertices already satisfied by inventory.
-export function state_satisfied_vertices(graph, inventory) {
+function state_satisfied_vertices(graph, inventory) {
   const satisfied_vertices = [];
   for (const vertex of graph.vertices) {
     if (inventory_satisfies(vertex, inventory)) satisfied_vertices.push(vertex);
@@ -120,7 +62,7 @@ export function state_satisfied_vertices(graph, inventory) {
 }
 
 // Remove vertices, decrement consumed prerequisites, and prune edges.
-export function update_quantities_and_prune(removed_vertices, graph) {
+function update_quantities_and_prune(removed_vertices, graph) {
   if (!removed_vertices.length) return graph;
 
   const removed_id_set = new Set(removed_vertices.map(({id}) => id));

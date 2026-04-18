@@ -1,5 +1,5 @@
 {
-  "objective": "TEST",
+  "objective": "test",
   "graph": {
     "objective": "Cook a porkchop.",
     "sinks": [
@@ -148,5 +148,5 @@
       }
     ]
   },
-  "saved_at": "2026-04-18T02:13:19.798Z"
+  "saved_at": "2026-04-18T02:26:30.285Z"
 }

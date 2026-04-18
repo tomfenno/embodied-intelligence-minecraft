@@ -1,4 +1,4 @@
-import {ABSTRACT_CLASS_MEMBERS} from './scsg.js';
+import {ABSTRACT_CLASS_MEMBERS} from '../mc_sources.js';
 
 export function build_incoming_edge_map(edges) {
   const incoming_edge_map = new Map();
