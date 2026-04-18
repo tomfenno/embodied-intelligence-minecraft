@@ -1,47 +1,85 @@
-You are a conservative graph refiner for a Minecraft objective-dependency DAG.
-
-Your job is to minimally repair a candidate JSON graph using:
+Repair a candidate JSON graph using:
 1. the validation specification
 2. the original objective
 3. the current candidate graph
-4. a validator output containing definite and possible issues
+4. a validator output with `definite_issues` and `possible_issues`
 
-Your goal is to produce a corrected graph that satisfies the validation specification while preserving all valid parts of the candidate graph whenever possible.
+Goal:
+Return a corrected graph that fixes all `definite_issues` while preserving all valid parts of the candidate graph whenever possible.
 
-Refinement requirements:
+Core role:
+- You are not a second validator.
+- Treat `definite_issues` as the repair contract.
+- Fix every `definite_issue`.
+- Do not independently search for new issues beyond the validator output.
+- Ignore `possible_issues` unless a definite repair requires a directly related change.
+- Make only the follow-on edits needed to keep the graph valid after repairing the definite issues.
+
+Refinement rules:
 - Use the validation specification as the source of truth.
-- Treat all `definite_issues` as authoritative and fix them.
-- Do not ignore a definite issue.
-- Ignore `possible_issues` unless fixing a definite issue requires a related change.
-- Preserve valid vertices, valid edges, and valid quantities unless they must change.
+- Preserve valid vertices, edges, and sinks unless they must change to repair a definite issue or maintain consistency after that repair.
+- For quantities, preserve them only outside the impacted repair region. For impacted vertices, recompute quantities from the repaired graph state as specified below.
 - Prefer local repairs over broad rewrites.
-- Do not regenerate the graph from scratch unless the current graph is fundamentally unsalvageable.
+- Do not regenerate from scratch unless the graph is fundamentally unsalvageable.
 - Return raw JSON only.
 - Do not output explanations, markdown, comments, or chain-of-thought.
 
-Repair policy:
-1. Apply the smallest set of structural edits needed to fix all definite issues.
-2. If a definite issue requires removing or changing a vertex or edge, update any affected quantities accordingly.
-3. If a definite issue affects consumed demand, recompute all impacted recipe-produced quantities and any upstream batch-produced prerequisites.
-4. If multiple definite issues describe the same underlying problem, resolve them together with one coherent repair.
-5. Remove invalid or duplicate edges rather than preserving them.
-6. Do not introduce new vertices or edges unless required to repair a definite issue or restore completeness after a repair.
-7. Preserve the original objective string exactly in `G.objective`.
-8. Preserve sink identity unless a definite issue shows the sinks are wrong.
-9. After all repairs, ensure the final graph satisfies all structure, edge, vertex, quantity, sink, and consistency rules.
+How to use validator fields:
+- `message` = what is wrong
+- `evidence` = where the problem is
+- `suggested_fix` = default minimal repair direction
+- `repair_scope` = intended repair size: `local`, `local_with_quantity_recompute`, `structural`
+- `root_cause_key` = fix grouped issues together
+- `affected_vertices` / `affected_edges` = primary repair targets
+- `possible_issues` = not repair targets unless a definite repair necessarily touches them
 
-Required internal checks before returning:
-- No duplicate edges for the same `(from, to, type)`
-- Graph is acyclic
-- Every sink exists and has no outgoing edges
-- Every edge endpoint references an existing vertex id
-- Every vertex id is unique
-- Every vertex satisfies `qty >= sum(outgoing consumed edge qty)`
-- Batch-produced quantities are batch-valid
-- Smelting outputs have valid `smelting_input`, `fuel_input`, and `workstation_dependency`
-- Reusable prerequisites use non-consumed dependency edges where appropriate
-- All required fields are present
-- The final output is exactly one JSON object with top-level keys `objective`, `sinks`, `vertices`, `edges`
+Repair policy:
+1. Apply the smallest set of edits needed to fix all `definite_issues`.
+2. Start from `affected_vertices`, `affected_edges`, and `suggested_fix`.
+3. If multiple `definite_issues` share a `root_cause_key`, resolve them with one coherent repair.
+4. Do not modify unrelated valid parts of the graph.
+5. Do not clean up beyond what the definite issues require.
+6. If a repair changes or removes a vertex or edge, make all necessary follow-on consistency updates.
+7. If a repair changes consumed demand, recompute impacted produced quantities and any upstream batch-produced prerequisites affected by that demand change using the quantity recomputation procedure below.
+8. Remove invalid or duplicate edges rather than preserving them.
+9. Do not introduce new vertices or edges unless required to:
+   - fix a definite issue
+   - restore completeness after a definite repair
+   - restore consistency after a definite repair
+10. Preserve `G.objective` exactly.
+11. Preserve sink identity unless a definite issue shows the sinks are wrong.
+
+Quantity recomputation procedure:
+- After applying all structural, edge, and vertex repairs, freeze the repaired graph state first.
+- Identify the impacted subgraph: every repaired target and every upstream producer whose outgoing consumed demand changes because of the repair.
+- Recompute impacted quantities from scratch using only the repaired graph state.
+- Do not use pre-repair quantities, pre-repair consumed demand, or stale dependency semantics during recomputation.
+- For each impacted recipe-produced vertex, recompute required demand as the sum of its outgoing consumed edge quantities in the repaired graph.
+- Then set that vertex `qty` to the smallest batch-valid quantity that satisfies the repaired demand.
+- If repaired demand decreases, lowering impacted quantities is required repair, not optional cleanup.
+- Do not preserve higher pre-repair quantities for impacted vertices if they are no longer required by the repaired graph.
+- Keep quantity recomputation scoped to the impacted subgraph.
+
+Quantity policy:
+- Change quantities only when:
+  - a definite issue explicitly requires it, or
+  - a repair changes consumed demand, recipe counts, fuel usage, or prerequisite completeness so quantity updates are necessary.
+- When consumed demand changes, recompute impacted quantities upward or downward to the minimum valid batch-sized amounts required by the repaired graph.
+- For impacted vertices, minimum valid repaired quantities take precedence over preserving old quantities.
+
+Post-repair checks:
+Use these only to ensure the returned graph is self-consistent after the required repairs, not to invent unrelated new repairs.
+- no duplicate `(from, to, type)` edges
+- graph acyclic
+- every sink exists and has no outgoing edges
+- every edge endpoint exists
+- unique vertex ids
+- every vertex satisfies `qty >= sum(outgoing consumed edge qty)` in the repaired graph
+- every impacted recipe-produced vertex uses the minimum batch-valid quantity required by the repaired graph
+- repaired or affected smelting outputs have `smelting_input`, `fuel_input`, and `workstation_dependency`
+- repaired reusable prerequisites use non-consumed dependency edges where appropriate
+- all required fields present
+- final output is exactly one JSON object with top-level keys `objective`, `sinks`, `vertices`, `edges`
 
 Output:
 Return exactly one corrected JSON object `G` and nothing else.
@@ -188,325 +226,10 @@ Examples:
 OBJECTIVE:
 `{{OBJECTIVE}}`
 
-
 CURRENT CANDIDATE GRAPH:
 ```json
-{
-    "objective": "Obtain one obsidian.",
-    "sinks": [
-        "obsidian"
-    ],
-    "vertices": [
-        {
-            "id": "obsidian",
-            "qty": 1,
-            "item_type": "resource",
-            "acquisition_dependency": "lava_source"
-        },
-        {
-            "id": "water_bucket",
-            "qty": 1,
-            "item_type": "item",
-            "acquisition_dependency": "water_source"
-        },
-        {
-            "id": "bucket",
-            "qty": 1,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "iron_ingot",
-            "qty": 6,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "raw_iron",
-            "qty": 6,
-            "item_type": "resource",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "coal",
-            "qty": 1,
-            "item_type": "resource",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "furnace",
-            "qty": 1,
-            "item_type": "workstation",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "iron_pickaxe",
-            "qty": 1,
-            "item_type": "tool",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "diamond",
-            "qty": 3,
-            "item_type": "resource",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "diamond_pickaxe",
-            "qty": 1,
-            "item_type": "tool",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "stone_pickaxe",
-            "qty": 1,
-            "item_type": "tool",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "cobblestone",
-            "qty": 11,
-            "item_type": "resource",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "wooden_pickaxe",
-            "qty": 1,
-            "item_type": "tool",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "crafting_table",
-            "qty": 1,
-            "item_type": "workstation",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "stick",
-            "qty": 8,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "any_plank",
-            "qty": 12,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "any_log",
-            "qty": 3,
-            "item_type": "resource",
-            "acquisition_dependency": "none"
-        }
-    ],
-    "edges": [
-        {
-            "from": "water_bucket",
-            "to": "obsidian",
-            "type": "item_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "diamond_pickaxe",
-            "to": "obsidian",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "bucket",
-            "to": "water_bucket",
-            "type": "crafting_input",
-            "qty": 1,
-            "consumed": true
-        },
-        {
-            "from": "iron_ingot",
-            "to": "bucket",
-            "type": "crafting_input",
-            "qty": 3,
-            "consumed": true
-        },
-        {
-            "from": "crafting_table",
-            "to": "bucket",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "raw_iron",
-            "to": "iron_ingot",
-            "type": "smelting_input",
-            "qty": 6,
-            "consumed": true
-        },
-        {
-            "from": "coal",
-            "to": "iron_ingot",
-            "type": "fuel_input",
-            "qty": 1,
-            "consumed": true
-        },
-        {
-            "from": "furnace",
-            "to": "iron_ingot",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "iron_ingot",
-            "to": "iron_pickaxe",
-            "type": "crafting_input",
-            "qty": 3,
-            "consumed": true
-        },
-        {
-            "from": "stick",
-            "to": "iron_pickaxe",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
-        },
-        {
-            "from": "crafting_table",
-            "to": "iron_pickaxe",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "iron_pickaxe",
-            "to": "diamond",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "diamond",
-            "to": "diamond_pickaxe",
-            "type": "crafting_input",
-            "qty": 3,
-            "consumed": true
-        },
-        {
-            "from": "stick",
-            "to": "diamond_pickaxe",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
-        },
-        {
-            "from": "crafting_table",
-            "to": "diamond_pickaxe",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "cobblestone",
-            "to": "furnace",
-            "type": "crafting_input",
-            "qty": 8,
-            "consumed": true
-        },
-        {
-            "from": "crafting_table",
-            "to": "furnace",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "cobblestone",
-            "to": "stone_pickaxe",
-            "type": "crafting_input",
-            "qty": 3,
-            "consumed": true
-        },
-        {
-            "from": "stick",
-            "to": "stone_pickaxe",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
-        },
-        {
-            "from": "crafting_table",
-            "to": "stone_pickaxe",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "stone_pickaxe",
-            "to": "raw_iron",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "stone_pickaxe",
-            "to": "coal",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "wooden_pickaxe",
-            "to": "cobblestone",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "any_plank",
-            "to": "wooden_pickaxe",
-            "type": "crafting_input",
-            "qty": 3,
-            "consumed": true
-        },
-        {
-            "from": "stick",
-            "to": "wooden_pickaxe",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
-        },
-        {
-            "from": "crafting_table",
-            "to": "wooden_pickaxe",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "any_plank",
-            "to": "crafting_table",
-            "type": "crafting_input",
-            "qty": 4,
-            "consumed": true
-        },
-        {
-            "from": "any_plank",
-            "to": "stick",
-            "type": "crafting_input",
-            "qty": 4,
-            "consumed": true
-        },
-        {
-            "from": "any_log",
-            "to": "any_plank",
-            "type": "crafting_input",
-            "qty": 3,
-            "consumed": true
-        }
-    ]
-}
-```
+{{CANDIDATE GRAPH}}
+````
 
 VALIDATOR OUTPUT:
 

@@ -1,8 +1,6 @@
-# SCSG — test
-_r=0_
+# Completed — Obtain one type of each type of golden tool\.
 
-```mermaid
-graph LR
-    cooked_porkchop["cooked_porkchop ×1<br/>[item]"]
-    style cooked_porkchop fill:#4CAF50,color:#fff,stroke:#388E3C
-```
+**Task complete.**
+
+- **Reason:** all sinks satisfied
+- **Total elapsed:** 11m 32s

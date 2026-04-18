@@ -1,29 +1,15 @@
 import {readFile as read_file} from 'fs/promises';
 
+import {get_nts_state as get_state_for_candidates, get_sgsg_state} from '../agent_state.js';
 import {clearCheckpoint as clear_checkpoint, saveCheckpoint as save_checkpoint,} from '../checkpoint.js';
 import {extract_json, save_json, to_snake_case} from '../json_utils.js';
-import {
-  get_canonical_mob_source,
-  get_canonical_source_for_target,
-  get_grounded_nearby_source,
-  get_source_kind_for_target,
-  resolve_fallback_block_source,
-  resolve_nearby_block_source,
-  resolve_nearby_mob_source,
-} from '../mc_sources.js';
+import {get_canonical_mob_source, get_canonical_source_for_target, get_grounded_nearby_source, get_source_kind_for_target, resolve_fallback_block_source, resolve_nearby_block_source, resolve_nearby_mob_source,} from '../mc_sources.js';
 import {fill_ptd_prompt} from '../prompt_utils.js';
 import {createRolloutLogger as create_rollout_logger} from '../rollout_logger.js';
 import {compute_scsg} from '../scsg.js';
-import {get_nts_state as get_state_for_candidates, get_sgsg_state} from '../agent_state.js';
+
 import {execute_task_action} from './actions.js';
-import {
-  build_incoming_edge_map,
-  edge_in_subgraph,
-  edge_key,
-  get_satisfied_inputs_by_type,
-  get_single_satisfied_input_item,
-  resolve_concrete_craft_target,
-} from './graph.js';
+import {build_incoming_edge_map, edge_in_subgraph, edge_key, get_satisfied_inputs_by_type, get_single_satisfied_input_item, resolve_concrete_craft_target,} from './graph.js';
 
 const max_outer_retries = 10;
 const itemish_types = new Set(['item', 'tool', 'workstation']);
@@ -44,10 +30,12 @@ async function structured_loop(models, agent, task_name, graph = null) {
   const log = create_rollout_logger(task_name);
 
   // This hard coded option to load a graph is intended. Do not remove.
-  const load_graph = true;
+  const load_graph = false;
+  const graph_file_path =
+      './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
+  // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
   graph = load_graph ?
-      await load_graph_from_file(
-          './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json') :
+      await load_graph_from_file(graph_file_path) :
       await generate_primary_task_dag(models.ptd, task_name, graph, log);
   if (!graph) return;
 
