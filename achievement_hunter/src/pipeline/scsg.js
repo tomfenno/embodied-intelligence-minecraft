@@ -1,15 +1,3 @@
-/**
- * Deterministic State-Conditioned Subgraph computation.
- *
- * Implements the original SCSG fixed-point pruning algorithm, then normalizes
- * the returned graph so it represents REMAINING WORK.
- *
- * Edge direction: prerequisite → dependent (e.from feeds e.to).
- * Sinks are goal-side vertices with no outgoing edges.
- */
-
-// ── Abstract-class membership tables ─────────────────────────────────────────
-
 export const ABSTRACT_CLASS_MEMBERS = {
   any_log: [
     'oak_log',
@@ -70,328 +58,258 @@ export const ABSTRACT_CLASS_MEMBERS = {
   ],
 };
 
-// ── Public API ───────────────────────────────────────────────────────────────
-
-/**
- * Computes the State-Conditioned Subgraph of PTD graph G given the bot's
- * current inventory.
- *
- * @param {object} G
- *   PTD graph { objective, sinks, vertices, edges }.
- * @param {string|object} inventory
- *   "Nothing" OR a map of { item_id: count }.
- *
- * @returns {{ r: 1, why: string, final: {vertices, edges} }}
- * @returns {{ r: 2, why: string, final: {vertices: [], edges: []} }}
- * @returns {{ r: 0, s: string[], final: {vertices, edges} }}
- */
-export function compute_scsg(G, inventory) {
-  // Step 1: Nothing inventory — no pruning possible.
+// Compute the remaining-work subgraph for the current inventory state.
+export function compute_scsg(graph, inventory) {
   if (inventory === 'Nothing') {
     return {
       r: 1,
       why: 'S.inventory==Nothing',
-      final: {
-        vertices: G.vertices.map(v => ({...v})),
-        edges: G.edges.map(e => ({...e})),
-      },
+      final: clone_graph_content(graph),
     };
   }
 
-  const original_sinks = get_sinks(G);
-  const original_sink_ids = original_sinks.map(v => v.id);
+  const original_sinks = get_sinks(graph);
+  const original_sink_ids = original_sinks.map(({id}) => id);
   const original_sink_id_set = new Set(original_sink_ids);
+  const initially_satisfied_id_set =
+      new Set(state_satisfied_vertices(graph, inventory).map(({id}) => id));
 
-  // Step 2: all original sinks already satisfied.
-  const initially_satisfied_ids =
-      new Set(state_satisfied_vertices(G, inventory).map(v => v.id));
-  if (original_sinks.every(v => initially_satisfied_ids.has(v.id))) {
-    return {
-      r: 2,
-      why: 'all original sinks satisfied',
-      final: {vertices: [], edges: []},
-    };
+  if (original_sink_ids.every(id => initially_satisfied_id_set.has(id))) {
+    return {r: 2, why: 'all original sinks satisfied', final: empty_graph()};
   }
 
-  // Steps 3–5: original fixed-point pruning loop on a mutable deep copy.
-  let g_prime = _deep_copy_graph(G);
-  _update_quantities_from_state(g_prime, inventory);
+  let pruned_graph = deep_copy_graph(graph);
+  update_quantities_from_state(pruned_graph, inventory);
 
   while (true) {
-    const v_sat = state_satisfied_vertices(g_prime, inventory);
-    g_prime = update_quantities_and_prune(v_sat, g_prime);
+    const satisfied_vertices =
+        state_satisfied_vertices(pruned_graph, inventory);
+    pruned_graph =
+        update_quantities_and_prune(satisfied_vertices, pruned_graph);
 
-    const current_sinks = get_sinks(g_prime);
-    const v_disc = current_sinks.filter(v => !original_sink_id_set.has(v.id));
-    g_prime = update_quantities_and_prune(v_disc, g_prime);
+    const disconnected_sinks =
+        get_sinks(pruned_graph).filter(({id}) => !original_sink_id_set.has(id));
+    pruned_graph =
+        update_quantities_and_prune(disconnected_sinks, pruned_graph);
 
-    if (v_sat.length === 0 && v_disc.length === 0) break;
+    if (!satisfied_vertices.length && !disconnected_sinks.length) break;
   }
 
-  // Normalize the stabilized pruned graph into a "remaining work" graph.
-  const normalized =
-      _normalize_remaining_work_graph(g_prime, inventory, original_sink_id_set);
+  const remaining_work_graph = normalize_remaining_work_graph(
+      pruned_graph, inventory, original_sink_id_set);
 
-  if (normalized.vertices.length === 0) {
-    return {
-      r: 2,
-      why: 'all original sinks satisfied',
-      final: normalized,
-    };
+  return remaining_work_graph.vertices.length ?
+      {r: 0, s: original_sink_ids, final: remaining_work_graph} :
+      {r: 2, why: 'all original sinks satisfied', final: remaining_work_graph};
+}
+
+// Return vertices with no outgoing edges.
+export function get_sinks(graph) {
+  const has_outgoing = new Set();
+  for (const {from} of graph.edges) has_outgoing.add(from);
+  return graph.vertices.filter(({id}) => !has_outgoing.has(id));
+}
+
+// Return vertices already satisfied by inventory.
+export function state_satisfied_vertices(graph, inventory) {
+  const satisfied_vertices = [];
+  for (const vertex of graph.vertices) {
+    if (inventory_satisfies(vertex, inventory)) satisfied_vertices.push(vertex);
   }
-
-  return {
-    r: 0,
-    s: original_sink_ids,
-    final: normalized,
-  };
+  return satisfied_vertices;
 }
 
-// ── Algorithm Primitives ─────────────────────────────────────────────────────
+// Remove vertices, decrement consumed prerequisites, and prune edges.
+export function update_quantities_and_prune(removed_vertices, graph) {
+  if (!removed_vertices.length) return graph;
 
-/**
- * GET_SINKS(G): vertices with no outgoing edges.
- * An edge e.from = v.id means v feeds something, so v is not a sink.
- *
- * @param {{ vertices: object[], edges: object[] }} G
- * @returns {object[]} Vertex objects that are sinks.
- */
-export function get_sinks(G) {
-  const has_outgoing = new Set(G.edges.map(e => e.from));
-  return G.vertices.filter(v => !has_outgoing.has(v.id));
-}
+  const removed_id_set = new Set(removed_vertices.map(({id}) => id));
+  const decrement_by_id = new Map();
+  const edges = [];
 
-/**
- * STATE_SATISFIED_VERTICES(G, inventory): vertices whose required qty is
- * already present in inventory.
- *
- * Abstract any_* ids are resolved by summing all concrete class members found
- * in inventory. Unknown any_* classes are treated as unsatisfied.
- *
- * @param {{ vertices: object[] }} G
- * @param {object} inventory
- * @returns {object[]} Vertices whose inventory requirement is met.
- */
-export function state_satisfied_vertices(G, inventory) {
-  return G.vertices.filter(v => _inventory_satisfies(v, inventory));
-}
-
-/**
- * UPDATE_QUANTITIES_AND_PRUNE(V_rm, G):
- *   1. Decrements the qty of each upstream vertex for every consumed edge
- *      that pointed to a removed vertex.
- *   2. Removes all edges to/from removed vertices.
- *   3. Removes the vertices themselves.
- *
- * Kept exactly in line with the original algorithm’s behavior.
- *
- * @param {object[]} V_rm
- * @param {object} G
- * @returns {object}
- */
-export function update_quantities_and_prune(V_rm, G) {
-  if (V_rm.length === 0) return G;
-
-  const remove_ids = new Set(V_rm.map(v => v.id));
-
-  const dec = new Map();
-  for (const e of G.edges) {
-    if (remove_ids.has(e.to) && e.consumed) {
-      dec.set(e.from, (dec.get(e.from) ?? 0) + e.qty);
+  for (const edge of graph.edges) {
+    if (removed_id_set.has(edge.to) && edge.consumed) {
+      decrement_by_id.set(
+          edge.from, (decrement_by_id.get(edge.from) ?? 0) + edge.qty);
+    }
+    if (!removed_id_set.has(edge.from) && !removed_id_set.has(edge.to)) {
+      edges.push({...edge});
     }
   }
 
-  const vertices = G.vertices.filter(v => !remove_ids.has(v.id))
-                       .map(
-                           v => dec.has(v.id) ?
-                               {...v, qty: Math.max(0, v.qty - dec.get(v.id))} :
-                               {...v});
-
-  const edges =
-      G.edges.filter(e => !remove_ids.has(e.from) && !remove_ids.has(e.to))
-          .map(e => ({...e}));
-
-  return {...G, vertices, edges};
-}
-
-// ── Internal Helpers ─────────────────────────────────────────────────────────
-
-/**
- * Returns how many units of id are present in inventory.
- * Handles abstract any_* ids by summing all concrete class members.
- * Unknown any_* classes return 0.
- */
-function _inventory_count(id, inventory) {
-  if (id.startsWith('any_')) {
-    const members = ABSTRACT_CLASS_MEMBERS[id] ?? [];
-    return members.reduce((sum, item) => sum + (inventory[item] ?? 0), 0);
+  const vertices = [];
+  for (const vertex of graph.vertices) {
+    if (removed_id_set.has(vertex.id)) continue;
+    const decrement = decrement_by_id.get(vertex.id) ?? 0;
+    vertices.push(
+        decrement ? {...vertex, qty: Math.max(0, vertex.qty - decrement)} :
+                    {...vertex});
   }
-  return inventory[id] ?? 0;
+
+  return {...graph, vertices, edges};
 }
 
-/**
- * Returns true if the inventory satisfies a single vertex's qty requirement.
- */
-function _inventory_satisfies(vertex, inventory) {
-  return _inventory_count(vertex.id, inventory) >= vertex.qty;
+// Count concrete or abstract inventory for an item id.
+function inventory_count(id, inventory) {
+  if (!id.startsWith('any_')) return inventory[id] ?? 0;
+  let total = 0;
+  for (const member_id of ABSTRACT_CLASS_MEMBERS[id] ?? []) {
+    total += inventory[member_id] ?? 0;
+  }
+  return total;
 }
 
-/**
- * Original structural pre-pass:
- *
- * For each partially satisfied vertex, scale each incoming consumed edge
- * proportionally to the remaining unmet fraction of that vertex and reduce
- * the upstream vertex qty by the no-longer-needed amount.
- *
- * Important: this DOES NOT reduce the partially satisfied vertex's own qty.
- */
-function _update_quantities_from_state(G, inventory) {
-  for (const vertex of G.vertices) {
-    const have = _inventory_count(vertex.id, inventory);
-    if (have <= 0 || have >= vertex.qty) continue;
+// Check whether inventory meets a vertex quantity.
+function inventory_satisfies(vertex, inventory) {
+  return inventory_count(vertex.id, inventory) >= vertex.qty;
+}
 
-    const scale = (vertex.qty - have) / vertex.qty;
+// Scale incoming consumed edges for partially satisfied vertices.
+function update_quantities_from_state(graph, inventory) {
+  const vertex_by_id = new Map();
+  for (const vertex of graph.vertices) {
+    if (!vertex_by_id.has(vertex.id)) vertex_by_id.set(vertex.id, vertex);
+  }
 
-    for (const edge of G.edges) {
-      if (edge.to !== vertex.id || !edge.consumed) continue;
+  const incoming_consumed_edges_by_id = new Map();
+  for (const edge of graph.edges) {
+    if (!edge.consumed) continue;
+    const incoming_edges = incoming_consumed_edges_by_id.get(edge.to);
+    if (incoming_edges)
+      incoming_edges.push(edge);
+    else
+      incoming_consumed_edges_by_id.set(edge.to, [edge]);
+  }
 
+  for (const vertex of graph.vertices) {
+    const inventory_qty = inventory_count(vertex.id, inventory);
+    if (inventory_qty <= 0 || inventory_qty >= vertex.qty) continue;
+
+    const scale = (vertex.qty - inventory_qty) / vertex.qty;
+    for (const edge of incoming_consumed_edges_by_id.get(vertex.id) ?? []) {
       const original_edge_qty = edge.qty;
-      edge.qty = Math.ceil(original_edge_qty * scale);
+      const next_edge_qty = Math.ceil(original_edge_qty * scale);
+      edge.qty = next_edge_qty;
 
-      const upstream = G.vertices.find(v => v.id === edge.from);
-      if (upstream) {
-        upstream.qty =
-            Math.max(0, upstream.qty - (original_edge_qty - edge.qty));
+      const upstream_vertex = vertex_by_id.get(edge.from);
+      if (upstream_vertex) {
+        upstream_vertex.qty = Math.max(
+            0, upstream_vertex.qty - (original_edge_qty - next_edge_qty));
       }
     }
   }
 }
 
-/**
- * Normalize the stabilized pruned graph so it directly represents remaining
- * work still to be done.
- *
- * Rules:
- * - Original sinks: remaining unmet qty after inventory.
- * - Vertices with surviving outgoing non-consumed edges: remaining required
- *   reusable qty after inventory.
- * - Consumable non-sink vertices: remaining outgoing consumed demand after
- *   inventory.
- *
- * Then remove zero-work vertices and repeatedly prune newly exposed
- * non-original sinks.
- */
-function _normalize_remaining_work_graph(G, inventory, original_sink_id_set) {
-  let h = _deep_copy_graph(G);
+// Recompute the stabilized graph so quantities mean remaining work.
+function normalize_remaining_work_graph(
+    graph, inventory, original_sink_id_set) {
+  let normalized_graph = deep_copy_graph(graph);
 
   while (true) {
-    const prev_signature = _graph_signature(h);
+    const previous_signature = graph_signature(normalized_graph);
+    normalized_graph = recompute_returned_vertex_quantities(
+        normalized_graph, inventory, original_sink_id_set);
+    normalized_graph = remove_zero_qty_vertices(normalized_graph);
+    normalized_graph = remove_irrelevant_intermediate_sinks(
+        normalized_graph, original_sink_id_set);
+    if (previous_signature === graph_signature(normalized_graph)) {
+      return normalized_graph;
+    }
+  }
+}
 
-    h = _recompute_returned_vertex_quantities(
-        h, inventory, original_sink_id_set);
-    h = _remove_zero_qty_vertices(h);
-    h = _remove_irrelevant_intermediate_sinks(h, original_sink_id_set);
+// Recalculate each surviving vertex's remaining required quantity.
+function recompute_returned_vertex_quantities(
+    graph, inventory, original_sink_id_set) {
+  const outgoing_consumed_qty_by_id = new Map();
+  const reusable_vertex_id_set = new Set();
 
-    const next_signature = _graph_signature(h);
-    if (prev_signature === next_signature) break;
+  for (const {from, qty, consumed} of graph.edges) {
+    if (consumed) {
+      outgoing_consumed_qty_by_id.set(
+          from, (outgoing_consumed_qty_by_id.get(from) ?? 0) + qty);
+    } else {
+      reusable_vertex_id_set.add(from);
+    }
   }
 
-  return h;
-}
-
-function _recompute_returned_vertex_quantities(
-    G, inventory, original_sink_id_set) {
-  const outgoing_map = _build_outgoing_edge_map(G.edges);
-
-  const vertices = G.vertices.map(v => {
-    const outgoing = outgoing_map.get(v.id) ?? [];
-    const outgoing_consumed_qty =
-        outgoing.filter(e => e.consumed).reduce((sum, e) => sum + e.qty, 0);
-    const has_outgoing_nonconsumed = outgoing.some(e => !e.consumed);
-    const inv_count = _inventory_count(v.id, inventory);
-
-    let qty;
-
-    if (original_sink_id_set.has(v.id)) {
-      qty = Math.max(0, v.qty - inv_count);
-    } else if (has_outgoing_nonconsumed) {
-      // Reusable dependency still required by at least one surviving outgoing
-      // non-consumed edge; subtract what inventory already satisfies.
-      qty = Math.max(0, v.qty - inv_count);
-    } else {
-      // Consumable non-sink: remaining work is the surviving outgoing consumed
-      // demand minus what inventory already covers.
-      qty = Math.max(0, outgoing_consumed_qty - inv_count);
-    }
-
-    return {...v, qty};
-  });
-
-  return {...G, vertices};
-}
-
-function _remove_zero_qty_vertices(G) {
-  const keep_vertices = G.vertices.filter(v => v.qty > 0);
-  const keep_ids = new Set(keep_vertices.map(v => v.id));
-
-  const keep_edges =
-      G.edges.filter(e => keep_ids.has(e.from) && keep_ids.has(e.to));
-
   return {
-    ...G,
-    vertices: keep_vertices,
-    edges: keep_edges,
+    ...graph,
+    vertices: graph.vertices.map(
+        vertex => ({
+          ...vertex,
+          qty: Math.max(
+              0,
+              (original_sink_id_set.has(vertex.id) ||
+                       reusable_vertex_id_set.has(vertex.id) ?
+                   vertex.qty :
+                   (outgoing_consumed_qty_by_id.get(vertex.id) ?? 0)) -
+                  inventory_count(vertex.id, inventory)),
+        })),
   };
 }
 
-function _remove_irrelevant_intermediate_sinks(G, original_sink_id_set) {
-  let h = _deep_copy_graph(G);
+// Drop vertices with no remaining work and their edges.
+function remove_zero_qty_vertices(graph) {
+  const vertices = graph.vertices.filter(({qty}) => qty > 0);
+  const keep_id_set = new Set(vertices.map(({id}) => id));
+  return {
+    ...graph,
+    vertices,
+    edges: graph.edges.filter(
+        ({from, to}) => keep_id_set.has(from) && keep_id_set.has(to)),
+  };
+}
+
+// Repeatedly prune non-goal sinks exposed by earlier removals.
+function remove_irrelevant_intermediate_sinks(graph, original_sink_id_set) {
+  let pruned_graph = graph;
 
   while (true) {
-    const sinks = get_sinks(h);
-    const remove_ids = new Set(
-        sinks.filter(v => !original_sink_id_set.has(v.id)).map(v => v.id));
-
-    if (remove_ids.size === 0) break;
-
-    h = {
-      ...h,
-      vertices: h.vertices.filter(v => !remove_ids.has(v.id)),
-      edges:
-          h.edges.filter(e => !remove_ids.has(e.from) && !remove_ids.has(e.to)),
+    const removed_id_set =
+        new Set(get_sinks(pruned_graph)
+                    .filter(({id}) => !original_sink_id_set.has(id))
+                    .map(({id}) => id));
+    if (!removed_id_set.size) return pruned_graph;
+    pruned_graph = {
+      ...pruned_graph,
+      vertices: pruned_graph.vertices.filter(({id}) => !removed_id_set.has(id)),
+      edges: pruned_graph.edges.filter(
+          ({from, to}) => !removed_id_set.has(from) && !removed_id_set.has(to)),
     };
   }
-
-  return h;
 }
 
-function _build_outgoing_edge_map(edges) {
-  const m = new Map();
-  for (const e of edges) {
-    if (!m.has(e.from)) m.set(e.from, []);
-    m.get(e.from).push(e);
-  }
-  return m;
-}
-
-function _graph_signature(G) {
-  const v_sig = G.vertices.map(v => `${v.id}:${v.qty}`).sort().join('|');
-
-  const e_sig =
-      G.edges
+// Build a stable graph fingerprint for fixed-point convergence.
+function graph_signature(graph) {
+  return `${
+      graph.vertices.map(({id, qty}) => `${id}:${qty}`).sort().join('|')}||${
+      graph.edges
           .map(
-              e =>
-                  `${e.from}->${e.to}:${e.type}:${e.qty}:${e.consumed ? 1 : 0}`)
+              ({from, to, type, qty, consumed}) =>
+                  `${from}->${to}:${type}:${qty}:${consumed ? 1 : 0}`)
           .sort()
-          .join('|');
-
-  return `${v_sig}||${e_sig}`;
+          .join('|')}`;
 }
 
-function _deep_copy_graph(G) {
+// Deep-copy graph structure and payload objects.
+function deep_copy_graph(graph) {
   return {
-    ...G,
-    vertices: G.vertices.map(v => ({...v})),
-    edges: G.edges.map(e => ({...e})),
+    ...graph,
+    vertices: graph.vertices.map(vertex => ({...vertex})),
+    edges: graph.edges.map(edge => ({...edge})),
+  };
+}
+
+// Return an empty graph payload.
+function empty_graph() {
+  return {vertices: [], edges: []};
+}
+
+// Clone only the public graph content fields.
+function clone_graph_content(graph) {
+  return {
+    vertices: graph.vertices.map(vertex => ({...vertex})),
+    edges: graph.edges.map(edge => ({...edge})),
   };
 }

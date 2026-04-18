@@ -122,40 +122,6 @@ function code_block(text) {
   return `\`\`\`\n${String(text ?? '')}\n\`\`\``;
 }
 
-function create_metric_state() {
-  return {
-    count: 0,
-    total_ms: 0,
-  };
-}
-
-function note_metric(metric_state, latency_ms) {
-  if (latency_ms == null) return;
-  metric_state.count += 1;
-  metric_state.total_ms += latency_ms;
-}
-
-function average_metric_ms(metric_state) {
-  if (!metric_state || metric_state.count === 0) return null;
-  return metric_state.total_ms / metric_state.count;
-}
-
-function render_latency_block(
-    current_ms, metric_state, unavailable_note = null) {
-  const current_line = current_ms == null ?
-      `- **Current output:** n/a${
-          unavailable_note ? ` (${escape_markdown(unavailable_note)})` : ''}` :
-      `- **Current output:** ${format_latency(current_ms)}`;
-
-  const average_ms = average_metric_ms(metric_state);
-  const average_line = average_ms == null ?
-      '- **Average output:** n/a' :
-      `- **Average output:** ${format_latency(average_ms)} across ${
-          metric_state.count} output${metric_state.count === 1 ? '' : 's'}`;
-
-  return `**LLM latency**\n${current_line}\n${average_line}`;
-}
-
 function render_single_latency_block(label, latency_ms) {
   if (latency_ms == null) return null;
   return `**LLM latency**\n- **${escape_markdown(label)}:** ${
@@ -246,18 +212,14 @@ const stage_renderer = {
         graph_to_mermaid(graph);
   },
 
-  nts(nts_state, metric_state) {
+  nts(nts_state) {
     if (!nts_state) return PLACEHOLDER.NTS;
 
     const body = nts_state.parsed ?
         json_block(nts_state.parsed) :
         `_NTS parse failed._\n\n${code_block(nts_state.raw)}`;
 
-    const metrics = render_latency_block(
-        nts_state.latency_ms ?? null, metric_state,
-        nts_state.current_note ?? null);
-
-    return `**Current Task**\n\n${metrics}\n\n${body}`;
+    return `**Current Task**\n\n${body}`;
   },
 
   completion(objective, completion_state) {
@@ -271,21 +233,15 @@ const stage_renderer = {
 };
 
 const am_renderer = {
-  current(entry, metric_state) {
+  current(entry) {
     const body =
         entry.parsed ? json_block(entry.parsed) : code_block(entry.raw);
-    const source_note = entry.source === SOURCE.SEARCH ?
-        'derived search command' :
-        entry.current_note ?? null;
-
-    const metrics = render_latency_block(
-        entry.latency_ms ?? null, metric_state, source_note);
 
     let title = `**Current Action** _(attempt ${entry.attempt}`;
     if (entry.source === SOURCE.SEARCH) title += ' · search';
     title += ')_';
 
-    let block = `${title}\n\n${metrics}\n\n${body}`;
+    let block = `${title}\n\n${body}`;
 
     if (entry.warning) {
       block += `\n\n> **Warning:** ${escape_markdown(entry.warning)}`;
@@ -307,13 +263,13 @@ const am_renderer = {
     return `- _(attempt ${entry.attempt}${source})_ ${body}${warn}`;
   },
 
-  panel(history, metric_state) {
+  panel(history) {
     if (history.length === 0) return PLACEHOLDER.AM;
 
     const current = history.at(-1);
     const previous = history.slice(0, -1).reverse();
 
-    let block = this.current(current, metric_state);
+    let block = this.current(current);
 
     if (previous.length > 0) {
       block += '\n\n**Previous:**\n\n' +
@@ -412,10 +368,6 @@ export function createRolloutLogger(objective) {
     nts_result: null,
     am_history: [],
     completion: null,
-    metrics: {
-      nts: create_metric_state(),
-      am: create_metric_state(),
-    },
   };
 
   live_writer.remove_file(LIVE_FILE.LEGACY_DASHBOARD);
@@ -455,11 +407,9 @@ export function createRolloutLogger(objective) {
         null :
         stage_renderer.candidates(objective, live_state.candidates);
 
-    const nts_content =
-        stage_renderer.nts(live_state.nts_result, live_state.metrics.nts);
+    const nts_content = stage_renderer.nts(live_state.nts_result);
 
-    const am_content =
-        am_renderer.panel(live_state.am_history, live_state.metrics.am);
+    const am_content = am_renderer.panel(live_state.am_history);
 
     live_writer.write_file(LIVE_FILE.PTD, ptd_content);
     live_writer.write_file(LIVE_FILE.SCSG, scsg_content || PLACEHOLDER.SCSG);
@@ -525,16 +475,7 @@ export function createRolloutLogger(objective) {
         ...(Object.keys(meta).length > 0 ? {meta} : {}),
       });
 
-      if (meta.latency_ms != null && meta.count_latency !== false) {
-        note_metric(live_state.metrics.nts, meta.latency_ms);
-      }
-
-      live_state.nts_result = {
-        raw,
-        parsed,
-        latency_ms: meta.latency_ms ?? null,
-        current_note: meta.current_note ?? null,
-      };
+      live_state.nts_result = {raw, parsed};
 
       render_live();
     },
@@ -548,18 +489,11 @@ export function createRolloutLogger(objective) {
         ...(Object.keys(meta).length > 0 ? {meta} : {}),
       });
 
-      if (meta.source === SOURCE.LLM && meta.latency_ms != null &&
-          meta.count_latency !== false) {
-        note_metric(live_state.metrics.am, meta.latency_ms);
-      }
-
       live_state.am_history.push({
         attempt,
         raw,
         parsed: extract_json(raw),
         source: meta.source ?? SOURCE.LLM,
-        latency_ms: meta.latency_ms ?? null,
-        current_note: meta.current_note ?? null,
       });
 
       render_live();
