@@ -396,15 +396,15 @@ const live_writer = {
  * Creates a new rollout log file for a single structured loop run.
  */
 export function createRolloutLogger(objective) {
-  mkdirSync(ROLLOUTS_DIR, {recursive: true});
   mkdirSync(LIVE_DIR, {recursive: true});
 
   const started_at = iso_now();
   const started_ms = Date.now();
   const timestamp = started_at.replace(/[:.]/g, '-');
   const safe_objective = objective.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
-  const rollout_path =
-      path.join(ROLLOUTS_DIR, `${timestamp}_${safe_objective}.json`);
+  const rollout_dir = path.join(ROLLOUTS_DIR, `${timestamp}_${safe_objective}`);
+  const rollout_path = path.join(rollout_dir, 'rollout_trace.json');
+  mkdirSync(rollout_dir, {recursive: true});
 
   const rollout = {
     objective,
@@ -491,6 +491,9 @@ export function createRolloutLogger(objective) {
   // ───────────────────────────────────────────────────────────
 
   return {
+    rollout_dir,
+    objective,
+
     ptd(raw, parsed, meta = {}) {
       record_stage({
         stage: STAGE.PTD,

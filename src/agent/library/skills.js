@@ -452,6 +452,10 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
     const unsafeBlocks = ['obsidian', 'crafting_table', 'furnace'];
 
     for (let i=0; i<num; i++) {
+        // [Achievement Hunter] Check interrupt at the top of every iteration so
+        // that a cancelTask()-induced catch+continue exits the loop immediately
+        // rather than spinning into another collect call.
+        if (bot.interrupt_code) break;
         let blocks = world.getNearestBlocksWhere(bot, block => {
             if (!blocktypes.includes(block.name)) {
                 return false;

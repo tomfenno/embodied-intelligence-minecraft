@@ -1,0 +1,3048 @@
+{
+  "objective": "Create an Iron Golem.",
+  "status": "running",
+  "started_at": "2026-04-18T20:47:52.894Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-18T20:47:52.898Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "iron_block",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 38,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 38,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 5,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "shears",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_block",
+              "type": "crafting_input",
+              "qty": 36,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "iron_block",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 38,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 5,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "stone_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "shears",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "shears",
+              "to": "carved_pumpkin",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ]
+      },
+      "state": {
+        "inventory": "Nothing"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:47:52.964Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "any_log",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T20:47:53.008Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "any_log",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:47:53.088Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"any_log\")",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "dandelion",
+          "grass_block",
+          "short_grass",
+          "dirt",
+          "tall_grass",
+          "cornflower",
+          "andesite",
+          "stone",
+          "azure_bluet",
+          "coal_ore",
+          "poppy"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "pig",
+            "cow"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:47:53.089Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"oak_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:47:57.183Z",
+      "elapsed": "4s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!collectBlocks(\"oak_log\", 3)",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "short_grass",
+          "grass_block",
+          "oak_leaves",
+          "dirt",
+          "oak_log",
+          "stone",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "chicken",
+            "horse",
+            "pig",
+            "cow"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:12.885Z",
+      "elapsed": "19s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "iron_block",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 38,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 38,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 5,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 9,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "shears",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_block",
+              "type": "crafting_input",
+              "qty": 36,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "iron_block",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 38,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 5,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "stone_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "shears",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "shears",
+              "to": "carved_pumpkin",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_log": 3
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:12.933Z",
+      "elapsed": "20s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_plank",
+          "qty": 9,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_log",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T20:48:12.981Z",
+      "elapsed": "20s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "oak_planks",
+        "qty": 9,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_log",
+              "qty": 3
+            }
+          ],
+          "workstation": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:13.075Z",
+      "elapsed": "20s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"oak_planks\", 3)",
+      "state": {
+        "inventory": {
+          "oak_log": 3
+        },
+        "craftable_items": [
+          "oak_planks"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "grass_block",
+          "oak_leaves",
+          "short_grass",
+          "oak_log",
+          "stone",
+          "tall_grass",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "horse",
+            "chicken",
+            "pig",
+            "cow"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:13.894Z",
+      "elapsed": "21s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "iron_block",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 38,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 38,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 5,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "shears",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_block",
+              "type": "crafting_input",
+              "qty": 36,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "iron_block",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 38,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 5,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "stone_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "shears",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "shears",
+              "to": "carved_pumpkin",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 12
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:13.947Z",
+      "elapsed": "21s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "crafting_table",
+          "qty": 1,
+          "item_type": "workstation",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "stick",
+          "qty": 4,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T20:48:13.994Z",
+      "elapsed": "21s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "crafting_table",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4
+            }
+          ],
+          "workstation": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:14.093Z",
+      "elapsed": "21s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"crafting_table\", 1)",
+      "state": {
+        "inventory": {
+          "oak_planks": 12
+        },
+        "craftable_items": [
+          "crafting_table",
+          "oak_button",
+          "oak_pressure_plate",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "grass_block",
+          "oak_leaves",
+          "short_grass",
+          "oak_log",
+          "stone",
+          "tall_grass",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "horse",
+            "chicken",
+            "pig",
+            "cow"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:14.913Z",
+      "elapsed": "22s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "iron_block",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 38,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 38,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 5,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "shears",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_block",
+              "type": "crafting_input",
+              "qty": 36,
+              "consumed": true
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 38,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 5,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "shears",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "shears",
+              "to": "carved_pumpkin",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 8,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:14.967Z",
+      "elapsed": "22s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "stick",
+          "qty": 4,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T20:48:15.014Z",
+      "elapsed": "22s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "stick",
+        "qty": 4,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 2
+            }
+          ],
+          "workstation": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:15.111Z",
+      "elapsed": "22s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"stick\", 1)",
+      "state": {
+        "inventory": {
+          "oak_planks": 8,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "oak_slab",
+          "chest",
+          "crafting_table",
+          "oak_stairs",
+          "oak_button",
+          "oak_pressure_plate",
+          "oak_door",
+          "oak_trapdoor",
+          "oak_boat",
+          "bowl",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "grass_block",
+          "oak_leaves",
+          "short_grass",
+          "oak_log",
+          "stone",
+          "tall_grass",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "horse",
+            "chicken",
+            "pig",
+            "cow"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:15.930Z",
+      "elapsed": "23s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "iron_block",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 38,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 38,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 5,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "shears",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_block",
+              "type": "crafting_input",
+              "qty": 36,
+              "consumed": true
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 38,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 5,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "shears",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "shears",
+              "to": "carved_pumpkin",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 6,
+          "crafting_table": 1,
+          "stick": 4
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:15.980Z",
+      "elapsed": "23s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "wooden_pickaxe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T20:48:16.028Z",
+      "elapsed": "23s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "wooden_pickaxe",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 3
+            },
+            {
+              "item": "stick",
+              "qty": 2
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:16.126Z",
+      "elapsed": "23s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"wooden_pickaxe\", 1)",
+      "state": {
+        "inventory": {
+          "oak_planks": 6,
+          "crafting_table": 1,
+          "stick": 4
+        },
+        "craftable_items": [
+          "oak_slab",
+          "crafting_table",
+          "oak_fence",
+          "oak_stairs",
+          "oak_button",
+          "oak_pressure_plate",
+          "oak_door",
+          "oak_trapdoor",
+          "oak_fence_gate",
+          "oak_boat",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stick",
+          "oak_sign"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "grass_block",
+          "oak_leaves",
+          "short_grass",
+          "oak_log",
+          "stone",
+          "tall_grass",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "horse",
+            "chicken",
+            "pig",
+            "cow"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:24.265Z",
+      "elapsed": "31s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "iron_block",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 38,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 38,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 5,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "shears",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_block",
+              "type": "crafting_input",
+              "qty": 36,
+              "consumed": true
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 38,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 5,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "iron_ingot",
+              "to": "shears",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "shears",
+              "to": "carved_pumpkin",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 3,
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:24.316Z",
+      "elapsed": "31s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "coal",
+          "qty": 5,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "wooden_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "coal_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": "coal_ore"
+        },
+        {
+          "id": "cobblestone",
+          "qty": 11,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "wooden_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "stone",
+          "source_kind": "block",
+          "grounded_nearby_source": "stone"
+        },
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T20:48:24.366Z",
+      "elapsed": "31s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "coal",
+        "qty": 5,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "coal_ore",
+          "item_dependency": null,
+          "tool": "wooden_pickaxe"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:48:24.463Z",
+      "elapsed": "31s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"coal_ore\", 5)",
+      "state": {
+        "inventory": {
+          "oak_planks": 3,
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1
+        },
+        "craftable_items": [
+          "oak_slab",
+          "oak_button",
+          "oak_pressure_plate",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "short_grass",
+          "grass_block",
+          "oak_leaves",
+          "dirt",
+          "oak_log",
+          "stone",
+          "coal_ore",
+          "tall_grass"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "horse",
+            "chicken",
+            "pig"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:49:16.014Z",
+      "elapsed": "1m 23s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "iron_block",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 38,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 38,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 8,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "shears",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_block",
+              "type": "crafting_input",
+              "qty": 36,
+              "consumed": true
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 38,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "iron_ingot",
+              "to": "shears",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "shears",
+              "to": "carved_pumpkin",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "oak_planks": 3,
+          "dirt": 5,
+          "coal": 5,
+          "cobblestone": 3
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:49:16.067Z",
+      "elapsed": "1m 23s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "cobblestone",
+          "qty": 8,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "wooden_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "stone",
+          "source_kind": "block",
+          "grounded_nearby_source": "stone"
+        },
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T20:49:16.118Z",
+      "elapsed": "1m 23s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "cobblestone",
+        "qty": 8,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "stone",
+          "item_dependency": null,
+          "tool": "wooden_pickaxe"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:49:16.222Z",
+      "elapsed": "1m 23s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"stone\", 8)",
+      "state": {
+        "inventory": {
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "oak_planks": 3,
+          "dirt": 5,
+          "coal": 5,
+          "cobblestone": 3
+        },
+        "craftable_items": [
+          "oak_slab",
+          "cobblestone_slab",
+          "torch",
+          "lever",
+          "oak_button",
+          "oak_pressure_plate",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "gravel",
+          "dirt",
+          "andesite",
+          "grass_block",
+          "copper_ore",
+          "short_grass",
+          "tall_grass"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "horse",
+            "chicken"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:49:43.678Z",
+      "elapsed": "1m 50s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "iron_block",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 38,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 38,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "shears",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_block",
+              "type": "crafting_input",
+              "qty": 36,
+              "consumed": true
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 38,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "shears",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "shears",
+              "to": "carved_pumpkin",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "oak_planks": 3,
+          "dirt": 5,
+          "coal": 6,
+          "cobblestone": 14
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:49:43.731Z",
+      "elapsed": "1m 50s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "furnace",
+          "qty": 1,
+          "item_type": "workstation",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 8,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "stone_pickaxe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T20:49:43.781Z",
+      "elapsed": "1m 50s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "furnace",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 8
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:49:43.881Z",
+      "elapsed": "1m 50s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"furnace\", 1)",
+      "state": {
+        "inventory": {
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "oak_planks": 3,
+          "dirt": 5,
+          "coal": 6,
+          "cobblestone": 14
+        },
+        "craftable_items": [
+          "oak_slab",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "oak_pressure_plate",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "andesite",
+          "stone",
+          "gravel",
+          "dirt",
+          "copper_ore",
+          "grass_block",
+          "short_grass",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "chicken",
+            "horse",
+            "sheep",
+            "pig"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:49:52.729Z",
+      "elapsed": "1m 59s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "iron_block",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 38,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 38,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "shears",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_block",
+              "type": "crafting_input",
+              "qty": 36,
+              "consumed": true
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 38,
+              "consumed": true
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "shears",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "shears",
+              "to": "carved_pumpkin",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "furnace": 1,
+          "stick": 2,
+          "cobblestone": 7,
+          "wooden_pickaxe": 1,
+          "oak_planks": 3,
+          "dirt": 5,
+          "coal": 6,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:49:52.779Z",
+      "elapsed": "1m 59s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "stone_pickaxe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T20:49:52.829Z",
+      "elapsed": "1m 59s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "stone_pickaxe",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 3
+            },
+            {
+              "item": "stick",
+              "qty": 2
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:49:52.929Z",
+      "elapsed": "2m 00s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"stone_pickaxe\", 1)",
+      "state": {
+        "inventory": {
+          "furnace": 1,
+          "stick": 2,
+          "cobblestone": 7,
+          "wooden_pickaxe": 1,
+          "oak_planks": 3,
+          "dirt": 5,
+          "coal": 6,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "oak_slab",
+          "cobblestone_slab",
+          "torch",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "oak_pressure_plate",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "andesite",
+          "stone",
+          "dirt",
+          "gravel",
+          "copper_ore",
+          "grass_block",
+          "short_grass"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "pig",
+            "horse",
+            "sheep",
+            "chicken"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:50:00.062Z",
+      "elapsed": "2m 07s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "iron_block",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 38,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 38,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "shears",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_block",
+              "type": "crafting_input",
+              "qty": 36,
+              "consumed": true
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 38,
+              "consumed": true
+            },
+            {
+              "from": "iron_ingot",
+              "to": "shears",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "shears",
+              "to": "carved_pumpkin",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "furnace": 1,
+          "cobblestone": 4,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "oak_planks": 3,
+          "dirt": 5,
+          "coal": 6,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:50:00.114Z",
+      "elapsed": "2m 07s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "raw_iron",
+          "qty": 38,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "stone_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "iron_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T20:50:00.168Z",
+      "elapsed": "2m 07s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "raw_iron",
+        "qty": 38,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "iron_ore",
+          "item_dependency": null,
+          "tool": "stone_pickaxe"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:50:00.269Z",
+      "elapsed": "2m 07s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"iron_ore\")",
+      "state": {
+        "inventory": {
+          "furnace": 1,
+          "cobblestone": 4,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "oak_planks": 3,
+          "dirt": 5,
+          "coal": 6,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "oak_slab",
+          "cobblestone_slab",
+          "oak_button",
+          "oak_pressure_plate",
+          "bowl",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "andesite",
+          "stone",
+          "dirt",
+          "gravel",
+          "copper_ore",
+          "grass_block",
+          "short_grass"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "horse",
+            "pig",
+            "sheep",
+            "chicken"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:50:00.271Z",
+      "elapsed": "2m 07s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"iron_ore\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T20:50:18.291Z",
+      "elapsed": "2m 25s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!collectBlocks(\"iron_ore\", 38)",
+      "state": {
+        "inventory": {
+          "cobblestone": 4,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "oak_planks": 3,
+          "dirt": 7,
+          "coal": 6,
+          "crafting_table": 1,
+          "furnace": 1
+        },
+        "craftable_items": [
+          "oak_slab",
+          "cobblestone_slab",
+          "oak_button",
+          "oak_pressure_plate",
+          "bowl",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "stone",
+          "grass_block",
+          "bush",
+          "iron_ore",
+          "short_grass",
+          "gravel"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "sheep"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    }
+  ]
+}

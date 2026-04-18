@@ -1,0 +1,1189 @@
+{
+  "objective": "Create an Iron Golem.",
+  "status": "completed",
+  "started_at": "2026-04-18T21:03:20.553Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-18T21:03:20.557Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 110,
+          "furnace": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:20.617Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:20.651Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "pumpkin",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "pumpkin",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:20.714Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"pumpkin\")",
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 110,
+          "furnace": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "polished_diorite",
+          "andesite",
+          "polished_andesite",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "andesite_wall",
+          "diorite_wall",
+          "andesite_stairs",
+          "diorite_stairs",
+          "granite_slab",
+          "andesite_slab",
+          "diorite_slab",
+          "lever",
+          "oak_button",
+          "iron_ingot",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "cobblestone",
+          "diorite",
+          "copper_ore",
+          "iron_ore",
+          "gravel",
+          "coal_ore",
+          "water",
+          "andesite",
+          "granite"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:20.715Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"pumpkin\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:21.223Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"pumpkin\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:21.770Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"pumpkin\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:22.877Z",
+      "elapsed": "2s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"pumpkin\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:28.665Z",
+      "elapsed": "8s",
+      "stage": "AM",
+      "attempt": 6,
+      "raw": "!searchForBlock(\"pumpkin\", 511)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:29.280Z",
+      "elapsed": "8s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!collectBlocks(\"pumpkin\", 1)",
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 110,
+          "furnace": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "polished_diorite",
+          "andesite",
+          "polished_andesite",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "andesite_wall",
+          "diorite_wall",
+          "andesite_stairs",
+          "diorite_stairs",
+          "granite_slab",
+          "andesite_slab",
+          "diorite_slab",
+          "lever",
+          "oak_button",
+          "iron_ingot",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "cobblestone",
+          "diorite",
+          "copper_ore",
+          "pumpkin",
+          "iron_ore",
+          "gravel",
+          "coal_ore",
+          "water",
+          "andesite",
+          "granite"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:38.858Z",
+      "elapsed": "18s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 111,
+          "furnace": 1,
+          "crafting_table": 1,
+          "pumpkin": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:38.892Z",
+      "elapsed": "18s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "carved_pumpkin",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "pumpkin",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "shears",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:38.923Z",
+      "elapsed": "18s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": null,
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:38.924Z",
+      "elapsed": "18s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 111,
+          "furnace": 1,
+          "crafting_table": 1,
+          "pumpkin": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:38.954Z",
+      "elapsed": "18s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "carved_pumpkin",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "pumpkin",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "shears",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:38.985Z",
+      "elapsed": "18s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": null,
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:38.986Z",
+      "elapsed": "18s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 111,
+          "furnace": 1,
+          "crafting_table": 1,
+          "pumpkin": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.017Z",
+      "elapsed": "18s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "carved_pumpkin",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "pumpkin",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "shears",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.047Z",
+      "elapsed": "18s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": null,
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.048Z",
+      "elapsed": "18s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 111,
+          "furnace": 1,
+          "crafting_table": 1,
+          "pumpkin": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.078Z",
+      "elapsed": "18s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "carved_pumpkin",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "pumpkin",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "shears",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.108Z",
+      "elapsed": "18s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": null,
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.109Z",
+      "elapsed": "18s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 111,
+          "furnace": 1,
+          "crafting_table": 1,
+          "pumpkin": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.139Z",
+      "elapsed": "18s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "carved_pumpkin",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "pumpkin",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "shears",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.170Z",
+      "elapsed": "18s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": null,
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.171Z",
+      "elapsed": "18s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 111,
+          "furnace": 1,
+          "crafting_table": 1,
+          "pumpkin": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.202Z",
+      "elapsed": "18s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "carved_pumpkin",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "pumpkin",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "shears",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.233Z",
+      "elapsed": "18s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": null,
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.234Z",
+      "elapsed": "18s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 111,
+          "furnace": 1,
+          "crafting_table": 1,
+          "pumpkin": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.264Z",
+      "elapsed": "18s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "carved_pumpkin",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "pumpkin",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "shears",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.294Z",
+      "elapsed": "18s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": null,
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.295Z",
+      "elapsed": "18s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 111,
+          "furnace": 1,
+          "crafting_table": 1,
+          "pumpkin": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.329Z",
+      "elapsed": "18s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "carved_pumpkin",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "pumpkin",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "shears",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.361Z",
+      "elapsed": "18s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": null,
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.362Z",
+      "elapsed": "18s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 111,
+          "furnace": 1,
+          "crafting_table": 1,
+          "pumpkin": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.392Z",
+      "elapsed": "18s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "carved_pumpkin",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "pumpkin",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "shears",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.423Z",
+      "elapsed": "18s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": null,
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.424Z",
+      "elapsed": "18s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "shears": 1,
+          "andesite": 17,
+          "diorite": 6,
+          "oak_planks": 1,
+          "coal": 1,
+          "stick": 2,
+          "raw_iron": 2,
+          "iron_block": 4,
+          "granite": 3,
+          "raw_copper": 4,
+          "wooden_pickaxe": 1,
+          "stone_pickaxe": 1,
+          "cobblestone": 111,
+          "furnace": 1,
+          "crafting_table": 1,
+          "pumpkin": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.455Z",
+      "elapsed": "18s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "carved_pumpkin",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "pumpkin",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "shears",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-18T21:03:39.486Z",
+      "elapsed": "18s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": null,
+      "meta": {
+        "source": "deterministic"
+      }
+    }
+  ],
+  "completed_at": "2026-04-18T21:03:39.487Z",
+  "total_elapsed": "18s",
+  "completion_reason": "max outer retries exceeded"
+}
