@@ -101,6 +101,3 @@ async function _send_refined_request(
   return {finalResult: r, transcript, totalRounds: n};
 }
 
-// Re-export for callers that depend on the public name.
-// After Phase 3, this alias can be removed once all callers are updated.
-export { _send_refined_request as sendRefinedRequest };

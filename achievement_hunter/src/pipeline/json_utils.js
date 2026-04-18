@@ -13,20 +13,6 @@ import path from 'path';
  *   const obj = extract_json('```json\n{"a": 1}\n```');
  *   // obj => { a: 1 }
  */
-/**
- * Strips markdown code fences from a string and returns the trimmed inner
- * content. If no fences are present, returns the string trimmed as-is.
- *
- * Example:
- *   strip_fences('```plaintext\n!collectBlocks("oak_log", 3)\n```')
- *   // => '!collectBlocks("oak_log", 3)'
- */
-export function strip_fences(str) {
-  if (typeof str !== 'string') return str;
-  const fenced = str.match(/```(?:\w+)?\s*([\s\S]*?)```/);
-  return fenced ? fenced[1].trim() : str.trim();
-}
-
 export function extract_json(str) {
   if (str == null) return null;
 

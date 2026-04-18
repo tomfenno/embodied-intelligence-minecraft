@@ -86,34 +86,6 @@ export function fill_scsg_feedback_prompt(task_prompt, candidate_answer) {
 }
 
 /**
- * Fills the action_mediator prompt template with a task object and a
- * state object. Returns the filled prompt string.
- *
- * Example:
- *   const prompt = fill_action_mediator_prompt(task_obj, state_obj);
- */
-export function fill_action_mediator_prompt(task, state) {
-  const template = _read_template(
-      '../../docs/prompts/action_mediator_prompts/action_mediator.md');
-  return _fill(template, {'TASK': task, 'STATE': state});
-}
-
-/**
- * Fills the next_task_selector prompt template with an enriched subgraph
- * object and a state object. Returns the filled prompt string.
- *
- * Example:
- *   const prompt = fill_next_task_selector_prompt(enriched_subgraph_obj,
- * state_obj);
- */
-export function fill_next_task_selector_prompt(enriched_subgraph, state) {
-  const template = _read_template(
-      '../../docs/prompts/next_task_selector_prompts/next_task_selector.md');
-  return _fill(
-      template, {'CANDIDATE_TARGETS': enriched_subgraph, 'STATE': state});
-}
-
-/**
  * Fills the scsg_refiner_prompt template with a task prompt string, a
  * previous candidate object, and an audit report object. The task_prompt
  * is typically the output of fill_scsg_prompt. Returns the filled prompt
