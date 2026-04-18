@@ -184,6 +184,11 @@ export function select_next_task(candidates, state) {
   }
 
   for (const candidate of candidates) {
+    const task = try_make_interact_task(candidate, state);
+    if (task) return task;
+  }
+
+  for (const candidate of candidates) {
     if (candidate.item_type !== 'resource') continue;
     const task = make_fallback_acquisition_task(candidate, state);
     if (task) return task;
@@ -299,4 +304,42 @@ async function load_graph_from_file(file_path) {
     throw new Error(
         `Failed to load PTD graph from "${file_path}": ${error.message}`);
   }
+}
+
+export function try_make_interact_task(candidate, state) {
+  if (candidate.item_type === 'resource') return null;
+
+  const tool = get_single_satisfied_input_item(candidate, 'tool_dependency');
+  const crafting_input =
+      get_single_satisfied_input_item(candidate, 'crafting_input');
+
+  // Case 1: explicit tool-on-item interaction, e.g. shears on pumpkin.
+  if (tool != null && crafting_input != null) {
+    return {
+      target_item: candidate.id,
+      qty: candidate.qty,
+      action_type: 'interact',
+      parameters: {
+        tool: tool,
+        target: crafting_input,
+      },
+    };
+  }
+
+  // Case 2: item-on-nearby-world-source interaction, e.g. bucket on water/lava.
+  if (crafting_input == null) return null;
+
+  const target =
+      resolve_nearby_block_source(candidate, state.nearby_blocks ?? []);
+
+  return target ? {
+    target_item: candidate.id,
+    qty: candidate.qty,
+    action_type: 'interact',
+    parameters: {
+      tool: crafting_input,
+      target: target,
+    },
+  } :
+                  null;
 }

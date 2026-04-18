@@ -79,31 +79,126 @@ export async function execute_task_action(task, agent, log) {
       if (found) {
         const post_state = get_am_state(agent);
         const reached = check_search_complete(search_target, post_state);
-        current_step.result = reached ?
-            {
-              success: true,
-              kind: 'search_success',
-              message: search_message,
-            } :
-            {
-              success: false,
-              kind: 'search_found_not_reached',
-              message: search_message,
-            };
-        spl.log(`Search found "${search_target}", re-running AM with fresh state.`);
+        current_step.result = reached ? {
+          success: true,
+          kind: 'search_success',
+          message: search_message,
+        } :
+                                        {
+                                          success: false,
+                                          kind: 'search_found_not_reached',
+                                          message: search_message,
+                                        };
+        spl.log(
+            `Search found "${search_target}", re-running AM with fresh state.`);
       } else {
         current_step.result = {
           success: false,
           kind: 'search_exhausted',
           message: search_message,
         };
-        spl.warn(`Search exhausted all radii for "${search_target}", re-evaluating.`);
+        spl.warn(`Search exhausted all radii for "${
+            search_target}", re-evaluating.`);
       }
       continue;
     }
 
     const result = await execute_command(agent, action.command);
     spl.log('Command result:', result);
+
+    if (task.action_type === 'interact' &&
+        is_successful_command_result(result)) {
+      const post_state = get_am_state(agent);
+
+      if (interact_target_satisfied(task, post_state)) {
+        repeated_failure_signature = null;
+        repeated_failure_count = 0;
+
+        current_step.result = {
+          success: true,
+          kind: 'command_success',
+          message: result.message != null ? String(result.message).trim() :
+                                            null,
+        };
+
+        task_trace.terminal_status = 'success';
+        task_trace.terminal_reason = 'completed';
+        task_trace.final_state = get_recovery_trace_state(agent);
+        task_trace.summary = build_summary(task_trace.steps, 'success');
+        persist_task_trace(task_trace, log.rollout_dir);
+
+        return 'success';
+      }
+
+      if (interact_target_collectable(task, post_state)) {
+        const collect_command = `!collectBlocks("${task.target_item}", ${
+            Math.min(task.qty, max_collect_qty)})`;
+
+        const collect_step = {
+          i: `${attempt + 1}a`,
+          state: get_recovery_trace_state(agent),
+          action: collect_command,
+          result: null,
+        };
+        task_trace.steps.push(collect_step);
+
+        log.am(attempt + 1, collect_command, post_state, {
+          source: log_source.deterministic,
+        });
+
+        spl.log(
+            'Interact produced collectable target; collecting:',
+            collect_command);
+
+        const collect_result = await execute_command(agent, collect_command);
+        spl.log('Collect-after-interact result:', collect_result);
+
+        if (is_successful_command_result(collect_result)) {
+          const final_state = get_am_state(agent);
+          if (interact_target_satisfied(task, final_state)) {
+            repeated_failure_signature = null;
+            repeated_failure_count = 0;
+
+            collect_step.result = {
+              success: true,
+              kind: 'command_success',
+              message: collect_result.message != null ?
+                  String(collect_result.message).trim() :
+                  null,
+            };
+
+            task_trace.terminal_status = 'success';
+            task_trace.terminal_reason = 'completed';
+            task_trace.final_state = get_recovery_trace_state(agent);
+            task_trace.summary = build_summary(task_trace.steps, 'success');
+            persist_task_trace(task_trace, log.rollout_dir);
+
+            return 'success';
+          }
+        }
+
+        collect_step.result = {
+          success: false,
+          kind: 'command_failure',
+          message: collect_result?.message != null ?
+              String(collect_result.message).trim() :
+              null,
+        };
+
+        continue;
+      }
+
+      repeated_failure_signature = null;
+      repeated_failure_count = 0;
+
+      current_step.result = {
+        success: true,
+        kind: 'command_success',
+        message: result.message != null ? String(result.message).trim() : null,
+      };
+
+      continue;
+    }
 
     if (is_successful_command_result(result)) {
       repeated_failure_signature = null;
@@ -194,6 +289,8 @@ export function mediate_action(task, state) {
       return mediate_craft(task);
     case 'smelt':
       return mediate_smelt(task, state);
+    case 'interact':
+      return mediate_interact(task, state);
     default:
       throw new Error(`Unsupported action_type: "${task.action_type}"`);
   }
@@ -215,7 +312,8 @@ export function mediate_collect(task, state) {
       } :
       {
         kind: 'command',
-        command: `!collectBlocks("${concrete_block}", ${Math.min(task.qty, max_collect_qty)})`,
+        command: `!collectBlocks("${concrete_block}", ${
+            Math.min(task.qty, max_collect_qty)})`,
       };
 }
 
@@ -265,6 +363,47 @@ export function mediate_smelt(task, state) {
             fuel_name}")` :
         `!smelt_item("${smelting_input.item}", ${smelting_input.qty})`,
   };
+}
+
+export function mediate_interact(task, state) {
+  const {tool, target} = task.parameters ?? {};
+
+  if (!tool || !target) {
+    throw new Error(
+        `Interact task missing tool/target: ${JSON.stringify(task)}`);
+  }
+
+  const inventory = state.inventory ?? {};
+  const nearby_blocks = state.nearby_blocks ?? [];
+
+  if ((inventory[target] ?? 0) > 0) {
+    return {
+      kind: 'command',
+      command: `!placeItem("${target}")`,
+    };
+  }
+
+  if (nearby_blocks.includes(target)) {
+    return {
+      kind: 'command',
+      command: `!useOn("${tool}", "${target}")`,
+    };
+  }
+
+  return {
+    kind: 'command',
+    command: `!search("${target}")`,
+  };
+}
+
+function interact_target_satisfied(task, state) {
+  const inventory = state.inventory ?? {};
+  return (inventory[task.target_item] ?? 0) >= task.qty;
+}
+
+function interact_target_collectable(task, state) {
+  const nearby_blocks = state.nearby_blocks ?? [];
+  return nearby_blocks.includes(task.target_item);
 }
 
 export function resolve_smelt_fuel_name(task, state) {
@@ -327,14 +466,13 @@ function build_summary(steps, terminal_status) {
   };
 
   if (terminal_status === 'fail') {
-    summary.failed_steps = steps
-        .filter(s => s.result?.success === false)
-        .map(s => ({
-               i: s.i,
-               action: s.action,
-               kind: s.result.kind,
-               message: s.result.message,
-             }));
+    summary.failed_steps = steps.filter(s => s.result?.success === false)
+                               .map(s => ({
+                                      i: s.i,
+                                      action: s.action,
+                                      kind: s.result.kind,
+                                      message: s.result.message,
+                                    }));
   }
 
   return summary;
