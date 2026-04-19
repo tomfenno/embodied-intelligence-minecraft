@@ -483,7 +483,6 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
             break;
         }
         const block = blocks[0];
-        await bot.tool.equipForBlock(block);
         if (isLiquid) {
             const bucket = bot.inventory.items().find(item => item.name === 'bucket');
             if (!bucket) {
@@ -491,11 +490,24 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
                 return false;
             }
             await bot.equip(bucket, 'hand');
-        }
-        const itemId = bot.heldItem ? bot.heldItem.type : null
-        if (!block.canHarvest(itemId)) {
-            log(bot, `Don't have right tools to harvest ${blockType}.`);
-            return false;
+        } else {
+            // [Achievement Hunter] Use requireHarvest:true instead of the original
+            // equipForBlock() + canHarvest(bot.heldItem?.type) two-step. The original
+            // pattern was racey: when a tool breaks, bot.heldItem can still reference
+            // the destroyed item's type ID after the break event fires, causing
+            // canHarvest to pass and bot.collectBlock.collect() to run with no actual
+            // tool — leading to a pathfinder memory leak and OOM crash. requireHarvest
+            // filters against fresh inventory data before any equip attempt, then
+            // throws NoItem if no valid tool exists, eliminating the stale-state window.
+            try {
+                await bot.tool.equipForBlock(block, {requireHarvest: true});
+            } catch (err) {
+                if (err.name === 'NoItem') {
+                    log(bot, `Don't have right tools to harvest ${blockType}.`);
+                    return false;
+                }
+                throw err;
+            }
         }
         try {
             let success = false;
