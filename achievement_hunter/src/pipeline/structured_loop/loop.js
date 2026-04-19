@@ -29,7 +29,7 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   const log = create_rollout_logger(task_name);
 
   // This hard coded option to load a graph is intended. Do not remove.
-  const load_graph = true;
+  const load_graph = false;
   const graph_file_path =
       `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
   //    './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';

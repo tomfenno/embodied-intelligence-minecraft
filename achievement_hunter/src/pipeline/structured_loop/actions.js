@@ -379,7 +379,7 @@ export function mediate_interact(task, state) {
   if ((inventory[target] ?? 0) > 0) {
     return {
       kind: 'command',
-      command: `!placeItem("${target}")`,
+      command: `!placeHere("${target}")`,
     };
   }
 

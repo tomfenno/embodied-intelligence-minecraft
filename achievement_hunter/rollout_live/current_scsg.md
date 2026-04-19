@@ -1,6 +1,6 @@
-# Completed — test
+# Completed — Obtain a carved pumpkin
 
 **Task complete.**
 
-- **Reason:** max outer retries exceeded
-- **Total elapsed:** 0s
+- **Reason:** all sinks satisfied
+- **Total elapsed:** 3m 25s
