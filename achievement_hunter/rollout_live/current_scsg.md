@@ -1,6 +1,6 @@
-# Completed — test
+# Completed — Get a lava bucket\.
 
 **Task complete.**
 
 - **Reason:** all sinks satisfied
-- **Total elapsed:** 6s
+- **Total elapsed:** 4m 06s

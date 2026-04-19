@@ -690,30 +690,29 @@ describe('should_abort_repeated_failure', () => {
   const STUB_TASK = {};
 
   it('returns true when craftRecipe slot-timeout repeated >= 2 times', () => {
-    expect(should_abort_repeated_failure(STUB_TASK, CRAFT_CMD, SLOT_TIMEOUT, 2))
+    expect(should_abort_repeated_failure(CRAFT_CMD, SLOT_TIMEOUT, 2))
         .toBe(true);
   });
 
   it('returns true for repeated_count > 2', () => {
-    expect(should_abort_repeated_failure(STUB_TASK, CRAFT_CMD, SLOT_TIMEOUT, 5))
+    expect(should_abort_repeated_failure(CRAFT_CMD, SLOT_TIMEOUT, 5))
         .toBe(true);
   });
 
   it('returns false when repeated_count is only 1', () => {
-    expect(should_abort_repeated_failure(STUB_TASK, CRAFT_CMD, SLOT_TIMEOUT, 1))
+    expect(should_abort_repeated_failure(CRAFT_CMD, SLOT_TIMEOUT, 1))
         .toBe(false);
   });
 
   it('returns false for a non-craftRecipe command', () => {
     expect(should_abort_repeated_failure(
-               STUB_TASK, '!collectBlocks("stone", 8)', SLOT_TIMEOUT, 5))
+               '!collectBlocks("stone", 8)', SLOT_TIMEOUT, 5))
         .toBe(false);
   });
 
   it('returns false for craftRecipe without the slot-timeout error message',
      () => {
        expect(should_abort_repeated_failure(
-                  STUB_TASK,
                   CRAFT_CMD,
                   {
                     success: false,
@@ -725,7 +724,7 @@ describe('should_abort_repeated_failure', () => {
      });
 
   it('returns false when result is null', () => {
-    expect(should_abort_repeated_failure(STUB_TASK, CRAFT_CMD, null, 5))
+    expect(should_abort_repeated_failure(CRAFT_CMD, null, 5))
         .toBe(false);
   });
 });
