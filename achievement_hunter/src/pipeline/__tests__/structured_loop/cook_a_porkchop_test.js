@@ -59,7 +59,7 @@ import {get_canonical_block_source, get_canonical_mob_source, is_environmental_u
 import {build_incoming_edge_map, edge_in_subgraph, edge_key, get_satisfied_inputs_by_type, get_single_satisfied_input_item, resolve_concrete_craft_target,} from '../../structured_loop/graph.js';
 import {check_search_complete, expand_search_item, is_entity_target, make_search_command, parse_search_command,} from '../../structured_loop/search.js';
 import {get_command_failure_signature, is_craft_command, is_successful_command_result, mediate_collect, mediate_craft, mediate_kill, mediate_smelt, resolve_smelt_fuel_name, should_abort_repeated_failure,} from '../../structured_loop/actions.js';
-import {make_fallback_acquisition_task, select_next_task, try_make_craft_task, try_make_immediate_acquisition_task, try_make_smelt_task,} from '../../structured_loop/loop.js';
+import {make_fallback_acquisition_task, select_next_task, try_make_craft_task, try_make_immediate_acquisition_task, try_make_smelt_task,} from '../../structured_loop/tasks.js';
 
 // ── Rollout-derived fixtures
 // ──────────────────────────────────────────────────
