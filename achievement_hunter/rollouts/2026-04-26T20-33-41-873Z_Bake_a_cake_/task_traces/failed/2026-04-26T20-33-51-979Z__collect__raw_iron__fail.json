@@ -1,0 +1,192 @@
+{
+  "objective": "Bake a cake.",
+  "task": {
+    "target_item": "raw_iron",
+    "qty": 9,
+    "action_type": "collect",
+    "parameters": {
+      "source_block": "iron_ore",
+      "item_dependency": null,
+      "tool": "stone_pickaxe"
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -209.5,
+            "y": 103.94,
+            "z": 1317.57
+          },
+          "dimension": "overworld",
+          "biome": "meadow",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "dirt",
+          "legs": "farmland",
+          "head": "air",
+          "firstBlockAboveHead": "oak_stairs (3 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "wheat_seeds": 26,
+            "carrot": 1,
+            "wheat": 5,
+            "egg": 1,
+            "stick": 2,
+            "oak_planks": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "dirt": 22,
+            "stone_pickaxe": 1,
+            "furnace": 1,
+            "stone_hoe": 1,
+            "coal": 2
+          },
+          "equipment": {
+            "mainHand": "dirt"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "farmland",
+            "dirt",
+            "water",
+            "cobblestone",
+            "grass_block",
+            "oak_log",
+            "short_grass",
+            "oak_planks",
+            "wheat",
+            "mossy_cobblestone",
+            "wildflowers",
+            "cobblestone_stairs",
+            "white_bed",
+            "glass_pane",
+            "oak_door",
+            "dirt_path",
+            "oak_stairs",
+            "stone",
+            "tall_grass",
+            "wall_torch",
+            "coal_ore",
+            "oak_slab"
+          ],
+          "entityTypes": [
+            "villager",
+            "iron_golem"
+          ]
+        },
+        "craftable_items": [
+          "torch",
+          "oak_button",
+          "wooden_shovel",
+          "bread"
+        ]
+      },
+      "action": "!search(\"iron_ore\")",
+      "result": {
+        "success": true,
+        "kind": "search_success",
+        "message": "Action output:\nFound iron_ore at (-202, 97, 1327). Navigating...\nPath not found, but attempting to navigate anyway using destructive movements.\nYou have reached at -202, 97, 1327."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -204.33,
+        "y": 99,
+        "z": 1326.5
+      },
+      "dimension": "overworld",
+      "biome": "meadow",
+      "timeLabel": "Morning"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "stone",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "dirt (1 blocks up)"
+    },
+    "inventory": {
+      "counts": {
+        "oak_planks": 1,
+        "carrot": 1,
+        "wheat": 5,
+        "egg": 1,
+        "cobblestone": 5,
+        "wheat_seeds": 26,
+        "stick": 2,
+        "crafting_table": 1,
+        "wooden_pickaxe": 1,
+        "dirt": 24,
+        "stone_pickaxe": 1,
+        "furnace": 1,
+        "stone_hoe": 1,
+        "coal": 2
+      },
+      "equipment": {
+        "mainHand": "stone_pickaxe"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "stone",
+        "dirt",
+        "grass_block",
+        "iron_ore",
+        "dirt_path",
+        "short_grass",
+        "dandelion",
+        "copper_ore",
+        "coal_ore",
+        "emerald_ore"
+      ],
+      "entityTypes": [
+        "villager",
+        "iron_golem"
+      ]
+    },
+    "craftable_items": [
+      "cobblestone_slab",
+      "torch",
+      "lever",
+      "oak_button",
+      "wooden_shovel",
+      "stone_sword",
+      "stone_shovel",
+      "stone_pickaxe",
+      "stone_axe",
+      "stone_hoe",
+      "bread"
+    ]
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"iron_ore\")",
+    "last_result_kind": "search_success",
+    "failed_steps": []
+  }
+}

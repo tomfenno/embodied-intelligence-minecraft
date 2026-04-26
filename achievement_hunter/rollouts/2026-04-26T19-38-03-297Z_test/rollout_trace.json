@@ -1,0 +1,37 @@
+{
+  "objective": "test",
+  "status": "completed",
+  "started_at": "2026-04-26T19:38:03.297Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-26T19:38:03.305Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 2,
+        "why": "all original sinks satisfied",
+        "final": {
+          "vertices": [],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "cobblestone": 67,
+          "lava_bucket": 1,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        }
+      }
+    }
+  ],
+  "completed_at": "2026-04-26T19:38:03.307Z",
+  "total_elapsed": "0s",
+  "completion_reason": "all sinks satisfied"
+}

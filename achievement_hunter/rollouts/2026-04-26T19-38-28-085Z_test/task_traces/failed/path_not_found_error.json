@@ -1,0 +1,120 @@
+{
+  "objective": "test",
+  "task": {
+    "target_item": "lava_bucket",
+    "qty": 1,
+    "action_type": "interact",
+    "parameters": {
+      "tool": "bucket",
+      "target": "lava"
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -468.91,
+            "y": 318,
+            "z": 1145.62
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "cobblestone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "bucket": 1
+          },
+          "equipment": {
+            "mainHand": null
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "cobblestone"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": []
+      },
+      "action": "!search(\"lava\")",
+      "result": {
+        "success": false,
+        "kind": "search_found_not_reached",
+        "message": "Action output:\nFound lava at (-413, 19, 1136). Navigating...\nPath not found, but attempting to navigate anyway using destructive movements.\nPathfinding stopped: No path to the goal!."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -467.58,
+        "y": 318,
+        "z": 1144.59
+      },
+      "dimension": "overworld",
+      "biome": "stony_shore",
+      "timeLabel": "Morning"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "cobblestone",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "none"
+    },
+    "inventory": {
+      "counts": {
+        "bucket": 1
+      },
+      "equipment": {
+        "mainHand": null
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "cobblestone"
+      ],
+      "entityTypes": []
+    },
+    "craftable_items": []
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"lava\")",
+    "last_result_kind": "search_found_not_reached",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!search(\"lava\")",
+        "kind": "search_found_not_reached",
+        "message": "Action output:\nFound lava at (-413, 19, 1136). Navigating...\nPath not found, but attempting to navigate anyway using destructive movements.\nPathfinding stopped: No path to the goal!."
+      }
+    ]
+  }
+}

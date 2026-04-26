@@ -1,0 +1,206 @@
+{
+  "objective": "test",
+  "task": {
+    "target_item": "wheat",
+    "qty": 1,
+    "action_type": "collect",
+    "parameters": {
+      "source_block": "wheat",
+      "item_dependency": null,
+      "tool": "stone_hoe"
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -256.7,
+            "y": 88,
+            "z": 1290.5
+          },
+          "dimension": "overworld",
+          "biome": "plains",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "dirt (1 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "chicken": 2,
+            "oak_planks": 1,
+            "bucket": 1,
+            "furnace": 1,
+            "cobblestone": 27,
+            "wheat": 2,
+            "stone_hoe": 1,
+            "iron_ingot": 1,
+            "dirt": 6,
+            "stick": 2,
+            "stone_pickaxe": 1,
+            "coal": 2,
+            "sugar": 10,
+            "egg": 3,
+            "oak_log": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "coal_ore",
+            "dirt",
+            "diorite",
+            "grass_block",
+            "short_grass"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "oak_planks",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "tripwire_hook",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "iron_shovel",
+          "iron_nugget"
+        ]
+      },
+      "action": "!search(\"wheat\")",
+      "result": {
+        "success": true,
+        "kind": "search_success",
+        "message": "Action output:\nFound wheat at (-225, 105, 1331). Navigating...\nFound non-destructive path.\nYou have reached at -225, 105, 1331."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -226.51,
+        "y": 104.94,
+        "z": 1329.47
+      },
+      "dimension": "overworld",
+      "biome": "plains",
+      "timeLabel": "Night"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "dirt",
+      "legs": "farmland",
+      "head": "beetroots",
+      "firstBlockAboveHead": "none"
+    },
+    "inventory": {
+      "counts": {
+        "chicken": 2,
+        "oak_planks": 1,
+        "bucket": 1,
+        "furnace": 1,
+        "cobblestone": 27,
+        "wheat": 34,
+        "stone_hoe": 1,
+        "iron_ingot": 1,
+        "dirt": 1,
+        "stick": 2,
+        "stone_pickaxe": 1,
+        "coal": 2,
+        "sugar": 10,
+        "egg": 3,
+        "oak_log": 1,
+        "crafting_table": 1,
+        "wooden_pickaxe": 1
+      },
+      "equipment": {
+        "mainHand": "dirt"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "farmland",
+        "dirt",
+        "water",
+        "beetroots",
+        "oak_log",
+        "carrots",
+        "potatoes",
+        "composter",
+        "wheat",
+        "grass_block",
+        "tall_grass",
+        "short_grass",
+        "dirt_path",
+        "wildflowers",
+        "stone",
+        "coal_ore"
+      ],
+      "entityTypes": [
+        "villager"
+      ]
+    },
+    "craftable_items": [
+      "oak_planks",
+      "cobblestone_slab",
+      "torch",
+      "furnace",
+      "cobblestone_stairs",
+      "cobblestone_wall",
+      "hay_block",
+      "lever",
+      "tripwire_hook",
+      "oak_button",
+      "wooden_shovel",
+      "stone_sword",
+      "stone_shovel",
+      "stone_pickaxe",
+      "stone_axe",
+      "stone_hoe",
+      "iron_shovel",
+      "bread",
+      "iron_nugget"
+    ]
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"wheat\")",
+    "last_result_kind": "search_success",
+    "failed_steps": []
+  }
+}

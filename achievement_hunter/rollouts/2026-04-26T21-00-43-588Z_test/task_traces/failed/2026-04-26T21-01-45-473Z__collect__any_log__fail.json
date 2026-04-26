@@ -1,0 +1,151 @@
+{
+  "objective": "test",
+  "task": {
+    "target_item": "any_log",
+    "qty": 3,
+    "action_type": "collect",
+    "parameters": {
+      "source_block": "any_log",
+      "item_dependency": null,
+      "tool": null
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -208.51,
+            "y": 80,
+            "z": 1255.47
+          },
+          "dimension": "overworld",
+          "biome": "plains",
+          "timeLabel": "Afternoon"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "grass_block",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (3 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "bucket": 1,
+            "wheat": 2,
+            "sugar": 10,
+            "chicken": 2,
+            "egg": 3
+          },
+          "equipment": {
+            "mainHand": "bucket"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "grass_block",
+            "short_grass",
+            "dirt",
+            "stone",
+            "dirt_path",
+            "copper_ore",
+            "coal_ore"
+          ],
+          "entityTypes": [
+            "chicken"
+          ]
+        },
+        "craftable_items": []
+      },
+      "action": "!search(\"any_log\")",
+      "result": {
+        "success": false,
+        "kind": "search_found_not_reached",
+        "message": "Action output:\nFound oak_log at (-245, 95, 1293). Navigating...\nPath not found, but attempting to navigate anyway using destructive movements.\nYou have reached at -245, 95, 1293."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -242.35,
+        "y": 95,
+        "z": 1291.35
+      },
+      "dimension": "overworld",
+      "biome": "plains",
+      "timeLabel": "Afternoon"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "grass_block",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "none"
+    },
+    "inventory": {
+      "counts": {
+        "bucket": 1,
+        "wheat": 2,
+        "sugar": 10,
+        "chicken": 2,
+        "egg": 3
+      },
+      "equipment": {
+        "mainHand": "bucket"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "grass_block",
+        "short_grass",
+        "tall_grass",
+        "dirt",
+        "oak_log",
+        "dirt_path",
+        "mossy_cobblestone",
+        "cobblestone",
+        "oak_planks",
+        "oak_stairs",
+        "glass_pane",
+        "stone",
+        "wall_torch",
+        "yellow_bed",
+        "diorite"
+      ],
+      "entityTypes": []
+    },
+    "craftable_items": []
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"any_log\")",
+    "last_result_kind": "search_found_not_reached",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!search(\"any_log\")",
+        "kind": "search_found_not_reached",
+        "message": "Action output:\nFound oak_log at (-245, 95, 1293). Navigating...\nPath not found, but attempting to navigate anyway using destructive movements.\nYou have reached at -245, 95, 1293."
+      }
+    ]
+  }
+}

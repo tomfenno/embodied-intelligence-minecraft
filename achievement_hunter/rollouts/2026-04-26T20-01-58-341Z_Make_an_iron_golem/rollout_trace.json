@@ -1,0 +1,319 @@
+{
+  "objective": "Make an iron golem",
+  "status": "running",
+  "started_at": "2026-04-26T20:01:58.341Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-26T20:01:58.350Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "iron_block": 32,
+          "shears": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:01:58.451Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:01:58.514Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "pumpkin",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "pumpkin",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:01:58.635Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"pumpkin\")",
+      "state": {
+        "inventory": {
+          "iron_block": 32,
+          "shears": 1
+        },
+        "craftable_items": [
+          "iron_ingot"
+        ],
+        "nearby_blocks": [
+          "cobblestone",
+          "dirt"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:01:58.637Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"pumpkin\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:01:59.235Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"pumpkin\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:02:00.089Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"pumpkin\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:02:02.112Z",
+      "elapsed": "3s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"pumpkin\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:02:10.763Z",
+      "elapsed": "12s",
+      "stage": "AM",
+      "attempt": 6,
+      "raw": "!searchForBlock(\"pumpkin\", 511)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:02:31.612Z",
+      "elapsed": "33s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "iron_block": 32,
+          "shears": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:02:31.674Z",
+      "elapsed": "33s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:02:31.735Z",
+      "elapsed": "33s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "pumpkin",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "pumpkin",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:02:31.859Z",
+      "elapsed": "33s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"pumpkin\")",
+      "state": {
+        "inventory": {
+          "iron_block": 32,
+          "shears": 1
+        },
+        "craftable_items": [
+          "iron_ingot"
+        ],
+        "nearby_blocks": [
+          "cobblestone",
+          "dirt"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:02:31.860Z",
+      "elapsed": "33s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"pumpkin\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:02:32.454Z",
+      "elapsed": "34s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"pumpkin\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:02:33.300Z",
+      "elapsed": "34s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"pumpkin\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:02:35.289Z",
+      "elapsed": "36s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"pumpkin\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    }
+  ]
+}

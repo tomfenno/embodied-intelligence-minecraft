@@ -1,0 +1,1126 @@
+{
+  "objective": "t",
+  "status": "running",
+  "started_at": "2026-04-21T18:27:04.547Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-21T18:27:04.553Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "lava_bucket"
+        ],
+        "final": {
+          "objective": "Get a lava bucket. ",
+          "sinks": [
+            "lava_bucket"
+          ],
+          "vertices": [
+            {
+              "id": "lava_bucket",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "lava_source"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:04.620Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "lava_bucket",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "lava_source",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": "lava"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-21T18:27:04.657Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "lava_bucket",
+        "qty": 1,
+        "action_type": "interact",
+        "parameters": {
+          "tool": "bucket",
+          "target": "lava"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:04.732Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "lava",
+          "dirt",
+          "stone",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:05.731Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "lava",
+          "dirt",
+          "stone",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:18.244Z",
+      "elapsed": "13s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:18.448Z",
+      "elapsed": "13s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:18.650Z",
+      "elapsed": "14s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:18.811Z",
+      "elapsed": "14s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "lava_bucket"
+        ],
+        "final": {
+          "objective": "Get a lava bucket. ",
+          "sinks": [
+            "lava_bucket"
+          ],
+          "vertices": [
+            {
+              "id": "lava_bucket",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "lava_source"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:18.856Z",
+      "elapsed": "14s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "lava_bucket",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "lava_source",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": "lava"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-21T18:27:18.906Z",
+      "elapsed": "14s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "lava_bucket",
+        "qty": 1,
+        "action_type": "interact",
+        "parameters": {
+          "tool": "bucket",
+          "target": "lava"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:18.992Z",
+      "elapsed": "14s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:19.200Z",
+      "elapsed": "14s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:19.406Z",
+      "elapsed": "14s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:22.493Z",
+      "elapsed": "17s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "copper_ore",
+          "gravel",
+          "granite",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:24.453Z",
+      "elapsed": "19s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "lava",
+          "dirt",
+          "stone",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:24.672Z",
+      "elapsed": "20s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "lava_bucket"
+        ],
+        "final": {
+          "objective": "Get a lava bucket. ",
+          "sinks": [
+            "lava_bucket"
+          ],
+          "vertices": [
+            {
+              "id": "lava_bucket",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "lava_source"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:24.715Z",
+      "elapsed": "20s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "lava_bucket",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "lava_source",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": "lava"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-21T18:27:24.759Z",
+      "elapsed": "20s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "lava_bucket",
+        "qty": 1,
+        "action_type": "interact",
+        "parameters": {
+          "tool": "bucket",
+          "target": "lava"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:24.849Z",
+      "elapsed": "20s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "lava",
+          "dirt",
+          "stone",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:25.800Z",
+      "elapsed": "21s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:25.954Z",
+      "elapsed": "21s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:26.162Z",
+      "elapsed": "21s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:26.315Z",
+      "elapsed": "21s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "cobblestone": 67,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "dirt",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:27.278Z",
+      "elapsed": "22s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "lava_bucket"
+        ],
+        "final": {
+          "objective": "Get a lava bucket. ",
+          "sinks": [
+            "lava_bucket"
+          ],
+          "vertices": [
+            {
+              "id": "lava_bucket",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "lava_source"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "cobblestone": 67,
+          "bucket": 1,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:27.327Z",
+      "elapsed": "22s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "lava_bucket",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "lava_source",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": "lava"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-21T18:27:27.371Z",
+      "elapsed": "22s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "lava_bucket",
+        "qty": 1,
+        "action_type": "interact",
+        "parameters": {
+          "tool": "bucket",
+          "target": "lava"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:27.462Z",
+      "elapsed": "22s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "cobblestone": 67,
+          "bucket": 1,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "lava",
+          "dirt",
+          "stone",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:27.559Z",
+      "elapsed": "23s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "cobblestone": 67,
+          "lava_bucket": 1,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "lava",
+          "dirt",
+          "stone",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:29.145Z",
+      "elapsed": "24s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "cobblestone": 67,
+          "lava_bucket": 1,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "stone",
+          "lava",
+          "gravel",
+          "granite",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:33.239Z",
+      "elapsed": "28s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!search(\"lava\")",
+      "state": {
+        "inventory": {
+          "cobblestone": 67,
+          "lava_bucket": 1,
+          "stone_pickaxe": 1,
+          "wooden_pickaxe": 1,
+          "leaf_litter": 5,
+          "oak_planks": 1,
+          "furnace": 1,
+          "crafting_table": 1,
+          "dirt": 4
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "copper_ore",
+          "diorite",
+          "granite",
+          "dirt",
+          "gravel",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-21T18:27:33.241Z",
+      "elapsed": "28s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"lava\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "objective": "Bake a cake.",
+  "task": {
+    "target_item": "wheat",
+    "qty": 3,
+    "action_type": "collect",
+    "parameters": {
+      "source_block": "wheat",
+      "item_dependency": null,
+      "tool": "stone_hoe"
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -231.48,
+            "y": 81.92,
+            "z": 1380.58
+          },
+          "dimension": "overworld",
+          "biome": "plains",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": false,
+          "current": "mode:unstuck"
+        },
+        "surroundings": {
+          "below": "grass_block",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "stick": 2,
+            "oak_planks": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "dirt": 6,
+            "stone_pickaxe": 1,
+            "furnace": 1,
+            "stone_hoe": 1,
+            "coal": 2
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "grass_block",
+            "dirt",
+            "stone",
+            "granite",
+            "short_grass",
+            "coal_ore",
+            "dandelion",
+            "water"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "torch",
+          "oak_button",
+          "wooden_shovel"
+        ]
+      },
+      "action": "!search(\"wheat\")",
+      "result": {
+        "success": true,
+        "kind": "search_success",
+        "message": "Action output:\nFound wheat at (-231, 105, 1332). Navigating...\nPath not found, but attempting to navigate anyway using destructive movements.\nYou have reached at -231, 105, 1332."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -229.5,
+        "y": 105,
+        "z": 1333.52
+      },
+      "dimension": "overworld",
+      "biome": "plains",
+      "timeLabel": "Morning"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "oak_log",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "none"
+    },
+    "inventory": {
+      "counts": {
+        "stick": 2,
+        "oak_planks": 1,
+        "crafting_table": 1,
+        "wooden_pickaxe": 1,
+        "dirt": 22,
+        "stone_pickaxe": 1,
+        "furnace": 1,
+        "stone_hoe": 1,
+        "coal": 2
+      },
+      "equipment": {
+        "mainHand": "dirt"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "oak_log",
+        "potatoes",
+        "wheat",
+        "farmland",
+        "beetroots",
+        "dirt",
+        "dirt_path",
+        "grass_block",
+        "water",
+        "tall_grass",
+        "short_grass",
+        "carrots",
+        "stone",
+        "composter"
+      ],
+      "entityTypes": [
+        "villager"
+      ]
+    },
+    "craftable_items": [
+      "torch",
+      "oak_button",
+      "wooden_shovel"
+    ]
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"wheat\")",
+    "last_result_kind": "search_success",
+    "failed_steps": []
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "objective": "test",
+  "task": {
+    "target_item": "egg",
+    "qty": 1,
+    "action_type": "kill",
+    "parameters": {
+      "source_mob": "chicken",
+      "weapon": null
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -233.54,
+            "y": 93,
+            "z": 1274.6
+          },
+          "dimension": "overworld",
+          "biome": "plains",
+          "timeLabel": "Afternoon"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "grass_block",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "bucket": 1,
+            "wheat": 2,
+            "sugar": 10,
+            "chicken": 1
+          },
+          "equipment": {
+            "mainHand": "bucket"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "grass_block",
+            "dirt",
+            "dirt_path",
+            "short_grass",
+            "stone"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": []
+      },
+      "action": "!search(\"chicken\")",
+      "result": {
+        "success": true,
+        "kind": "search_success",
+        "message": "Action output:\nFound chicken 18.16547773611361 blocks away.\nFound non-destructive path.\nYou have reached at -222.26835276592334, 85, 1262.8144197482604."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -226.66,
+        "y": 85,
+        "z": 1262.66
+      },
+      "dimension": "overworld",
+      "biome": "plains",
+      "timeLabel": "Afternoon"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "grass_block",
+      "legs": "short_grass",
+      "head": "air",
+      "firstBlockAboveHead": "none"
+    },
+    "inventory": {
+      "counts": {
+        "bucket": 1,
+        "wheat": 2,
+        "sugar": 10,
+        "chicken": 1
+      },
+      "equipment": {
+        "mainHand": "bucket"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "short_grass",
+        "grass_block",
+        "dirt",
+        "dirt_path",
+        "stone",
+        "dandelion",
+        "wall_torch",
+        "oak_fence",
+        "oxeye_daisy",
+        "stripped_oak_wood",
+        "azure_bluet"
+      ],
+      "entityTypes": [
+        "chicken"
+      ]
+    },
+    "craftable_items": []
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"chicken\")",
+    "last_result_kind": "search_success",
+    "failed_steps": []
+  }
+}

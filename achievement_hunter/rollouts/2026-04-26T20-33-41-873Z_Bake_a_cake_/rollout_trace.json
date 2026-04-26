@@ -1,0 +1,3194 @@
+{
+  "objective": "Bake a cake.",
+  "status": "completed",
+  "started_at": "2026-04-26T20:33:41.873Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-26T20:33:41.879Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 9,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 9,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "bucket",
+              "to": "milk_bucket",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_ingot",
+              "to": "bucket",
+              "type": "crafting_input",
+              "qty": 9,
+              "consumed": true
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 9,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "wheat_seeds": 26,
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "stick": 2,
+          "oak_planks": 1,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 22,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "coal": 2
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:33:41.948Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "raw_iron",
+          "qty": 9,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "stone_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "iron_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:33:41.993Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "raw_iron",
+        "qty": 9,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "iron_ore",
+          "item_dependency": null,
+          "tool": "stone_pickaxe"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:33:42.073Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"iron_ore\")",
+      "state": {
+        "inventory": {
+          "wheat_seeds": 26,
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "stick": 2,
+          "oak_planks": 1,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 22,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "coal": 2
+        },
+        "craftable_items": [
+          "torch",
+          "oak_button",
+          "wooden_shovel",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "farmland",
+          "dirt",
+          "water",
+          "cobblestone",
+          "grass_block",
+          "oak_log",
+          "short_grass",
+          "oak_planks",
+          "wheat",
+          "mossy_cobblestone",
+          "wildflowers",
+          "cobblestone_stairs",
+          "white_bed",
+          "glass_pane",
+          "oak_door",
+          "dirt_path",
+          "oak_stairs",
+          "stone",
+          "tall_grass",
+          "wall_torch",
+          "coal_ore",
+          "oak_slab"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "villager",
+            "iron_golem"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:33:42.074Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"iron_ore\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:33:51.980Z",
+      "elapsed": "10s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 9,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 9,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "bucket",
+              "to": "milk_bucket",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_ingot",
+              "to": "bucket",
+              "type": "crafting_input",
+              "qty": 9,
+              "consumed": true
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 9,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 1,
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 5,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 24,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "coal": 2
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:33:52.009Z",
+      "elapsed": "10s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "raw_iron",
+          "qty": 9,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "stone_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "iron_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": "iron_ore"
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:33:52.037Z",
+      "elapsed": "10s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "raw_iron",
+        "qty": 9,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "iron_ore",
+          "item_dependency": null,
+          "tool": "stone_pickaxe"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:33:52.095Z",
+      "elapsed": "10s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"iron_ore\", 9)",
+      "state": {
+        "inventory": {
+          "oak_planks": 1,
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 5,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 24,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "coal": 2
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "torch",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "grass_block",
+          "iron_ore",
+          "dirt_path",
+          "short_grass",
+          "dandelion",
+          "copper_ore",
+          "coal_ore",
+          "emerald_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "villager",
+            "iron_golem"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:34:48.914Z",
+      "elapsed": "1m 07s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 9,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "bucket",
+              "to": "milk_bucket",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_ingot",
+              "to": "bucket",
+              "type": "crafting_input",
+              "qty": 9,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 1,
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 23,
+          "raw_iron": 12,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 23,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "coal": 2
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:34:48.950Z",
+      "elapsed": "1m 07s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "iron_ingot",
+          "qty": 9,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "raw_iron",
+              "qty": 9,
+              "type": "smelting_input",
+              "consumed": true
+            },
+            {
+              "item": "coal",
+              "qty": 2,
+              "type": "fuel_input",
+              "consumed": true
+            },
+            {
+              "item": "furnace",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:34:48.985Z",
+      "elapsed": "1m 07s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "iron_ingot",
+        "qty": 9,
+        "action_type": "smelt",
+        "parameters": {
+          "smelting_inputs": [
+            {
+              "item": "raw_iron",
+              "qty": 9
+            }
+          ],
+          "fuel_inputs": [
+            {
+              "item": "coal",
+              "qty": 2
+            }
+          ],
+          "workstation": "furnace"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:34:49.056Z",
+      "elapsed": "1m 07s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!smelt_item(\"raw_iron\", 9, \"coal\")",
+      "state": {
+        "inventory": {
+          "oak_planks": 1,
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 23,
+          "raw_iron": 12,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 23,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "coal": 2
+        },
+        "craftable_items": [
+          "raw_iron_block",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "copper_ore",
+          "coal_ore",
+          "emerald_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:24.987Z",
+      "elapsed": "2m 43s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "bucket",
+              "to": "milk_bucket",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 1,
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 23,
+          "raw_iron": 3,
+          "iron_ingot": 9,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 23,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:25.025Z",
+      "elapsed": "2m 43s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "iron_ingot",
+              "qty": 9,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:36:25.063Z",
+      "elapsed": "2m 43s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "bucket",
+        "qty": 3,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "iron_ingot",
+              "qty": 9
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:25.135Z",
+      "elapsed": "2m 43s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"bucket\", 3)",
+      "state": {
+        "inventory": {
+          "oak_planks": 1,
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 23,
+          "raw_iron": 3,
+          "iron_ingot": 9,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 23,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1
+        },
+        "craftable_items": [
+          "iron_block",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "iron_bars",
+          "cobblestone_wall",
+          "lever",
+          "tripwire_hook",
+          "oak_button",
+          "heavy_weighted_pressure_plate",
+          "iron_door",
+          "iron_trapdoor",
+          "rail",
+          "minecart",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "iron_sword",
+          "iron_shovel",
+          "iron_pickaxe",
+          "iron_axe",
+          "iron_hoe",
+          "bread",
+          "iron_helmet",
+          "iron_chestplate",
+          "iron_leggings",
+          "iron_boots",
+          "bucket",
+          "shears",
+          "cauldron",
+          "iron_nugget"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "copper_ore",
+          "coal_ore",
+          "emerald_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:32.569Z",
+      "elapsed": "2m 50s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 23,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "oak_planks": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 23,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:32.611Z",
+      "elapsed": "2m 50s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:36:32.650Z",
+      "elapsed": "2m 50s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:32.724Z",
+      "elapsed": "2m 50s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 23,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "oak_planks": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 23,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "copper_ore",
+          "coal_ore",
+          "emerald_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "iron_golem"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:32.725Z",
+      "elapsed": "2m 50s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:33.262Z",
+      "elapsed": "2m 51s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:33.954Z",
+      "elapsed": "2m 52s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:35.691Z",
+      "elapsed": "2m 53s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"sugar_cane\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:44.472Z",
+      "elapsed": "3m 02s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 23,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "oak_planks": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 22,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:44.512Z",
+      "elapsed": "3m 02s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:36:44.549Z",
+      "elapsed": "3m 02s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:44.628Z",
+      "elapsed": "3m 02s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 23,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "oak_planks": 1,
+          "wooden_pickaxe": 1,
+          "dirt": 22,
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "copper_ore",
+          "coal_ore",
+          "emerald_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "iron_golem"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:44.629Z",
+      "elapsed": "3m 02s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:45.167Z",
+      "elapsed": "3m 03s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:45.852Z",
+      "elapsed": "3m 03s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:36:47.645Z",
+      "elapsed": "3m 05s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"sugar_cane\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:06.272Z",
+      "elapsed": "5m 24s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 1,
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "dirt": 22,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:06.300Z",
+      "elapsed": "5m 24s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:39:06.328Z",
+      "elapsed": "5m 24s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:06.381Z",
+      "elapsed": "5m 24s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "oak_planks": 1,
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "dirt": 22,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "gravel",
+          "iron_ore",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:06.383Z",
+      "elapsed": "5m 24s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:06.892Z",
+      "elapsed": "5m 25s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:07.455Z",
+      "elapsed": "5m 25s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:09.174Z",
+      "elapsed": "5m 27s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "oak_planks": 1,
+          "dirt": 22,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:09.201Z",
+      "elapsed": "5m 27s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:39:09.227Z",
+      "elapsed": "5m 27s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:09.281Z",
+      "elapsed": "5m 27s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "oak_planks": 1,
+          "dirt": 22,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "gravel",
+          "iron_ore",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:09.282Z",
+      "elapsed": "5m 27s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:09.792Z",
+      "elapsed": "5m 27s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:10.348Z",
+      "elapsed": "5m 28s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:12.074Z",
+      "elapsed": "5m 30s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "dirt": 22,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:12.100Z",
+      "elapsed": "5m 30s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:39:12.128Z",
+      "elapsed": "5m 30s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:12.181Z",
+      "elapsed": "5m 30s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "oak_planks": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "dirt": 22,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "gravel",
+          "iron_ore",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:12.183Z",
+      "elapsed": "5m 30s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:12.691Z",
+      "elapsed": "5m 30s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:13.245Z",
+      "elapsed": "5m 31s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:14.981Z",
+      "elapsed": "5m 33s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "dirt": 22,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "oak_planks": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:15.008Z",
+      "elapsed": "5m 33s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:39:15.033Z",
+      "elapsed": "5m 33s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:15.087Z",
+      "elapsed": "5m 33s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "dirt": 22,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "oak_planks": 1,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "gravel",
+          "iron_ore",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:15.089Z",
+      "elapsed": "5m 33s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:15.600Z",
+      "elapsed": "5m 33s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:16.159Z",
+      "elapsed": "5m 34s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:17.869Z",
+      "elapsed": "5m 35s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "cobblestone": 159,
+          "wheat": 5,
+          "egg": 1,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "oak_planks": 1,
+          "dirt": 22,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:17.897Z",
+      "elapsed": "5m 36s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:39:17.923Z",
+      "elapsed": "5m 36s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:17.976Z",
+      "elapsed": "5m 36s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "cobblestone": 159,
+          "wheat": 5,
+          "egg": 1,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "oak_planks": 1,
+          "dirt": 22,
+          "furnace": 1,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "gravel",
+          "iron_ore",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:17.978Z",
+      "elapsed": "5m 36s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:18.486Z",
+      "elapsed": "5m 36s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:19.044Z",
+      "elapsed": "5m 37s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:20.771Z",
+      "elapsed": "5m 38s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "furnace": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "oak_planks": 1,
+          "dirt": 22,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:20.800Z",
+      "elapsed": "5m 38s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:39:20.827Z",
+      "elapsed": "5m 38s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:20.880Z",
+      "elapsed": "5m 39s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "furnace": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "oak_planks": 1,
+          "dirt": 22,
+          "stone_hoe": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "gravel",
+          "iron_ore",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:20.881Z",
+      "elapsed": "5m 39s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:21.392Z",
+      "elapsed": "5m 39s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:21.942Z",
+      "elapsed": "5m 40s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:23.682Z",
+      "elapsed": "5m 41s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "stone_hoe": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "oak_planks": 1,
+          "dirt": 22,
+          "furnace": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:23.709Z",
+      "elapsed": "5m 41s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:39:23.736Z",
+      "elapsed": "5m 41s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:23.792Z",
+      "elapsed": "5m 41s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "stone_hoe": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "oak_planks": 1,
+          "dirt": 22,
+          "furnace": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "gravel",
+          "iron_ore",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:23.794Z",
+      "elapsed": "5m 41s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:24.306Z",
+      "elapsed": "5m 42s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:24.863Z",
+      "elapsed": "5m 42s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:26.577Z",
+      "elapsed": "5m 44s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "crafting_table": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "oak_planks": 1,
+          "dirt": 22,
+          "furnace": 1,
+          "stone_hoe": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:26.605Z",
+      "elapsed": "5m 44s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:39:26.633Z",
+      "elapsed": "5m 44s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:26.686Z",
+      "elapsed": "5m 44s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "crafting_table": 1,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 159,
+          "raw_iron": 3,
+          "bucket": 3,
+          "wheat_seeds": 26,
+          "stick": 2,
+          "carrot": 1,
+          "oak_planks": 1,
+          "dirt": 22,
+          "furnace": 1,
+          "stone_hoe": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "gravel",
+          "iron_ore",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:26.687Z",
+      "elapsed": "5m 44s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:27.195Z",
+      "elapsed": "5m 45s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:39:27.752Z",
+      "elapsed": "5m 45s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    }
+  ],
+  "completed_at": "2026-04-26T20:39:29.477Z",
+  "total_elapsed": "5m 47s",
+  "completion_reason": "max outer retries exceeded"
+}

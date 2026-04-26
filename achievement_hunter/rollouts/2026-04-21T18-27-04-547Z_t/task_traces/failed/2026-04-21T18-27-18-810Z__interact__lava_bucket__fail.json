@@ -1,0 +1,427 @@
+{
+  "objective": "t",
+  "task": {
+    "target_item": "lava_bucket",
+    "qty": 1,
+    "action_type": "interact",
+    "parameters": {
+      "tool": "bucket",
+      "target": "lava"
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -488.5,
+            "y": 48,
+            "z": 1105.73
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "dirt",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "bucket": 1,
+            "cobblestone": 67,
+            "stone_pickaxe": 1,
+            "wooden_pickaxe": 1,
+            "leaf_litter": 5,
+            "oak_planks": 1,
+            "furnace": 1,
+            "crafting_table": 1,
+            "dirt": 4
+          },
+          "equipment": {
+            "mainHand": "dirt"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "lava",
+            "dirt",
+            "stone",
+            "gravel",
+            "granite",
+            "copper_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ]
+      },
+      "action": "!useOn(\"bucket\", \"lava\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFound non-destructive path.\nYou have reached at -490, 48, 1106.\nBlock stone is in the way, moving closer...\nFound non-destructive path.\nYou have reached at -489.8240947132817, 48, 1105.6087191940096.\nBlock stone is in the way, not using bucket."
+      }
+    },
+    {
+      "i": 2,
+      "state": {
+        "world": {
+          "position": {
+            "x": -488.5,
+            "y": 48,
+            "z": 1105.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "dirt",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "bucket": 1,
+            "cobblestone": 67,
+            "stone_pickaxe": 1,
+            "wooden_pickaxe": 1,
+            "leaf_litter": 5,
+            "oak_planks": 1,
+            "furnace": 1,
+            "crafting_table": 1,
+            "dirt": 4
+          },
+          "equipment": {
+            "mainHand": "dirt"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "lava",
+            "dirt",
+            "stone",
+            "gravel",
+            "granite",
+            "copper_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ]
+      },
+      "action": "!useOn(\"bucket\", \"lava\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFound non-destructive path.\nYou have reached at -490, 48, 1106.\nBlock stone is in the way, moving closer...\nFound destructive path.\nYou have reached at -489.15933819026327, 48, 1106.55806693539.\nBlock stone is in the way, not using bucket."
+      }
+    },
+    {
+      "i": 3,
+      "state": {
+        "world": {
+          "position": {
+            "x": -489.41,
+            "y": 48,
+            "z": 1105.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (0 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "bucket": 1,
+            "cobblestone": 67,
+            "stone_pickaxe": 1,
+            "wooden_pickaxe": 1,
+            "leaf_litter": 5,
+            "oak_planks": 1,
+            "furnace": 1,
+            "crafting_table": 1,
+            "dirt": 4
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "lava",
+            "dirt",
+            "gravel",
+            "granite",
+            "copper_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ]
+      },
+      "action": "!useOn(\"bucket\", \"lava\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFound non-destructive path.\nYou have reached at -490, 48, 1106.\nBlock stone is in the way, moving closer...\nFound non-destructive path.\nYou have reached at -489.9045186086377, 48, 1106.4555680642632.\nBlock stone is in the way, not using bucket."
+      }
+    },
+    {
+      "i": 4,
+      "state": {
+        "world": {
+          "position": {
+            "x": -489.41,
+            "y": 48,
+            "z": 1105.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (0 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "bucket": 1,
+            "cobblestone": 67,
+            "stone_pickaxe": 1,
+            "wooden_pickaxe": 1,
+            "leaf_litter": 5,
+            "oak_planks": 1,
+            "furnace": 1,
+            "crafting_table": 1,
+            "dirt": 4
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "lava",
+            "dirt",
+            "gravel",
+            "granite",
+            "copper_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ]
+      },
+      "action": "!useOn(\"bucket\", \"lava\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFound non-destructive path.\nYou have reached at -490, 48, 1106.\nBlock stone is in the way, moving closer...\nFound non-destructive path.\nYou have reached at -489.6299327377094, 48, 1106.2569438721323.\nBlock stone is in the way, not using bucket."
+      }
+    },
+    {
+      "i": 5,
+      "state": {
+        "world": {
+          "position": {
+            "x": -489.41,
+            "y": 48,
+            "z": 1105.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (0 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "bucket": 1,
+            "cobblestone": 67,
+            "stone_pickaxe": 1,
+            "wooden_pickaxe": 1,
+            "leaf_litter": 5,
+            "oak_planks": 1,
+            "furnace": 1,
+            "crafting_table": 1,
+            "dirt": 4
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "lava",
+            "dirt",
+            "gravel",
+            "granite",
+            "copper_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "oak_button"
+        ]
+      },
+      "action": "!useOn(\"bucket\", \"lava\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFound non-destructive path.\nYou have reached at -490, 48, 1106.\nBlock stone is in the way, moving closer...\nFound non-destructive path.\nYou have reached at -490.56257123476655, 48, 1105.3731252484613.\nBlock stone is in the way, not using bucket."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -489.41,
+        "y": 48,
+        "z": 1105.5
+      },
+      "dimension": "overworld",
+      "biome": "stony_shore",
+      "timeLabel": "Morning"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "stone",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "stone (0 blocks up)"
+    },
+    "inventory": {
+      "counts": {
+        "bucket": 1,
+        "cobblestone": 67,
+        "stone_pickaxe": 1,
+        "wooden_pickaxe": 1,
+        "leaf_litter": 5,
+        "oak_planks": 1,
+        "furnace": 1,
+        "crafting_table": 1,
+        "dirt": 4
+      },
+      "equipment": {
+        "mainHand": "stone_pickaxe"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "stone",
+        "lava",
+        "dirt",
+        "gravel",
+        "granite",
+        "copper_ore"
+      ],
+      "entityTypes": []
+    },
+    "craftable_items": [
+      "cobblestone_slab",
+      "furnace",
+      "cobblestone_stairs",
+      "cobblestone_wall",
+      "oak_button"
+    ]
+  },
+  "summary": {
+    "step_count": 5,
+    "last_action": "!useOn(\"bucket\", \"lava\")",
+    "last_result_kind": "command_success",
+    "failed_steps": []
+  }
+}

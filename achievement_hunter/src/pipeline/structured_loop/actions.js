@@ -55,6 +55,7 @@ export async function execute_task_action(task, agent, log) {
     if (search_target != null) {
       current_step.result = await handle_search_action(
           search_target, state, agent, log, attempt_number);
+      attempt_index = max_inner_retries;  // Only search once.
       continue;
     }
 
@@ -323,8 +324,7 @@ export function should_abort_repeated_failure(command, result, repeated_count) {
 export function is_craft_command(command) {
   return typeof command === 'string' &&
       (command.startsWith('!craftRecipe(') ||
-       command.startsWith('!smeltItem(') ||
-       command.startsWith('!smelt_item('));
+       command.startsWith('!smeltItem(') || command.startsWith('!smelt_item('));
 }
 
 function create_task_trace(task, log) {

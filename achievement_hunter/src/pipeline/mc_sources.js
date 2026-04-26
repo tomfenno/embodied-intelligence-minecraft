@@ -174,10 +174,12 @@ const canonical_mob_source_by_target = {
   glow_ink_sac: 'glow_squid',
   leather: 'cow',
   beef: 'cow',
+  milk_bucket: 'cow',
   mutton: 'sheep',
   wool: 'sheep',
   porkchop: 'pig',
   chicken: 'chicken',
+  egg: 'chicken',
   rabbit_hide: 'rabbit',
   rabbit: 'rabbit',
 };
