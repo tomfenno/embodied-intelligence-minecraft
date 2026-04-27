@@ -3,6 +3,7 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 
 import {executeCommand} from '../../../../src/agent/commands/index.js';
+import * as skills from '../../../../src/agent/library/skills.js';
 import {get_recovery_trace_state, get_sgsg_state} from '../agent_state.js';
 import {extract_json} from '../json_utils.js';
 import {compute_scsg} from '../scsg.js';
@@ -176,6 +177,25 @@ function validate_replanner_output(output, available_actions) {
   }
 }
 
+async function ensure_safe_before_llm(agent) {
+  const bot = agent.bot;
+  const block = bot.blockAt(bot.entity.position);
+  const block_above = bot.blockAt(bot.entity.position.offset(0, 1, 0));
+
+  const in_water = block?.name === 'water' || block_above?.name === 'water';
+  const in_lava  = block?.name === 'lava'  || block_above?.name === 'lava';
+
+  if (in_water) {
+    await skills.moveAway(bot, 10);
+  } else if (in_lava) {
+    await bot.lookAt(bot.entity.position.offset(5, 1, 0), true);
+    bot.setControlState('jump', true);
+    bot.setControlState('sprint', true);
+    await new Promise(r => setTimeout(r, 3000));
+    bot.clearControlStates();
+  }
+}
+
 /**
  * Main recovery entry point. Called when a task fails in the structured loop.
  *
@@ -192,6 +212,8 @@ export async function recover_failed_task(failed_trace, agent, model, graph, log
 
     const prompt = fill_failure_replanner_prompt(
         failed_trace, previous_diagnoses, available_actions);
+
+    await ensure_safe_before_llm(agent);
 
     let replanner_output = null;
     try {

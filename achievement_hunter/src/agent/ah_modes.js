@@ -43,10 +43,10 @@ const modes_list = [
       let blockAbove = bot.blockAt(bot.entity.position.offset(0, 1, 0));
       if (!block) block = {name: 'air'};
       if (!blockAbove) blockAbove = {name: 'air'};
-      if (blockAbove.name === 'water') {
-        if (!bot.pathfinder.goal) {
-          bot.setControlState('jump', true);
-        }
+      if (block.name === 'water' || blockAbove.name === 'water') {
+        execute(this, agent, async () => {
+          await skills.moveAway(bot, 5);
+        });
       } else if (
           this.fall_blocks.some(name => blockAbove.name.includes(name))) {
         execute(this, agent, async () => {
@@ -67,9 +67,10 @@ const modes_list = [
           });
         } else {
           execute(this, agent, async () => {
-            const water_bucket = bot.inventory.items().find(
+            // Re-check for water_bucket acquired since the outer check ran.
+            const wb = bot.inventory.items().find(
                 item => item.name === 'water_bucket');
-            if (water_bucket) {
+            if (wb) {
               const success = await skills.placeBlock(
                   bot, 'water_bucket', block.position.x, block.position.y,
                   block.position.z);
@@ -77,16 +78,43 @@ const modes_list = [
                 say(agent, 'Placed some water, ahhhh that\'s better!');
               return;
             }
-            const nearest_water = world.getNearestBlock(bot, 'water', 20);
-            if (nearest_water) {
-              const pos = nearest_water.position;
-              const success =
-                  await skills.goToPosition(bot, pos.x, pos.y, pos.z, 0.2);
-              if (success)
-                say(agent, 'Found some water, ahhhh that\'s better!');
-              return;
+
+            // Phase 1: direct-control escape — bypasses the pathfinder, which
+            // treats lava as impassable and returns without moving when the bot
+            // is surrounded by lava blocks.
+            const bot_pos = bot.entity.position;
+            const hazard = new Set(['lava', 'fire']);
+            const directions = [
+              {x: 1, z: 0}, {x: -1, z: 0},
+              {x: 0, z: 1},  {x: 0, z: -1},
+              {x: 1, z: 1},  {x: -1, z: 1},
+              {x: 1, z: -1}, {x: -1, z: -1},
+            ];
+            const escape_dir = directions.find(d => {
+              const b = bot.blockAt(bot_pos.offset(d.x, 0, d.z));
+              return b != null && !hazard.has(b.name);
+            });
+            const look_target = escape_dir
+                ? bot_pos.offset(escape_dir.x * 5, 1, escape_dir.z * 5)
+                : bot_pos.offset(5, 1, 0);
+            await bot.lookAt(look_target, true);
+            bot.setControlState('jump', true);
+            bot.setControlState('sprint', true);
+            await new Promise(r => setTimeout(r, 3000));
+            bot.clearControlStates();
+
+            // Phase 2: if now on solid ground, pathfind to water to extinguish fire.
+            const cur_block = bot.blockAt(bot.entity.position);
+            if (cur_block && !hazard.has(cur_block.name)) {
+              const nearest_water = world.getNearestBlock(bot, 'water', 20);
+              if (nearest_water) {
+                const wp = nearest_water.position;
+                const success =
+                    await skills.goToPosition(bot, wp.x, wp.y, wp.z, 0.2);
+                if (success)
+                  say(agent, 'Found some water, ahhhh that\'s better!');
+              }
             }
-            await skills.moveAway(bot, 5);
           });
         }
       } else if (

@@ -1,0 +1,469 @@
+{
+  "objective": "test",
+  "status": "completed",
+  "started_at": "2026-04-27T23:37:37.201Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-27T23:37:37.206Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "lava_bucket"
+        ],
+        "final": {
+          "objective": "Get a lava bucket. ",
+          "sinks": [
+            "lava_bucket"
+          ],
+          "vertices": [
+            {
+              "id": "lava_bucket",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "lava_source"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "bucket": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:37:37.275Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "lava_bucket",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "lava_source",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-27T23:37:37.318Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "lava_bucket",
+        "qty": 1,
+        "action_type": "interact",
+        "parameters": {
+          "tool": "bucket",
+          "target": "lava"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:37:37.395Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1
+        },
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "fern",
+          "spruce_leaves",
+          "stone",
+          "spruce_log",
+          "short_grass"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "fox"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:37:37.396Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"lava\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:37:47.383Z",
+      "elapsed": "10s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "dirt": 1
+        },
+        "craftable_items": [],
+        "nearby_blocks": [
+          "andesite",
+          "stone",
+          "granite",
+          "podzol",
+          "dirt",
+          "copper_ore",
+          "grass_block",
+          "lava",
+          "iron_ore",
+          "coal_ore",
+          "lapis_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:37:49.924Z",
+      "elapsed": "12s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "dirt": 1
+        },
+        "craftable_items": [],
+        "nearby_blocks": [
+          "andesite",
+          "stone",
+          "granite",
+          "podzol",
+          "dirt",
+          "copper_ore",
+          "grass_block",
+          "lava",
+          "iron_ore",
+          "coal_ore",
+          "lapis_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:37:52.420Z",
+      "elapsed": "15s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "dirt": 1
+        },
+        "craftable_items": [],
+        "nearby_blocks": [
+          "andesite",
+          "stone",
+          "granite",
+          "podzol",
+          "dirt",
+          "copper_ore",
+          "grass_block",
+          "lava",
+          "iron_ore",
+          "coal_ore",
+          "lapis_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:37:54.814Z",
+      "elapsed": "17s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1,
+          "dirt": 1
+        },
+        "craftable_items": [],
+        "nearby_blocks": [
+          "andesite",
+          "stone",
+          "granite",
+          "podzol",
+          "dirt",
+          "copper_ore",
+          "grass_block",
+          "lava",
+          "iron_ore",
+          "coal_ore",
+          "lapis_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:38:59.493Z",
+      "elapsed": "1m 22s",
+      "stage": "RECOVERY",
+      "type": "attempt_start",
+      "attempt": 1,
+      "task": {
+        "target_item": "lava_bucket",
+        "qty": 1,
+        "action_type": "interact",
+        "parameters": {
+          "tool": "bucket",
+          "target": "lava"
+        }
+      },
+      "diagnosis": "The bot found lava but couldn’t reach it because an andesite block blocked the path and it had no pickaxe, so pathfinding refused destructive movement. Craft a wooden pickaxe so the bot can break stone-type blocks while pathing to the lava, then use the bucket.",
+      "planned_actions": [
+        {
+          "name": "!collectBlocks",
+          "args": [
+            "spruce_log",
+            3
+          ]
+        },
+        {
+          "name": "!craftRecipe",
+          "args": [
+            "spruce_planks",
+            3
+          ]
+        },
+        {
+          "name": "!craftRecipe",
+          "args": [
+            "crafting_table",
+            1
+          ]
+        },
+        {
+          "name": "!placeHere",
+          "args": [
+            "crafting_table"
+          ]
+        },
+        {
+          "name": "!craftRecipe",
+          "args": [
+            "stick",
+            1
+          ]
+        },
+        {
+          "name": "!craftRecipe",
+          "args": [
+            "wooden_pickaxe",
+            1
+          ]
+        },
+        {
+          "name": "!useOn",
+          "args": [
+            "bucket",
+            "lava"
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-27T23:40:39.824Z",
+      "elapsed": "3m 02s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 0,
+      "result": {
+        "command": "!collectBlocks(\"spruce_log\", 3)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFailed to collect spruce_log: Timeout: Took to long to decide path to goal!.\nCollected 2 spruce_log.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:40:39.879Z",
+      "elapsed": "3m 02s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 1,
+      "result": {
+        "command": "!craftRecipe(\"spruce_planks\", 3)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nSuccessfully crafted spruce_planks, you now have 8 spruce_planks.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:40:39.928Z",
+      "elapsed": "3m 02s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 2,
+      "result": {
+        "command": "!craftRecipe(\"crafting_table\", 1)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nSuccessfully crafted crafting_table, you now have 1 crafting_table.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:40:41.073Z",
+      "elapsed": "3m 03s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 3,
+      "result": {
+        "command": "!placeHere(\"crafting_table\")",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nPlaced crafting_table at (-154, 70, 8).\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:40:41.129Z",
+      "elapsed": "3m 03s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 4,
+      "result": {
+        "command": "!craftRecipe(\"stick\", 1)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nSuccessfully crafted stick, you now have 4 stick.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:40:41.182Z",
+      "elapsed": "3m 03s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 5,
+      "result": {
+        "command": "!craftRecipe(\"wooden_pickaxe\", 1)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nSuccessfully crafted wooden_pickaxe, you now have 1 wooden_pickaxe.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:41:21.025Z",
+      "elapsed": "3m 43s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 6,
+      "result": {
+        "command": "!useOn(\"bucket\", \"lava\")",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:41:21.093Z",
+      "elapsed": "3m 43s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 6,
+      "result": {
+        "command": "!useOn(\"bucket\", \"lava\")",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:41:21.124Z",
+      "elapsed": "3m 43s",
+      "stage": "RECOVERY",
+      "type": "end",
+      "status": "success"
+    },
+    {
+      "timestamp": "2026-04-27T23:41:21.124Z",
+      "elapsed": "3m 43s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 2,
+        "why": "all original sinks satisfied",
+        "final": {
+          "vertices": [],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "spruce_planks": 3,
+          "lava_bucket": 1,
+          "spruce_log": 1,
+          "dirt": 1,
+          "stick": 2,
+          "wooden_pickaxe": 1,
+          "andesite": 7,
+          "granite": 5,
+          "cobblestone": 5
+        }
+      }
+    }
+  ],
+  "completed_at": "2026-04-27T23:41:21.125Z",
+  "total_elapsed": "3m 43s",
+  "completion_reason": "all sinks satisfied"
+}

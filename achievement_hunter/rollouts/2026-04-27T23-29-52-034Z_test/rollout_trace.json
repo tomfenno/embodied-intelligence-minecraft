@@ -1,0 +1,165 @@
+{
+  "objective": "test",
+  "status": "completed",
+  "started_at": "2026-04-27T23:29:52.034Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-27T23:29:52.038Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "lava_bucket"
+        ],
+        "final": {
+          "objective": "Get a lava bucket. ",
+          "sinks": [
+            "lava_bucket"
+          ],
+          "vertices": [
+            {
+              "id": "lava_bucket",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "lava_source"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "bucket": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:29:52.093Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "lava_bucket",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "lava_source",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": "lava"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-27T23:29:52.135Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "lava_bucket",
+        "qty": 1,
+        "action_type": "interact",
+        "parameters": {
+          "tool": "bucket",
+          "target": "lava"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:29:52.211Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1
+        },
+        "craftable_items": [],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "granite",
+          "diorite",
+          "dirt",
+          "copper_ore",
+          "sandstone",
+          "coal_ore",
+          "gravel",
+          "sand"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:29:53.398Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!useOn(\"bucket\", \"lava\")",
+      "state": {
+        "inventory": {
+          "bucket": 1
+        },
+        "craftable_items": [],
+        "nearby_blocks": [
+          "stone",
+          "lava",
+          "granite",
+          "diorite",
+          "dirt",
+          "copper_ore",
+          "sandstone",
+          "coal_ore",
+          "gravel",
+          "sand"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T23:29:53.544Z",
+      "elapsed": "1s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 2,
+        "why": "all original sinks satisfied",
+        "final": {
+          "vertices": [],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "lava_bucket": 1
+        }
+      }
+    }
+  ],
+  "completed_at": "2026-04-27T23:29:53.544Z",
+  "total_elapsed": "1s",
+  "completion_reason": "all sinks satisfied"
+}

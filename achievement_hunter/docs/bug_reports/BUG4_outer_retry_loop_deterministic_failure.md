@@ -1,3 +1,4 @@
+# Patched 
 # BUG 4 — Outer Retry Loop Re-Queues Deterministically Failing Task
 
 **Severity:** Medium (wastes retries, extends failure duration)

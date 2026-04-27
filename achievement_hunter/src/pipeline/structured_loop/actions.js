@@ -89,7 +89,17 @@ export async function execute_task_action(task, agent, log, model = null, graph 
       continue;
     }
 
-    const command_result = await executeCommand(agent, action.command);
+    const is_lava_useOn = task.action_type === 'interact' &&
+        task.parameters?.target === 'lava' &&
+        action.command.startsWith('!useOn(');
+
+    if (is_lava_useOn) agent.bot.setControlState('sneak', true);
+    let command_result;
+    try {
+      command_result = await executeCommand(agent, action.command);
+    } finally {
+      if (is_lava_useOn) agent.bot.setControlState('sneak', false);
+    }
     spl.log('Command result:', command_result);
 
     if (task.action_type === 'interact' &&
