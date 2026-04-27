@@ -29,6 +29,7 @@
   "ptd_model": "",
   "ptd_feedback_model": "",
   "ptd_refinement_model": "",
+  "failure_replanner_model": "",
 
   "modes": {
     "self_preservation": true,

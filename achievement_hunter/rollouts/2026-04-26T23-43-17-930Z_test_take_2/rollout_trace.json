@@ -1,0 +1,976 @@
+{
+  "objective": "test take 2",
+  "status": "running",
+  "started_at": "2026-04-26T23:43:17.930Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-26T23:43:17.935Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wheat",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "wheat",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "cake",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "egg": 3,
+          "raw_iron": 1,
+          "cobblestone": 3,
+          "coal": 1,
+          "stick": 2,
+          "bucket": 3,
+          "granite": 1,
+          "oak_sapling": 1,
+          "furnace": 1,
+          "stone_shovel": 1,
+          "wooden_pickaxe": 1,
+          "snowball": 8,
+          "oak_planks": 1,
+          "stone_hoe": 1,
+          "stone_pickaxe": 1,
+          "diorite": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:43:17.989Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": "cow",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "wheat",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "stone_hoe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "wheat",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "any_log",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "any_log",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T23:43:18.023Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "wheat",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "wheat",
+          "item_dependency": null,
+          "tool": "stone_hoe"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:43:18.072Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"wheat\")",
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "egg": 3,
+          "raw_iron": 1,
+          "cobblestone": 3,
+          "coal": 1,
+          "stick": 2,
+          "bucket": 3,
+          "granite": 1,
+          "oak_sapling": 1,
+          "furnace": 1,
+          "stone_shovel": 1,
+          "wooden_pickaxe": 1,
+          "snowball": 8,
+          "oak_planks": 1,
+          "stone_hoe": 1,
+          "stone_pickaxe": 1,
+          "diorite": 1
+        },
+        "craftable_items": [
+          "andesite",
+          "oak_planks",
+          "torch",
+          "snow_block",
+          "lever",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "water",
+          "stone",
+          "sculk_vein",
+          "sculk",
+          "redstone_ore",
+          "deepslate",
+          "dirt",
+          "infested_stone",
+          "iron_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:43:18.074Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"wheat\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:43:18.589Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"wheat\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:43:19.105Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"wheat\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:43:19.638Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"wheat\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:46:16.220Z",
+      "elapsed": "2m 58s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!search(\"wheat\")",
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "egg": 3,
+          "raw_iron": 1,
+          "oak_sapling": 1,
+          "coal": 1,
+          "stick": 2,
+          "bucket": 3,
+          "granite": 1,
+          "cobbled_deepslate": 1,
+          "furnace": 1,
+          "andesite": 25,
+          "cobblestone": 2,
+          "stone_shovel": 1,
+          "wooden_pickaxe": 1,
+          "snowball": 8,
+          "oak_planks": 1,
+          "stone_hoe": 1,
+          "diorite": 7
+        },
+        "craftable_items": [
+          "polished_diorite",
+          "andesite",
+          "polished_andesite",
+          "oak_planks",
+          "torch",
+          "snow_block",
+          "lever",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "cobblestone",
+          "gravel",
+          "glow_lichen",
+          "dripstone_block",
+          "copper_ore",
+          "pointed_dripstone",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:46:16.222Z",
+      "elapsed": "2m 58s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"wheat\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:46:16.728Z",
+      "elapsed": "2m 58s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"wheat\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:46:17.247Z",
+      "elapsed": "2m 59s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"wheat\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:47:26.972Z",
+      "elapsed": "4m 09s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!search(\"wheat\")",
+      "state": {
+        "inventory": {
+          "egg": 3,
+          "raw_iron": 1,
+          "oak_sapling": 1,
+          "coal": 1,
+          "stick": 2,
+          "bucket": 3,
+          "granite": 1,
+          "cobbled_deepslate": 1,
+          "furnace": 1,
+          "andesite": 25,
+          "cobblestone": 6,
+          "stone_shovel": 1,
+          "oak_log": 1,
+          "snowball": 8,
+          "oak_planks": 1,
+          "stone_hoe": 1,
+          "diorite": 7
+        },
+        "craftable_items": [
+          "polished_diorite",
+          "andesite",
+          "polished_andesite",
+          "oak_planks",
+          "torch",
+          "snow_block",
+          "lever",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "cobblestone",
+          "coal_ore",
+          "iron_ore",
+          "emerald_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:47:26.974Z",
+      "elapsed": "4m 09s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"wheat\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:47:27.489Z",
+      "elapsed": "4m 09s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"wheat\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:47:29.128Z",
+      "elapsed": "4m 11s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!search(\"wheat\")",
+      "state": {
+        "inventory": {
+          "raw_iron": 1,
+          "oak_sapling": 1,
+          "coal": 1,
+          "stick": 2,
+          "bucket": 3,
+          "granite": 1,
+          "cobbled_deepslate": 1,
+          "furnace": 1,
+          "andesite": 25,
+          "cobblestone": 6,
+          "stone_shovel": 1,
+          "oak_log": 1,
+          "snowball": 8,
+          "oak_planks": 1,
+          "stone_hoe": 1,
+          "egg": 3,
+          "diorite": 7
+        },
+        "craftable_items": [
+          "polished_diorite",
+          "andesite",
+          "polished_andesite",
+          "oak_planks",
+          "torch",
+          "snow_block",
+          "lever",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "cobblestone",
+          "coal_ore",
+          "iron_ore",
+          "emerald_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:47:29.129Z",
+      "elapsed": "4m 11s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"wheat\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:47:29.642Z",
+      "elapsed": "4m 11s",
+      "stage": "AM",
+      "attempt": 6,
+      "raw": "!searchForBlock(\"wheat\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:47:31.312Z",
+      "elapsed": "4m 13s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!search(\"wheat\")",
+      "state": {
+        "inventory": {
+          "stone_shovel": 1,
+          "oak_sapling": 1,
+          "coal": 1,
+          "stick": 2,
+          "bucket": 3,
+          "granite": 1,
+          "cobbled_deepslate": 1,
+          "furnace": 1,
+          "andesite": 25,
+          "cobblestone": 6,
+          "raw_iron": 1,
+          "oak_log": 1,
+          "snowball": 8,
+          "oak_planks": 1,
+          "stone_hoe": 1,
+          "egg": 3,
+          "diorite": 7
+        },
+        "craftable_items": [
+          "polished_diorite",
+          "andesite",
+          "polished_andesite",
+          "oak_planks",
+          "torch",
+          "snow_block",
+          "lever",
+          "oak_button"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "cobblestone",
+          "coal_ore",
+          "iron_ore",
+          "emerald_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:47:31.313Z",
+      "elapsed": "4m 13s",
+      "stage": "AM",
+      "attempt": 6,
+      "raw": "!searchForBlock(\"wheat\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:47:31.829Z",
+      "elapsed": "4m 13s",
+      "stage": "AM",
+      "attempt": 7,
+      "raw": "!searchForBlock(\"wheat\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:48:21.706Z",
+      "elapsed": "5m 03s",
+      "stage": "RECOVERY",
+      "type": "attempt_start",
+      "attempt": 1,
+      "task": {
+        "target_item": "wheat",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "wheat",
+          "item_dependency": null,
+          "tool": "stone_hoe"
+        }
+      },
+      "diagnosis": "Pathfinding to the wheat failed because the bot was underground and lacked a pickaxe, so it could not break stone to reach the surface or the farm. Craft a stone pickaxe, go to the surface, then equip the hoe and harvest the wheat.",
+      "planned_actions": [
+        {
+          "name": "!craftRecipe",
+          "args": [
+            "oak_planks",
+            1
+          ]
+        },
+        {
+          "name": "!craftRecipe",
+          "args": [
+            "crafting_table",
+            1
+          ]
+        },
+        {
+          "name": "!placeHere",
+          "args": [
+            "crafting_table"
+          ]
+        },
+        {
+          "name": "!craftRecipe",
+          "args": [
+            "stone_pickaxe",
+            1
+          ]
+        },
+        {
+          "name": "!equip",
+          "args": [
+            "stone_pickaxe"
+          ]
+        },
+        {
+          "name": "!goToSurface",
+          "args": []
+        },
+        {
+          "name": "!equip",
+          "args": [
+            "stone_hoe"
+          ]
+        },
+        {
+          "name": "!collectBlocks",
+          "args": [
+            "wheat",
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T23:48:21.712Z",
+      "elapsed": "5m 03s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 0,
+      "result": {
+        "command": "!craftRecipe(\"oak_planks\", 1)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nSuccessfully crafted oak_planks, you now have 5 oak_planks.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:48:21.755Z",
+      "elapsed": "5m 03s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 1,
+      "result": {
+        "command": "!craftRecipe(\"crafting_table\", 1)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nSuccessfully crafted crafting_table, you now have 1 crafting_table.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:48:39.665Z",
+      "elapsed": "5m 21s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 2,
+      "result": {
+        "command": "!placeHere(\"crafting_table\")",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFailed to place crafting_table at (56, 98, 1229).\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:48:57.633Z",
+      "elapsed": "5m 39s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 3,
+      "result": {
+        "command": "!craftRecipe(\"stone_pickaxe\", 1)",
+        "success": false,
+        "kind": "command_failure",
+        "message": "Action output:\nFailed to place crafting_table at (56, 100, 1229).\n!!Code threw exception!!\nError: Error: Recipe requires craftingTable, but one was not supplied: {\"result\":{\"id\":882,\"count\":1},\"inShape\":[[{\"id\":35,\"metadata\":null,\"count\":1},{\"id\":35,\"metadata\":null,\"count\":1},{\"id\":35,\"metadata\":null,\"count\":1}],[{\"id\":-1,\"metadata\":null,\"count\":1},{\"id\":905,\"metadata\":null,\"count\":1},{\"id\":-1,\"metadata\":null,\"count\":1}],[{\"id\":-1,\"metadata\":null,\"count\":1},{\"id\":905,\"metadata\":null,\"count\":1},{\"id\":-1,\"metadata\":null,\"count\":1}]],\"outShape\":null,\"ingredients\":null,\"delta\":[{\"id\":35,\"metadata\":null,\"count\":-3},{\"id\":905,\"metadata\":null,\"count\":-2},{\"id\":882,\"count\":1}],\"requiresTable\":true}\nStack trace:\nundefined\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:49:14.761Z",
+      "elapsed": "5m 56s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 3,
+      "result": {
+        "command": "!craftRecipe(\"stone_pickaxe\", 1)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nPlaced crafting_table at (56, 102, 1228).\nSuccessfully crafted stone_pickaxe, you now have 1 stone_pickaxe.\nCollected 1 crafting_table.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:49:14.804Z",
+      "elapsed": "5m 56s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 4,
+      "result": {
+        "command": "!equip(\"stone_pickaxe\")",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nEquipped stone_pickaxe.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:49:15.319Z",
+      "elapsed": "5m 57s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 5,
+      "result": {
+        "command": "!goToSurface()",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:49:16.333Z",
+      "elapsed": "5m 58s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 5,
+      "result": {
+        "command": "!goToSurface()",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:49:16.737Z",
+      "elapsed": "5m 58s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 5,
+      "result": {
+        "command": "!goToSurface()",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:49:16.767Z",
+      "elapsed": "5m 58s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 6,
+      "result": {
+        "command": "!equip(\"stone_hoe\")",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nEquipped stone_hoe.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:49:17.993Z",
+      "elapsed": "6m 00s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 7,
+      "result": {
+        "command": "!collectBlocks(\"wheat\", 3)",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:49:19.094Z",
+      "elapsed": "6m 01s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 7,
+      "result": {
+        "command": "!collectBlocks(\"wheat\", 3)",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:49:19.533Z",
+      "elapsed": "6m 01s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 7,
+      "result": {
+        "command": "!collectBlocks(\"wheat\", 3)",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:50:26.864Z",
+      "elapsed": "7m 08s",
+      "stage": "RECOVERY",
+      "type": "attempt_start",
+      "attempt": 2,
+      "task": {
+        "target_item": "wheat",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "wheat",
+          "item_dependency": null,
+          "tool": "stone_hoe"
+        }
+      },
+      "diagnosis": "The bot was in a mountain cave, so goToSurface failed and there was no wheat within the default collection radius. We should move along the cave to find an exit, then surface and deliberately search widely for wheat before harvesting with the hoe.",
+      "planned_actions": [
+        {
+          "name": "!moveAway",
+          "args": [
+            60
+          ]
+        },
+        {
+          "name": "!goToSurface",
+          "args": []
+        },
+        {
+          "name": "!searchForBlock",
+          "args": [
+            "wheat",
+            511
+          ]
+        },
+        {
+          "name": "!equip",
+          "args": [
+            "stone_hoe"
+          ]
+        },
+        {
+          "name": "!collectBlocks",
+          "args": [
+            "wheat",
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T23:50:58.395Z",
+      "elapsed": "7m 40s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 2,
+      "action_index": 0,
+      "result": {
+        "command": "!moveAway(60)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nPath not found, but attempting to navigate anyway using destructive movements.\nMoved away from (61, 102, 1226) to (99, 63, 1199).\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:51:43.645Z",
+      "elapsed": "8m 25s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 2,
+      "action_index": 1,
+      "result": {
+        "command": "!goToSurface()",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:51:47.292Z",
+      "elapsed": "8m 29s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 2,
+      "action_index": 1,
+      "result": {
+        "command": "!goToSurface()",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:51:50.948Z",
+      "elapsed": "8m 33s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 2,
+      "action_index": 1,
+      "result": {
+        "command": "!goToSurface()",
+        "success": false,
+        "kind": "command_failure",
+        "message": ""
+      }
+    }
+  ]
+}

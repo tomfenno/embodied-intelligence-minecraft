@@ -6,6 +6,7 @@ import {get_am_state, get_recovery_trace_state} from '../agent_state.js';
 import {ABSTRACT_CLASS_MEMBERS, is_environmental_use_target} from '../mc_sources.js';
 import {get_item_batch_size} from '../recipe_utils.js';
 
+import {recover_failed_task} from './failure_replanner.js';
 import {check_search_complete, parse_search_command, run_search} from './search.js';
 
 const spl = {
@@ -22,11 +23,27 @@ const max_inner_retries = 5;
 const craft_debounce_ms = 750;
 const max_collect_qty = 16;
 
-export async function execute_task_action(task, agent, log) {
+// Only these kinds represent genuine command failures worth replanning.
+// Search-outcome kinds (search_found_not_reached, search_exhausted, etc.)
+// are navigation results, not execution failures, and should not trigger recovery.
+const RECOVERABLE_FAILURE_KINDS = new Set([
+  'command_failure',
+  'unstructured_failure_result',
+  'runner_exception',
+  'unexpected_action_kind',
+]);
+
+function has_recoverable_failure(task_trace) {
+  return (task_trace.summary?.failed_steps ?? []).some(
+      s => RECOVERABLE_FAILURE_KINDS.has(s.kind));
+}
+
+export async function execute_task_action(task, agent, log, model = null, graph = null) {
   const task_trace = create_task_trace(task, log);
 
   let repeated_failure_signature = null;
   let repeated_failure_count = 0;
+  const searched_targets = new Set();
 
   for (let attempt_index = 0; attempt_index < max_inner_retries;
        attempt_index++) {
@@ -53,9 +70,22 @@ export async function execute_task_action(task, agent, log) {
 
     const search_target = parse_search_command(action.command);
     if (search_target != null) {
+      if (searched_targets.has(search_target)) {
+        spl.warn(`Search for "${search_target}" already attempted, stopping.`);
+        current_step.result = create_step_result(
+            false, 'search_already_attempted',
+            `Search for "${search_target}" already attempted in this action sequence`);
+        attempt_index = max_inner_retries;
+        continue;
+      }
       current_step.result = await handle_search_action(
           search_target, state, agent, log, attempt_number);
-      attempt_index = max_inner_retries;  // Only search once.
+      if (current_step.result.kind === 'search_exhausted') {
+        searched_targets.add(search_target);  // Only block re-search when not found.
+        attempt_index = max_inner_retries;
+      }
+      // On search_success or search_found_not_reached (PathStopped): allow
+      // reattempt — bot may be closer now or path obstruction may have changed.
       continue;
     }
 
@@ -133,13 +163,15 @@ export async function execute_task_action(task, agent, log) {
               repeated_failure_count}) for:`,
           action.command);
 
-      return finalize_task_trace(
-          task_trace, agent, log, 'fail', 'repeated_identical_failure');
+      finalize_task_trace(task_trace, agent, log, 'fail', 'repeated_identical_failure');
+      if (model && has_recoverable_failure(task_trace)) return await recover_failed_task(task_trace, agent, model, graph, log);
+      return 'fail';
     }
   }
 
-  return finalize_task_trace(
-      task_trace, agent, log, 'fail', 'exhausted_inner_retries');
+  finalize_task_trace(task_trace, agent, log, 'fail', 'exhausted_inner_retries');
+  if (model) return await recover_failed_task(task_trace, agent, model, graph, log);
+  return 'fail';
 }
 
 export function mediate_action(task, state) {

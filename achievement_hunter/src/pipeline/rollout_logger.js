@@ -24,6 +24,7 @@ const STAGE = {
   NTS: 'NTS',
   AM: 'AM',
   AM_WARN: 'AM_WARN',
+  RECOVERY: 'RECOVERY',
 };
 
 const SOURCE = {
@@ -142,6 +143,11 @@ function render_elapsed_panel(elapsed, status) {
         escape_html(status_label)}</div>`,
     '</div>',
   ].join('\n');
+}
+
+function format_recovery_command(action) {
+  const args = (action.args ?? []).map(a => JSON.stringify(a)).join(', ');
+  return `${action.name}(${args})`;
 }
 
 // ── Renderers
@@ -290,6 +296,52 @@ const stage_renderer = {
         `- **Reason:** ${safe_reason}\n` +
         `- **Total elapsed:** ${completion_state.total_elapsed}\n`;
   },
+
+  recovery_status(recovery) {
+    if (!recovery) return null;
+    const current = recovery.attempts.at(-1);
+    if (!current) return '**Recovery**\n\n_Awaiting LLM..._';
+
+    const parts = [
+      `**Recovery** _(attempt ${current.attempt})_\n\n`,
+      `**Diagnosis:** ${escape_markdown(current.diagnosis)}\n\n`,
+      `**Plan:**\n`,
+    ];
+    for (const action of current.planned_actions) {
+      parts.push(`- ${inline_code(format_recovery_command(action))}\n`);
+    }
+
+    const previous = recovery.attempts.slice(0, -1);
+    if (previous.length > 0) {
+      parts.push('\n**Previous diagnoses:**\n');
+      for (const prev of [...previous].reverse()) {
+        parts.push(`- _(attempt ${prev.attempt})_ ${escape_markdown(prev.diagnosis)}\n`);
+      }
+    }
+
+    return parts.join('');
+  },
+
+  recovery_actions(recovery) {
+    if (!recovery) return PLACEHOLDER.AM;
+    const current = recovery.attempts.at(-1);
+    if (!current) return '**Recovery Actions**\n\n_Awaiting actions..._';
+
+    const parts = [`**Recovery Actions** _(attempt ${current.attempt})_\n\n`];
+    for (let i = 0; i < current.planned_actions.length; i++) {
+      const command = inline_code(format_recovery_command(current.planned_actions[i]));
+      const result = current.results[i];
+      if (!result) {
+        parts.push(`- ⏳ ${command}\n`);
+      } else if (result.success) {
+        parts.push(`- ✅ ${command}\n`);
+      } else {
+        const msg = result.message ? ` — ${escape_markdown(result.message)}` : '';
+        parts.push(`- ❌ ${command}${msg}\n`);
+      }
+    }
+    return parts.join('');
+  },
 };
 
 const am_renderer = {
@@ -429,6 +481,7 @@ export function createRolloutLogger(objective) {
     nts_result: null,
     am_history: [],
     completion: null,
+    recovery: null,
   };
 
   live_writer.remove_file(LIVE_FILE.LEGACY_DASHBOARD);
@@ -465,13 +518,17 @@ export function createRolloutLogger(objective) {
         stage_renderer.completion(objective, live_state.completion) :
         stage_renderer.scsg(live_state.scsg_result, objective);
 
-    const candidates_content = rollout.status === STATUS.COMPLETED ?
-        null :
-        stage_renderer.candidates(objective, live_state.candidates);
+    const in_recovery = live_state.recovery != null;
+
+    const candidates_content = rollout.status === STATUS.COMPLETED ? null :
+        in_recovery ? stage_renderer.recovery_status(live_state.recovery) :
+                      stage_renderer.candidates(objective, live_state.candidates);
 
     const nts_content = stage_renderer.nts(live_state.nts_result);
 
-    const am_content = am_renderer.panel(live_state.am_history);
+    const am_content = in_recovery ?
+        stage_renderer.recovery_actions(live_state.recovery) :
+        am_renderer.panel(live_state.am_history);
 
     live_writer.write_file(LIVE_FILE.PTD, ptd_content);
     live_writer.write_file(LIVE_FILE.SCSG, scsg_content || PLACEHOLDER.SCSG);
@@ -593,6 +650,43 @@ export function createRolloutLogger(objective) {
 
       live_state.am_history.at(-1).warning = message;
       record_stage({stage: STAGE.AM_WARN, message});
+      render_live();
+    },
+
+    recovery_attempt(attempt, task, diagnosis, planned_actions) {
+      if (!live_state.recovery) {
+        live_state.recovery = {task, attempts: []};
+      }
+      live_state.recovery.attempts.push(
+          {attempt, diagnosis, planned_actions, results: []});
+      record_stage({
+        stage: STAGE.RECOVERY,
+        type: 'attempt_start',
+        attempt,
+        task,
+        diagnosis,
+        planned_actions,
+      });
+      render_live();
+    },
+
+    recovery_action_result(attempt_num, action_index, result) {
+      const entry =
+          live_state.recovery?.attempts.find(a => a.attempt === attempt_num);
+      if (entry) entry.results[action_index] = result;
+      record_stage({
+        stage: STAGE.RECOVERY,
+        type: 'action_result',
+        attempt: attempt_num,
+        action_index,
+        result,
+      });
+      render_live();
+    },
+
+    recovery_end(final_status) {
+      record_stage({stage: STAGE.RECOVERY, type: 'end', status: final_status});
+      live_state.recovery = null;
       render_live();
     },
 

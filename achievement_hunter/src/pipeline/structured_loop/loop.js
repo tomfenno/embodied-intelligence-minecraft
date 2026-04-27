@@ -70,7 +70,7 @@ export async function structured_loop(models, agent, task_name, graph = null) {
       continue;
     }
 
-    if (await execute_task_action(task, agent, log) === 'success') {
+    if (await execute_task_action(task, agent, log, models.failure_replanner, graph) === 'success') {
       consecutive_failures = 0;
       continue;
     }

@@ -109,6 +109,26 @@ export function fill_scsg_refiner_prompt(
 }
 
 
+/**
+ * Fills the failure_replanner prompt template with a failed trace, previous
+ * diagnoses, and available actions. Returns the filled prompt string.
+ *
+ * Example:
+ *   const prompt = fill_failure_replanner_prompt(trace_obj, diagnoses_arr,
+ * actions_arr);
+ */
+export function fill_failure_replanner_prompt(
+    failed_trace, previous_diagnoses, available_actions) {
+  const template = _read_template(
+      '../../docs/prompts/failure_replanner/failure_replanner.md');
+  return _fill(template, {
+    FAILED_TRACE: failed_trace,
+    PREVIOUS_DIAGNOSES: previous_diagnoses,
+    AVAILABLE_ACTIONS: available_actions,
+  });
+}
+
+
 /* Helper Functions ------------------------------------------------------ */
 
 const _template_cache = new Map();

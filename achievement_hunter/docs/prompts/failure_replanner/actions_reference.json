@@ -1,0 +1,229 @@
+[
+  {
+    "name": "!stop",
+    "description": "Force stop all actions and commands that are currently executing.",
+    "category": "control",
+    "constraints": {},
+    "examples": ["!stop()"]
+  },
+  {
+    "name": "!goToCoordinates",
+    "description": "Go to the given x, y, z location.",
+    "category": "movement",
+    "constraints": {
+      "y": {
+        "min": -64,
+        "max": 320
+      },
+      "closeness": {
+        "min": 0
+      }
+    },
+    "examples": [
+      "!goToCoordinates(100, 64, -200, 1)",
+      "!goToCoordinates(0, 70, 0, 3)"
+    ]
+  },
+  {
+    "name": "!searchForBlock",
+    "description": "Find and go to the nearest block of a given type in a given range.",
+    "category": "movement",
+    "constraints": {
+      "search_range": {
+        "min": 32,
+        "max": 511
+      }
+    },
+    "examples": [
+      "!searchForBlock(\"diamond_ore\", 64)",
+      "!searchForBlock(\"chest\", 128)"
+    ]
+  },
+  {
+    "name": "!searchForEntity",
+    "description": "Find and go to the nearest entity of a given type in a given range.",
+    "category": "movement",
+    "constraints": {
+      "search_range": {
+        "min": 32,
+        "max": 512
+      }
+    },
+    "examples": [
+      "!searchForEntity(\"cow\", 64)",
+      "!searchForEntity(\"villager\", 100)"
+    ]
+  },
+  {
+    "name": "!moveAway",
+    "description": "Move a short distance away from the current location for local unsticking or repositioning only. Do NOT use this for long-distance travel, biome search, exploration, or resource search; use !searchForBlock, !searchForEntity, !goToSurface, or !goToCoordinates instead.",
+    "category": "movement",
+    "constraints": {
+      "distance": {
+        "min": 1,
+        "max": 32,
+        "recommended_max": 16,
+        "note": "Large distances can send the bot toward unintended low-cost locations such as bedrock. Prefer 8-16 for unsticking; use 32 only for escaping a local obstruction."
+      }
+    },
+    "examples": ["!moveAway(10)", "!moveAway(25)"]
+  },
+  {
+    "name": "!consume",
+    "description": "Eat/drink the given item.",
+    "category": "inventory",
+    "constraints": {
+      "item_must_be_consumable": true
+    },
+    "examples": ["!consume(\"bread\")", "!consume(\"potion\")"]
+  },
+  {
+    "name": "!equip",
+    "description": "Equip the given item.",
+    "category": "inventory",
+    "constraints": {},
+    "examples": ["!equip(\"diamond_sword\")", "!equip(\"iron_pickaxe\")"]
+  },
+  {
+    "name": "!collectBlocks",
+    "description": "Collect the nearest blocks of a given type.",
+    "category": "collection",
+    "constraints": {
+      "num": {
+        "min": 1
+      },
+      "timeout_minutes": 10
+    },
+    "examples": [
+      "!collectBlocks(\"oak_log\", 10)",
+      "!collectBlocks(\"stone\", 32)"
+    ]
+  },
+  {
+    "name": "!craftRecipe",
+    "description": "Craft the given recipe a given number of times.",
+    "category": "crafting",
+    "constraints": {
+      "num": {
+        "min": 1
+      },
+      "crafting_table_required_for_some_recipes": true
+    },
+    "examples": [
+      "!craftRecipe(\"stick\", 4)",
+      "!craftRecipe(\"crafting_table\", 1)"
+    ]
+  },
+  {
+    "name": "!smeltItem",
+    "description": "Smelt the given item the given number of times.",
+    "category": "crafting",
+    "constraints": {
+      "num": {
+        "min": 1
+      },
+      "furnace_must_be_nearby": true,
+      "restarts_agent_on_success": true
+    },
+    "examples": ["!smeltItem(\"raw_iron\", 8)", "!smeltItem(\"raw_gold\", 4)"]
+  },
+  {
+    "name": "!clearFurnace",
+    "description": "Take all items out of the nearest furnace.",
+    "category": "crafting",
+    "constraints": {
+      "furnace_must_be_nearby": true
+    },
+    "examples": ["!clearFurnace()"]
+  },
+  {
+    "name": "!placeHere",
+    "description": "Place a given block in the current location. Do NOT use to build structures, only use for single blocks/torches.",
+    "category": "collection",
+    "constraints": {
+      "single_block_only": true,
+      "item_must_be_in_inventory": true
+    },
+    "examples": ["!placeHere(\"torch\")", "!placeHere(\"crafting_table\")"]
+  },
+  {
+    "name": "!attack",
+    "description": "Attack and kill the nearest entity of a given type.",
+    "category": "control",
+    "constraints": {},
+    "examples": ["!attack(\"zombie\")", "!attack(\"cow\")"]
+  },
+  {
+    "name": "!goToBed",
+    "description": "Go to the nearest bed and sleep.",
+    "category": "movement",
+    "constraints": {
+      "bed_must_be_nearby": true,
+      "must_be_night_or_thunderstorm": true
+    },
+    "examples": ["!goToBed()"]
+  },
+  {
+    "name": "!stay",
+    "description": "Stay in the current location no matter what. Pauses all modes.",
+    "category": "control",
+    "constraints": {
+      "seconds": {
+        "min": -1,
+        "note": "-1 means forever"
+      }
+    },
+    "examples": ["!stay(30)", "!stay(-1)"]
+  },
+  {
+    "name": "!setMode",
+    "description": "Set a mode to on or off. A mode is an automatic behavior that constantly checks and responds to the environment.",
+    "category": "control",
+    "constraints": {
+      "mode_must_exist": true
+    },
+    "examples": [
+      "!setMode(\"self_defense\", true)",
+      "!setMode(\"self_preservation\", false)"
+    ]
+  },
+  {
+    "name": "!digDown",
+    "description": "Digs down a specified distance. Stops if it reaches lava, water, or a fall >=4 blocks below the bot.",
+    "category": "collection",
+    "constraints": {
+      "distance": {
+        "min": 1
+      },
+      "stops_at_lava": true,
+      "stops_at_water": true,
+      "stops_at_drop_gte_4": true
+    },
+    "examples": ["!digDown(5)", "!digDown(20)"]
+  },
+  {
+    "name": "!goToSurface",
+    "description": "Moves the bot to the highest block above it (usually the surface).",
+    "category": "movement",
+    "constraints": {},
+    "examples": ["!goToSurface()"]
+  },
+  {
+    "name": "!useOn",
+    "description": "Use (right click) the given tool on the nearest target of the given type.",
+    "category": "custom",
+    "constraints": {
+      "target": {
+        "allowed_values": ["entity type", "block type", "nothing"]
+      },
+      "tool_name": {
+        "note": "Use \"hand\" for no tool"
+      }
+    },
+    "examples": [
+      "!useOn(\"flint_and_steel\", \"tnt\")",
+      "!useOn(\"bucket\", \"lava\")",
+      "!useOn(\"hand\", \"lever\")"
+    ]
+  }
+]
