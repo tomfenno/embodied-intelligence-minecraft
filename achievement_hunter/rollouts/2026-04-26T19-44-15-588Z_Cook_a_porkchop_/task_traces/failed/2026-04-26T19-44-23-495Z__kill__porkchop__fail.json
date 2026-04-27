@@ -1,0 +1,132 @@
+{
+  "objective": "Cook a porkchop.",
+  "task": {
+    "target_item": "porkchop",
+    "qty": 1,
+    "action_type": "kill",
+    "parameters": {
+      "source_mob": "pig",
+      "weapon": null
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -468.38,
+            "y": 318,
+            "z": 1145.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Afternoon"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "cobblestone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "furnace": 1,
+            "acacia_planks": 32
+          },
+          "equipment": {
+            "mainHand": "furnace"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "cobblestone"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "crafting_table",
+          "acacia_button",
+          "acacia_pressure_plate",
+          "stick"
+        ]
+      },
+      "action": "!search(\"pig\")",
+      "result": {
+        "success": false,
+        "kind": "search_found_not_reached",
+        "message": "Action output:\nFound pig 282.2837510373885 blocks away.\nPath not found, but attempting to navigate anyway using destructive movements.\nPathfinding stopped: Cannot break cobblestone with current tools.\nPathfinding stopped: Path was stopped before it could be completed! Thus, the desired goal was not reached.."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -468.48,
+        "y": 318,
+        "z": 1145.42
+      },
+      "dimension": "overworld",
+      "biome": "stony_shore",
+      "timeLabel": "Afternoon"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "cobblestone",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "none"
+    },
+    "inventory": {
+      "counts": {
+        "furnace": 1,
+        "acacia_planks": 32
+      },
+      "equipment": {
+        "mainHand": "furnace"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "cobblestone"
+      ],
+      "entityTypes": []
+    },
+    "craftable_items": [
+      "crafting_table",
+      "acacia_button",
+      "acacia_pressure_plate",
+      "stick"
+    ]
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"pig\")",
+    "last_result_kind": "search_found_not_reached",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!search(\"pig\")",
+        "kind": "search_found_not_reached",
+        "message": "Action output:\nFound pig 282.2837510373885 blocks away.\nPath not found, but attempting to navigate anyway using destructive movements.\nPathfinding stopped: Cannot break cobblestone with current tools.\nPathfinding stopped: Path was stopped before it could be completed! Thus, the desired goal was not reached.."
+      }
+    ]
+  }
+}

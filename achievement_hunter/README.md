@@ -20,12 +20,13 @@
 /gamemode spectator
 /spectate andy
 /effect give <your name>  minecraft:night_vision infinite 
+/execute as AH_Bot run skin set URL classic https://www.minecraftskins.com/uploads/skins/2026/02/16/computer-23869410.png?v950
 ```
 >**Note:** if the agent disconnects you will need to use the command: 
 ` /spectate andy`
 to resume spectating the agent when they reconnect.
 
-This will set your camera to the pov of `andy` and it will give you night vision which comes in handy when the agent goes into a dark cave. When in chat mode you can leave the window without it pausing.
+This will set your camera to the pov of `andy` and it will give you night vision which comes in handy when the agent goesd into a dark cave. When in chat mode you can leave the window without it pausing.
 
 It helps to make the chat screen smaller so you can still see what is happening. 
 

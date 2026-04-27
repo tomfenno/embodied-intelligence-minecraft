@@ -3,6 +3,7 @@ services:
     build: .
     stdin_open: true
     tty: true
+    command: sh -c "rm -f /app/achievement_hunter/rollouts/checkpoint.json && npm start"
     environment:
       SETTINGS_JSON: |
         {"auto_open_ui": false}
@@ -12,7 +13,10 @@ services:
       - ./profiles:/app/profiles
       - ./bots:/app/bots
       - ./achievement_hunter/logs:/app/achievement_hunter/logs
+      - ./achievement_hunter/rollouts:/app/achievement_hunter/rollouts
+      - ./achievement_hunter/src:/app/achievement_hunter/src
       - ./achievement_hunter/docs:/app/achievement_hunter/docs
+      - ./achievement_hunter/rollout_live:/app/achievement_hunter/rollout_live
     ports:
       - "3000-3003:3000-3003" # see the view from the camera mounted on your bot head: http://localhost:3000/
       - "8080:8080" # Mindserver port

@@ -1,0 +1,46 @@
+{
+  "name": "AH_Bot",
+
+  "model": "gpt-5",
+
+  "//": [
+    "Per-stage model overrides. Omit any field to fall back to 'model' above.",
+    "Available OpenAI models used here (relative rankings are approximate):",
+    "",
+    "Reasoning power:  gpt-5 > o3 > gpt-4o > o3-mini > gpt-5.4-mini > gpt-4o-mini > gpt-5.4-nano",
+    "Latency (fastest first): gpt-5.4-nano > gpt-4o-mini > gpt-5.4-mini > gpt-4o > o3-mini > gpt-5 > o3",
+    "Cost (cheapest first):   gpt-5.4-nano < gpt-4o-mini < gpt-5.4-mini < gpt-4o < o3-mini < gpt-5 < o3",
+    "",
+    "Model notes:",
+    "  gpt-5         — highest overall capability of this set; slower and more expensive; best for hardest planning/spec tasks",
+    "  gpt-5.4-mini  — stronger mini reasoning model; good balance of quality, latency, and cost",
+    "  gpt-5.4-nano  — cheapest / lightest of this set; best for simple high-volume deterministic mediation",
+    "  gpt-4o        — strong general-purpose model; faster than flagship reasoning models; still available in API",
+    "  gpt-4o-mini   — lightweight, fast, and inexpensive; good for structured dispatch / selection",
+    "  o3            — strongest dedicated reasoning model in this list after gpt-5; slowest and most expensive",
+    "  o3-mini       — smaller reasoning model; better latency/cost than o3 with weaker reasoning depth",
+    "",
+    "Notes:",
+    "  - Rankings are practical engineering guidance, not exact published benchmarks.",
+    "  - ChatGPT browser labels such as Instant / Thinking / Pro are product labels, not API model ids.",
+    "  - GPT-4o was retired in ChatGPT but remains available in the API."
+  ],
+
+  "ptd_model": "",
+  "ptd_feedback_model": "",
+  "ptd_refinement_model": "",
+  "failure_replanner_model": "",
+
+  "modes": {
+    "self_preservation": true,
+    "unstuck": true,
+    "cowardice": false,
+    "self_defense": true,
+    "hunting": false,
+    "item_collecting": true,
+    "torch_placing": false,
+    "elbow_room": true,
+    "idle_staring": false,
+    "cheat": false
+  }
+}

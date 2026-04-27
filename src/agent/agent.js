@@ -283,8 +283,10 @@ export class Agent {
                     this.history.add(source, message);
                 }
                 let execute_res = await executeCommand(this, message);
-                if (execute_res) 
-                    this.routeResponse(source, execute_res);
+                // [Achievement Hunter Project] executeCommand returns {success, message} for actions, plain string for queries.
+                const execute_res_msg = execute_res?.message ?? execute_res;
+                if (execute_res_msg)
+                    this.routeResponse(source, execute_res_msg);
                 return true;
             }
         }
@@ -360,12 +362,14 @@ export class Agent {
                 }
 
                 let execute_res = await executeCommand(this, res);
+                // [Achievement Hunter Project] executeCommand returns {success, message} for actions, plain string for queries.
+                const execute_res_msg = execute_res?.message ?? execute_res;
 
                 console.log('Agent executed:', command_name, 'and got:', execute_res);
                 used_command = true;
 
-                if (execute_res)
-                    this.history.add('system', execute_res);
+                if (execute_res_msg)
+                    this.history.add('system', execute_res_msg);
                 else
                     break;
             }

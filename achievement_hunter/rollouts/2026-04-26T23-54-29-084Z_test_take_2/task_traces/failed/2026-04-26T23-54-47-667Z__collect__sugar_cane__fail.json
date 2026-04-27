@@ -1,0 +1,225 @@
+{
+  "objective": "test take 2",
+  "task": {
+    "target_item": "sugar_cane",
+    "qty": 2,
+    "action_type": "collect",
+    "parameters": {
+      "source_block": "sugar_cane",
+      "item_dependency": null,
+      "tool": null
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": 55.5,
+            "y": 137,
+            "z": 1233.5
+          },
+          "dimension": "overworld",
+          "biome": "snowy_slopes",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "oak_planks",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "oak_planks (3 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "diorite": 7,
+            "crafting_table": 1,
+            "gravel": 1,
+            "oak_sapling": 1,
+            "coal": 1,
+            "wheat_seeds": 26,
+            "bucket": 3,
+            "granite": 1,
+            "cobbled_deepslate": 1,
+            "furnace": 1,
+            "wheat": 5,
+            "raw_iron": 1,
+            "andesite": 25,
+            "dirt": 2,
+            "stone_shovel": 1,
+            "stone_pickaxe": 1,
+            "snowball": 8,
+            "oak_planks": 1,
+            "stone_hoe": 1,
+            "egg": 3
+          },
+          "equipment": {
+            "mainHand": "dirt"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "cobblestone",
+            "oak_planks",
+            "white_bed",
+            "oak_log",
+            "mossy_cobblestone",
+            "oak_door",
+            "glass_pane",
+            "dirt",
+            "cobblestone_stairs",
+            "farmland",
+            "oak_stairs",
+            "water",
+            "powder_snow",
+            "wall_torch",
+            "wheat",
+            "snow",
+            "dirt_path",
+            "grass_block",
+            "snow_block",
+            "stone",
+            "oak_slab",
+            "iron_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "polished_diorite",
+          "polished_andesite",
+          "snow_block",
+          "andesite_wall",
+          "diorite_wall",
+          "andesite_stairs",
+          "diorite_stairs",
+          "andesite_slab",
+          "diorite_slab",
+          "oak_button",
+          "bread"
+        ]
+      },
+      "action": "!search(\"sugar_cane\")",
+      "result": {
+        "success": false,
+        "kind": "search_exhausted",
+        "message": null
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": 55.5,
+        "y": 137,
+        "z": 1233.5
+      },
+      "dimension": "overworld",
+      "biome": "snowy_slopes",
+      "timeLabel": "Morning"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "oak_planks",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "oak_planks (3 blocks up)"
+    },
+    "inventory": {
+      "counts": {
+        "diorite": 7,
+        "crafting_table": 1,
+        "gravel": 1,
+        "oak_sapling": 1,
+        "coal": 1,
+        "wheat_seeds": 26,
+        "bucket": 3,
+        "granite": 1,
+        "cobbled_deepslate": 1,
+        "furnace": 1,
+        "wheat": 5,
+        "raw_iron": 1,
+        "andesite": 25,
+        "dirt": 2,
+        "stone_shovel": 1,
+        "stone_pickaxe": 1,
+        "snowball": 8,
+        "oak_planks": 1,
+        "stone_hoe": 1,
+        "egg": 3
+      },
+      "equipment": {
+        "mainHand": "dirt"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "cobblestone",
+        "oak_planks",
+        "white_bed",
+        "oak_log",
+        "mossy_cobblestone",
+        "oak_door",
+        "glass_pane",
+        "dirt",
+        "cobblestone_stairs",
+        "farmland",
+        "oak_stairs",
+        "water",
+        "powder_snow",
+        "wall_torch",
+        "wheat",
+        "snow",
+        "dirt_path",
+        "grass_block",
+        "snow_block",
+        "stone",
+        "oak_slab",
+        "iron_ore"
+      ],
+      "entityTypes": []
+    },
+    "craftable_items": [
+      "polished_diorite",
+      "polished_andesite",
+      "snow_block",
+      "andesite_wall",
+      "diorite_wall",
+      "andesite_stairs",
+      "diorite_stairs",
+      "andesite_slab",
+      "diorite_slab",
+      "oak_button",
+      "bread"
+    ]
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"sugar_cane\")",
+    "last_result_kind": "search_exhausted",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!search(\"sugar_cane\")",
+        "kind": "search_exhausted",
+        "message": null
+      }
+    ]
+  }
+}

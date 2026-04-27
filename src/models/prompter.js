@@ -74,6 +74,16 @@ export class Prompter {
             this.vision_model = this.chat_model;
         }
 
+        this.ptd_model = this.profile.ptd_model
+            ? createModel(selectAPI(this.profile.ptd_model))
+            : this.chat_model;
+        this.nts_model = this.profile.nts_model
+            ? createModel(selectAPI(this.profile.nts_model))
+            : this.chat_model;
+        this.am_model = this.profile.am_model
+            ? createModel(selectAPI(this.profile.am_model))
+            : this.chat_model;
+
         
         let embedding_model_profile = null;
         if (this.profile.embedding) {

@@ -1,0 +1,188 @@
+{
+  "objective": "Bake a cake.",
+  "task": {
+    "target_item": "sugar_cane",
+    "qty": 2,
+    "action_type": "collect",
+    "parameters": {
+      "source_block": "sugar_cane",
+      "item_dependency": null,
+      "tool": null
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -192.46,
+            "y": 96,
+            "z": 1321.5
+          },
+          "dimension": "overworld",
+          "biome": "meadow",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (6 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "carrot": 1,
+            "wheat": 5,
+            "egg": 1,
+            "cobblestone": 23,
+            "raw_iron": 3,
+            "bucket": 3,
+            "wheat_seeds": 26,
+            "stick": 2,
+            "oak_planks": 1,
+            "wooden_pickaxe": 1,
+            "dirt": 23,
+            "stone_pickaxe": 1,
+            "furnace": 1,
+            "stone_hoe": 1,
+            "crafting_table": 1
+          },
+          "equipment": {
+            "mainHand": "oak_planks"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "copper_ore",
+            "coal_ore",
+            "emerald_ore"
+          ],
+          "entityTypes": [
+            "iron_golem"
+          ]
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread"
+        ]
+      },
+      "action": "!search(\"sugar_cane\")",
+      "result": {
+        "success": false,
+        "kind": "search_found_not_reached",
+        "message": "Action output:\nFound sugar_cane at (-258, 65, 1385). Navigating...\nPath not found, but attempting to navigate anyway using destructive movements.\nPathfinding stopped: Took to long to decide path to goal!."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -193.49,
+        "y": 96.75,
+        "z": 1321.48
+      },
+      "dimension": "overworld",
+      "biome": "meadow",
+      "timeLabel": "Morning"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "stone",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "stone (6 blocks up)"
+    },
+    "inventory": {
+      "counts": {
+        "carrot": 1,
+        "wheat": 5,
+        "egg": 1,
+        "cobblestone": 23,
+        "raw_iron": 3,
+        "bucket": 3,
+        "wheat_seeds": 26,
+        "stick": 2,
+        "oak_planks": 1,
+        "wooden_pickaxe": 1,
+        "dirt": 22,
+        "stone_pickaxe": 1,
+        "furnace": 1,
+        "stone_hoe": 1,
+        "crafting_table": 1
+      },
+      "equipment": {
+        "mainHand": "dirt"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "stone",
+        "dirt",
+        "copper_ore",
+        "coal_ore",
+        "emerald_ore"
+      ],
+      "entityTypes": [
+        "iron_golem"
+      ]
+    },
+    "craftable_items": [
+      "cobblestone_slab",
+      "furnace",
+      "cobblestone_stairs",
+      "cobblestone_wall",
+      "lever",
+      "oak_button",
+      "wooden_shovel",
+      "stone_sword",
+      "stone_shovel",
+      "stone_pickaxe",
+      "stone_axe",
+      "stone_hoe",
+      "bread"
+    ]
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"sugar_cane\")",
+    "last_result_kind": "search_found_not_reached",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!search(\"sugar_cane\")",
+        "kind": "search_found_not_reached",
+        "message": "Action output:\nFound sugar_cane at (-258, 65, 1385). Navigating...\nPath not found, but attempting to navigate anyway using destructive movements.\nPathfinding stopped: Took to long to decide path to goal!."
+      }
+    ]
+  }
+}

@@ -1,0 +1,360 @@
+{
+  "objective": "TEST",
+  "status": "running",
+  "started_at": "2026-04-26T23:25:48.409Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-26T23:25:48.417Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wheat",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 9,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 9,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "wheat",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "bucket",
+              "to": "milk_bucket",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_ingot",
+              "to": "bucket",
+              "type": "crafting_input",
+              "qty": 9,
+              "consumed": true
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 9,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "egg": 3,
+          "stone_hoe": 1,
+          "furnace": 1,
+          "oak_log": 1,
+          "cobblestone": 14,
+          "wooden_pickaxe": 1,
+          "stick": 2,
+          "oak_planks": 1,
+          "crafting_table": 1,
+          "stone_pickaxe": 1,
+          "coal": 3
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:25:48.485Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "wheat",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "stone_hoe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "wheat",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "raw_iron",
+          "qty": 9,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "stone_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "iron_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T23:25:48.530Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "wheat",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "wheat",
+          "item_dependency": null,
+          "tool": "stone_hoe"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:25:48.607Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"wheat\")",
+      "state": {
+        "inventory": {
+          "egg": 3,
+          "stone_hoe": 1,
+          "furnace": 1,
+          "oak_log": 1,
+          "cobblestone": 14,
+          "wooden_pickaxe": 1,
+          "stick": 2,
+          "oak_planks": 1,
+          "crafting_table": 1,
+          "stone_pickaxe": 1,
+          "coal": 3
+        },
+        "craftable_items": [
+          "oak_planks",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "snow_block",
+          "coal_ore",
+          "powder_snow",
+          "emerald_ore",
+          "snow",
+          "grass_block"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:25:48.609Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"wheat\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:25:49.155Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"wheat\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:25:49.841Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"wheat\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:25:51.377Z",
+      "elapsed": "2s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"wheat\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:25:56.106Z",
+      "elapsed": "7s",
+      "stage": "AM",
+      "attempt": 6,
+      "raw": "!searchForBlock(\"wheat\", 511)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T23:27:02.206Z",
+      "elapsed": "1m 13s",
+      "stage": "RECOVERY",
+      "type": "attempt_start",
+      "attempt": 1,
+      "task": {
+        "target_item": "wheat",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "wheat",
+          "item_dependency": null,
+          "tool": "stone_hoe"
+        }
+      },
+      "diagnosis": "The search failed because there is no wheat near the current snowy_slopes location and the prior search used a generic, likely short-range query. Move to explore new terrain, then perform a wide-radius wheat search, equip the hoe, and harvest enough plants to meet the item goal.",
+      "planned_actions": [
+        {
+          "name": "!moveAway",
+          "args": [
+            300
+          ]
+        },
+        {
+          "name": "!searchForBlock",
+          "args": [
+            "wheat",
+            512
+          ]
+        },
+        {
+          "name": "!equip",
+          "args": [
+            "stone_hoe"
+          ]
+        },
+        {
+          "name": "!collectBlocks",
+          "args": [
+            "wheat",
+            6
+          ]
+        }
+      ]
+    }
+  ]
+}

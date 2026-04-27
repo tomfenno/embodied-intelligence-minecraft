@@ -1,0 +1,485 @@
+{
+  "objective": "test",
+  "task": {
+    "target_item": "lava_bucket",
+    "qty": 1,
+    "action_type": "interact",
+    "parameters": {
+      "tool": "bucket",
+      "target": "lava"
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -473.58,
+            "y": 34,
+            "z": 1011.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (0 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "oak_sapling": 1,
+            "bucket": 1,
+            "furnace": 1,
+            "stone_pickaxe": 1,
+            "oak_planks": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "leaf_litter": 7,
+            "cobblestone": 35,
+            "granite": 12
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "lava",
+            "diorite",
+            "gravel",
+            "copper_ore",
+            "granite",
+            "coal_ore",
+            "water",
+            "dirt",
+            "iron_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "polished_granite",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "oak_button"
+        ]
+      },
+      "action": "!useOn(\"bucket\", \"lava\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFound non-destructive path.\nYou have reached at -473, 34, 1012.\nBlock stone is in the way, moving closer...\nFound non-destructive path.\nYou have reached at -473.624427177142, 34, 1011.3128051243173.\nBlock stone is in the way, not using bucket."
+      }
+    },
+    {
+      "i": 2,
+      "state": {
+        "world": {
+          "position": {
+            "x": -473.58,
+            "y": 34,
+            "z": 1011.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (0 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "oak_sapling": 1,
+            "bucket": 1,
+            "furnace": 1,
+            "stone_pickaxe": 1,
+            "oak_planks": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "leaf_litter": 7,
+            "cobblestone": 35,
+            "granite": 12
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "lava",
+            "diorite",
+            "gravel",
+            "copper_ore",
+            "granite",
+            "coal_ore",
+            "water",
+            "dirt",
+            "iron_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "polished_granite",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "oak_button"
+        ]
+      },
+      "action": "!useOn(\"bucket\", \"lava\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFound non-destructive path.\nYou have reached at -473, 34, 1012.\nBlock stone is in the way, moving closer...\nFound non-destructive path.\nYou have reached at -473.89190194960565, 34, 1012.8587412314555.\nBlock stone is in the way, not using bucket."
+      }
+    },
+    {
+      "i": 3,
+      "state": {
+        "world": {
+          "position": {
+            "x": -473.58,
+            "y": 34,
+            "z": 1011.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (0 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "oak_sapling": 1,
+            "bucket": 1,
+            "furnace": 1,
+            "stone_pickaxe": 1,
+            "oak_planks": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "leaf_litter": 7,
+            "cobblestone": 35,
+            "granite": 12
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "lava",
+            "diorite",
+            "gravel",
+            "copper_ore",
+            "granite",
+            "coal_ore",
+            "water",
+            "dirt",
+            "iron_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "polished_granite",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "oak_button"
+        ]
+      },
+      "action": "!useOn(\"bucket\", \"lava\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFound non-destructive path.\nYou have reached at -473, 34, 1012.\nBlock stone is in the way, moving closer...\nFound non-destructive path.\nYou have reached at -473.0366130811849, 34, 1012.746974536363.\nBlock stone is in the way, not using bucket."
+      }
+    },
+    {
+      "i": 4,
+      "state": {
+        "world": {
+          "position": {
+            "x": -473.58,
+            "y": 34,
+            "z": 1011.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (0 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "oak_sapling": 1,
+            "bucket": 1,
+            "furnace": 1,
+            "stone_pickaxe": 1,
+            "oak_planks": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "leaf_litter": 7,
+            "cobblestone": 35,
+            "granite": 12
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "lava",
+            "diorite",
+            "gravel",
+            "copper_ore",
+            "granite",
+            "coal_ore",
+            "water",
+            "dirt",
+            "iron_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "polished_granite",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "oak_button"
+        ]
+      },
+      "action": "!useOn(\"bucket\", \"lava\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nFound non-destructive path.\nYou have reached at -473, 34, 1012.\nBlock stone is in the way, moving closer...\nPath not found, but attempting to navigate anyway using destructive movements.\nYou have reached at -472.2948640598437, 34, 1012.5423256761563.\nEquipped bucket.\nUsed bucket on lava."
+      }
+    },
+    {
+      "i": 5,
+      "state": {
+        "world": {
+          "position": {
+            "x": -472.49,
+            "y": 35,
+            "z": 1012.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "cobblestone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (0 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "oak_sapling": 1,
+            "furnace": 1,
+            "stone_pickaxe": 1,
+            "oak_planks": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "leaf_litter": 7,
+            "cobblestone": 37,
+            "bucket": 1,
+            "granite": 12
+          },
+          "equipment": {
+            "mainHand": "bucket"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "cobblestone",
+            "diorite",
+            "gravel",
+            "copper_ore",
+            "granite",
+            "lava",
+            "coal_ore",
+            "water",
+            "iron_ore",
+            "dirt"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "polished_granite",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "oak_button"
+        ]
+      },
+      "action": "!useOn(\"bucket\", \"lava\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nPath not found, but attempting to navigate anyway using destructive movements.\nYou have reached at -493, 34, 1028.\nBlock stone is in the way, moving closer...\nFound destructive path.\nYou have reached at -493.41921377739226, 34, 1028.3175522963766.\nEquipped bucket.\nUsed bucket on lava."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -493.5,
+        "y": 35,
+        "z": 1028.5
+      },
+      "dimension": "overworld",
+      "biome": "stony_shore",
+      "timeLabel": "Night"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "cobblestone",
+      "legs": "cave_air",
+      "head": "cave_air",
+      "firstBlockAboveHead": "stone (1 blocks up)"
+    },
+    "inventory": {
+      "counts": {
+        "oak_sapling": 1,
+        "furnace": 1,
+        "stone_pickaxe": 1,
+        "oak_planks": 1,
+        "crafting_table": 1,
+        "wooden_pickaxe": 1,
+        "leaf_litter": 7,
+        "cobblestone": 35,
+        "bucket": 1,
+        "granite": 33
+      },
+      "equipment": {
+        "mainHand": "bucket"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "cave_air",
+        "cobblestone",
+        "lava",
+        "stone",
+        "diorite",
+        "granite",
+        "copper_ore",
+        "raw_copper_block",
+        "lapis_ore",
+        "iron_ore",
+        "andesite",
+        "coal_ore",
+        "gravel"
+      ],
+      "entityTypes": []
+    },
+    "craftable_items": [
+      "polished_granite",
+      "cobblestone_slab",
+      "furnace",
+      "cobblestone_stairs",
+      "cobblestone_wall",
+      "granite_wall",
+      "granite_stairs",
+      "granite_slab",
+      "oak_button"
+    ]
+  },
+  "summary": {
+    "step_count": 5,
+    "last_action": "!useOn(\"bucket\", \"lava\")",
+    "last_result_kind": "command_success",
+    "failed_steps": []
+  }
+}

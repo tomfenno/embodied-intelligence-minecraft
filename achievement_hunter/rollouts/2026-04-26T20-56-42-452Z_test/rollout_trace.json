@@ -1,0 +1,369 @@
+{
+  "objective": "test",
+  "status": "completed",
+  "started_at": "2026-04-26T20:56:42.452Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-26T20:56:42.458Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_porkchop"
+        ],
+        "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
+          "vertices": [
+            {
+              "id": "cooked_porkchop",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "porkchop",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "mob"
+            }
+          ],
+          "edges": [
+            {
+              "from": "porkchop",
+              "to": "cooked_porkchop",
+              "type": "smelting_input",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat_seeds": 26,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 324,
+          "raw_iron": 3,
+          "bucket": 3,
+          "crafting_table": 1,
+          "sugar_cane": 1,
+          "sugar": 2,
+          "stone_pickaxe": 2,
+          "stone_hoe": 1,
+          "stick": 2,
+          "oak_planks": 1,
+          "dirt": 26,
+          "furnace": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:56:42.525Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "porkchop",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [],
+          "source_hint": "pig",
+          "source_kind": "mob",
+          "grounded_nearby_source": "pig"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:56:42.570Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "porkchop",
+        "qty": 1,
+        "action_type": "kill",
+        "parameters": {
+          "source_mob": "pig",
+          "weapon": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:56:42.664Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!attack(\"pig\")",
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat_seeds": 26,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 324,
+          "raw_iron": 3,
+          "bucket": 3,
+          "crafting_table": 1,
+          "sugar_cane": 1,
+          "sugar": 2,
+          "stone_pickaxe": 2,
+          "stone_hoe": 1,
+          "stick": 2,
+          "oak_planks": 1,
+          "dirt": 26,
+          "furnace": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread",
+          "sugar"
+        ],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "short_grass",
+          "dirt_path",
+          "stone",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "pig"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:56:48.730Z",
+      "elapsed": "6s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_porkchop"
+        ],
+        "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
+          "vertices": [
+            {
+              "id": "cooked_porkchop",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat_seeds": 26,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 324,
+          "raw_iron": 3,
+          "bucket": 3,
+          "crafting_table": 1,
+          "sugar_cane": 1,
+          "sugar": 2,
+          "porkchop": 1,
+          "stone_pickaxe": 2,
+          "stone_hoe": 1,
+          "stick": 2,
+          "oak_planks": 1,
+          "dirt": 26,
+          "furnace": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:56:48.774Z",
+      "elapsed": "6s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "cooked_porkchop",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "porkchop",
+              "qty": 1,
+              "type": "smelting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 1,
+              "type": "fuel_input",
+              "consumed": true
+            },
+            {
+              "item": "furnace",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-26T20:56:48.817Z",
+      "elapsed": "6s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "cooked_porkchop",
+        "qty": 1,
+        "action_type": "smelt",
+        "parameters": {
+          "smelting_inputs": [
+            {
+              "item": "porkchop",
+              "qty": 1
+            }
+          ],
+          "fuel_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 1
+            }
+          ],
+          "workstation": "furnace"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:56:48.895Z",
+      "elapsed": "6s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!smelt_item(\"porkchop\", 1, \"oak_planks\")",
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat_seeds": 26,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 324,
+          "raw_iron": 3,
+          "bucket": 3,
+          "crafting_table": 1,
+          "sugar_cane": 1,
+          "sugar": 2,
+          "porkchop": 1,
+          "stone_pickaxe": 2,
+          "stone_hoe": 1,
+          "stick": 2,
+          "oak_planks": 1,
+          "dirt": 26,
+          "furnace": 1
+        },
+        "craftable_items": [
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "bread",
+          "sugar"
+        ],
+        "nearby_blocks": [
+          "short_grass",
+          "grass_block",
+          "dirt",
+          "stone",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-26T20:57:02.674Z",
+      "elapsed": "20s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 2,
+        "why": "all original sinks satisfied",
+        "final": {
+          "vertices": [],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "carrot": 1,
+          "wheat_seeds": 26,
+          "wheat": 5,
+          "egg": 1,
+          "cobblestone": 324,
+          "raw_iron": 3,
+          "bucket": 3,
+          "crafting_table": 1,
+          "sugar_cane": 1,
+          "sugar": 2,
+          "cooked_porkchop": 1,
+          "stone_pickaxe": 2,
+          "stone_hoe": 1,
+          "stick": 2,
+          "furnace": 1,
+          "dirt": 26
+        }
+      }
+    }
+  ],
+  "completed_at": "2026-04-26T20:57:02.676Z",
+  "total_elapsed": "20s",
+  "completion_reason": "all sinks satisfied"
+}

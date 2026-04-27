@@ -1,0 +1,346 @@
+{
+  "objective": "test take 2",
+  "status": "running",
+  "started_at": "2026-04-27T00:04:59.096Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-27T00:04:59.103Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cake"
+        ],
+        "final": {
+          "objective": "Bake a cake.",
+          "sinks": [
+            "cake"
+          ],
+          "vertices": [
+            {
+              "id": "cake",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "milk_bucket",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "mob"
+            },
+            {
+              "id": "sugar",
+              "qty": 2,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "sugar_cane",
+              "qty": 2,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "milk_bucket",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "sugar",
+              "to": "cake",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "sugar_cane",
+              "to": "sugar",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "tuff": 22,
+          "crafting_table": 1,
+          "gravel": 1,
+          "oak_sapling": 1,
+          "coal": 1,
+          "wheat_seeds": 26,
+          "bucket": 3,
+          "granite": 1,
+          "cobbled_deepslate": 95,
+          "furnace": 1,
+          "wheat": 5,
+          "diorite": 7,
+          "raw_iron": 1,
+          "andesite": 25,
+          "stone_shovel": 1,
+          "stone_pickaxe": 1,
+          "snowball": 8,
+          "oak_planks": 1,
+          "stone_hoe": 1,
+          "egg": 3
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-27T00:04:59.167Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "milk_bucket",
+          "qty": 3,
+          "item_type": "item",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [
+            {
+              "item": "bucket",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": "cow",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "sugar_cane",
+          "qty": 2,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "sugar_cane",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-27T00:04:59.201Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T00:04:59.262Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"sugar_cane\")",
+      "state": {
+        "inventory": {
+          "tuff": 22,
+          "crafting_table": 1,
+          "gravel": 1,
+          "oak_sapling": 1,
+          "coal": 1,
+          "wheat_seeds": 26,
+          "bucket": 3,
+          "granite": 1,
+          "cobbled_deepslate": 95,
+          "furnace": 1,
+          "wheat": 5,
+          "diorite": 7,
+          "raw_iron": 1,
+          "andesite": 25,
+          "stone_shovel": 1,
+          "stone_pickaxe": 1,
+          "snowball": 8,
+          "oak_planks": 1,
+          "stone_hoe": 1,
+          "egg": 3
+        },
+        "craftable_items": [
+          "polished_diorite",
+          "polished_andesite",
+          "polished_deepslate",
+          "tuff_slab",
+          "tuff_stairs",
+          "tuff_wall",
+          "polished_tuff",
+          "furnace",
+          "snow_block",
+          "andesite_wall",
+          "diorite_wall",
+          "cobbled_deepslate_wall",
+          "andesite_stairs",
+          "diorite_stairs",
+          "cobbled_deepslate_stairs",
+          "andesite_slab",
+          "diorite_slab",
+          "cobbled_deepslate_slab",
+          "oak_button",
+          "bread"
+        ],
+        "nearby_blocks": [
+          "water",
+          "deepslate",
+          "deepslate_redstone_ore",
+          "gravel"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T00:04:59.263Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"sugar_cane\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T00:04:59.769Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"sugar_cane\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T00:05:00.278Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"sugar_cane\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T00:05:00.793Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"sugar_cane\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T00:05:02.007Z",
+      "elapsed": "2s",
+      "stage": "AM",
+      "attempt": 6,
+      "raw": "!searchForBlock(\"sugar_cane\", 511)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T00:05:26.649Z",
+      "elapsed": "27s",
+      "stage": "RECOVERY",
+      "type": "attempt_start",
+      "attempt": 1,
+      "task": {
+        "target_item": "sugar_cane",
+        "qty": 2,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "sugar_cane",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "diagnosis": "The bot tried to find sugar cane while deep underground in deepslate, where sugar cane cannot generate, so the search exhausted. Get to the surface first, then search and collect nearby sugar cane.",
+      "planned_actions": [
+        {
+          "name": "!goToSurface",
+          "args": []
+        },
+        {
+          "name": "!searchForBlock",
+          "args": [
+            "sugar_cane",
+            256
+          ]
+        },
+        {
+          "name": "!collectBlocks",
+          "args": [
+            "sugar_cane",
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-27T00:05:45.902Z",
+      "elapsed": "46s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 0,
+      "result": {
+        "command": "!goToSurface()",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nPath not found, but attempting to navigate anyway using destructive movements.\nPathfinding stopped: Cannot break deepslate with current tools.\nPathfinding stopped: Path was stopped before it could be completed! Thus, the desired goal was not reached..\nGoing to the surface at y=94.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T00:05:47.215Z",
+      "elapsed": "48s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 1,
+      "result": {
+        "command": "!searchForBlock(\"sugar_cane\", 256)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nCould not find any sugar_cane in 256 blocks.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-27T00:05:47.251Z",
+      "elapsed": "48s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 2,
+      "result": {
+        "command": "!collectBlocks(\"sugar_cane\", 2)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nNo sugar_cane nearby to collect.\nCollected 0 sugar_cane.\n"
+      }
+    }
+  ]
+}

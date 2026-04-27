@@ -1,0 +1,183 @@
+{
+  "objective": "TEST",
+  "task": {
+    "target_item": "wheat",
+    "qty": 3,
+    "action_type": "collect",
+    "parameters": {
+      "source_block": "wheat",
+      "item_dependency": null,
+      "tool": "stone_hoe"
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -262.51,
+            "y": 117,
+            "z": 1136.5
+          },
+          "dimension": "overworld",
+          "biome": "snowy_slopes",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "snow_block (0 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "egg": 3,
+            "stone_hoe": 1,
+            "furnace": 1,
+            "oak_log": 1,
+            "cobblestone": 14,
+            "wooden_pickaxe": 1,
+            "stick": 2,
+            "oak_planks": 1,
+            "crafting_table": 1,
+            "stone_pickaxe": 1,
+            "coal": 3
+          },
+          "equipment": {
+            "mainHand": "furnace"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "snow_block",
+            "coal_ore",
+            "powder_snow",
+            "emerald_ore",
+            "snow",
+            "grass_block"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "oak_planks",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ]
+      },
+      "action": "!search(\"wheat\")",
+      "result": {
+        "success": false,
+        "kind": "search_exhausted",
+        "message": null
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -262.51,
+        "y": 117,
+        "z": 1136.5
+      },
+      "dimension": "overworld",
+      "biome": "snowy_slopes",
+      "timeLabel": "Morning"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "stone",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "snow_block (0 blocks up)"
+    },
+    "inventory": {
+      "counts": {
+        "egg": 3,
+        "stone_hoe": 1,
+        "furnace": 1,
+        "oak_log": 1,
+        "cobblestone": 14,
+        "wooden_pickaxe": 1,
+        "stick": 2,
+        "oak_planks": 1,
+        "crafting_table": 1,
+        "stone_pickaxe": 1,
+        "coal": 3
+      },
+      "equipment": {
+        "mainHand": "furnace"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "stone",
+        "snow_block",
+        "coal_ore",
+        "powder_snow",
+        "emerald_ore",
+        "snow",
+        "grass_block"
+      ],
+      "entityTypes": []
+    },
+    "craftable_items": [
+      "oak_planks",
+      "cobblestone_slab",
+      "torch",
+      "furnace",
+      "cobblestone_stairs",
+      "cobblestone_wall",
+      "lever",
+      "oak_button",
+      "wooden_shovel",
+      "stone_sword",
+      "stone_shovel",
+      "stone_pickaxe",
+      "stone_axe",
+      "stone_hoe"
+    ]
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"wheat\")",
+    "last_result_kind": "search_exhausted",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!search(\"wheat\")",
+        "kind": "search_exhausted",
+        "message": null
+      }
+    ]
+  }
+}

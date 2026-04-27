@@ -16,10 +16,11 @@ function runAsAction (actionFn, resume = false, timeout = -1) {
         const actionFnWithAgent = async () => {
             await actionFn(agent, ...args);
         };
+        // [Achievement Hunter Project] Return {success, message} so callers can check success without string matching.
         const code_return = await agent.actions.runAction(`action:${actionLabel}`, actionFnWithAgent, { timeout, resume });
         if (code_return.interrupted && !code_return.timedout)
-            return;
-        return code_return.message;
+            return { success: false, message: '' };
+        return { success: code_return.success, message: code_return.message };
     }
 
     return wrappedAction;

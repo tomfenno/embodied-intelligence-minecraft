@@ -14,6 +14,13 @@ export function getCommand(name) {
     return commandMap[name];
 }
 
+export function registerCommands(commands) {
+    for (const command of commands) {
+        commandMap[command.name] = command;
+        commandList.push(command);
+    }
+}
+
 export function blacklistCommands(commands) {
     const unblockable = ['!stop', '!stats', '!inventory', '!goal'];
     for (let command_name of commands) {
@@ -211,8 +218,9 @@ function numParams(command) {
 
 export async function executeCommand(agent, message) {
     let parsed = parseCommandMessage(message);
+    // [Achievement Hunter Project] Parse/validation errors wrapped as {success, message} to match action command shape.
     if (typeof parsed === 'string')
-        return parsed; //The command was incorrectly formatted or an invalid input was given.
+        return { success: false, message: parsed };
     else {
         console.log('parsed command:', parsed);
         const command = getCommand(parsed.commandName);
@@ -221,8 +229,9 @@ export async function executeCommand(agent, message) {
             numArgs = parsed.args.length;
         }
         if (numArgs !== numParams(command))
-            return `Command ${command.name} was given ${numArgs} args, but requires ${numParams(command)} args.`;
+            return { success: false, message: `Command ${command.name} was given ${numArgs} args, but requires ${numParams(command)} args.` };
         else {
+            // Action commands (via runAsAction) return {success, message}; query commands return a plain string.
             const result = await command.perform(agent, ...parsed.args);
             return result;
         }

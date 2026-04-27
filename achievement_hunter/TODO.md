@@ -28,36 +28,5 @@
 
 > **Note:** If a recurring but hard-to-diagnose bug appears, run step 3 in the web browser so the self-refine LLMs can be probed more directly.
 
-
-Here is a clearer version of that TODO:
-
-#### SCSG Feedback and Refine Prompts
-
-* These prompts currently include the entire original `SCSG prompt` as input. In contrast, the `PTD self-refine prompts` use a condensed version of the original prompt and take only the `objective` as input. We may be able to improve the `SCSG` prompts by following a similar design:
-
-  * move a condensed version of the original `SCSG prompt` into the prompt itself
-  * replace the full `SCSG prompt` input with the `PTD graph` as the main input
-
-Here is a clearer version of that TODO:
-
-#### Next Task Selector (NTS)
-
-* The current `NTS` prompt only covers the basic functionality we want. We may want to expand its capabilities in the following ways:
-
-1. Allow the `NTS` to prune the `SCSG` as it proceeds. This would let us reuse a single `SCSG` across multiple time steps, which could reduce the need to wait for a newly generated `SCSG`.
-
-2. If we allow the `NTS` to prune the `SCSG`, we should also provide it with a history of environment `actions` as input.
-
-3. Experiment with having the `NTS` output multiple `tasks`, either:
-
-   * in no particular order, or
-   * in a prioritized sequence
-
-Here is a clearer version of that TODO:
-
-#### Action Mediator (AM)
-
-* The `AM` prompt may need to be expanded to accept a `memory` input, similar to the one used by `Andy`.
-
-* We may also want to experiment with adding a dedicated `coding` prompt, similar to the setup used by `Andy`.
-
+#### Bug fixes
+1. SGSG, need to condition on nearby blocks and account for pruning buckets.
