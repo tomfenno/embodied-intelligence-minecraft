@@ -83,48 +83,44 @@ logic as protection.
 
 ## Fix Recommendations
 
-### Fix A — Correct the Water Condition in `self_preservation` ✅ Applied (corrected)
+### Fix A — Use `bot.oxygenLevel` as the Drowning Signal ✅ Applied
 
-**Change the water check to cover the fully-submerged case only, and replace passive
-`jump=true` with an active escape via `execute()`.**
+**Replace all water block checks with a direct oxygen level check. Escape only when the bot
+is genuinely running out of air.**
 
 ```js
-// ah_modes.js:46–49 — self_preservation.update, first branch
-if (block.name === 'water' && blockAbove.name === 'water') {
+// ah_modes.js:45–49 — self_preservation.update, first branch
+if (bot.oxygenLevel != null && bot.oxygenLevel < 15) {
   execute(this, agent, async () => {
     await skills.moveAway(bot, 5);
   });
 }
 ```
 
-**Patch location:** `achievement_hunter/src/agent/ah_modes.js:46–49`
+**Patch location:** `achievement_hunter/src/agent/ah_modes.js:45–49`
 
-The key changes:
-1. `block.name === 'water' && blockAbove.name === 'water'` — triggers only when fully submerged
-   (both feet block and head block are water). Normal pathfinder traversal through water (wading
-   or swimming with head above) does NOT trigger.
-2. `execute()` wraps the action in `agent.actions.runAction`, interrupting the current action
-   and running the escape. Replaces the purely passive `setControlState('jump', true)`.
-3. The `!bot.pathfinder.goal` gate is removed — escape fires regardless of whether the bot
-   is pathfinding.
+**Source:** `bot.oxygenLevel` is provided by mineflayer's `breath.js` / `entities.js` plugins
+(`air_supply / 15`, range 0–20). 20 = full air. Depletes only when the bot's head is fully
+submerged. Recharges immediately when the head surfaces.
 
-**Why `&&` not `||`:** Using `||` (any water contact) caused a regression: `self_preservation`
-would fire on every tick while the bot waded through water during normal `searchForBlock`
-navigation, interrupting it mid-path. `searchForBlock` would then re-interrupt
-`self_preservation`, causing a ping-pong loop where both actions kept throwing `PathStopped`
-and neither completed. Only fully-submerged state (head underwater) is an actual drowning
-hazard; wading and surface swimming are normal and must not be interrupted.
+**Why this is better than all previous approaches:**
 
-**Why `moveAway` works for water (unlike lava):** The pathfinder treats water as passable
-(high cost, not infinite). `moveAway(bot, 5)` finds a valid path from inside water to solid
-ground. This is the opposite of the lava case where the pathfinder fails.
+| Approach | Problem |
+|---|---|
+| `blockAbove === 'water'` (original) | Missed fully-submerged cave case (ceiling above head) |
+| `block \|\| blockAbove === 'water'` | Fired on wading; caused ping-pong PathStopped loop |
+| `block && blockAbove === 'water'` | Still fired during pathfinder navigation through 2+-block-deep lakes |
+| `!bot.pathfinder.goal && water` | `bot.pathfinder.goal` unreliable during `setMovements` transitions |
+| **`bot.oxygenLevel < 15`** | Fires only when bot has been genuinely submerged for ~3.75 s — not on wading, not on brief head dips during swimming, not during active pathfinder navigation through water |
 
-**Spam guard:** `execute()` sets `mode.active = true` for the duration. `ModeController.update()`
-checks `!mode.active` before calling any mode's update, so the escape won't be re-entered
-until the previous `moveAway` completes.
+**Threshold:** 15 out of 20 = lost 5 air units = ~3.75 seconds of continuous head submersion.
+- Short enough to escape before dangerous levels (10 units = ~7.5 s remaining before total air loss, then drowning damage)
+- Long enough to ignore brief head dips during normal pathfinder water traversal
+- `!= null` guard handles the pre-spawn window before any `breath` packet arrives
 
-**Robustness:** High. Covers the fully-submerged cave case without interfering with normal
-water traversal during navigation.
+**Wading (feet in water, head above):** oxygenLevel stays at 20 → no trigger ✓  
+**Active swimming through a river:** bot surfaces within ~2–3 s → oxygenLevel stays ≥ 15 → no trigger ✓  
+**Stuck submerged (LLM call, pathfinder stalled):** oxygenLevel steadily drops below 15 → trigger ✓
 
 ---
 

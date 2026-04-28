@@ -1,0 +1,118 @@
+{
+  "objective": "test",
+  "task": {
+    "target_item": "porkchop",
+    "qty": 1,
+    "action_type": "kill",
+    "parameters": {
+      "source_mob": "pig",
+      "weapon": null
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -2039.56,
+            "y": 76,
+            "z": -3858.5
+          },
+          "dimension": "overworld",
+          "biome": "stony_shore",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "sandstone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {},
+          "equipment": {
+            "mainHand": null
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "sandstone",
+            "stone"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": []
+      },
+      "action": "!search(\"pig\")",
+      "result": {
+        "success": false,
+        "kind": "search_exhausted",
+        "message": null
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -2039.56,
+        "y": 76,
+        "z": -3858.5
+      },
+      "dimension": "overworld",
+      "biome": "stony_shore",
+      "timeLabel": "Morning"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "sandstone",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "none"
+    },
+    "inventory": {
+      "counts": {},
+      "equipment": {
+        "mainHand": null
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "sandstone",
+        "stone"
+      ],
+      "entityTypes": []
+    },
+    "craftable_items": []
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"pig\")",
+    "last_result_kind": "search_exhausted",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!search(\"pig\")",
+        "kind": "search_exhausted",
+        "message": null
+      }
+    ]
+  }
+}

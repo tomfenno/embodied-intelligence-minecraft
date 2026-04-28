@@ -1,0 +1,131 @@
+{
+  "objective": "test",
+  "task": {
+    "target_item": "porkchop",
+    "qty": 1,
+    "action_type": "kill",
+    "parameters": {
+      "source_mob": "pig",
+      "weapon": null
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -2019.59,
+            "y": 62.17,
+            "z": -3877.41
+          },
+          "dimension": "overworld",
+          "biome": "ocean",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "water",
+          "legs": "water",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {},
+          "equipment": {
+            "mainHand": null
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "water",
+            "dirt",
+            "grass_block",
+            "kelp",
+            "stone",
+            "kelp_plant",
+            "sand"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": []
+      },
+      "action": "!search(\"pig\")",
+      "result": {
+        "success": false,
+        "kind": "search_exhausted",
+        "message": null
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -2017.57,
+        "y": 63,
+        "z": -3880.56
+      },
+      "dimension": "overworld",
+      "biome": "ocean",
+      "timeLabel": "Morning"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "grass_block",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "none"
+    },
+    "inventory": {
+      "counts": {},
+      "equipment": {
+        "mainHand": null
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "grass_block",
+        "water",
+        "dirt",
+        "sand",
+        "stone",
+        "kelp",
+        "kelp_plant",
+        "seagrass",
+        "coal_ore",
+        "andesite"
+      ],
+      "entityTypes": []
+    },
+    "craftable_items": []
+  },
+  "summary": {
+    "step_count": 1,
+    "last_action": "!search(\"pig\")",
+    "last_result_kind": "search_exhausted",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!search(\"pig\")",
+        "kind": "search_exhausted",
+        "message": null
+      }
+    ]
+  }
+}

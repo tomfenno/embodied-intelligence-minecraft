@@ -12,6 +12,7 @@ Bugs identified from the `hard-code-nts-am` branch run logs (2026-04-16, 2026-04
 | 6 | `BUG6_drowning_during_llm_call.md` | High | **Fixed** — `ah_modes.js:46–49` (water condition), `failure_replanner.js:180–216` (pre-LLM check) | Low–Medium |
 | 7 | `BUG7_flowing_liquid_triggers_useOn.md` | Medium | **Fixed** — `agent_state.js:34,60` (metadata filter) | Low — one-line guard in both block loops |
 | 8 | `BUG8_useToolOnBlock_wall_obstruction.md` | Medium | **Fixed** — `skills.js` (`// Start of AH code` block after line 2083) | Low — dig-through obstruction instead of random angle hunt |
+| 9 | `BUG9_goalchanged_crashes_spl_at_recovery_boundary.md` | High | **Fixed** — `failure_replanner.js:185–210` (`ensure_safe_before_llm`) | Low — oxygenLevel condition + try-catch |
 
 ## Priority Order
 
@@ -32,11 +33,11 @@ Bugs identified from the `hard-code-nts-am` branch run logs (2026-04-16, 2026-04
   pathfinder treats lava as impassable, escape fails silently. Fix A replaced with
   direct-control sprint-jump escape (`ah_modes.js:69–119`). Fix B adds sneak state during
   `!useOn("bucket", "lava")` to prevent falling in (`actions.js:92–102`).
-- **BUG 6:** Fixed (corrected). Initial Fix A used `||` (any water contact) which caused a
-  regression: `self_preservation` fired on every tick during normal water traversal, ping-ponging
-  with `searchForBlock` and causing `PathStopped` loops. Corrected to `&&` (fully submerged only —
-  both feet and head blocks are water). Pre-LLM hazard check in `failure_replanner.js:180–216`
-  intentionally retains `||` (one-shot check, not a recurring tick).
+- **BUG 6:** Fixed (third iteration). Water block checks (`||`, `&&`, `!pathfinder.goal`) all
+  had edge cases during pathfinder navigation. Final fix uses `bot.oxygenLevel < 15` (mineflayer
+  `air_supply / 15`, range 0–20): fires only after ~3.75 s of continuous head submersion, ignores
+  wading and brief swimming dips, can't false-positive on pathfinder navigation. Pre-LLM hazard
+  check in `failure_replanner.js:180–216` retains water block check (one-shot, not a tick).
 - **BUG 7:** Fixed. `nearby_blocks` included flowing water/lava (same block name as source,
   metadata 1–7) which caused `mediate_interact` to emit `!useOn` prematurely. Fixed by
   skipping `COLLECTIBLE_LIQUIDS` blocks with `metadata !== 0` in both `get_am_state` and
@@ -48,6 +49,11 @@ Bugs identified from the `hard-code-nts-am` branch run logs (2026-04-16, 2026-04
 - **BUG 1:** Plausible hypothesis. A protocol version mismatch is the most likely
   cause, but the exact wrong type mapping has not been confirmed from raw packet data.
   "Likely cause" — not proven root cause.
+- **BUG 9:** High confidence. Crash stack trace directly shows GoalChanged thrown from
+  `moveAway` inside `ensure_safe_before_llm`, propagating uncaught through `recover_failed_task`
+  and the SPL while loop. Self_preservation completes successfully after the crash — confirms the
+  exception is a race artifact, not a real failure. Fix A (try-catch in `ensure_safe_before_llm`)
+  is sufficient; Fix B (SPL-level catch) makes the loop resilient to any future similar race.
 - **BUG 8:** Fixed. Root cause confirmed by `!goToCoordinates(-479, -38, -1764, 1)` failing ×3
   in recovery attempt 2 — direct proof that `GoalNear=1` at the lava block is unreachable. Fix
   replaces random angle-hunting with a dig-through: bot only attempts `useOn` when view is clear

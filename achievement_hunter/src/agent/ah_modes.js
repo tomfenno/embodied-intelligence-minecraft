@@ -42,7 +42,7 @@ const modes_list = [
       let blockAbove = bot.blockAt(bot.entity.position.offset(0, 1, 0));
       if (!block) block = {name: 'air'};
       if (!blockAbove) blockAbove = {name: 'air'};
-      if (block.name === 'water' && blockAbove.name === 'water') {
+      if (bot.oxygenLevel != null && bot.oxygenLevel < 15) {
         execute(this, agent, async () => {
           await skills.moveAway(bot, 5);
         });
@@ -84,25 +84,30 @@ const modes_list = [
             const bot_pos = bot.entity.position;
             const hazard = new Set(['lava', 'fire']);
             const directions = [
-              {x: 1, z: 0}, {x: -1, z: 0},
-              {x: 0, z: 1},  {x: 0, z: -1},
-              {x: 1, z: 1},  {x: -1, z: 1},
-              {x: 1, z: -1}, {x: -1, z: -1},
+              {x: 1, z: 0},
+              {x: -1, z: 0},
+              {x: 0, z: 1},
+              {x: 0, z: -1},
+              {x: 1, z: 1},
+              {x: -1, z: 1},
+              {x: 1, z: -1},
+              {x: -1, z: -1},
             ];
             const escape_dir = directions.find(d => {
               const b = bot.blockAt(bot_pos.offset(d.x, 0, d.z));
               return b != null && !hazard.has(b.name);
             });
-            const look_target = escape_dir
-                ? bot_pos.offset(escape_dir.x * 5, 1, escape_dir.z * 5)
-                : bot_pos.offset(5, 1, 0);
+            const look_target = escape_dir ?
+                bot_pos.offset(escape_dir.x * 5, 1, escape_dir.z * 5) :
+                bot_pos.offset(5, 1, 0);
             await bot.lookAt(look_target, true);
             bot.setControlState('jump', true);
             bot.setControlState('sprint', true);
             await new Promise(r => setTimeout(r, 3000));
             bot.clearControlStates();
 
-            // Phase 2: if now on solid ground, pathfind to water to extinguish fire.
+            // Phase 2: if now on solid ground, pathfind to water to extinguish
+            // fire.
             const cur_block = bot.blockAt(bot.entity.position);
             if (cur_block && !hazard.has(cur_block.name)) {
               const nearest_water = world.getNearestBlock(bot, 'water', 20);

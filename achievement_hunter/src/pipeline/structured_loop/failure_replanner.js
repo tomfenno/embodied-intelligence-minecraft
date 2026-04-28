@@ -187,17 +187,25 @@ async function ensure_safe_before_llm(agent) {
   const block = bot.blockAt(bot.entity.position);
   const block_above = bot.blockAt(bot.entity.position.offset(0, 1, 0));
 
-  const in_water = block?.name === 'water' || block_above?.name === 'water';
+  // Match self_preservation's oxygenLevel threshold — avoids unnecessary moveAway
+  // calls during shallow wading, which reduces race opportunities with the mode.
+  const in_water = bot.oxygenLevel != null && bot.oxygenLevel < 15;
   const in_lava  = block?.name === 'lava'  || block_above?.name === 'lava';
 
-  if (in_water) {
-    await skills.moveAway(bot, 10);
-  } else if (in_lava) {
-    await bot.lookAt(bot.entity.position.offset(5, 1, 0), true);
-    bot.setControlState('jump', true);
-    bot.setControlState('sprint', true);
-    await new Promise(r => setTimeout(r, 3000));
-    bot.clearControlStates();
+  try {
+    if (in_water) {
+      await skills.moveAway(bot, 10);
+    } else if (in_lava) {
+      await bot.lookAt(bot.entity.position.offset(5, 1, 0), true);
+      bot.setControlState('jump', true);
+      bot.setControlState('sprint', true);
+      await new Promise(r => setTimeout(r, 3000));
+      bot.clearControlStates();
+    }
+  } catch (e) {
+    // A mode (self_preservation) raced with this escape and won — it moved the
+    // bot to safety already. Log and proceed; the mode's escape is sufficient.
+    spl.warn(`ensure_safe_before_llm: escape interrupted (${e.message}) — mode moved bot to safety.`);
   }
 }
 

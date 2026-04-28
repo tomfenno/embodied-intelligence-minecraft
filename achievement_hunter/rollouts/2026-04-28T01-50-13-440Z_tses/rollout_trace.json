@@ -1,0 +1,201 @@
+{
+  "objective": "tses",
+  "status": "running",
+  "started_at": "2026-04-28T01:50:13.440Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-28T01:50:13.446Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "cooked_porkchop"
+        ],
+        "final": {
+          "objective": "Cook a porkchop.",
+          "sinks": [
+            "cooked_porkchop"
+          ],
+          "vertices": [
+            {
+              "id": "cooked_porkchop",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "porkchop",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "mob"
+            }
+          ],
+          "edges": [
+            {
+              "from": "porkchop",
+              "to": "cooked_porkchop",
+              "type": "smelting_input",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "spruce_log": 1,
+          "cobblestone": 5,
+          "wooden_pickaxe": 1,
+          "stick": 2,
+          "spruce_planks": 3,
+          "dirt": 1,
+          "crafting_table": 1,
+          "furnace": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:50:13.507Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "porkchop",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "mob",
+          "satisfied_inputs": [],
+          "source_hint": "pig",
+          "source_kind": "mob",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:50:13.546Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "porkchop",
+        "qty": 1,
+        "action_type": "kill",
+        "parameters": {
+          "source_mob": "pig",
+          "weapon": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:50:13.663Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"pig\")",
+      "state": {
+        "inventory": {
+          "spruce_log": 1,
+          "cobblestone": 5,
+          "wooden_pickaxe": 1,
+          "stick": 2,
+          "spruce_planks": 3,
+          "dirt": 1,
+          "crafting_table": 1,
+          "furnace": 1
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "spruce_slab",
+          "cobblestone_slab",
+          "lever",
+          "spruce_button",
+          "spruce_pressure_plate",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "sandstone",
+          "water",
+          "tall_seagrass",
+          "seagrass",
+          "sand",
+          "dirt"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "salmon",
+            "squid"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:50:13.667Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForEntity(\"pig\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:50:14.174Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForEntity(\"pig\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:50:14.678Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForEntity(\"pig\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:50:16.059Z",
+      "elapsed": "2s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForEntity(\"pig\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:50:19.254Z",
+      "elapsed": "5s",
+      "stage": "AM",
+      "attempt": 6,
+      "raw": "!searchForEntity(\"pig\", 511)",
+      "meta": {
+        "source": "search"
+      }
+    }
+  ]
+}

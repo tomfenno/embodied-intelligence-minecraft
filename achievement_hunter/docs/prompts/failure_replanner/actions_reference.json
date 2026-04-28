@@ -31,7 +31,8 @@
     "constraints": {
       "search_range": {
         "min": 32,
-        "max": 511
+        "max": 500,
+        "note": "Passing a search_range below the min or above the max will cause the command to fail."
       }
     },
     "examples": [
@@ -46,7 +47,8 @@
     "constraints": {
       "search_range": {
         "min": 32,
-        "max": 512
+        "max": 500,
+        "note": "Passing a search_range below the min or above the max will cause the command to fail."
       }
     },
     "examples": [
