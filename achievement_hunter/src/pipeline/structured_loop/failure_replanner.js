@@ -45,7 +45,7 @@ function load_available_actions() {
 }
 
 // Converts {name, args} into a bot command string e.g.
-// !searchForBlock("pumpkin", 512)
+// !search("pumpkin")
 function format_action_as_command(action) {
   const formatted_args = action.args.map(arg => {
     if (typeof arg === 'string') return JSON.stringify(arg);

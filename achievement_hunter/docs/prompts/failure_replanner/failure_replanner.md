@@ -82,7 +82,7 @@ Return only valid JSON matching this schema:
         "properties": {
           "name": {
             "type": "string",
-            "description": "Action name exactly as listed in available_actions, e.g. !searchForBlock."
+            "description": "Action name exactly as listed in available_actions, e.g. !search."
           },
           "args": {
             "type": "array",
