@@ -25,7 +25,8 @@ const max_collect_qty = 16;
 
 // Only these kinds represent genuine command failures worth replanning.
 // Search-outcome kinds (search_found_not_reached, search_exhausted, etc.)
-// are navigation results, not execution failures, and should not trigger recovery.
+// are navigation results, not execution failures, and should not trigger
+// recovery.
 const RECOVERABLE_FAILURE_KINDS = new Set([
   'command_failure',
   'unstructured_failure_result',
@@ -34,11 +35,12 @@ const RECOVERABLE_FAILURE_KINDS = new Set([
 ]);
 
 function has_recoverable_failure(task_trace) {
-  return (task_trace.summary?.failed_steps ?? []).some(
-      s => RECOVERABLE_FAILURE_KINDS.has(s.kind));
+  return (task_trace.summary?.failed_steps ?? [])
+      .some(s => RECOVERABLE_FAILURE_KINDS.has(s.kind));
 }
 
-export async function execute_task_action(task, agent, log, model = null, graph = null) {
+export async function execute_task_action(
+    task, agent, log, model = null, graph = null) {
   const task_trace = create_task_trace(task, log);
 
   let repeated_failure_signature = null;
@@ -74,14 +76,16 @@ export async function execute_task_action(task, agent, log, model = null, graph 
         spl.warn(`Search for "${search_target}" already attempted, stopping.`);
         current_step.result = create_step_result(
             false, 'search_already_attempted',
-            `Search for "${search_target}" already attempted in this action sequence`);
+            `Search for "${
+                search_target}" already attempted in this action sequence`);
         attempt_index = max_inner_retries;
         continue;
       }
       current_step.result = await handle_search_action(
           search_target, state, agent, log, attempt_number);
       if (current_step.result.kind === 'search_exhausted') {
-        searched_targets.add(search_target);  // Only block re-search when not found.
+        searched_targets.add(
+            search_target);  // Only block re-search when not found.
         attempt_index = max_inner_retries;
       }
       // On search_success or search_found_not_reached (PathStopped): allow
@@ -173,14 +177,18 @@ export async function execute_task_action(task, agent, log, model = null, graph 
               repeated_failure_count}) for:`,
           action.command);
 
-      finalize_task_trace(task_trace, agent, log, 'fail', 'repeated_identical_failure');
-      if (model && has_recoverable_failure(task_trace)) return await recover_failed_task(task_trace, agent, model, graph, log);
+      finalize_task_trace(
+          task_trace, agent, log, 'fail', 'repeated_identical_failure');
+      if (model && has_recoverable_failure(task_trace))
+        return await recover_failed_task(task_trace, agent, model, graph, log);
       return 'fail';
     }
   }
 
-  finalize_task_trace(task_trace, agent, log, 'fail', 'exhausted_inner_retries');
-  if (model) return await recover_failed_task(task_trace, agent, model, graph, log);
+  finalize_task_trace(
+      task_trace, agent, log, 'fail', 'exhausted_inner_retries');
+  if (model)
+    return await recover_failed_task(task_trace, agent, model, graph, log);
   return 'fail';
 }
 
@@ -285,6 +293,7 @@ export function mediate_interact(task, state) {
   if (nearby_blocks.includes(target)) {
     return create_command_action(`!useOn("${tool}", "${target}")`);
   }
+
 
   return create_command_action(`!search("${target}")`);
 }

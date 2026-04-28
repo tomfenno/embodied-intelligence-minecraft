@@ -6,15 +6,18 @@ import {executeCommand} from '../../../../src/agent/commands/index.js';
 import * as skills from '../../../../src/agent/library/skills.js';
 import {get_recovery_trace_state, get_sgsg_state} from '../agent_state.js';
 import {extract_json} from '../json_utils.js';
-import {compute_scsg} from '../scsg.js';
 import {fill_failure_replanner_prompt} from '../prompt_utils.js';
+import {compute_scsg} from '../scsg.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const AVAILABLE_ACTIONS_PATH =
-    path.join(__dirname, '../../../docs/prompts/failure_replanner/actions_reference.json');
+const AVAILABLE_ACTIONS_PATH = path.join(
+    __dirname,
+    '../../../docs/prompts/failure_replanner/actions_reference.json');
 
 const MAX_RECOVERY_ATTEMPTS = 3;
 const MAX_ACTION_RETRIES = 3;
+
+const craft_debounce_ms = 750;
 
 const HARD_FAILURE_KINDS =
     new Set(['runner_exception', 'invalid_command', 'unavailable_action']);
@@ -34,7 +37,8 @@ function load_available_actions() {
   return _available_actions;
 }
 
-// Converts {name, args} into a bot command string e.g. !searchForBlock("pumpkin", 512)
+// Converts {name, args} into a bot command string e.g.
+// !searchForBlock("pumpkin", 512)
 function format_action_as_command(action) {
   const formatted_args = action.args.map(arg => {
     if (typeof arg === 'string') return JSON.stringify(arg);
@@ -47,15 +51,18 @@ function format_action_as_command(action) {
 
 async function run_action(action, agent) {
   const command = format_action_as_command(action);
-  const is_lava_useOn = command.startsWith('!useOn(') && command.includes('"lava"');
+  const is_lava_useOn =
+      command.startsWith('!useOn(') && command.includes('"lava"');
 
   if (is_lava_useOn) agent.bot.setControlState('sneak', true);
   try {
     const env_result = await executeCommand(agent, command);
+    await sleep(craft_debounce_ms);
     return {
       command,
       success: env_result?.success === true,
-      kind: env_result?.success === true ? 'command_success' : 'command_failure',
+      kind: env_result?.success === true ? 'command_success' :
+                                           'command_failure',
       message: env_result?.message ?? null,
     };
   } catch (e) {
@@ -96,21 +103,22 @@ function infer_terminal_reason(action_results) {
 function build_failed_trace_from_attempt(
     original_failed_trace, action_results, latest_state) {
   const steps = action_results.map((result, i) => ({
-    i: i + 1,
-    action: result.command,
-    result: {
-      success: result.success,
-      kind: result.kind,
-      message: result.message,
-    },
-  }));
+                                     i: i + 1,
+                                     action: result.command,
+                                     result: {
+                                       success: result.success,
+                                       kind: result.kind,
+                                       message: result.message,
+                                     },
+                                   }));
 
-  const failed_steps = steps.filter(s => !s.result.success).map(s => ({
-    i: s.i,
-    action: s.action,
-    kind: s.result.kind,
-    message: s.result.message,
-  }));
+  const failed_steps =
+      steps.filter(s => !s.result.success).map(s => ({
+                                                 i: s.i,
+                                                 action: s.action,
+                                                 kind: s.result.kind,
+                                                 message: s.result.message,
+                                               }));
 
   return {
     objective: original_failed_trace.objective,
@@ -170,7 +178,8 @@ function validate_replanner_output(output, available_actions) {
     }
 
     if (!Array.isArray(action.args)) {
-      throw new Error(`Action args must be an array: ${JSON.stringify(action)}`);
+      throw new Error(
+          `Action args must be an array: ${JSON.stringify(action)}`);
     }
 
     for (const arg of action.args) {
@@ -187,10 +196,11 @@ async function ensure_safe_before_llm(agent) {
   const block = bot.blockAt(bot.entity.position);
   const block_above = bot.blockAt(bot.entity.position.offset(0, 1, 0));
 
-  // Match self_preservation's oxygenLevel threshold — avoids unnecessary moveAway
-  // calls during shallow wading, which reduces race opportunities with the mode.
+  // Match self_preservation's oxygenLevel threshold — avoids unnecessary
+  // moveAway calls during shallow wading, which reduces race opportunities with
+  // the mode.
   const in_water = bot.oxygenLevel != null && bot.oxygenLevel < 15;
-  const in_lava  = block?.name === 'lava'  || block_above?.name === 'lava';
+  const in_lava = block?.name === 'lava' || block_above?.name === 'lava';
 
   try {
     if (in_water) {
@@ -205,7 +215,8 @@ async function ensure_safe_before_llm(agent) {
   } catch (e) {
     // A mode (self_preservation) raced with this escape and won — it moved the
     // bot to safety already. Log and proceed; the mode's escape is sufficient.
-    spl.warn(`ensure_safe_before_llm: escape interrupted (${e.message}) — mode moved bot to safety.`);
+    spl.warn(`ensure_safe_before_llm: escape interrupted (${
+        e.message}) — mode moved bot to safety.`);
   }
 }
 
@@ -215,7 +226,8 @@ async function ensure_safe_before_llm(agent) {
  * Accepts the failed trace, the live agent, and a single LlmClient (model).
  * Returns 'success' if recovery completed the task, or 'fail' otherwise.
  */
-export async function recover_failed_task(failed_trace, agent, model, graph, log = null) {
+export async function recover_failed_task(
+    failed_trace, agent, model, graph, log = null) {
   const available_actions = load_available_actions();
   const task = failed_trace.task;
   const previous_diagnoses = [];
@@ -257,19 +269,25 @@ export async function recover_failed_task(failed_trace, agent, model, graph, log
       actions: replanner_output.actions,
     });
 
-    log?.recovery_attempt(attempt, task, replanner_output.diagnosis, replanner_output.actions);
+    log?.recovery_attempt(
+        attempt, task, replanner_output.diagnosis, replanner_output.actions);
 
     const action_results = [];
     let latest_state = null;
     let hard_failed = false;
 
-    for (let action_index = 0; action_index < replanner_output.actions.length; action_index++) {
+    for (let action_index = 0; action_index < replanner_output.actions.length;
+         action_index++) {
       const action = replanner_output.actions[action_index];
 
       let result = null;
       for (let retry = 0; retry < MAX_ACTION_RETRIES; retry++) {
-        if (retry > 0) spl.log(`Retrying action (${retry}/${MAX_ACTION_RETRIES - 1}):`, format_action_as_command(action));
-        else spl.log('Executing:', format_action_as_command(action));
+        if (retry > 0)
+          spl.log(
+              `Retrying action (${retry}/${MAX_ACTION_RETRIES - 1}):`,
+              format_action_as_command(action));
+        else
+          spl.log('Executing:', format_action_as_command(action));
 
         result = await run_action(action, agent);
         spl.log('Result:', result);
@@ -301,8 +319,8 @@ export async function recover_failed_task(failed_trace, agent, model, graph, log
 
     if (hard_failed) break;
 
-    failed_trace =
-        build_failed_trace_from_attempt(failed_trace, action_results, latest_state);
+    failed_trace = build_failed_trace_from_attempt(
+        failed_trace, action_results, latest_state);
   }
 
   spl.warn(`Recovery exhausted after ${MAX_RECOVERY_ATTEMPTS} attempts.`);
