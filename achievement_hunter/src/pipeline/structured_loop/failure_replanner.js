@@ -327,3 +327,7 @@ export async function recover_failed_task(
   log?.recovery_end('fail');
   return 'fail';
 }
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

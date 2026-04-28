@@ -42,8 +42,9 @@ const modes_list = [
       let blockAbove = bot.blockAt(bot.entity.position.offset(0, 1, 0));
       if (!block) block = {name: 'air'};
       if (!blockAbove) blockAbove = {name: 'air'};
-      if (bot.oxygenLevel != null && bot.oxygenLevel < 15) {
+      if (blockAbove.name === 'water') {
         // does not call execute so does not interrupt other actions
+        say(agent, 'I\'m drowning! :(');
         if (!bot.pathfinder.goal) {
           bot.setControlState('jump', true);
         }
