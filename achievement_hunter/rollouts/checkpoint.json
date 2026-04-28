@@ -1,39 +1,62 @@
 {
-  "objective": "test",
+  "objective": "tset",
   "graph": {
-    "objective": "Create an Iron Golem.",
+    "objective": "Bake a cake.",
     "sinks": [
-      "iron_block",
-      "carved_pumpkin"
+      "cake"
     ],
     "vertices": [
       {
-        "id": "iron_block",
-        "qty": 4,
-        "item_type": "item",
-        "acquisition_dependency": "none"
-      },
-      {
-        "id": "carved_pumpkin",
+        "id": "cake",
         "qty": 1,
         "item_type": "item",
         "acquisition_dependency": "none"
       },
       {
+        "id": "milk_bucket",
+        "qty": 3,
+        "item_type": "item",
+        "acquisition_dependency": "mob"
+      },
+      {
+        "id": "sugar",
+        "qty": 2,
+        "item_type": "item",
+        "acquisition_dependency": "none"
+      },
+      {
+        "id": "wheat",
+        "qty": 3,
+        "item_type": "resource",
+        "acquisition_dependency": "none"
+      },
+      {
+        "id": "egg",
+        "qty": 1,
+        "item_type": "resource",
+        "acquisition_dependency": "mob"
+      },
+      {
+        "id": "bucket",
+        "qty": 3,
+        "item_type": "item",
+        "acquisition_dependency": "none"
+      },
+      {
         "id": "iron_ingot",
-        "qty": 38,
+        "qty": 9,
         "item_type": "item",
         "acquisition_dependency": "none"
       },
       {
         "id": "raw_iron",
-        "qty": 38,
+        "qty": 9,
         "item_type": "resource",
         "acquisition_dependency": "none"
       },
       {
         "id": "coal",
-        "qty": 5,
+        "qty": 2,
         "item_type": "resource",
         "acquisition_dependency": "none"
       },
@@ -44,9 +67,33 @@
         "acquisition_dependency": "none"
       },
       {
-        "id": "crafting_table",
+        "id": "stone_pickaxe",
         "qty": 1,
-        "item_type": "workstation",
+        "item_type": "tool",
+        "acquisition_dependency": "none"
+      },
+      {
+        "id": "wooden_pickaxe",
+        "qty": 1,
+        "item_type": "tool",
+        "acquisition_dependency": "none"
+      },
+      {
+        "id": "stone_hoe",
+        "qty": 1,
+        "item_type": "tool",
+        "acquisition_dependency": "none"
+      },
+      {
+        "id": "cobblestone",
+        "qty": 13,
+        "item_type": "resource",
+        "acquisition_dependency": "none"
+      },
+      {
+        "id": "stick",
+        "qty": 8,
+        "item_type": "item",
         "acquisition_dependency": "none"
       },
       {
@@ -62,53 +109,71 @@
         "acquisition_dependency": "none"
       },
       {
-        "id": "stick",
-        "qty": 4,
-        "item_type": "item",
-        "acquisition_dependency": "none"
-      },
-      {
-        "id": "wooden_pickaxe",
-        "qty": 1,
-        "item_type": "tool",
-        "acquisition_dependency": "none"
-      },
-      {
-        "id": "cobblestone",
-        "qty": 11,
+        "id": "sugar_cane",
+        "qty": 2,
         "item_type": "resource",
         "acquisition_dependency": "none"
       },
       {
-        "id": "stone_pickaxe",
+        "id": "crafting_table",
         "qty": 1,
-        "item_type": "tool",
-        "acquisition_dependency": "none"
-      },
-      {
-        "id": "shears",
-        "qty": 1,
-        "item_type": "tool",
-        "acquisition_dependency": "none"
-      },
-      {
-        "id": "pumpkin",
-        "qty": 1,
-        "item_type": "resource",
+        "item_type": "workstation",
         "acquisition_dependency": "none"
       }
     ],
     "edges": [
       {
-        "from": "iron_ingot",
-        "to": "iron_block",
+        "from": "milk_bucket",
+        "to": "cake",
         "type": "crafting_input",
-        "qty": 36,
+        "qty": 3,
+        "consumed": true
+      },
+      {
+        "from": "sugar",
+        "to": "cake",
+        "type": "crafting_input",
+        "qty": 2,
+        "consumed": true
+      },
+      {
+        "from": "wheat",
+        "to": "cake",
+        "type": "crafting_input",
+        "qty": 3,
+        "consumed": true
+      },
+      {
+        "from": "egg",
+        "to": "cake",
+        "type": "crafting_input",
+        "qty": 1,
         "consumed": true
       },
       {
         "from": "crafting_table",
-        "to": "iron_block",
+        "to": "cake",
+        "type": "workstation_dependency",
+        "qty": 1,
+        "consumed": false
+      },
+      {
+        "from": "bucket",
+        "to": "milk_bucket",
+        "type": "crafting_input",
+        "qty": 3,
+        "consumed": true
+      },
+      {
+        "from": "iron_ingot",
+        "to": "bucket",
+        "type": "crafting_input",
+        "qty": 9,
+        "consumed": true
+      },
+      {
+        "from": "crafting_table",
+        "to": "bucket",
         "type": "workstation_dependency",
         "qty": 1,
         "consumed": false
@@ -117,14 +182,14 @@
         "from": "raw_iron",
         "to": "iron_ingot",
         "type": "smelting_input",
-        "qty": 38,
+        "qty": 9,
         "consumed": true
       },
       {
         "from": "coal",
         "to": "iron_ingot",
         "type": "fuel_input",
-        "qty": 5,
+        "qty": 2,
         "consumed": true
       },
       {
@@ -142,72 +207,9 @@
         "consumed": false
       },
       {
-        "from": "wooden_pickaxe",
+        "from": "stone_pickaxe",
         "to": "coal",
         "type": "tool_dependency",
-        "qty": 1,
-        "consumed": false
-      },
-      {
-        "from": "any_log",
-        "to": "any_plank",
-        "type": "crafting_input",
-        "qty": 3,
-        "consumed": true
-      },
-      {
-        "from": "any_plank",
-        "to": "crafting_table",
-        "type": "crafting_input",
-        "qty": 4,
-        "consumed": true
-      },
-      {
-        "from": "any_plank",
-        "to": "wooden_pickaxe",
-        "type": "crafting_input",
-        "qty": 3,
-        "consumed": true
-      },
-      {
-        "from": "stick",
-        "to": "wooden_pickaxe",
-        "type": "crafting_input",
-        "qty": 2,
-        "consumed": true
-      },
-      {
-        "from": "crafting_table",
-        "to": "wooden_pickaxe",
-        "type": "workstation_dependency",
-        "qty": 1,
-        "consumed": false
-      },
-      {
-        "from": "any_plank",
-        "to": "stick",
-        "type": "crafting_input",
-        "qty": 2,
-        "consumed": true
-      },
-      {
-        "from": "cobblestone",
-        "to": "stone_pickaxe",
-        "type": "crafting_input",
-        "qty": 3,
-        "consumed": true
-      },
-      {
-        "from": "stick",
-        "to": "stone_pickaxe",
-        "type": "crafting_input",
-        "qty": 2,
-        "consumed": true
-      },
-      {
-        "from": "crafting_table",
-        "to": "stone_pickaxe",
-        "type": "workstation_dependency",
         "qty": 1,
         "consumed": false
       },
@@ -226,6 +228,55 @@
         "consumed": false
       },
       {
+        "from": "cobblestone",
+        "to": "stone_pickaxe",
+        "type": "crafting_input",
+        "qty": 3,
+        "consumed": true
+      },
+      {
+        "from": "stick",
+        "to": "stone_pickaxe",
+        "type": "crafting_input",
+        "qty": 2,
+        "consumed": true
+      },
+      {
+        "from": "crafting_table",
+        "to": "stone_pickaxe",
+        "type": "workstation_dependency",
+        "qty": 1,
+        "consumed": false
+      },
+      {
+        "from": "cobblestone",
+        "to": "stone_hoe",
+        "type": "crafting_input",
+        "qty": 2,
+        "consumed": true
+      },
+      {
+        "from": "stick",
+        "to": "stone_hoe",
+        "type": "crafting_input",
+        "qty": 2,
+        "consumed": true
+      },
+      {
+        "from": "crafting_table",
+        "to": "stone_hoe",
+        "type": "workstation_dependency",
+        "qty": 1,
+        "consumed": false
+      },
+      {
+        "from": "stone_hoe",
+        "to": "wheat",
+        "type": "tool_dependency",
+        "qty": 1,
+        "consumed": false
+      },
+      {
         "from": "wooden_pickaxe",
         "to": "cobblestone",
         "type": "tool_dependency",
@@ -233,27 +284,55 @@
         "consumed": false
       },
       {
-        "from": "iron_ingot",
-        "to": "shears",
+        "from": "any_plank",
+        "to": "stick",
+        "type": "crafting_input",
+        "qty": 4,
+        "consumed": true
+      },
+      {
+        "from": "any_plank",
+        "to": "wooden_pickaxe",
+        "type": "crafting_input",
+        "qty": 3,
+        "consumed": true
+      },
+      {
+        "from": "stick",
+        "to": "wooden_pickaxe",
         "type": "crafting_input",
         "qty": 2,
         "consumed": true
       },
       {
-        "from": "pumpkin",
-        "to": "carved_pumpkin",
-        "type": "crafting_input",
+        "from": "crafting_table",
+        "to": "wooden_pickaxe",
+        "type": "workstation_dependency",
         "qty": 1,
+        "consumed": false
+      },
+      {
+        "from": "sugar_cane",
+        "to": "sugar",
+        "type": "crafting_input",
+        "qty": 2,
         "consumed": true
       },
       {
-        "from": "shears",
-        "to": "carved_pumpkin",
-        "type": "tool_dependency",
-        "qty": 1,
-        "consumed": false
+        "from": "any_plank",
+        "to": "crafting_table",
+        "type": "crafting_input",
+        "qty": 4,
+        "consumed": true
+      },
+      {
+        "from": "any_log",
+        "to": "any_plank",
+        "type": "crafting_input",
+        "qty": 3,
+        "consumed": true
       }
     ]
   },
-  "saved_at": "2026-04-28T19:34:27.904Z"
+  "saved_at": "2026-04-28T20:54:15.854Z"
 }

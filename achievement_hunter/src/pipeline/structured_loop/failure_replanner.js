@@ -4,10 +4,12 @@ import {fileURLToPath} from 'url';
 
 import {executeCommandWithModeRecovery} from '../command_utils.js';
 import * as skills from '../../../../src/agent/library/skills.js';
-import {get_recovery_trace_state, get_sgsg_state} from '../agent_state.js';
+import {get_am_state, get_recovery_trace_state, get_sgsg_state} from '../agent_state.js';
 import {extract_json} from '../json_utils.js';
 import {fill_failure_replanner_prompt} from '../prompt_utils.js';
 import {compute_scsg} from '../scsg.js';
+
+import {check_search_complete, run_search} from './search.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const AVAILABLE_ACTIONS_PATH = path.join(
@@ -19,8 +21,13 @@ const MAX_ACTION_RETRIES = 3;
 
 const craft_debounce_ms = 750;
 
-const HARD_FAILURE_KINDS =
-    new Set(['runner_exception', 'invalid_command', 'unavailable_action']);
+const HARD_FAILURE_KINDS = new Set([
+  'runner_exception',
+  'invalid_command',
+  'unavailable_action',
+  'search_exhausted',
+  'search_already_attempted',
+]);
 
 const spl = {
   log: (...args) => console.log('[SPL][recovery]', ...args),
@@ -49,7 +56,11 @@ function format_action_as_command(action) {
   return `${action.name}(${formatted_args.join(', ')})`;
 }
 
-async function run_action(action, agent) {
+async function run_action(action, agent, log, searched_targets) {
+  if (action.name === '!search') {
+    return await run_search_action(action, agent, log, searched_targets);
+  }
+
   const command = format_action_as_command(action);
   try {
     const env_result = await executeCommandWithModeRecovery(agent, command);
@@ -60,6 +71,54 @@ async function run_action(action, agent) {
       kind: env_result?.success === true ? 'command_success' : 'command_failure',
       message: env_result?.message ?? null,
     };
+  } catch (e) {
+    return {
+      command,
+      success: false,
+      kind: 'runner_exception',
+      message: String(e),
+    };
+  }
+}
+
+async function run_search_action(action, agent, log, searched_targets) {
+  const command = format_action_as_command(action);
+  const target = action.args?.[0];
+
+  if (typeof target !== 'string' || target.length === 0) {
+    return {
+      command,
+      success: false,
+      kind: 'invalid_command',
+      message: '!search requires a non-empty string target',
+    };
+  }
+
+  if (searched_targets.has(target)) {
+    return {
+      command,
+      success: false,
+      kind: 'search_already_attempted',
+      message:
+          `Search for "${target}" already attempted in this recovery sequence`,
+    };
+  }
+
+  try {
+    const state = get_am_state(agent);
+    const {found, message} = await run_search(target, state, agent, log, 0);
+    await sleep(craft_debounce_ms);
+
+    if (!found) {
+      searched_targets.add(target);
+      return {command, success: false, kind: 'search_exhausted', message};
+    }
+
+    const target_reached =
+        check_search_complete(target, get_am_state(agent));
+    return target_reached ?
+        {command, success: true, kind: 'search_success', message} :
+        {command, success: false, kind: 'search_found_not_reached', message};
   } catch (e) {
     return {
       command,
@@ -225,6 +284,7 @@ export async function recover_failed_task(
   const available_actions = load_available_actions();
   const task = failed_trace.task;
   const previous_diagnoses = [];
+  const searched_targets = new Set();
 
   for (let attempt = 1; attempt <= MAX_RECOVERY_ATTEMPTS; attempt++) {
     spl.log(`Attempt ${attempt}/${MAX_RECOVERY_ATTEMPTS}`);
@@ -283,7 +343,7 @@ export async function recover_failed_task(
         else
           spl.log('Executing:', format_action_as_command(action));
 
-        result = await run_action(action, agent);
+        result = await run_action(action, agent, log, searched_targets);
         spl.log('Result:', result);
 
         log?.recovery_action_result(attempt, action_index, result);

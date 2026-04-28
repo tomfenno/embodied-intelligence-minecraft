@@ -17,6 +17,11 @@
       },
       "closeness": {
         "min": 0
+      },
+      "horizontal_distance_from_current_position": {
+        "max": 500,
+        "metric": "euclidean",
+        "applies_to": ["x", "z"]
       }
     },
     "examples": [
@@ -25,36 +30,15 @@
     ]
   },
   {
-    "name": "!searchForBlock",
-    "description": "Find and go to the nearest block of a given type in a given range.",
+    "name": "!search",
+    "description": "Search for the nearest block or entity of a given type by sweeping radii 32, 64, 128, 256, 511 from the bot's current position. Equivalent to running a maximum-radius search; there is no broader scan available.",
     "category": "movement",
     "constraints": {
-      "search_range": {
-        "min": 32,
-        "max": 500,
-        "note": "Passing a search_range below the min or above the max will cause the command to fail."
-      }
+      "target_must_be_concrete": "Pass concrete block or entity names (e.g. \"chicken\", \"diamond_ore\"). Abstract category names (e.g. \"any_log\") are not supported and will fail.",
+      "exhaustion_is_terminal": "If a previous !search for the same target returned 'search_exhausted', re-issuing !search from the same position will fail identically. Relocate first (e.g. !goToCoordinates, !moveAway) before searching again.",
+      "no_repeat_in_sequence": "A second !search for the same target inside one recovery action sequence will short-circuit to 'search_already_attempted'."
     },
-    "examples": [
-      "!searchForBlock(\"diamond_ore\", 64)",
-      "!searchForBlock(\"chest\", 128)"
-    ]
-  },
-  {
-    "name": "!searchForEntity",
-    "description": "Find and go to the nearest entity of a given type in a given range.",
-    "category": "movement",
-    "constraints": {
-      "search_range": {
-        "min": 32,
-        "max": 500,
-        "note": "Passing a search_range below the min or above the max will cause the command to fail."
-      }
-    },
-    "examples": [
-      "!searchForEntity(\"cow\", 64)",
-      "!searchForEntity(\"villager\", 100)"
-    ]
+    "examples": ["!search(\"chicken\")", "!search(\"diamond_ore\")"]
   },
   {
     "name": "!moveAway",
