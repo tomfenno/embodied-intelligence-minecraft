@@ -1,0 +1,17 @@
+diff --git a/node_modules/mineflayer-tool/lib/Inventory.js b/node_modules/mineflayer-tool/lib/Inventory.js
+index e130cbc..0357cad 100644
+--- a/node_modules/mineflayer-tool/lib/Inventory.js
++++ b/node_modules/mineflayer-tool/lib/Inventory.js
+@@ -45,6 +45,12 @@ exports.standardToolFilter = standardToolFilter;
+ function retrieveTools(bot, options, cb) {
+     return __awaiter(this, void 0, void 0, function* () {
+         const chestLocations = [...options.chestLocations];
++        if (chestLocations.length === 0) {
++            const err = (0, Tool_1.error)('NoChest', 'No chest locations registered to retrieve tools from!');
++            if ((cb != null) && typeof cb === 'function')
++                cb(err);
++            throw err;
++        }
+         while (chestLocations.length > 0) {
+             const chest = getClosestChest(bot, chestLocations);
+             if (chest == null) {

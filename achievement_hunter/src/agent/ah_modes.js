@@ -5,17 +5,56 @@
  * touching the base Mindcraft code.
  *
  * Changes vs upstream:
+ *   - lava_sneak: new passive mode — sneaks whenever lava is adjacent
+ * (horizontal, diagonal, or below an adjacent edge) so the bot doesn't fall in.
+ * Replaces the hardcoded is_lava_useOn sneak guards that were scattered across
+ * the SPL.
  *   - unstuck: try/finally around moveAway so the 10-second kill timer is
  *     always cleared even when interrupted mid-pathfind (PathStopped would
  *     otherwise skip clearTimeout and fire agent.cleanKill).
  *   - ModeController: agent passed via constructor instead of module-level
- * global.
+ *     global.
  */
 
 import * as skills from '../../../src/agent/library/skills.js';
 import * as world from '../../../src/agent/library/world.js';
 import settings from '../../../src/agent/settings.js';
 import * as mc from '../../../src/utils/mcdata.js';
+
+/**
+ * Returns true if lava is within one block of the bot in any direction that
+ * poses a fall-in risk: horizontally adjacent, diagonally adjacent (same Y),
+ * or one block below an adjacent edge.
+ */
+function is_lava_adjacent(bot) {
+  const pos = bot.entity.position;
+  const offsets = [
+    // Horizontal adjacency at feet Y
+    [1, 0, 0],
+    [-1, 0, 0],
+    [0, 0, 1],
+    [0, 0, -1],
+    // Diagonal adjacency at feet Y
+    [1, 0, 1],
+    [1, 0, -1],
+    [-1, 0, 1],
+    [-1, 0, -1],
+    // Below adjacent edges — cardinal
+    [1, -1, 0],
+    [-1, -1, 0],
+    [0, -1, 1],
+    [0, -1, -1],
+    // Below adjacent edges — diagonal
+    [1, -1, 1],
+    [1, -1, -1],
+    [-1, -1, 1],
+    [-1, -1, -1],
+  ];
+  return offsets.some(([dx, dy, dz]) => {
+    const block = bot.blockAt(pos.offset(dx, dy, dz));
+    return block?.name === 'lava';
+  });
+}
 
 /**
  * Appends to the behavior log and, if narration is enabled, echoes to in-game
@@ -35,21 +74,24 @@ const modes_list = [
     interrupts: ['all'],
     on: true,
     active: false,
-    fall_blocks: ['sand', 'gravel', 'concrete_powder'],
+    fall_blocks: [
+      'sand', 'gravel', 'concrete_powder'
+    ],  // includes matching substrings like 'sandstone' and 'red_sand'
     update: async function(agent) {
       const bot = agent.bot;
       let block = bot.blockAt(bot.entity.position);
       let blockAbove = bot.blockAt(bot.entity.position.offset(0, 1, 0));
-      if (!block) block = {name: 'air'};
+      if (!block)
+        block = {name: 'air'};  // hacky fix when blocks are not loaded
       if (!blockAbove) blockAbove = {name: 'air'};
       if (blockAbove.name === 'water') {
         // does not call execute so does not interrupt other actions
-        say(agent, 'I\'m drowning! :(');
         if (!bot.pathfinder.goal) {
           bot.setControlState('jump', true);
         }
       } else if (
           this.fall_blocks.some(name => blockAbove.name.includes(name))) {
+        bot.setControlState('sneak', false);
         execute(this, agent, async () => {
           await skills.moveAway(bot, 2);
         });
@@ -57,81 +99,52 @@ const modes_list = [
           block.name === 'lava' || block.name === 'fire' ||
           blockAbove.name === 'lava' || blockAbove.name === 'fire') {
         say(agent, 'I\'m on fire!');
-        const water_bucket =
+        bot.setControlState('sneak', false);
+        // if you have a water bucket, use it
+        let waterBucket =
             bot.inventory.items().find(item => item.name === 'water_bucket');
-        if (water_bucket) {
+        if (waterBucket) {
           execute(this, agent, async () => {
-            const success = await skills.placeBlock(
+            let success = await skills.placeBlock(
                 bot, 'water_bucket', block.position.x, block.position.y,
                 block.position.z);
             if (success) say(agent, 'Placed some water, ahhhh that\'s better!');
           });
         } else {
           execute(this, agent, async () => {
-            // Re-check for water_bucket acquired since the outer check ran.
-            const wb = bot.inventory.items().find(
+            let waterBucket = bot.inventory.items().find(
                 item => item.name === 'water_bucket');
-            if (wb) {
-              const success = await skills.placeBlock(
+            if (waterBucket) {
+              let success = await skills.placeBlock(
                   bot, 'water_bucket', block.position.x, block.position.y,
                   block.position.z);
               if (success)
                 say(agent, 'Placed some water, ahhhh that\'s better!');
               return;
             }
-
-            // Phase 1: direct-control escape — bypasses the pathfinder, which
-            // treats lava as impassable and returns without moving when the bot
-            // is surrounded by lava blocks.
-            const bot_pos = bot.entity.position;
-            const hazard = new Set(['lava', 'fire']);
-            const directions = [
-              {x: 1, z: 0},
-              {x: -1, z: 0},
-              {x: 0, z: 1},
-              {x: 0, z: -1},
-              {x: 1, z: 1},
-              {x: -1, z: 1},
-              {x: 1, z: -1},
-              {x: -1, z: -1},
-            ];
-            const escape_dir = directions.find(d => {
-              const b = bot.blockAt(bot_pos.offset(d.x, 0, d.z));
-              return b != null && !hazard.has(b.name);
-            });
-            const look_target = escape_dir ?
-                bot_pos.offset(escape_dir.x * 5, 1, escape_dir.z * 5) :
-                bot_pos.offset(5, 1, 0);
-            await bot.lookAt(look_target, true);
-            bot.setControlState('jump', true);
-            bot.setControlState('sprint', true);
-            await new Promise(r => setTimeout(r, 3000));
-            bot.clearControlStates();
-
-            // Phase 2: if now on solid ground, pathfind to water to extinguish
-            // fire.
-            const cur_block = bot.blockAt(bot.entity.position);
-            if (cur_block && !hazard.has(cur_block.name)) {
-              const nearest_water = world.getNearestBlock(bot, 'water', 20);
-              if (nearest_water) {
-                const wp = nearest_water.position;
-                const success =
-                    await skills.goToPosition(bot, wp.x, wp.y, wp.z, 0.2);
-                if (success)
-                  say(agent, 'Found some water, ahhhh that\'s better!');
-              }
+            let nearestWater = world.getNearestBlock(bot, 'water', 20);
+            if (nearestWater) {
+              const pos = nearestWater.position;
+              let success =
+                  await skills.goToPosition(bot, pos.x, pos.y, pos.z, 0.2);
+              if (success)
+                say(agent, 'Found some water, ahhhh that\'s better!');
+              return;
             }
+            await skills.moveAway(bot, 5);
           });
         }
       } else if (
           Date.now() - bot.lastDamageTime < 3000 &&
           (bot.health < 5 || bot.lastDamageTaken >= bot.health)) {
         say(agent, 'I\'m dying!');
+        bot.setControlState('sneak', false);
         execute(this, agent, async () => {
           await skills.moveAway(bot, 20);
         });
       } else if (agent.isIdle()) {
-        bot.clearControlStates();
+        bot.clearControlStates();  // clear jump if not in danger or doing
+                                   // anything else
       }
     }
   },
@@ -199,6 +212,7 @@ const modes_list = [
       this.prev_dig_block = null;
     }
   },
+  // Unchanged from upstream modes.js — untested with AH_Bot.
   {
     name: 'cowardice',
     description: 'Run away from enemies. Interrupts all actions.',
@@ -233,6 +247,36 @@ const modes_list = [
       }
     }
   },
+  {
+    name: 'lava_sneak',
+    description:
+        'Sneak when lava is adjacent to prevent falling in. Does not interrupt actions.',
+    interrupts: ['all'],
+    on: true,
+    active: false,
+    update: function(agent) {
+      const bot = agent.bot;
+      const block = bot.blockAt(bot.entity.position);
+      if (block?.name === 'lava') {
+        // Already in lava — clear sneak so self_preservation and
+        // ensure_safe_before_llm can sprint to escape unimpeded.
+        bot.setControlState('sneak', false);
+        return;
+      }
+      if (bot.pathfinder.goal) {
+        // Pathfinder is actively navigating — it handles lava avoidance via
+        // cost map. External sneak breaks jump timing near lava edges.
+        bot.setControlState('sneak', false);
+        return;
+      }
+      if (is_lava_adjacent(bot)) {
+        bot.setControlState('sneak', true);
+      } else {
+        bot.setControlState('sneak', false);
+      }
+    }
+  },
+  // Unchanged from upstream modes.js — untested with AH_Bot.
   {
     name: 'hunting',
     description: 'Hunt nearby animals when idle.',
@@ -281,6 +325,7 @@ const modes_list = [
       }
     }
   },
+  // Unchanged from upstream modes.js — untested with AH_Bot.
   {
     name: 'torch_placing',
     description: 'Place torches when idle and there are no torches nearby.',
@@ -323,6 +368,7 @@ const modes_list = [
       }
     }
   },
+  // Unchanged from upstream modes.js — untested with AH_Bot.
   {
     name: 'idle_staring',
     description: 'Animation to look around at entities when idle.',
@@ -334,7 +380,7 @@ const modes_list = [
     next_change: 0,
     update: function(agent) {
       const entity = agent.bot.nearestEntity();
-      const entity_in_view = entity &&
+      let entity_in_view = entity &&
           entity.position.distanceTo(agent.bot.entity.position) < 10 &&
           entity.name !== 'enderman';
       if (entity_in_view && entity !== this.last_entity) {
@@ -343,8 +389,8 @@ const modes_list = [
         this.next_change = Date.now() + Math.random() * 1000 + 4000;
       }
       if (entity_in_view && this.staring) {
-        const is_baby = entity.type !== 'player' && entity.metadata[16];
-        const height = is_baby ? entity.height / 2 : entity.height;
+        let isbaby = entity.type !== 'player' && entity.metadata[16];
+        let height = isbaby ? entity.height / 2 : entity.height;
         agent.bot.lookAt(entity.position.offset(0, height, 0));
       }
       if (!entity_in_view) this.last_entity = null;
@@ -359,24 +405,20 @@ const modes_list = [
       }
     }
   },
+  // Unchanged from upstream modes.js — untested with AH_Bot.
   {
     name: 'cheat',
     description: 'Use cheats to instantly place blocks and teleport.',
     interrupts: [],
     on: false,
     active: false,
-    update: function(agent) { /* do nothing */ }
-  }
+    update: function(agent) { /* do nothing */
+    }
+  },
 ];
 
-/**
- * Runs a mode's action via the action manager, stopping the self-prompter if
- * active. After completion, re-prompts the agent if an action was interrupted
- * and no resume function is queued.
- */
 async function execute(mode, agent, func, timeout = -1) {
   if (agent.self_prompter.isActive()) agent.self_prompter.stopLoop();
-  const interrupted_action = agent.actions.currentActionLabel;
   mode.active = true;
   const code_return =
       await agent.actions.runAction(`mode:${mode.name}`, async () => {
@@ -427,6 +469,19 @@ class ModeController {
       if (mode.paused) console.log(`Unpausing mode ${mode.name}`);
       this.unpause(mode.name);
     }
+  }
+
+  isAnyModeActive() {
+    return modes_list.some(m => m.active);
+  }
+
+  async waitForIdle(timeoutMs = 30_000) {
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+      if (!this.isAnyModeActive()) return true;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    return false;
   }
 
   getMiniDocs() {

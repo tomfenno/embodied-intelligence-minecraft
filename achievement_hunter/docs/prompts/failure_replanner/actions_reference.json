@@ -58,7 +58,7 @@
   },
   {
     "name": "!moveAway",
-    "description": "Move a short distance away from the current location for local unsticking or repositioning only. Do NOT use this for long-distance travel, biome search, exploration, or resource search; use !searchForBlock, !searchForEntity, !goToSurface, or !goToCoordinates instead.",
+    "description": "Move a short distance away for unsticking or repositioning only. Direction is unpredictable — the bot goes wherever terrain is easiest and cannot be steered. Never use for: going up/down (use !goToSurface or !goToCoordinates), reaching a specific place (use !goToCoordinates), finding blocks/entities (use !searchForBlock or !searchForEntity).",
     "category": "movement",
     "constraints": {
       "distance": {

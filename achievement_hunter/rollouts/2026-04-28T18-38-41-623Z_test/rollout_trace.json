@@ -1,0 +1,619 @@
+{
+  "objective": "test",
+  "status": "running",
+  "started_at": "2026-04-28T18:38:41.623Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-28T18:38:41.630Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "lava_bucket",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "lava_source"
+            },
+            {
+              "id": "bucket",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 4,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "bucket",
+              "to": "lava_bucket",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "iron_ingot",
+              "to": "bucket",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "bucket",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "stone_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            }
+          ]
+        },
+        "s": [
+          "lava_bucket"
+        ]
+      },
+      "state": {
+        "inventory": "Nothing"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:41.712Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "any_log",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T18:38:41.764Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "any_log",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:41.862Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"any_log\")",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "grass_block",
+          "lava",
+          "dirt",
+          "gravel",
+          "stone",
+          "copper_ore",
+          "sand",
+          "granite",
+          "diorite",
+          "short_grass"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:41.863Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"oak_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:42.384Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"spruce_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:42.957Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"birch_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:43.523Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"jungle_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:44.084Z",
+      "elapsed": "2s",
+      "stage": "AM",
+      "attempt": 6,
+      "raw": "!searchForBlock(\"acacia_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:44.645Z",
+      "elapsed": "3s",
+      "stage": "AM",
+      "attempt": 7,
+      "raw": "!searchForBlock(\"dark_oak_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:45.206Z",
+      "elapsed": "3s",
+      "stage": "AM",
+      "attempt": 8,
+      "raw": "!searchForBlock(\"mangrove_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:45.771Z",
+      "elapsed": "4s",
+      "stage": "AM",
+      "attempt": 9,
+      "raw": "!searchForBlock(\"cherry_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:46.330Z",
+      "elapsed": "4s",
+      "stage": "AM",
+      "attempt": 10,
+      "raw": "!searchForBlock(\"pale_oak_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:46.895Z",
+      "elapsed": "5s",
+      "stage": "AM",
+      "attempt": 11,
+      "raw": "!searchForBlock(\"oak_log\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:47.415Z",
+      "elapsed": "5s",
+      "stage": "AM",
+      "attempt": 12,
+      "raw": "!searchForBlock(\"spruce_log\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:48.159Z",
+      "elapsed": "6s",
+      "stage": "AM",
+      "attempt": 13,
+      "raw": "!searchForBlock(\"birch_log\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:48.794Z",
+      "elapsed": "7s",
+      "stage": "AM",
+      "attempt": 14,
+      "raw": "!searchForBlock(\"jungle_log\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:49.528Z",
+      "elapsed": "7s",
+      "stage": "AM",
+      "attempt": 15,
+      "raw": "!searchForBlock(\"acacia_log\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:50.260Z",
+      "elapsed": "8s",
+      "stage": "AM",
+      "attempt": 16,
+      "raw": "!searchForBlock(\"dark_oak_log\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:50.994Z",
+      "elapsed": "9s",
+      "stage": "AM",
+      "attempt": 17,
+      "raw": "!searchForBlock(\"mangrove_log\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:51.732Z",
+      "elapsed": "10s",
+      "stage": "AM",
+      "attempt": 18,
+      "raw": "!searchForBlock(\"cherry_log\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:52.474Z",
+      "elapsed": "10s",
+      "stage": "AM",
+      "attempt": 19,
+      "raw": "!searchForBlock(\"pale_oak_log\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:53.235Z",
+      "elapsed": "11s",
+      "stage": "AM",
+      "attempt": 20,
+      "raw": "!searchForBlock(\"oak_log\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:53.758Z",
+      "elapsed": "12s",
+      "stage": "AM",
+      "attempt": 21,
+      "raw": "!searchForBlock(\"spruce_log\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:55.457Z",
+      "elapsed": "13s",
+      "stage": "AM",
+      "attempt": 22,
+      "raw": "!searchForBlock(\"birch_log\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:56.090Z",
+      "elapsed": "14s",
+      "stage": "AM",
+      "attempt": 23,
+      "raw": "!searchForBlock(\"jungle_log\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:57.789Z",
+      "elapsed": "16s",
+      "stage": "AM",
+      "attempt": 24,
+      "raw": "!searchForBlock(\"acacia_log\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:38:59.518Z",
+      "elapsed": "17s",
+      "stage": "AM",
+      "attempt": 25,
+      "raw": "!searchForBlock(\"dark_oak_log\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:39:01.238Z",
+      "elapsed": "19s",
+      "stage": "AM",
+      "attempt": 26,
+      "raw": "!searchForBlock(\"mangrove_log\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:39:02.960Z",
+      "elapsed": "21s",
+      "stage": "AM",
+      "attempt": 27,
+      "raw": "!searchForBlock(\"cherry_log\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:39:04.743Z",
+      "elapsed": "23s",
+      "stage": "AM",
+      "attempt": 28,
+      "raw": "!searchForBlock(\"pale_oak_log\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:39:06.492Z",
+      "elapsed": "24s",
+      "stage": "AM",
+      "attempt": 29,
+      "raw": "!searchForBlock(\"oak_log\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:39:07.012Z",
+      "elapsed": "25s",
+      "stage": "AM",
+      "attempt": 30,
+      "raw": "!searchForBlock(\"spruce_log\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:39:15.331Z",
+      "elapsed": "33s",
+      "stage": "AM",
+      "attempt": 31,
+      "raw": "!searchForBlock(\"birch_log\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:39:15.981Z",
+      "elapsed": "34s",
+      "stage": "AM",
+      "attempt": 32,
+      "raw": "!searchForBlock(\"jungle_log\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T18:39:24.095Z",
+      "elapsed": "42s",
+      "stage": "AM",
+      "attempt": 33,
+      "raw": "!searchForBlock(\"acacia_log\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    }
+  ]
+}

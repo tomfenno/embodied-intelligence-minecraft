@@ -31,11 +31,18 @@
   "ptd_refinement_model": "",
   "failure_replanner_model": "",
 
+  "//": [
+    "Modes for this agent are defined in achievement_hunter/src/agent/ah_modes.js",
+    "AH_Bot tuned modes: self_preservation, unstuck, self_defense, lava_sneak, item_collecting, elbow_room",
+    "Upstream modes (unchanged, untested with AH_Bot): cowardice, hunting, torch_placing, idle_staring, cheat"
+  ],
+
   "modes": {
     "self_preservation": true,
     "unstuck": true,
     "cowardice": false,
     "self_defense": true,
+    "lava_sneak": true,
     "hunting": false,
     "item_collecting": true,
     "torch_placing": false,

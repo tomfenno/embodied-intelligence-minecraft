@@ -2,7 +2,7 @@ import {readFileSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
-import {executeCommand} from '../../../../src/agent/commands/index.js';
+import {executeCommandWithModeRecovery} from '../command_utils.js';
 import * as skills from '../../../../src/agent/library/skills.js';
 import {get_recovery_trace_state, get_sgsg_state} from '../agent_state.js';
 import {extract_json} from '../json_utils.js';
@@ -51,18 +51,13 @@ function format_action_as_command(action) {
 
 async function run_action(action, agent) {
   const command = format_action_as_command(action);
-  const is_lava_useOn =
-      command.startsWith('!useOn(') && command.includes('"lava"');
-
-  if (is_lava_useOn) agent.bot.setControlState('sneak', true);
   try {
-    const env_result = await executeCommand(agent, command);
+    const env_result = await executeCommandWithModeRecovery(agent, command);
     await sleep(craft_debounce_ms);
     return {
       command,
       success: env_result?.success === true,
-      kind: env_result?.success === true ? 'command_success' :
-                                           'command_failure',
+      kind: env_result?.success === true ? 'command_success' : 'command_failure',
       message: env_result?.message ?? null,
     };
   } catch (e) {
@@ -72,8 +67,6 @@ async function run_action(action, agent) {
       kind: 'runner_exception',
       message: String(e),
     };
-  } finally {
-    if (is_lava_useOn) agent.bot.setControlState('sneak', false);
   }
 }
 
@@ -227,7 +220,8 @@ async function ensure_safe_before_llm(agent) {
  * Returns 'success' if recovery completed the task, or 'fail' otherwise.
  */
 export async function recover_failed_task(
-    failed_trace, agent, model, graph, log = null) {
+    failed_trace, agent, model, graph, log = null,
+    baseline_inventory = null) {
   const available_actions = load_available_actions();
   const task = failed_trace.task;
   const previous_diagnoses = [];
@@ -293,7 +287,7 @@ export async function recover_failed_task(
         spl.log('Result:', result);
 
         log?.recovery_action_result(attempt, action_index, result);
-        latest_state = get_recovery_trace_state(agent);
+        latest_state = get_recovery_trace_state(agent, baseline_inventory);
 
         if (scsg_task_complete_check(task, graph, agent)) {
           spl.log('Task complete after recovery.');
@@ -314,7 +308,7 @@ export async function recover_failed_task(
     }
 
     if (latest_state === null) {
-      latest_state = get_recovery_trace_state(agent);
+      latest_state = get_recovery_trace_state(agent, baseline_inventory);
     }
 
     if (hard_failed) break;
