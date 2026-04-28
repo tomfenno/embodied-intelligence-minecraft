@@ -27,16 +27,17 @@ const log_source = {
 // Runs the full structured task loop.
 export async function structured_loop(models, agent, task_name, graph = null) {
   const log = create_rollout_logger(task_name);
+  const bot = agent.bot;
 
   // This hard coded option to load a graph is intended. Do not remove.
   const load_graph = true;
   const graph_file_path =
       // './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
-      `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
-  // `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
-  //    './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
-  // './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
-  // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
+      // `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
+      // `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
+      // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
+      // './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
+      './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
   graph = load_graph ? await load_graph_from_file(graph_file_path) :
                        await generate_primary_task_dag_self_refined(
                            models, task_name, graph, log);
@@ -44,40 +45,69 @@ export async function structured_loop(models, agent, task_name, graph = null) {
 
   save_checkpoint(task_name, graph);
 
+  // Track death within this SPL run. When the bot dies the server cancels all
+  // actions; on the next loop iteration we wait for respawn, then let the loop
+  // recompute a fresh SCSG against the post-death (empty) inventory. Death is
+  // not counted as a consecutive failure — it is an external event, not a sign
+  // that the loop logic is stuck.
+  let death_pending = false;
+  let post_respawn_promise = Promise.resolve();
+
+  const on_death = () => {
+    spl.log('Bot died — awaiting respawn to recompute SCSG.');
+    death_pending = true;
+    post_respawn_promise = new Promise(
+        resolve => bot.once('spawn', () => setTimeout(resolve, 500)));
+  };
+  bot.on('death', on_death);
+
   let consecutive_failures = 0;
-  while (true) {
-    const state_conditioned_subgraph =
-        build_state_conditioned_subgraph(graph, agent, log);
-    if (state_conditioned_subgraph.status === 'complete') {
-      clear_checkpoint();
-      log.complete(state_conditioned_subgraph.reason);
-      return;
-    }
+  try {
+    while (true) {
+      if (death_pending) {
+        death_pending = false;
+        await post_respawn_promise;
+        spl.log('Respawned — recomputing SCSG with post-death inventory.');
+        consecutive_failures = 0;
+        continue;
+      }
 
-    const candidate_result = get_source_candidates(
-        state_conditioned_subgraph.subgraph, graph, agent, log);
-    if (candidate_result.status === 'complete') {
-      clear_checkpoint();
-      log.complete(candidate_result.reason);
-      return;
-    }
+      const state_conditioned_subgraph =
+          build_state_conditioned_subgraph(graph, agent, log);
+      if (state_conditioned_subgraph.status === 'complete') {
+        clear_checkpoint();
+        log.complete(state_conditioned_subgraph.reason);
+        return;
+      }
 
-    const task = get_next_task(candidate_result.candidates, agent, log);
+      const candidate_result = get_source_candidates(
+          state_conditioned_subgraph.subgraph, graph, agent, log);
+      if (candidate_result.status === 'complete') {
+        clear_checkpoint();
+        log.complete(candidate_result.reason);
+        return;
+      }
 
-    if (!task) {
-      spl.warn('get_next_task returned NULL; re-evaluating state...');
+      const task = get_next_task(candidate_result.candidates, agent, log);
+
+      if (!task) {
+        spl.warn('get_next_task returned NULL; re-evaluating state...');
+        if (++consecutive_failures >= max_outer_retries) break;
+        continue;
+      }
+
+      if (await execute_task_action(
+              task, agent, log, models.failure_replanner, graph) ===
+          'success') {
+        consecutive_failures = 0;
+        continue;
+      }
+
+      spl.log('Task failed after max retries, re-evaluating state...');
       if (++consecutive_failures >= max_outer_retries) break;
-      continue;
     }
-
-    if (await execute_task_action(
-            task, agent, log, models.failure_replanner, graph) === 'success') {
-      consecutive_failures = 0;
-      continue;
-    }
-
-    spl.log('Task failed after max retries, re-evaluating state...');
-    if (++consecutive_failures >= max_outer_retries) break;
+  } finally {
+    bot.off('death', on_death);
   }
 
   spl.error('Max outer retries exceeded. Aborting.');

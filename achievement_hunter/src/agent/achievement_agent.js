@@ -77,10 +77,16 @@ export class AchievementAgent extends Agent {
    * Intercepts the first player message as the SPL objective, then suppresses
    * all further messages while the loop is running. Suppression prevents the
    * base LLM path from issuing conflicting commands via executeCommand.
+   *
+   * System messages (death events, mode AUTO MESSAGEs) are always suppressed —
+   * the AH agent never makes LLM calls in response to system events; the SPL
+   * owns all execution and recovery.
    */
   async handleMessage(source, message, max_responses = null) {
-    if (this._waiting_for_objective && source !== 'system' &&
-        source !== this.name && !message.startsWith('!')) {
+    if (source === 'system') return true;
+
+    if (this._waiting_for_objective && source !== this.name &&
+        !message.startsWith('!')) {
       this._waiting_for_objective = false;
       console.log('[SPL] Received objective from', source, ':', message);
       this._launch_spl(message);

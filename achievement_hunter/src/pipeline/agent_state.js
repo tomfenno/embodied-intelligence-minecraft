@@ -1,5 +1,9 @@
 import {getBiomeName, getBlockAtPosition, getCraftableItems, getFirstBlockAboveHead, getInventoryCounts, getNearbyEntities, getNearestBlocks, getPosition,} from '../../../src/agent/library/world.js';
 
+// Water and lava source blocks (metadata 0) are collectable with a bucket.
+// Flowing blocks (metadata 1-7) share the same name but cannot be collected.
+const COLLECTIBLE_LIQUIDS = new Set(['water', 'lava']);
+
 function _get_inventory_counts(bot) {
   const raw = getInventoryCounts(bot);
   const result = {};
@@ -27,6 +31,7 @@ export function get_am_state(agent) {
 
   const block_set = new Set();
   for (const block of getNearestBlocks(bot)) {
+    if (COLLECTIBLE_LIQUIDS.has(block.name) && block.metadata !== 0) continue;
     block_set.add(block.name);
   }
   const nearby_blocks = Array.from(block_set);
@@ -52,6 +57,7 @@ export function get_nts_state(agent) {
 
   const block_set = new Set();
   for (const block of getNearestBlocks(bot)) {
+    if (COLLECTIBLE_LIQUIDS.has(block.name) && block.metadata !== 0) continue;
     block_set.add(block.name);
   }
   const nearby_blocks = Array.from(block_set);

@@ -12,7 +12,6 @@
  * global.
  */
 
-import convoManager from '../../../src/agent/conversation.js';
 import * as skills from '../../../src/agent/library/skills.js';
 import * as world from '../../../src/agent/library/world.js';
 import settings from '../../../src/agent/settings.js';
@@ -43,7 +42,7 @@ const modes_list = [
       let blockAbove = bot.blockAt(bot.entity.position.offset(0, 1, 0));
       if (!block) block = {name: 'air'};
       if (!blockAbove) blockAbove = {name: 'air'};
-      if (block.name === 'water' || blockAbove.name === 'water') {
+      if (block.name === 'water' && blockAbove.name === 'water') {
         execute(this, agent, async () => {
           await skills.moveAway(bot, 5);
         });
@@ -379,19 +378,6 @@ async function execute(mode, agent, func, timeout = -1) {
   mode.active = false;
   console.log(`Mode ${mode.name} finished executing, code_return: ${
       code_return.message}`);
-
-  const should_reprompt = interrupted_action && !agent.actions.resume_func &&
-      !agent.self_prompter.isActive() && !code_return.interrupted;
-
-  if (should_reprompt) {
-    const role = convoManager.inConversation() ? agent.last_sender : 'system';
-    const logs = agent.bot.modes.flushBehaviorLog();
-    agent.handleMessage(
-        role,
-        `(AUTO MESSAGE)Your previous action '${
-            interrupted_action}' was interrupted by ${mode.name}.
-        Your behavior log: ${logs}\nRespond accordingly.`);
-  }
 }
 
 const modes_map = {};

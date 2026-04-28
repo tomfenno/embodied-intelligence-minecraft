@@ -83,100 +83,101 @@ logic as protection.
 
 ## Fix Recommendations
 
-### Fix A — Correct the Water Condition in `self_preservation` (Top Recommendation)
+### Fix A — Correct the Water Condition in `self_preservation` ✅ Applied (corrected)
 
-**Change the water check to cover both the surface case and the fully-submerged case, and
-replace passive `jump=true` with an active escape via `execute()`.**
+**Change the water check to cover the fully-submerged case only, and replace passive
+`jump=true` with an active escape via `execute()`.**
 
 ```js
-// ah_modes.js — replacement water block in self_preservation.update
-
-const in_water = block.name === 'water' || blockAbove.name === 'water';
-
-if (in_water) {
+// ah_modes.js:46–49 — self_preservation.update, first branch
+if (block.name === 'water' && blockAbove.name === 'water') {
   execute(this, agent, async () => {
     await skills.moveAway(bot, 5);
-    // moveAway via pathfinder works here: the pathfinder CAN navigate through
-    // water (it treats water as high-cost but passable), and it will route the
-    // bot toward solid ground. This is the correct tool for water escape.
   });
 }
 ```
 
+**Patch location:** `achievement_hunter/src/agent/ah_modes.js:46–49`
+
 The key changes:
-1. `block.name === 'water' || blockAbove.name === 'water'` — catches both the fully-submerged
-   (ceiling above) and the at-surface (water above head) cases.
-2. `execute()` wraps the action in `agent.actions.runAction`, which interrupts any ongoing
-   pathfinder action (including the lava search) and runs the escape. This replaces the
-   purely passive `setControlState('jump', true)`.
-3. The `!bot.pathfinder.goal` gate is removed — escape should fire regardless of whether
-   the bot is pathfinding. The cost (interrupting the search) is justified by preventing death.
+1. `block.name === 'water' && blockAbove.name === 'water'` — triggers only when fully submerged
+   (both feet block and head block are water). Normal pathfinder traversal through water (wading
+   or swimming with head above) does NOT trigger.
+2. `execute()` wraps the action in `agent.actions.runAction`, interrupting the current action
+   and running the escape. Replaces the purely passive `setControlState('jump', true)`.
+3. The `!bot.pathfinder.goal` gate is removed — escape fires regardless of whether the bot
+   is pathfinding.
 
-**Why `moveAway` is the right tool for water (unlike lava):** The pathfinder treats water as
-passable (high cost, not infinite). `moveAway(bot, 5)` WILL find a valid path from inside
-water to solid ground. This is the opposite of the lava case where the pathfinder fails.
+**Why `&&` not `||`:** Using `||` (any water contact) caused a regression: `self_preservation`
+would fire on every tick while the bot waded through water during normal `searchForBlock`
+navigation, interrupting it mid-path. `searchForBlock` would then re-interrupt
+`self_preservation`, causing a ping-pong loop where both actions kept throwing `PathStopped`
+and neither completed. Only fully-submerged state (head underwater) is an actual drowning
+hazard; wading and surface swimming are normal and must not be interrupted.
 
-**Robustness:** High. Covers the fully-submerged cave case, works during pathfinding, and
-actively navigates the bot to safety rather than passively setting control states.
+**Why `moveAway` works for water (unlike lava):** The pathfinder treats water as passable
+(high cost, not infinite). `moveAway(bot, 5)` finds a valid path from inside water to solid
+ground. This is the opposite of the lava case where the pathfinder fails.
 
-**Soundness:** The fix correctly uses `execute()` (which goes through `runAction` and can
-interrupt other actions) rather than direct control states. `moveAway` is the appropriate
-pathfinder call for water because lava-passability is the issue for BUG 5, not water.
-Removing the `!bot.pathfinder.goal` gate is a deliberate trade-off: the search is interrupted,
-but that is preferable to death.
+**Spam guard:** `execute()` sets `mode.active = true` for the duration. `ModeController.update()`
+checks `!mode.active` before calling any mode's update, so the escape won't be re-entered
+until the previous `moveAway` completes.
 
-**One concern:** calling `execute()` every tick while in water would spam the action manager.
-This should be guarded either with a cooldown (same as the torch_placing mode uses `cooldown`)
-or by checking `!mode.active` before calling (which `ModeController.update()` already does —
-`mode.active` is true during the execute, so it won't re-enter until the escape completes).
+**Robustness:** High. Covers the fully-submerged cave case without interfering with normal
+water traversal during navigation.
 
 ---
 
-### Fix B — Pre-LLM Safety Check in `failure_replanner` (Secondary Recommendation)
+### Fix B — Pre-LLM Safety Check in `failure_replanner` ✅ Applied
 
-**The user's suggestion: ensure the bot is not in a hazardous state before making an LLM call.**
+**Ensure the bot is not in a hazardous state before making an LLM call. Check once and
+escape immediately — no polling loop.**
 
 ```js
-// failure_replanner.js — add before model.send_prompt(prompt)
-
-async function wait_for_safe_position(agent, timeout_ms = 15000) {
+// failure_replanner.js:180–196 — standalone function
+async function ensure_safe_before_llm(agent) {
   const bot = agent.bot;
-  const deadline = Date.now() + timeout_ms;
+  const block = bot.blockAt(bot.entity.position);
+  const block_above = bot.blockAt(bot.entity.position.offset(0, 1, 0));
 
-  while (Date.now() < deadline) {
-    const block = bot.blockAt(bot.entity.position);
-    const block_above = bot.blockAt(bot.entity.position.offset(0, 1, 0));
-    const in_hazard = block?.name === 'water' || block_above?.name === 'water'
-                   || block?.name === 'lava'  || block_above?.name === 'lava';
-    if (!in_hazard) return;
-    await sleep(500);
+  const in_water = block?.name === 'water' || block_above?.name === 'water'; // intentional ||: one-shot pre-LLM check, not a recurring tick
+  const in_lava  = block?.name === 'lava'  || block_above?.name === 'lava';
+
+  if (in_water) {
+    await skills.moveAway(bot, 10);
+  } else if (in_lava) {
+    await bot.lookAt(bot.entity.position.offset(5, 1, 0), true);
+    bot.setControlState('jump', true);
+    bot.setControlState('sprint', true);
+    await new Promise(r => setTimeout(r, 3000));
+    bot.clearControlStates();
   }
-  // Timeout: actively navigate away regardless
-  await skills.moveAway(bot, 10);
 }
 
-// In recover_failed_task, before the LLM call:
-await wait_for_safe_position(agent);
+// failure_replanner.js:216 — call site in recover_failed_task, before each LLM call
+await ensure_safe_before_llm(agent);
 const raw = await model.send_prompt(prompt);
 ```
 
-**Robustness:** Medium. Covers the specific reported failure mode (bot in water when LLM call
-begins). However it is a band-aid: it does not fix the underlying `self_preservation` failure
-that allowed the bot to be in a dangerous position in the first place. If Fix A (self_preservation)
-is applied correctly, Fix B becomes largely redundant.
+**Patch location:** `achievement_hunter/src/pipeline/structured_loop/failure_replanner.js:180–196` (function), `:216` (call site)
 
-**Soundness:** The suggestion is architecturally correct. A long-blocking call like an LLM
-request should not be made while the bot is in a hazardous state. The 15-second poll window
-gives the mode system time to handle the hazard autonomously; the fallback `moveAway` handles
-the case where the mode system failed (which is exactly the scenario in this bug).
+**Design rationale:** An earlier proposal polled every 500ms and waited for `self_preservation`
+to handle the hazard, which is passive and adds unnecessary latency. The implemented version
+checks once and acts immediately: water → `moveAway(10)` (pathfinder navigates to solid ground),
+lava → sprint-jump for 3 seconds (pathfinder can't navigate lava, so direct controls are used,
+same approach as the BUG 5 Fix A escape). If the bot is safe, the check returns instantly with
+no overhead.
 
-**Assessment:** Fix B is sound and worth adding as a **defensive belt-and-suspenders measure**,
-but it should not be the primary fix. Fix A addresses the root cause; Fix B adds a guaranteed
-safety net for this specific code path.
+**Called per recovery attempt, not once:** Correct — the bot's position changes between
+attempts as recovery actions execute. Each LLM call can start in a different state.
+
+**Robustness:** High for the specific LLM call window. Belt-and-suspenders on top of Fix A —
+Fix A handles hazards during all navigation, Fix B is the hard guarantee at each LLM
+call boundary.
 
 **Limitation:** Fix B only protects LLM calls in `failure_replanner`. If the bot drowns during
-a long `executeCommand` navigation (like the 91-second `!searchForBlock("lava", 128)` that
-preceded the LLM call), Fix B does not help. Only Fix A covers that window.
+a long navigation (like the 91-second `!searchForBlock("lava", 128)` that preceded the LLM
+call in this trace), Fix B does not help. Only Fix A covers that window.
 
 ---
 

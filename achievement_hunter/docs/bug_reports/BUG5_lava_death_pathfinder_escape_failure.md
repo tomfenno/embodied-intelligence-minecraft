@@ -6,6 +6,7 @@
 **Patches:**
 - Fix A — `achievement_hunter/src/agent/ah_modes.js:69–119` (`self_preservation` else-branch)
 - Fix B — `achievement_hunter/src/pipeline/structured_loop/actions.js:92–102` (`execute_task_action`)
+- Fix B (replanner) — `achievement_hunter/src/pipeline/structured_loop/failure_replanner.js:48–68` (`run_action`)
 
 ---
 
@@ -177,6 +178,11 @@ for the `!useOn` case where the bot is standing adjacent to the lava pool.
 **Robustness:** High. Server-side physics enforce the edge constraint — this is not a
 client-side heuristic. The `try/finally` guarantees sneak is always cleared even on
 exception or interruption.
+
+**Coverage gap — replanner:** `run_action` in `failure_replanner.js` also calls
+`executeCommand` directly and had no sneak guard. Recovery sequences can include
+`!useOn("bucket", "lava")` (e.g., when re-collecting lava after a death). The same
+try/finally pattern was applied there at `failure_replanner.js:48–68`.
 
 **Limitation:** Prevents falling off during the interaction animation. Does not protect
 against the pathfinder routing the bot onto a 1-block ledge with no solid ground behind it

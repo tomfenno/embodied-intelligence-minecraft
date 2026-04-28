@@ -8,8 +8,10 @@ Bugs identified from the `hard-code-nts-am` branch run logs (2026-04-16, 2026-04
 | 2 | `BUG2_stick_craft_updateslot_timeout.md` | **Critical** | Root cause identified | Low — single-line mineflayer patch |
 | 3 | `BUG3_triple_wrapped_error_lost_stack.md` | Low | Confirmed | Low — error re-throw style fix |
 | 4 | `BUG4_outer_retry_loop_deterministic_failure.md` | Medium | Confirmed | Low — outer loop signature tracking |
-| 5 | `BUG5_lava_death_pathfinder_escape_failure.md` | **Critical** | Root cause confirmed | Medium — replace `moveAway` with direct-control escape in `ah_modes.js` |
-| 6 | `BUG6_drowning_during_llm_call.md` | High | Root cause confirmed | Low–Medium — fix water condition + add pre-LLM safety check |
+| 5 | `BUG5_lava_death_pathfinder_escape_failure.md` | **Critical** | **Fixed** — `ah_modes.js:69–119` (escape), `actions.js:92–102` (sneak) | Medium |
+| 6 | `BUG6_drowning_during_llm_call.md` | High | **Fixed** — `ah_modes.js:46–49` (water condition), `failure_replanner.js:180–216` (pre-LLM check) | Low–Medium |
+| 7 | `BUG7_flowing_liquid_triggers_useOn.md` | Medium | **Fixed** — `agent_state.js:34,60` (metadata filter) | Low — one-line guard in both block loops |
+| 8 | `BUG8_useToolOnBlock_wall_obstruction.md` | Medium | **Fixed** — `skills.js` (`// Start of AH code` block after line 2083) | Low — dig-through obstruction instead of random angle hunt |
 
 ## Priority Order
 
@@ -26,16 +28,29 @@ Bugs identified from the `hard-code-nts-am` branch run logs (2026-04-16, 2026-04
   `updateSlot:0` before `putAway` registers its listener. Introduced when
   `mediate_craft` changed the command from `!craftRecipe("stick", 4)` to
   `!craftRecipe("stick", 1)`.
-- **BUG 5:** High confidence. Root cause traced in `ah_modes.js:89` — `moveAway`
-  delegates to pathfinder, pathfinder treats lava as impassable, escape fails silently.
-  Confirmed by inventory wipe in rollout trace at 5m 27s–5m 32s.
-- **BUG 6:** High confidence. Two independent root causes in `ah_modes.js:46-48`:
-  `blockAbove === 'water'` misses the fully-submerged case, and `jump=true` is
-  insufficient for active escape. Third contributing cause: no hazard check before
-  `model.send_prompt()` in `failure_replanner.js`.
+- **BUG 5:** Fixed. Root cause was `ah_modes.js:89` — `moveAway` delegates to pathfinder,
+  pathfinder treats lava as impassable, escape fails silently. Fix A replaced with
+  direct-control sprint-jump escape (`ah_modes.js:69–119`). Fix B adds sneak state during
+  `!useOn("bucket", "lava")` to prevent falling in (`actions.js:92–102`).
+- **BUG 6:** Fixed (corrected). Initial Fix A used `||` (any water contact) which caused a
+  regression: `self_preservation` fired on every tick during normal water traversal, ping-ponging
+  with `searchForBlock` and causing `PathStopped` loops. Corrected to `&&` (fully submerged only —
+  both feet and head blocks are water). Pre-LLM hazard check in `failure_replanner.js:180–216`
+  intentionally retains `||` (one-shot check, not a recurring tick).
+- **BUG 7:** Fixed. `nearby_blocks` included flowing water/lava (same block name as source,
+  metadata 1–7) which caused `mediate_interact` to emit `!useOn` prematurely. Fixed by
+  skipping `COLLECTIBLE_LIQUIDS` blocks with `metadata !== 0` in both `get_am_state` and
+  `get_nts_state` (`agent_state.js:34,60`). Reuses the `metadata === 0` pattern already
+  established in `skills.js`.
 - **BUG 4:** High confidence. Directly observable in the log.
 - **BUG 3:** High confidence. Triple-wrapped error and `undefined` stack trace are
   directly observable.
 - **BUG 1:** Plausible hypothesis. A protocol version mismatch is the most likely
   cause, but the exact wrong type mapping has not been confirmed from raw packet data.
   "Likely cause" — not proven root cause.
+- **BUG 8:** Fixed. Root cause confirmed by `!goToCoordinates(-479, -38, -1764, 1)` failing ×3
+  in recovery attempt 2 — direct proof that `GoalNear=1` at the lava block is unreachable. Fix
+  replaces random angle-hunting with a dig-through: bot only attempts `useOn` when view is clear
+  or it is above the lava; otherwise digs the blocking block. Annotated with
+  `// Start of AH code` / `// End of AH code` (convention for AH patches to files outside
+  `achievement_hunter/`).

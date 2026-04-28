@@ -47,6 +47,9 @@ function format_action_as_command(action) {
 
 async function run_action(action, agent) {
   const command = format_action_as_command(action);
+  const is_lava_useOn = command.startsWith('!useOn(') && command.includes('"lava"');
+
+  if (is_lava_useOn) agent.bot.setControlState('sneak', true);
   try {
     const env_result = await executeCommand(agent, command);
     return {
@@ -62,6 +65,8 @@ async function run_action(action, agent) {
       kind: 'runner_exception',
       message: String(e),
     };
+  } finally {
+    if (is_lava_useOn) agent.bot.setControlState('sneak', false);
   }
 }
 

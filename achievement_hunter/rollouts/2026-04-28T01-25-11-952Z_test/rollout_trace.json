@@ -1,0 +1,2366 @@
+{
+  "objective": "test",
+  "status": "completed",
+  "started_at": "2026-04-28T01:25:11.952Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-28T01:25:11.957Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_shovel",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_axe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 8,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 20,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 5,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 5,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_shovel",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_axe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_hoe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_shovel",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_axe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_hoe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_shovel",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_axe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_hoe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        },
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ]
+      },
+      "state": {
+        "inventory": "Nothing"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:12.013Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 5,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "any_log",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:25:12.046Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 5,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "any_log",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:12.109Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"any_log\")",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "sand",
+          "sandstone",
+          "water",
+          "grass_block",
+          "dirt"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "turtle"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:12.110Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"oak_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:14.863Z",
+      "elapsed": "2s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!collectBlocks(\"oak_log\", 5)",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "leaf_litter",
+          "sand",
+          "grass_block",
+          "dirt",
+          "oak_log",
+          "oak_leaves",
+          "sandstone",
+          "stone",
+          "water",
+          "spruce_log",
+          "spruce_leaves",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:37.487Z",
+      "elapsed": "25s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ],
+        "final": {
+          "objective": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+          "sinks": [
+            "wooden_pickaxe",
+            "wooden_shovel",
+            "wooden_axe",
+            "wooden_hoe"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_shovel",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_axe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 8,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 17,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_shovel",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_axe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_hoe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_shovel",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_axe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_hoe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_shovel",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_axe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_hoe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_log": 6
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:37.537Z",
+      "elapsed": "25s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_plank",
+          "qty": 17,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_log",
+              "qty": 5,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:25:37.589Z",
+      "elapsed": "25s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "oak_planks",
+        "qty": 17,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_log",
+              "qty": 5
+            }
+          ],
+          "workstation": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:37.697Z",
+      "elapsed": "25s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"oak_planks\", 5)",
+      "state": {
+        "inventory": {
+          "oak_log": 6
+        },
+        "craftable_items": [
+          "oak_planks",
+          "oak_wood"
+        ],
+        "nearby_blocks": [
+          "leaf_litter",
+          "dirt",
+          "grass_block",
+          "sand",
+          "oak_leaves",
+          "spruce_log",
+          "stone",
+          "water",
+          "sandstone",
+          "copper_ore",
+          "short_grass",
+          "spruce_leaves",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "pig"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:39.294Z",
+      "elapsed": "27s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ],
+        "final": {
+          "objective": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+          "sinks": [
+            "wooden_pickaxe",
+            "wooden_shovel",
+            "wooden_axe",
+            "wooden_hoe"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_shovel",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_axe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 8,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_shovel",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_axe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_hoe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_shovel",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_axe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_hoe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "oak_planks": 20
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:39.346Z",
+      "elapsed": "27s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "crafting_table",
+          "qty": 1,
+          "item_type": "workstation",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "stick",
+          "qty": 8,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:25:39.397Z",
+      "elapsed": "27s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "crafting_table",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4
+            }
+          ],
+          "workstation": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:39.502Z",
+      "elapsed": "27s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"crafting_table\", 1)",
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "oak_planks": 20
+        },
+        "craftable_items": [
+          "oak_planks",
+          "crafting_table",
+          "oak_button",
+          "oak_pressure_plate",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "leaf_litter",
+          "dirt",
+          "grass_block",
+          "sand",
+          "oak_leaves",
+          "spruce_log",
+          "stone",
+          "water",
+          "sandstone",
+          "copper_ore",
+          "short_grass",
+          "spruce_leaves",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "pig"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:40.846Z",
+      "elapsed": "28s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ],
+        "final": {
+          "objective": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+          "sinks": [
+            "wooden_pickaxe",
+            "wooden_shovel",
+            "wooden_axe",
+            "wooden_hoe"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_shovel",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_axe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 8,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_shovel",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_axe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_hoe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "oak_planks": 16,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:40.895Z",
+      "elapsed": "28s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "stick",
+          "qty": 8,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:25:40.945Z",
+      "elapsed": "28s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "stick",
+        "qty": 8,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4
+            }
+          ],
+          "workstation": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:41.045Z",
+      "elapsed": "29s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"stick\", 2)",
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "oak_planks": 16,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "oak_planks",
+          "oak_slab",
+          "chest",
+          "crafting_table",
+          "oak_stairs",
+          "oak_button",
+          "oak_pressure_plate",
+          "oak_door",
+          "oak_trapdoor",
+          "oak_boat",
+          "bowl",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "leaf_litter",
+          "dirt",
+          "grass_block",
+          "sand",
+          "oak_leaves",
+          "spruce_log",
+          "stone",
+          "water",
+          "sandstone",
+          "copper_ore",
+          "short_grass",
+          "spruce_leaves",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "pig"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:42.514Z",
+      "elapsed": "30s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ],
+        "final": {
+          "objective": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+          "sinks": [
+            "wooden_pickaxe",
+            "wooden_shovel",
+            "wooden_axe",
+            "wooden_hoe"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_shovel",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_axe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "oak_planks": 12,
+          "crafting_table": 1,
+          "stick": 8
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:42.565Z",
+      "elapsed": "30s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "wooden_pickaxe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "wooden_shovel",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "wooden_axe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "wooden_hoe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:25:42.617Z",
+      "elapsed": "30s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "wooden_pickaxe",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "stick",
+              "qty": 2
+            },
+            {
+              "item": "any_plank",
+              "qty": 3
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:42.725Z",
+      "elapsed": "30s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"wooden_pickaxe\", 1)",
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "oak_planks": 12,
+          "crafting_table": 1,
+          "stick": 8
+        },
+        "craftable_items": [
+          "oak_planks",
+          "oak_slab",
+          "chest",
+          "crafting_table",
+          "ladder",
+          "oak_fence",
+          "oak_stairs",
+          "oak_button",
+          "oak_pressure_plate",
+          "oak_door",
+          "oak_trapdoor",
+          "oak_fence_gate",
+          "oak_boat",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stick",
+          "oak_sign"
+        ],
+        "nearby_blocks": [
+          "leaf_litter",
+          "dirt",
+          "grass_block",
+          "sand",
+          "oak_leaves",
+          "spruce_log",
+          "stone",
+          "water",
+          "sandstone",
+          "copper_ore",
+          "short_grass",
+          "spruce_leaves",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "pig"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:50.303Z",
+      "elapsed": "38s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ],
+        "final": {
+          "objective": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+          "sinks": [
+            "wooden_pickaxe",
+            "wooden_shovel",
+            "wooden_axe",
+            "wooden_hoe"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_shovel",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_axe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "stick": 6,
+          "wooden_pickaxe": 1,
+          "oak_planks": 9,
+          "oak_log": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:50.358Z",
+      "elapsed": "38s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "wooden_shovel",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 1,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "wooden_axe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "wooden_hoe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:25:50.411Z",
+      "elapsed": "38s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "wooden_shovel",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "stick",
+              "qty": 2
+            },
+            {
+              "item": "any_plank",
+              "qty": 1
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:50.517Z",
+      "elapsed": "38s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"wooden_shovel\", 1)",
+      "state": {
+        "inventory": {
+          "stick": 6,
+          "wooden_pickaxe": 1,
+          "oak_planks": 9,
+          "oak_log": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "oak_planks",
+          "oak_slab",
+          "chest",
+          "crafting_table",
+          "oak_fence",
+          "oak_stairs",
+          "oak_button",
+          "oak_pressure_plate",
+          "oak_door",
+          "oak_trapdoor",
+          "oak_fence_gate",
+          "oak_boat",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stick",
+          "oak_sign"
+        ],
+        "nearby_blocks": [
+          "leaf_litter",
+          "sand",
+          "grass_block",
+          "dirt",
+          "oak_leaves",
+          "sandstone",
+          "stone",
+          "spruce_log",
+          "water",
+          "copper_ore",
+          "spruce_leaves",
+          "short_grass"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:57.860Z",
+      "elapsed": "45s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ],
+        "final": {
+          "objective": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+          "sinks": [
+            "wooden_pickaxe",
+            "wooden_shovel",
+            "wooden_axe",
+            "wooden_hoe"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_axe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 8,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1,
+          "oak_log": 1,
+          "stick": 4,
+          "oak_sapling": 1,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:57.914Z",
+      "elapsed": "45s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "wooden_axe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        },
+        {
+          "id": "wooden_hoe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:25:57.968Z",
+      "elapsed": "46s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "wooden_axe",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "stick",
+              "qty": 2
+            },
+            {
+              "item": "any_plank",
+              "qty": 3
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:25:58.072Z",
+      "elapsed": "46s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"wooden_axe\", 1)",
+      "state": {
+        "inventory": {
+          "oak_planks": 8,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1,
+          "oak_log": 1,
+          "stick": 4,
+          "oak_sapling": 1,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "oak_planks",
+          "oak_slab",
+          "chest",
+          "crafting_table",
+          "oak_fence",
+          "oak_stairs",
+          "oak_button",
+          "oak_pressure_plate",
+          "oak_door",
+          "oak_trapdoor",
+          "oak_fence_gate",
+          "oak_boat",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stick",
+          "oak_sign"
+        ],
+        "nearby_blocks": [
+          "leaf_litter",
+          "sand",
+          "grass_block",
+          "dirt",
+          "oak_leaves",
+          "sandstone",
+          "stone",
+          "water",
+          "spruce_log",
+          "copper_ore",
+          "spruce_leaves"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:03.150Z",
+      "elapsed": "51s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ],
+        "final": {
+          "objective": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+          "sinks": [
+            "wooden_pickaxe",
+            "wooden_shovel",
+            "wooden_axe",
+            "wooden_hoe"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_log",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_hoe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_hoe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "stick": 2,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1,
+          "oak_log": 1,
+          "oak_planks": 5,
+          "oak_sapling": 1,
+          "wooden_axe": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:03.205Z",
+      "elapsed": "51s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 3,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "any_log",
+          "source_kind": "block",
+          "grounded_nearby_source": "spruce_log"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:26:03.259Z",
+      "elapsed": "51s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "any_log",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:03.365Z",
+      "elapsed": "51s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"spruce_log\", 3)",
+      "state": {
+        "inventory": {
+          "stick": 2,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1,
+          "oak_log": 1,
+          "oak_planks": 5,
+          "oak_sapling": 1,
+          "wooden_axe": 1
+        },
+        "craftable_items": [
+          "oak_planks",
+          "crafting_table",
+          "oak_button",
+          "oak_pressure_plate",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "leaf_litter",
+          "sand",
+          "grass_block",
+          "dirt",
+          "oak_leaves",
+          "sandstone",
+          "stone",
+          "water",
+          "spruce_log",
+          "copper_ore",
+          "spruce_leaves"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "pig"
+          ]
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:17.711Z",
+      "elapsed": "1m 05s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ],
+        "final": {
+          "objective": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+          "sinks": [
+            "wooden_pickaxe",
+            "wooden_shovel",
+            "wooden_axe",
+            "wooden_hoe"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_hoe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_hoe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "oak_planks": 5,
+          "oak_sapling": 1,
+          "wooden_axe": 1,
+          "stick": 2,
+          "spruce_log": 4,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:17.763Z",
+      "elapsed": "1m 05s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_plank",
+          "qty": 1,
+          "item_type": "item",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_log",
+              "qty": 5,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:26:17.814Z",
+      "elapsed": "1m 05s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "oak_planks",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_log",
+              "qty": 5
+            }
+          ],
+          "workstation": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:17.915Z",
+      "elapsed": "1m 05s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"oak_planks\", 1)",
+      "state": {
+        "inventory": {
+          "oak_log": 1,
+          "oak_planks": 5,
+          "oak_sapling": 1,
+          "wooden_axe": 1,
+          "stick": 2,
+          "spruce_log": 4,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1
+        },
+        "craftable_items": [
+          "oak_planks",
+          "spruce_planks",
+          "spruce_wood",
+          "crafting_table",
+          "oak_button",
+          "oak_pressure_plate",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "spruce_leaves",
+          "grass_block",
+          "sand",
+          "spruce_log",
+          "stone",
+          "sandstone",
+          "coal_ore",
+          "large_fern",
+          "leaf_litter",
+          "short_grass",
+          "oak_leaves"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:18.747Z",
+      "elapsed": "1m 06s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ],
+        "final": {
+          "objective": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+          "sinks": [
+            "wooden_pickaxe",
+            "wooden_shovel",
+            "wooden_axe",
+            "wooden_hoe"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "crafting_table",
+              "to": "wooden_hoe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 9,
+          "oak_sapling": 1,
+          "wooden_axe": 1,
+          "stick": 2,
+          "spruce_log": 4,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:18.798Z",
+      "elapsed": "1m 06s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "crafting_table",
+          "qty": 1,
+          "item_type": "workstation",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:26:18.850Z",
+      "elapsed": "1m 06s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "crafting_table",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4
+            }
+          ],
+          "workstation": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:18.953Z",
+      "elapsed": "1m 07s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"crafting_table\", 1)",
+      "state": {
+        "inventory": {
+          "oak_planks": 9,
+          "oak_sapling": 1,
+          "wooden_axe": 1,
+          "stick": 2,
+          "spruce_log": 4,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "spruce_wood",
+          "crafting_table",
+          "oak_button",
+          "oak_pressure_plate",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "spruce_leaves",
+          "grass_block",
+          "sand",
+          "spruce_log",
+          "stone",
+          "sandstone",
+          "coal_ore",
+          "large_fern",
+          "leaf_litter",
+          "short_grass",
+          "oak_leaves"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:19.778Z",
+      "elapsed": "1m 07s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "wooden_pickaxe",
+          "wooden_shovel",
+          "wooden_axe",
+          "wooden_hoe"
+        ],
+        "final": {
+          "objective": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+          "sinks": [
+            "wooden_pickaxe",
+            "wooden_shovel",
+            "wooden_axe",
+            "wooden_hoe"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_hoe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "oak_planks": 5,
+          "crafting_table": 1,
+          "oak_sapling": 1,
+          "wooden_axe": 1,
+          "stick": 2,
+          "spruce_log": 4,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:19.830Z",
+      "elapsed": "1m 07s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "wooden_hoe",
+          "qty": 1,
+          "item_type": "tool",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_hint": null,
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T01:26:19.882Z",
+      "elapsed": "1m 07s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "wooden_hoe",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "stick",
+              "qty": 2
+            },
+            {
+              "item": "any_plank",
+              "qty": 2
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:19.986Z",
+      "elapsed": "1m 08s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"wooden_hoe\", 1)",
+      "state": {
+        "inventory": {
+          "oak_planks": 5,
+          "crafting_table": 1,
+          "oak_sapling": 1,
+          "wooden_axe": 1,
+          "stick": 2,
+          "spruce_log": 4,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "spruce_wood",
+          "oak_slab",
+          "crafting_table",
+          "oak_fence",
+          "oak_button",
+          "oak_pressure_plate",
+          "oak_boat",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "spruce_leaves",
+          "grass_block",
+          "sand",
+          "spruce_log",
+          "stone",
+          "sandstone",
+          "coal_ore",
+          "large_fern",
+          "leaf_litter",
+          "short_grass",
+          "oak_leaves"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T01:26:26.148Z",
+      "elapsed": "1m 14s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 2,
+        "why": "all original sinks satisfied",
+        "final": {
+          "vertices": [],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "wooden_hoe": 1,
+          "crafting_table": 1,
+          "oak_sapling": 1,
+          "wooden_axe": 1,
+          "oak_planks": 3,
+          "spruce_log": 4,
+          "wooden_pickaxe": 1,
+          "wooden_shovel": 1
+        }
+      }
+    }
+  ],
+  "completed_at": "2026-04-28T01:26:26.150Z",
+  "total_elapsed": "1m 14s",
+  "completion_reason": "all sinks satisfied"
+}
