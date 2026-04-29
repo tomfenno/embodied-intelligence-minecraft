@@ -21,8 +21,10 @@
       "horizontal_distance_from_current_position": {
         "max": 500,
         "metric": "euclidean",
-        "applies_to": ["x", "z"]
-      }
+        "applies_to": ["x", "z"],
+        "description": "The target x/z coordinate must be within 500 horizontal blocks of the agent's current x/z position."
+      },
+      "max_uses_per_recovery_plan": 1
     },
     "examples": [
       "!goToCoordinates(100, 64, -200, 1)",
@@ -34,15 +36,17 @@
     "description": "Search for the nearest block or entity of a given type by sweeping radii 32, 64, 128, 256, 511 from the bot's current position. Equivalent to running a maximum-radius search; there is no broader scan available.",
     "category": "movement",
     "constraints": {
-      "target_must_be_concrete": "Pass concrete block or entity names (e.g. \"chicken\", \"diamond_ore\"). Abstract category names (e.g. \"any_log\") are not supported and will fail.",
-      "exhaustion_is_terminal": "If a previous !search for the same target returned 'search_exhausted', re-issuing !search from the same position will fail identically. Relocate first (e.g. !goToCoordinates, !moveAway) before searching again.",
-      "no_repeat_in_sequence": "A second !search for the same target inside one recovery action sequence will short-circuit to 'search_already_attempted'."
+      "target_must_be_concrete": "Pass concrete block or entity names, e.g. \"chicken\", \"diamond_ore\". Abstract category names, e.g. \"any_log\", are not supported and will fail.",
+      "max_search_radius": 511,
+      "exhaustion_is_terminal": "If a previous !search for the same target returned 'search_exhausted', re-issuing !search from the same position will fail identically. Relocate first before searching again.",
+      "no_repeat_in_sequence": "A second !search for the same target inside one recovery action sequence will short-circuit to 'search_already_attempted'.",
+      "requires_relocation_after_exhaustion": true
     },
     "examples": ["!search(\"chicken\")", "!search(\"diamond_ore\")"]
   },
   {
     "name": "!moveAway",
-    "description": "Move a short distance away for unsticking or repositioning only. Direction is unpredictable — the bot goes wherever terrain is easiest and cannot be steered. Never use for: going up/down (use !goToSurface or !goToCoordinates), reaching a specific place (use !goToCoordinates), finding blocks/entities (use !search).",
+    "description": "Move a short distance away for unsticking or repositioning only. Direction is unpredictable — the bot goes wherever terrain is easiest and cannot be steered. Never use for: going up/down, reaching a specific place, finding blocks/entities, or relocating after a failed search.",
     "category": "movement",
     "constraints": {
       "distance": {
@@ -50,7 +54,8 @@
         "max": 32,
         "recommended_max": 16,
         "note": "Large distances can send the bot toward unintended low-cost locations such as bedrock. Prefer 8-16 for unsticking; use 32 only for escaping a local obstruction."
-      }
+      },
+      "not_for_search_relocation": "Do not use !moveAway as the main relocation strategy after search_exhausted. Use !goToCoordinates with a bounded target instead."
     },
     "examples": ["!moveAway(10)", "!moveAway(25)"]
   },
@@ -59,7 +64,8 @@
     "description": "Eat/drink the given item.",
     "category": "inventory",
     "constraints": {
-      "item_must_be_consumable": true
+      "item_must_be_consumable": true,
+      "item_must_be_in_inventory": true
     },
     "examples": ["!consume(\"bread\")", "!consume(\"potion\")"]
   },
@@ -67,17 +73,23 @@
     "name": "!equip",
     "description": "Equip the given item.",
     "category": "inventory",
-    "constraints": {},
+    "constraints": {
+      "item_must_be_in_inventory": true,
+      "item_must_be_equippable": true
+    },
     "examples": ["!equip(\"diamond_sword\")", "!equip(\"iron_pickaxe\")"]
   },
   {
     "name": "!collectBlocks",
-    "description": "Collect the nearest blocks of a given type.",
+    "description": "Collect the nearest blocks of a given type. Only works if the block is currently present in the state.",
     "category": "collection",
     "constraints": {
       "num": {
         "min": 1
       },
+      "target_must_be_in_state": true,
+      "recommended_use": "Use only after !search succeeds for the same block type, or when the block is already visible in nearby.blocks.",
+      "do_not_use_after_failed_search": "If !search for this block returned search_exhausted from the current position, !collectBlocks will not help.",
       "timeout_minutes": 10
     },
     "examples": [
@@ -93,6 +105,8 @@
       "num": {
         "min": 1
       },
+      "recipe_must_be_known": true,
+      "required_inputs_must_be_in_inventory": true,
       "crafting_table_required_for_some_recipes": true
     },
     "examples": [
@@ -108,6 +122,9 @@
       "num": {
         "min": 1
       },
+      "item_must_be_smeltable": true,
+      "input_item_must_be_in_inventory": true,
+      "fuel_must_be_available": true,
       "furnace_must_be_nearby": true,
       "restarts_agent_on_success": true
     },
@@ -134,14 +151,18 @@
   },
   {
     "name": "!attack",
-    "description": "Attack and kill the nearest entity of a given type.",
+    "description": "Attack and kill the nearest entity of a given type. Only works if the target entity is currently present in the state.",
     "category": "control",
-    "constraints": {},
+    "constraints": {
+      "target_must_be_in_state": true,
+      "recommended_use": "Use only after !search succeeds for the same entity type, or when the entity is already visible in nearby.entityTypes.",
+      "do_not_use_after_failed_search": "If !search for this entity returned search_exhausted from the current position, !attack will not help."
+    },
     "examples": ["!attack(\"zombie\")", "!attack(\"cow\")"]
   },
   {
     "name": "!goToBed",
-    "description": "Go to the nearest bed and sleep.",
+    "description": "Go to the nearest bed and sleep. Only works if a bed is within the state. If the bed is in the inventory it should be put down first.",
     "category": "movement",
     "constraints": {
       "bed_must_be_nearby": true,
@@ -156,22 +177,11 @@
     "constraints": {
       "seconds": {
         "min": -1,
-        "note": "-1 means forever"
+        "max": 300,
+        "note": "-1 means forever; use only when intentionally stopping the agent indefinitely."
       }
     },
     "examples": ["!stay(30)", "!stay(-1)"]
-  },
-  {
-    "name": "!setMode",
-    "description": "Set a mode to on or off. A mode is an automatic behavior that constantly checks and responds to the environment.",
-    "category": "control",
-    "constraints": {
-      "mode_must_exist": true
-    },
-    "examples": [
-      "!setMode(\"self_defense\", true)",
-      "!setMode(\"self_preservation\", false)"
-    ]
   },
   {
     "name": "!digDown",
@@ -179,24 +189,29 @@
     "category": "collection",
     "constraints": {
       "distance": {
-        "min": 1
+        "min": 1,
+        "max": 32,
+        "recommended_max": 16
       },
       "stops_at_lava": true,
       "stops_at_water": true,
-      "stops_at_drop_gte_4": true
+      "stops_at_drop_gte_4": true,
+      "do_not_use_for_navigation": "Do not use to reach distant targets or escape failed surface searches."
     },
     "examples": ["!digDown(5)", "!digDown(20)"]
   },
   {
     "name": "!goToSurface",
-    "description": "Moves the bot to the highest block above it (usually the surface).",
+    "description": "Moves the bot to the highest block above it, usually the surface.",
     "category": "movement",
-    "constraints": {},
+    "constraints": {
+      "only_use_when_below_surface_or_obstructed": true
+    },
     "examples": ["!goToSurface()"]
   },
   {
     "name": "!useOn",
-    "description": "Use (right click) the given tool on the nearest target of the given type.",
+    "description": "Use, right click, the given tool on the nearest target of the given type.",
     "category": "custom",
     "constraints": {
       "target": {
@@ -204,7 +219,9 @@
       },
       "tool_name": {
         "note": "Use \"hand\" for no tool"
-      }
+      },
+      "tool_must_be_in_inventory_unless_hand": true,
+      "target_must_be_in_state_unless_nothing": true
     },
     "examples": [
       "!useOn(\"flint_and_steel\", \"tnt\")",

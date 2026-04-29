@@ -41,3 +41,5 @@ logs/
 *.temp
 *.cache
 .ipynb_checkpoints/
+achievement_hunter/rollouts
+achievement_hunter/rollout_live

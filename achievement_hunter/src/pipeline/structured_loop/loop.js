@@ -30,7 +30,7 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   const bot = agent.bot;
 
   // This hard coded option to load a graph is intended. Do not remove.
-  const load_graph = true;
+  const load_graph = false;
   const graph_file_path =
       './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
   //  `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;

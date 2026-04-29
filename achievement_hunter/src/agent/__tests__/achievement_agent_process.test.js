@@ -38,4 +38,11 @@ describe('AchievementAgentProcess._should_restart', () => {
   it('returns true on exit code 1 with no signal (typical crash)', () => {
     expect(proc._should_restart(1, undefined)).toBe(true);
   });
+
+  it('returns false after a stop has been requested', () => {
+    proc._stop_requested = true;
+
+    expect(proc._should_restart(1, null)).toBe(false);
+    expect(proc._should_restart(null, 'SIGTERM')).toBe(false);
+  });
 });
