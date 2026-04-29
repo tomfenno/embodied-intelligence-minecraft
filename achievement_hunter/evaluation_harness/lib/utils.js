@@ -271,6 +271,24 @@ export async function stopServerProcess(processHandle) {
   }
 }
 
+export async function sendServerConsoleCommand(
+    processHandle, command, {waitMs = 500} = {}) {
+  if (!processHandle || processHandle.exitCode !== null) {
+    throw new Error('Cannot send command to a stopped Minecraft server');
+  }
+
+  try {
+    processHandle.stdin?.write(`${command}\n`);
+  } catch (error) {
+    throw new Error(
+        `Failed to send command to Minecraft server: ${error.message}`);
+  }
+
+  if (waitMs > 0) {
+    await sleep(waitMs);
+  }
+}
+
 export function makeTempDir(prefix, rootPath = path.join(PROJECT_ROOT, 'tmp')) {
   ensureDirectory(rootPath);
   return fs.mkdtempSync(path.join(rootPath, prefix));

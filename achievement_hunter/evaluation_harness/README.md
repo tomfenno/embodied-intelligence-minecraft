@@ -12,6 +12,8 @@ profiles pinned to `gpt-5`.
   episode when `world.provider` is `managed_local`.
 - Uses `survival` mode and `peaceful` difficulty unless overridden in the suite
   config.
+- Forces `gamerule spawnRadius 0` in managed-local mode so both agents spawn at
+  the same seed-native world spawn point for a given seed.
 - Writes artifacts under
   `achievement_hunter/evaluation_harness/experiments/<suite_name>/...`.
 
@@ -79,7 +81,8 @@ node achievement_hunter/evaluation_harness/cli.js \
 ```
 
 In this mode, the harness and agents run on the local evaluation machine and
-only the Minecraft server may be Dockerized or managed separately.
+only the Minecraft server may be Dockerized or managed separately. Exact spawn
+comparability is user-managed in external mode.
 
 ## Merging shard outputs
 

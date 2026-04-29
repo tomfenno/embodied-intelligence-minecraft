@@ -27,6 +27,7 @@ import {
   readJsonIfExists,
   resolveProjectPath,
   safeRemoveTree,
+  sendServerConsoleCommand,
   sleep,
   stopServerProcess,
   terminateProcessTree,
@@ -290,6 +291,7 @@ async function runSingleBenchmarkEpisode({
         process: serverHandle,
         outputPath: serverStdoutPath,
       });
+      await sendServerConsoleCommand(serverHandle, 'gamerule spawnRadius 0');
     }
 
     if (settingsOverride.achievement_hunter) {
@@ -382,12 +384,16 @@ async function runSingleBenchmarkEpisode({
     const dependencySummary = collectDependencyMetrics(resultDir, {
       preferTaskTraces: settingsOverride.achievement_hunter,
     });
+    const initialSpawn =
+        extractFirstLoginSpawnFromServerLog(
+            path.join(resultDir, 'server_stdout.log'), agentName);
     const score = resolveBenchmarkScore({
       resultDir,
       serverRoot: serverRuntime.serverRoot,
       worldPath: serverRuntime.worldPath,
       agentName,
       taskData,
+      episodeRuntime,
     });
 
     const manifest = {
@@ -425,6 +431,7 @@ async function runSingleBenchmarkEpisode({
       world_host: serverRuntime.host,
       world_port: serverRuntime.port,
       minecraft_version: worldConfig.minecraft_version || '1.21.6',
+      initial_spawn: initialSpawn,
       result_dir: resultDir,
     };
     writeJson(path.join(resultDir, 'episode_manifest.json'), manifest);
@@ -542,7 +549,17 @@ function mirrorEpisodeTimingIntoAchievementRollouts(resultDir, episodeRuntime) {
   }
 }
 
-function resolveBenchmarkScore({resultDir, serverRoot, worldPath, agentName, taskData}) {
+export function resolveBenchmarkScore({
+  resultDir,
+  serverRoot,
+  worldPath,
+  agentName,
+  taskData,
+  episodeRuntime = null,
+}) {
+  const runtimeScore = normalizeBenchmarkScore(episodeRuntime?.score);
+  if (runtimeScore != null) return runtimeScore;
+
   const score = extractResultRecursive(resultDir);
   if (score != null) return score;
 
@@ -568,18 +585,47 @@ function extractResultRecursive(rootPath) {
 function analyzeJsonFile(filePath) {
   try {
     const data = readJson(filePath);
-    if (!Array.isArray(data)) return null;
-    for (const turn of data) {
-      if (turn?.role !== 'system' || typeof turn.content !== 'string') continue;
-      const match = turn.content.match(/Task ended with score : ([0-9.]+)/);
-      if (match) {
-        return Number(match[1]);
-      }
+    let bestScore = null;
+    for (const turns of extractTurnCollections(data)) {
+      const score = extractScoreFromTurns(turns);
+      if (score == null) continue;
+      bestScore = bestScore == null ? score : Math.max(bestScore, score);
     }
+    return bestScore;
   } catch {
     return null;
   }
-  return null;
+}
+
+function normalizeBenchmarkScore(value) {
+  if (value == null || value === '') return null;
+  const numericScore = Number(value);
+  return Number.isFinite(numericScore) ? numericScore : null;
+}
+
+function extractTurnCollections(data) {
+  const turnCollections = [];
+  if (Array.isArray(data)) {
+    turnCollections.push(data);
+  }
+  if (data && typeof data === 'object' && Array.isArray(data.turns)) {
+    turnCollections.push(data.turns);
+  }
+  return turnCollections;
+}
+
+function extractScoreFromTurns(turns) {
+  let bestScore = null;
+  for (const turn of turns) {
+    if (turn?.role !== 'system' || typeof turn.content !== 'string') continue;
+    const match = turn.content.match(/Task ended with score : ([0-9.]+)/);
+    if (!match) continue;
+    const numericScore = normalizeBenchmarkScore(match[1]);
+    if (numericScore == null) continue;
+    bestScore = bestScore == null ? numericScore :
+                                   Math.max(bestScore, numericScore);
+  }
+  return bestScore;
 }
 
 function inspectAdvancementCompletion(serverRoot, worldPath, agentName, advancementId) {
@@ -600,6 +646,38 @@ function inspectAdvancementCompletion(serverRoot, worldPath, agentName, advancem
   } catch {
     return 0;
   }
+}
+
+export function extractFirstLoginSpawnFromServerLog(serverLogPath, agentName) {
+  if (!serverLogPath || !agentName || !fs.existsSync(serverLogPath)) {
+    return null;
+  }
+
+  const escapedAgentName = escapeRegex(agentName);
+  const loginPattern = new RegExp(
+      `\\]: ${escapedAgentName}\\[[^\\]]*\\] logged in with entity id ` +
+      `\\d+ at \\(([^,]+),\\s*([^,]+),\\s*([^)]+)\\)`);
+
+  const lines = fs.readFileSync(serverLogPath, 'utf8').split(/\r?\n/);
+  for (const line of lines) {
+    const match = line.match(loginPattern);
+    if (!match) continue;
+
+    const x = Number(match[1]);
+    const y = Number(match[2]);
+    const z = Number(match[3]);
+    if (![x, y, z].every(Number.isFinite)) {
+      return null;
+    }
+
+    return {x, y, z};
+  }
+
+  return null;
+}
+
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function mergeDefined(base, overrides) {
