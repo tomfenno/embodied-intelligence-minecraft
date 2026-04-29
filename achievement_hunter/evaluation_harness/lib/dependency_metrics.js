@@ -83,57 +83,93 @@ function collectTaskTraceCommandRecords(resultDir) {
 function collectHistoryCommandRecords(resultDir) {
   const records = [];
   let unparseableCommandRecords = 0;
+  const turns = collectOrderedHistoryTurns(resultDir);
 
-  for (const filePath of walkFiles(resultDir)) {
-    if (!filePath.includes(`${path.sep}histories${path.sep}`) ||
-        path.extname(filePath) !== '.json') {
+  for (let index = 0; index < turns.length; index++) {
+    const turn = turns[index];
+    if (turn?.role !== 'assistant' || typeof turn.content !== 'string') {
       continue;
     }
 
-    const turns = readJson(filePath);
-    for (let index = 0; index < turns.length; index++) {
-      const turn = turns[index];
-      if (turn?.role !== 'assistant' || typeof turn.content !== 'string') {
-        continue;
-      }
+    const actionName = extractActionName(turn.content);
+    if (!actionName) continue;
 
-      const actionName = extractActionName(turn.content);
-      if (!actionName) continue;
-
-      let matchedResult = null;
-      for (let lookahead = index + 1; lookahead < turns.length; lookahead++) {
-        const candidate = turns[lookahead];
-        if (!candidate || candidate.role === 'assistant' || candidate.role === 'user') {
-          break;
-        }
-        if (candidate.role !== 'system' || typeof candidate.content !== 'string') {
-          continue;
-        }
-        if (!isCommandResultCandidate(actionName, candidate.content)) {
-          continue;
-        }
-        matchedResult = candidate.content;
+    let matchedResult = null;
+    for (let lookahead = index + 1; lookahead < turns.length; lookahead++) {
+      const candidate = turns[lookahead];
+      if (!candidate || candidate.role === 'assistant' || candidate.role === 'user') {
         break;
       }
-
-      if (matchedResult == null) {
-        unparseableCommandRecords += 1;
+      if (candidate.role !== 'system' || typeof candidate.content !== 'string') {
         continue;
       }
-
-      const success = inferOfflineSuccess(actionName, matchedResult);
-      records.push(classifyCommandResult({
-        actionName,
-        command: turn.content,
-        result: {
-          success,
-          message: matchedResult,
-        },
-      }));
+      if (!isCommandResultCandidate(actionName, candidate.content)) {
+        continue;
+      }
+      matchedResult = candidate.content;
+      break;
     }
+
+    if (matchedResult == null) {
+      unparseableCommandRecords += 1;
+      continue;
+    }
+
+    const success = inferOfflineSuccess(actionName, matchedResult);
+    records.push(classifyCommandResult({
+      actionName,
+      command: turn.content,
+      result: {
+        success,
+        message: matchedResult,
+      },
+    }));
   }
 
   return {records, unparseableCommandRecords};
+}
+
+function collectOrderedHistoryTurns(resultDir) {
+  const historyPaths = [];
+  const memoryPaths = [];
+
+  for (const filePath of walkFiles(resultDir)) {
+    if (path.extname(filePath) !== '.json') continue;
+    if (filePath.includes(`${path.sep}histories${path.sep}`)) {
+      historyPaths.push(filePath);
+      continue;
+    }
+    if (path.basename(filePath) === 'memory.json' &&
+        filePath.includes(`${path.sep}agent_artifacts${path.sep}`)) {
+      memoryPaths.push(filePath);
+    }
+  }
+
+  historyPaths.sort();
+  memoryPaths.sort();
+
+  const turns = [];
+  for (const filePath of historyPaths) {
+    turns.push(...readTurnsFromArtifact(filePath));
+  }
+  for (const filePath of memoryPaths) {
+    turns.push(...readTurnsFromArtifact(filePath));
+  }
+
+  return turns;
+}
+
+function readTurnsFromArtifact(filePath) {
+  try {
+    const data = readJson(filePath);
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object' && Array.isArray(data.turns)) {
+      return data.turns;
+    }
+  } catch {
+    return [];
+  }
+  return [];
 }
 
 function extractActionName(commandText) {
