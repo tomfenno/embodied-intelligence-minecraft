@@ -1,0 +1,596 @@
+{
+  "objective": "test",
+  "task": {
+    "target_item": "iron_ingot",
+    "qty": 1,
+    "action_type": "smelt",
+    "parameters": {
+      "smelting_inputs": [
+        {
+          "item": "raw_iron",
+          "qty": 3
+        }
+      ],
+      "fuel_inputs": [
+        {
+          "item": "any_plank",
+          "qty": 3
+        }
+      ],
+      "workstation": "furnace"
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1013.46,
+            "y": 64,
+            "z": -2725.5
+          },
+          "dimension": "overworld",
+          "biome": "plains",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": false,
+          "current": "mode:self_preservation"
+        },
+        "surroundings": {
+          "below": "grass_block",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "cobblestone": 6,
+            "oak_log": 3,
+            "raw_iron": 1,
+            "andesite": 1,
+            "iron_ingot": 2,
+            "furnace": 2,
+            "wooden_pickaxe": 1,
+            "stone_pickaxe": 1,
+            "crafting_table": 1,
+            "oak_planks": 4,
+            "dirt": 5,
+            "granite": 24
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "grass_block",
+            "short_grass",
+            "dirt",
+            "stone",
+            "copper_ore",
+            "water",
+            "clay",
+            "oxeye_daisy",
+            "cornflower",
+            "dandelion"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "polished_granite",
+          "oak_planks",
+          "oak_slab",
+          "cobblestone_slab",
+          "crafting_table",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "oak_button",
+          "heavy_weighted_pressure_plate",
+          "oak_pressure_plate",
+          "bowl",
+          "stick",
+          "shears",
+          "iron_nugget",
+          "smithing_table"
+        ]
+      },
+      "action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    },
+    {
+      "i": 2,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1010.43,
+            "y": 63,
+            "z": -2724.43
+          },
+          "dimension": "overworld",
+          "biome": "plains",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "grass_block",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "cobblestone": 6,
+            "oak_log": 3,
+            "raw_iron": 1,
+            "andesite": 1,
+            "iron_ingot": 2,
+            "furnace": 2,
+            "wooden_pickaxe": 1,
+            "stone_pickaxe": 1,
+            "crafting_table": 1,
+            "oak_planks": 4,
+            "dirt": 5,
+            "granite": 24
+          },
+          "equipment": {
+            "mainHand": "furnace"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "grass_block",
+            "dirt",
+            "short_grass",
+            "water",
+            "clay",
+            "stone",
+            "copper_ore",
+            "sugar_cane"
+          ],
+          "entityTypes": [
+            "salmon"
+          ]
+        },
+        "craftable_items": [
+          "polished_granite",
+          "oak_planks",
+          "oak_slab",
+          "cobblestone_slab",
+          "crafting_table",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "oak_button",
+          "heavy_weighted_pressure_plate",
+          "oak_pressure_plate",
+          "bowl",
+          "stick",
+          "shears",
+          "iron_nugget",
+          "smithing_table"
+        ]
+      },
+      "action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    },
+    {
+      "i": 3,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1009.47,
+            "y": 62.92,
+            "z": -2723.47
+          },
+          "dimension": "overworld",
+          "biome": "plains",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "dirt",
+          "legs": "water",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "cobblestone": 6,
+            "oak_log": 3,
+            "raw_iron": 1,
+            "andesite": 1,
+            "iron_ingot": 2,
+            "furnace": 2,
+            "wooden_pickaxe": 1,
+            "stone_pickaxe": 1,
+            "crafting_table": 1,
+            "oak_planks": 4,
+            "dirt": 5,
+            "granite": 24
+          },
+          "equipment": {
+            "mainHand": "furnace"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "water",
+            "grass_block",
+            "dirt",
+            "clay",
+            "short_grass",
+            "stone",
+            "copper_ore",
+            "sugar_cane",
+            "granite"
+          ],
+          "entityTypes": [
+            "salmon"
+          ]
+        },
+        "craftable_items": [
+          "polished_granite",
+          "oak_planks",
+          "oak_slab",
+          "cobblestone_slab",
+          "crafting_table",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "oak_button",
+          "heavy_weighted_pressure_plate",
+          "oak_pressure_plate",
+          "bowl",
+          "stick",
+          "shears",
+          "iron_nugget",
+          "smithing_table"
+        ]
+      },
+      "action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    },
+    {
+      "i": 4,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1009.47,
+            "y": 62,
+            "z": -2723.47
+          },
+          "dimension": "overworld",
+          "biome": "plains",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "dirt",
+          "legs": "water",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "cobblestone": 6,
+            "oak_log": 3,
+            "raw_iron": 1,
+            "andesite": 1,
+            "iron_ingot": 2,
+            "furnace": 1,
+            "wooden_pickaxe": 1,
+            "stone_pickaxe": 1,
+            "crafting_table": 1,
+            "oak_planks": 4,
+            "dirt": 5,
+            "granite": 24
+          },
+          "equipment": {
+            "mainHand": "furnace"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "water",
+            "grass_block",
+            "dirt",
+            "furnace",
+            "clay",
+            "short_grass",
+            "stone",
+            "copper_ore",
+            "sugar_cane",
+            "granite"
+          ],
+          "entityTypes": [
+            "salmon"
+          ]
+        },
+        "craftable_items": [
+          "polished_granite",
+          "oak_planks",
+          "oak_slab",
+          "cobblestone_slab",
+          "crafting_table",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "oak_button",
+          "heavy_weighted_pressure_plate",
+          "oak_pressure_plate",
+          "bowl",
+          "stick",
+          "shears",
+          "iron_nugget",
+          "smithing_table"
+        ]
+      },
+      "action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    },
+    {
+      "i": 5,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1009.47,
+            "y": 62,
+            "z": -2723.47
+          },
+          "dimension": "overworld",
+          "biome": "plains",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "dirt",
+          "legs": "water",
+          "head": "air",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "cobblestone": 6,
+            "oak_log": 3,
+            "raw_iron": 1,
+            "andesite": 1,
+            "iron_ingot": 2,
+            "furnace": 1,
+            "wooden_pickaxe": 1,
+            "stone_pickaxe": 1,
+            "crafting_table": 1,
+            "oak_planks": 4,
+            "dirt": 5,
+            "granite": 24
+          },
+          "equipment": {
+            "mainHand": "furnace"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "water",
+            "grass_block",
+            "dirt",
+            "furnace",
+            "clay",
+            "short_grass",
+            "stone",
+            "copper_ore",
+            "sugar_cane",
+            "granite"
+          ],
+          "entityTypes": [
+            "salmon"
+          ]
+        },
+        "craftable_items": [
+          "polished_granite",
+          "oak_planks",
+          "oak_slab",
+          "cobblestone_slab",
+          "crafting_table",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "oak_button",
+          "heavy_weighted_pressure_plate",
+          "oak_pressure_plate",
+          "bowl",
+          "stick",
+          "shears",
+          "iron_nugget",
+          "smithing_table"
+        ]
+      },
+      "action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -1009.47,
+        "y": 62,
+        "z": -2723.47
+      },
+      "dimension": "overworld",
+      "biome": "plains",
+      "timeLabel": "Night"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "dirt",
+      "legs": "water",
+      "head": "air",
+      "firstBlockAboveHead": "none"
+    },
+    "inventory": {
+      "counts": {
+        "cobblestone": 6,
+        "oak_log": 3,
+        "raw_iron": 1,
+        "andesite": 1,
+        "iron_ingot": 2,
+        "furnace": 1,
+        "wooden_pickaxe": 1,
+        "stone_pickaxe": 1,
+        "crafting_table": 1,
+        "oak_planks": 4,
+        "dirt": 5,
+        "granite": 24
+      },
+      "equipment": {
+        "mainHand": "furnace"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "water",
+        "grass_block",
+        "dirt",
+        "furnace",
+        "clay",
+        "short_grass",
+        "stone",
+        "copper_ore",
+        "sugar_cane",
+        "granite"
+      ],
+      "entityTypes": [
+        "salmon"
+      ]
+    },
+    "craftable_items": [
+      "polished_granite",
+      "oak_planks",
+      "oak_slab",
+      "cobblestone_slab",
+      "crafting_table",
+      "cobblestone_stairs",
+      "cobblestone_wall",
+      "granite_wall",
+      "granite_stairs",
+      "granite_slab",
+      "oak_button",
+      "heavy_weighted_pressure_plate",
+      "oak_pressure_plate",
+      "bowl",
+      "stick",
+      "shears",
+      "iron_nugget",
+      "smithing_table"
+    ]
+  },
+  "summary": {
+    "step_count": 5,
+    "last_action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+    "last_result_kind": "unstructured_failure_result",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      },
+      {
+        "i": 2,
+        "action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      },
+      {
+        "i": 3,
+        "action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      },
+      {
+        "i": 4,
+        "action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      },
+      {
+        "i": 5,
+        "action": "!smelt_item(\"raw_iron\", 3, \"oak_planks\")",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    ]
+  }
+}

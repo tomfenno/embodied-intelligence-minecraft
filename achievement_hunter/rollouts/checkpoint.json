@@ -1,5 +1,5 @@
 {
-  "objective": "test take 2",
+  "objective": "tset",
   "graph": {
     "objective": "Bake a cake.",
     "sinks": [
@@ -334,5 +334,5 @@
       }
     ]
   },
-  "saved_at": "2026-04-27T00:04:59.102Z"
+  "saved_at": "2026-04-28T20:54:15.854Z"
 }

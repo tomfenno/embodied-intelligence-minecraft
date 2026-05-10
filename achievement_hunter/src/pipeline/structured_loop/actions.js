@@ -1,7 +1,7 @@
 import {appendFileSync, mkdirSync, writeFileSync} from 'fs';
 import path from 'path';
 
-import {executeCommand} from '../../../../src/agent/commands/index.js';
+import {executeCommandWithModeRecovery} from '../command_utils.js';
 import {get_am_state, get_recovery_trace_state} from '../agent_state.js';
 import {ABSTRACT_CLASS_MEMBERS, is_environmental_use_target} from '../mc_sources.js';
 import {get_item_batch_size} from '../recipe_utils.js';
@@ -25,7 +25,8 @@ const max_collect_qty = 16;
 
 // Only these kinds represent genuine command failures worth replanning.
 // Search-outcome kinds (search_found_not_reached, search_exhausted, etc.)
-// are navigation results, not execution failures, and should not trigger recovery.
+// are navigation results, not execution failures, and should not trigger
+// recovery.
 const RECOVERABLE_FAILURE_KINDS = new Set([
   'command_failure',
   'unstructured_failure_result',
@@ -34,12 +35,20 @@ const RECOVERABLE_FAILURE_KINDS = new Set([
 ]);
 
 function has_recoverable_failure(task_trace) {
-  return (task_trace.summary?.failed_steps ?? []).some(
-      s => RECOVERABLE_FAILURE_KINDS.has(s.kind));
+  return (task_trace.summary?.failed_steps ?? [])
+      .some(s => RECOVERABLE_FAILURE_KINDS.has(s.kind));
 }
 
-export async function execute_task_action(task, agent, log, model = null, graph = null) {
+export async function execute_task_action(
+    task, agent, log, model = null, graph = null) {
   const task_trace = create_task_trace(task, log);
+
+  // Snapshot inventory once at task start so trace steps and the failure
+  // replanner see this task's *delta* (current - baseline), not the global
+  // absolute count. Without this the LLM gets confused on capped collect
+  // tasks where prior tasks already pushed the global count above task.qty
+  // (see BUG 11).
+  const baseline_inventory = {...(get_am_state(agent).inventory ?? {})};
 
   let repeated_failure_signature = null;
   let repeated_failure_count = 0;
@@ -51,8 +60,8 @@ export async function execute_task_action(task, agent, log, model = null, graph 
     const state = get_am_state(agent);
     const action = mediate_action(task, state);
 
-    const current_step =
-        create_trace_step(attempt_number, agent, serialize_am_output(action));
+    const current_step = create_trace_step(
+        attempt_number, agent, serialize_am_output(action), baseline_inventory);
     task_trace.steps.push(current_step);
 
     log_am_action(log, attempt_number, action, state);
@@ -74,14 +83,16 @@ export async function execute_task_action(task, agent, log, model = null, graph 
         spl.warn(`Search for "${search_target}" already attempted, stopping.`);
         current_step.result = create_step_result(
             false, 'search_already_attempted',
-            `Search for "${search_target}" already attempted in this action sequence`);
+            `Search for "${
+                search_target}" already attempted in this action sequence`);
         attempt_index = max_inner_retries;
         continue;
       }
       current_step.result = await handle_search_action(
           search_target, state, agent, log, attempt_number);
       if (current_step.result.kind === 'search_exhausted') {
-        searched_targets.add(search_target);  // Only block re-search when not found.
+        searched_targets.add(
+            search_target);  // Only block re-search when not found.
         attempt_index = max_inner_retries;
       }
       // On search_success or search_found_not_reached (PathStopped): allow
@@ -89,17 +100,18 @@ export async function execute_task_action(task, agent, log, model = null, graph 
       continue;
     }
 
-    const command_result = await executeCommand(agent, action.command);
+    const command_result = await executeCommandWithModeRecovery(agent, action.command);
     spl.log('Command result:', command_result);
 
     if (task.action_type === 'interact' &&
         is_successful_command_result(command_result)) {
       const interact_result = await handle_interact_success(
-          task, agent, log, task_trace, attempt_number, command_result);
+          task, agent, log, task_trace, attempt_number, command_result,
+          baseline_inventory);
 
       if (interact_result.status === 'success') {
         return finalize_task_trace(
-            task_trace, agent, log, 'success', 'completed');
+            task_trace, agent, log, 'success', 'completed', baseline_inventory);
       }
 
       if (interact_result.status === 'continue') {
@@ -129,7 +141,7 @@ export async function execute_task_action(task, agent, log, model = null, graph 
       }
 
       return finalize_task_trace(
-          task_trace, agent, log, 'success', 'completed');
+          task_trace, agent, log, 'success', 'completed', baseline_inventory);
     }
 
     spl.warn('Command error:', command_result);
@@ -163,14 +175,22 @@ export async function execute_task_action(task, agent, log, model = null, graph 
               repeated_failure_count}) for:`,
           action.command);
 
-      finalize_task_trace(task_trace, agent, log, 'fail', 'repeated_identical_failure');
-      if (model && has_recoverable_failure(task_trace)) return await recover_failed_task(task_trace, agent, model, graph, log);
+      finalize_task_trace(
+          task_trace, agent, log, 'fail', 'repeated_identical_failure',
+          baseline_inventory);
+      if (model && has_recoverable_failure(task_trace))
+        return await recover_failed_task(
+            task_trace, agent, model, graph, log, baseline_inventory);
       return 'fail';
     }
   }
 
-  finalize_task_trace(task_trace, agent, log, 'fail', 'exhausted_inner_retries');
-  if (model) return await recover_failed_task(task_trace, agent, model, graph, log);
+  finalize_task_trace(
+      task_trace, agent, log, 'fail', 'exhausted_inner_retries',
+      baseline_inventory);
+  if (model)
+    return await recover_failed_task(
+        task_trace, agent, model, graph, log, baseline_inventory);
   return 'fail';
 }
 
@@ -376,10 +396,11 @@ function create_task_trace(task, log) {
   };
 }
 
-function create_trace_step(step_index, agent, action_output) {
+function create_trace_step(
+    step_index, agent, action_output, baseline_inventory = null) {
   return {
     i: step_index,
-    state: get_recovery_trace_state(agent),
+    state: get_recovery_trace_state(agent, baseline_inventory),
     action: action_output,
     result: null,
   };
@@ -438,7 +459,8 @@ async function handle_search_action(
 }
 
 async function handle_interact_success(
-    task, agent, log, task_trace, attempt_number, command_result) {
+    task, agent, log, task_trace, attempt_number, command_result,
+    baseline_inventory = null) {
   const post_command_state = get_am_state(agent);
 
   if (interact_target_satisfied(task, post_command_state)) {
@@ -454,7 +476,7 @@ async function handle_interact_success(
 
   const collect_step = {
     i: `${attempt_number}a`,
-    state: get_recovery_trace_state(agent),
+    state: get_recovery_trace_state(agent, baseline_inventory),
     action: collect_command,
     result: null,
   };
@@ -466,7 +488,7 @@ async function handle_interact_success(
 
   spl.log('Interact produced collectable target; collecting:', collect_command);
 
-  const collect_result = await executeCommand(agent, collect_command);
+  const collect_result = await executeCommandWithModeRecovery(agent, collect_command);
   spl.log('Collect-after-interact result:', collect_result);
 
   if (is_successful_command_result(collect_result)) {
@@ -484,10 +506,11 @@ async function handle_interact_success(
 }
 
 function finalize_task_trace(
-    task_trace, agent, log, terminal_status, terminal_reason) {
+    task_trace, agent, log, terminal_status, terminal_reason,
+    baseline_inventory = null) {
   task_trace.terminal_status = terminal_status;
   task_trace.terminal_reason = terminal_reason;
-  task_trace.final_state = get_recovery_trace_state(agent);
+  task_trace.final_state = get_recovery_trace_state(agent, baseline_inventory);
   task_trace.summary = build_summary(task_trace.steps, terminal_status);
 
   persist_task_trace(task_trace, log.rollout_dir);

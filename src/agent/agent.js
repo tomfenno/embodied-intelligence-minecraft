@@ -17,6 +17,10 @@ import settings from './settings.js';
 import { Task } from './tasks/tasks.js';
 import { speak } from './speak.js';
 import { log, validateNameFormat, handleDisconnection } from './connection_handler.js';
+import {
+    recordEpisodeCompleted,
+    recordEpisodeConnected,
+} from '../../achievement_hunter/evaluation_harness/episode_runtime.js';
 
 export class Agent {
     async start(load_mem=false, init_message=null, count_id=0) {
@@ -109,6 +113,7 @@ export class Agent {
         this.bot.once('spawn', async () => {
             try {
                 clearTimeout(spawnTimeout);
+                recordEpisodeConnected(this.name);
                 addBrowserViewer(this.bot, count_id);
                 console.log('Initializing vision intepreter...');
                 this.vision_interpreter = new VisionInterpreter(this, settings.allow_vision);
@@ -544,6 +549,7 @@ export class Agent {
             if (res) {
                 await this.history.add('system', `Task ended with score : ${res.score}`);
                 await this.history.save();
+                recordEpisodeCompleted(this.name, {score: res.score, message: res.message});
                 // await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 second for save to complete
                 console.log('Task finished:', res.message);
                 this.killAll();

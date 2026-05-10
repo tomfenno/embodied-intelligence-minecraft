@@ -1,3 +1,4 @@
+# Doesn't matter
 # BUG 3 — Triple-Wrapped Error / Lost Stack Trace
 
 **Severity:** Low (developer experience)

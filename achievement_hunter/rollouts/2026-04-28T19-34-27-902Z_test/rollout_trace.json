@@ -1,0 +1,456 @@
+{
+  "objective": "test",
+  "status": "running",
+  "started_at": "2026-04-28T19:34:27.902Z",
+  "stages": [
+    {
+      "timestamp": "2026-04-28T19:34:27.905Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "raw": "[deterministic]",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "iron_block",
+          "carved_pumpkin"
+        ],
+        "final": {
+          "objective": "Create an Iron Golem.",
+          "sinks": [
+            "iron_block",
+            "carved_pumpkin"
+          ],
+          "vertices": [
+            {
+              "id": "carved_pumpkin",
+              "qty": 1,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "pumpkin",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "pumpkin",
+              "to": "carved_pumpkin",
+              "type": "crafting_input",
+              "qty": 1,
+              "consumed": true
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "crafting_table": 1,
+          "spruce_planks": 1,
+          "raw_copper": 6,
+          "iron_block": 4,
+          "raw_iron": 1,
+          "andesite": 6,
+          "granite": 2,
+          "shears": 1,
+          "wooden_pickaxe": 1,
+          "diorite": 42,
+          "cobblestone": 181,
+          "stick": 2,
+          "furnace": 1,
+          "sandstone": 5
+        }
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:34:27.963Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "pumpkin",
+          "qty": 1,
+          "item_type": "resource",
+          "acquisition_dependency": "none",
+          "satisfied_inputs": [],
+          "source_hint": "pumpkin",
+          "source_kind": "block",
+          "grounded_nearby_source": null
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T19:34:27.997Z",
+      "elapsed": "0s",
+      "stage": "NTS",
+      "raw": "[deterministic]",
+      "parsed": {
+        "target_item": "pumpkin",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "pumpkin",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:34:28.092Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!search(\"pumpkin\")",
+      "state": {
+        "inventory": {
+          "crafting_table": 1,
+          "spruce_planks": 1,
+          "raw_copper": 6,
+          "iron_block": 4,
+          "raw_iron": 1,
+          "andesite": 6,
+          "granite": 2,
+          "shears": 1,
+          "wooden_pickaxe": 1,
+          "diorite": 42,
+          "cobblestone": 181,
+          "stick": 2,
+          "furnace": 1,
+          "sandstone": 5
+        },
+        "craftable_items": [
+          "polished_diorite",
+          "andesite",
+          "polished_andesite",
+          "cut_sandstone",
+          "sandstone_slab",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "andesite_wall",
+          "diorite_wall",
+          "andesite_stairs",
+          "diorite_stairs",
+          "andesite_slab",
+          "diorite_slab",
+          "lever",
+          "spruce_button",
+          "iron_ingot",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "cobblestone",
+          "lapis_ore",
+          "iron_ore",
+          "granite",
+          "copper_ore",
+          "dirt",
+          "diorite",
+          "coal_ore",
+          "andesite"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      },
+      "meta": {
+        "source": "deterministic"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:34:28.093Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"pumpkin\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:34:28.598Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"pumpkin\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:34:29.165Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"pumpkin\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:34:30.268Z",
+      "elapsed": "2s",
+      "stage": "AM",
+      "attempt": 5,
+      "raw": "!searchForBlock(\"pumpkin\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:34:35.565Z",
+      "elapsed": "7s",
+      "stage": "AM",
+      "attempt": 6,
+      "raw": "!searchForBlock(\"pumpkin\", 511)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:35:05.854Z",
+      "elapsed": "37s",
+      "stage": "RECOVERY",
+      "type": "attempt_start",
+      "attempt": 1,
+      "task": {
+        "target_item": "pumpkin",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "pumpkin",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "diagnosis": "The bot tried a generic search from an underground beach cave where pumpkins don’t generate, so nothing was found. Go to the surface, then perform a proper block search and harvest the pumpkin.",
+      "planned_actions": [
+        {
+          "name": "!goToSurface",
+          "args": []
+        },
+        {
+          "name": "!searchForBlock",
+          "args": [
+            "pumpkin",
+            256
+          ]
+        },
+        {
+          "name": "!collectBlocks",
+          "args": [
+            "pumpkin",
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T19:35:17.769Z",
+      "elapsed": "49s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 0,
+      "result": {
+        "command": "!goToSurface()",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nPath not found, but attempting to navigate anyway using destructive movements.\nPathfinding stopped: Cannot break andesite with current tools.\nPathfinding stopped: Path was stopped before it could be completed! Thus, the desired goal was not reached..\nGoing to the surface at y=64.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:35:25.400Z",
+      "elapsed": "57s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 1,
+      "result": {
+        "command": "!searchForBlock(\"pumpkin\", 256)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nCould not find any pumpkin in 256 blocks.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:35:26.331Z",
+      "elapsed": "58s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 1,
+      "action_index": 2,
+      "result": {
+        "command": "!collectBlocks(\"pumpkin\", 1)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nNo pumpkin nearby to collect.\nCollected 0 pumpkin.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:35:48.517Z",
+      "elapsed": "1m 20s",
+      "stage": "RECOVERY",
+      "type": "attempt_start",
+      "attempt": 2,
+      "task": {
+        "target_item": "pumpkin",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "pumpkin",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "diagnosis": "The bot is still underground in a beach biome and the prior plan failed because goToSurface was blocked by andesite, then searching underground found no pumpkins. Reposition to escape the blocked tunnel, reach the surface, then search a larger radius for pumpkins and harvest one.",
+      "planned_actions": [
+        {
+          "name": "!moveAway",
+          "args": [
+            16
+          ]
+        },
+        {
+          "name": "!goToSurface",
+          "args": []
+        },
+        {
+          "name": "!searchForBlock",
+          "args": [
+            "pumpkin",
+            500
+          ]
+        },
+        {
+          "name": "!collectBlocks",
+          "args": [
+            "pumpkin",
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-04-28T19:38:23.784Z",
+      "elapsed": "3m 55s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 2,
+      "action_index": 0,
+      "result": {
+        "command": "!moveAway(16)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nPath not found, but attempting to navigate anyway using destructive movements.\nMoved away from (-33, 56, -72) to (-33, 40, -74).\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:38:31.670Z",
+      "elapsed": "4m 03s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 2,
+      "action_index": 1,
+      "result": {
+        "command": "!goToSurface()",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nPath not found, but attempting to navigate anyway using destructive movements.\nUnable to reach -33, 64, -74, you are 8 blocks away.\nGoing to the surface at y=64.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:38:53.867Z",
+      "elapsed": "4m 25s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 2,
+      "action_index": 2,
+      "result": {
+        "command": "!searchForBlock(\"pumpkin\", 500)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nCould not find any pumpkin in 500 blocks.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:38:54.795Z",
+      "elapsed": "4m 26s",
+      "stage": "RECOVERY",
+      "type": "action_result",
+      "attempt": 2,
+      "action_index": 3,
+      "result": {
+        "command": "!collectBlocks(\"pumpkin\", 1)",
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nNo pumpkin nearby to collect.\nCollected 0 pumpkin.\n"
+      }
+    },
+    {
+      "timestamp": "2026-04-28T19:39:22.282Z",
+      "elapsed": "4m 54s",
+      "stage": "RECOVERY",
+      "type": "attempt_start",
+      "attempt": 3,
+      "task": {
+        "target_item": "pumpkin",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "pumpkin",
+          "item_dependency": null,
+          "tool": null
+        }
+      },
+      "diagnosis": "The bot was still underground in a beach biome, so the 500-block search found no pumpkins. Surface first, then travel inland to likely grassy biomes before searching and harvesting a pumpkin.",
+      "planned_actions": [
+        {
+          "name": "!moveAway",
+          "args": [
+            32
+          ]
+        },
+        {
+          "name": "!goToSurface",
+          "args": []
+        },
+        {
+          "name": "!goToCoordinates",
+          "args": [
+            -32,
+            70,
+            700,
+            3
+          ]
+        },
+        {
+          "name": "!searchForBlock",
+          "args": [
+            "pumpkin",
+            500
+          ]
+        },
+        {
+          "name": "!collectBlocks",
+          "args": [
+            "pumpkin",
+            1
+          ]
+        }
+      ]
+    }
+  ]
+}

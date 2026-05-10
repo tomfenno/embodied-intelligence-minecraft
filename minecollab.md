@@ -98,12 +98,12 @@ Unofficial offline launchers (e.g., TLauncher, Prism Launcher or forks of commun
 For guaranteed safety, please [purchase the game](https://www.minecraft.net/) and use the official launcher.
 
 1. Download the [Prism Launcher](https://github.com/Diegiwg/PrismLauncher-Cracked).
-2. Add an offline account with your username and create a [Minecraft 1.21.1 instance](https://prismlauncher.org/wiki/help-pages/vanilla-platform/).
+2. Add an offline account with your username and create a [Minecraft 1.21.6 instance](https://prismlauncher.org/wiki/help-pages/vanilla-platform/).
 3. Launch the created instance.
 4. Click **Multiplayer** and then **Direct Connection**.
 5. Enter `localhost:55916` and hit **Join Server**.
 
-Download the relevant task files and server data files, you can find the link [here](https://drive.google.com/drive/folders/1XygbitBBTsNO6q_doEiZHmdETpnyRmCS). The tasks files are for specifying the tasks to run and the server data is for allowing the models to launch the task in the correct world automatically. **Unzip the server_data.zip in the base `tasks/` folder**.
+Download the relevant task files and server data files, you can find the link [here](https://drive.google.com/drive/folders/1XygbitBBTsNO6q_doEiZHmdETpnyRmCS). The tasks files are for specifying the tasks to run and the server data is for allowing the models to launch the task in the correct world automatically. **Unzip the server_data.zip in the base `tasks/` folder**. The new Achievement Hunter evaluation harness does not use that legacy `tasks/server_data` path; it uses the committed `achievement_hunter/evaluation_harness/server_templates/minecraft_1_21_6_clean` template instead.
 
 Then, set up your conda environment: 
 
@@ -122,9 +122,17 @@ Then, you can run the evaluation_script **from the project root** using `python 
 
 **Linux**: `apt-get -y install tmux`
 
-**Windows**: You can not use tmux on Windows, but you can run tasks with the --no-launch-world flag. Run
+**Windows**: You can not use tmux on Windows, but you can run tasks with the --no-launch-world flag.
+
+For the legacy benchmark world, run
 ```
 cd /tasks/server_data/
+java -jar server.jar
+```
+
+For the Achievement Hunter evaluation harness default template, run
+```
+cd /achievement_hunter/evaluation_harness/server_templates/minecraft_1_21_6_clean/
 java -jar server.jar
 ```
 

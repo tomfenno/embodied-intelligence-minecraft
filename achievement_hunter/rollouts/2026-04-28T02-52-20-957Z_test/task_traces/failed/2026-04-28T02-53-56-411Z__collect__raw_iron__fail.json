@@ -1,0 +1,516 @@
+{
+  "objective": "test",
+  "task": {
+    "target_item": "raw_iron",
+    "qty": 19,
+    "action_type": "collect",
+    "parameters": {
+      "source_block": "iron_ore",
+      "item_dependency": null,
+      "tool": "stone_pickaxe"
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1758.5,
+            "y": 90,
+            "z": -3301.51
+          },
+          "dimension": "overworld",
+          "biome": "savanna_plateau",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "dirt",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "iron_ore (2 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "stick": 2,
+            "oak_log": 1,
+            "stone_pickaxe": 1,
+            "crafting_table": 1,
+            "cobblestone": 116,
+            "wooden_pickaxe": 1,
+            "oak_planks": 1,
+            "furnace": 1,
+            "coal": 6,
+            "raw_iron": 19
+          },
+          "equipment": {
+            "mainHand": "cobblestone"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "dirt",
+            "cobblestone",
+            "iron_ore",
+            "coal_ore",
+            "gravel",
+            "copper_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "oak_planks",
+          "raw_iron_block",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ]
+      },
+      "action": "!collectBlocks(\"iron_ore\", 16)",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    },
+    {
+      "i": 2,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1756.49,
+            "y": 89,
+            "z": -3290.5
+          },
+          "dimension": "overworld",
+          "biome": "savanna_plateau",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (1 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "cobblestone": 148,
+            "stick": 2,
+            "oak_log": 1,
+            "stone_pickaxe": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "oak_planks": 1,
+            "furnace": 1,
+            "coal": 6,
+            "raw_iron": 29
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "copper_ore",
+            "coal_ore",
+            "iron_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "oak_planks",
+          "raw_iron_block",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ]
+      },
+      "action": "!collectBlocks(\"iron_ore\", 16)",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    },
+    {
+      "i": 3,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1756.49,
+            "y": 89,
+            "z": -3290.5
+          },
+          "dimension": "overworld",
+          "biome": "savanna_plateau",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (1 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "cobblestone": 149,
+            "stick": 2,
+            "oak_log": 1,
+            "stone_pickaxe": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "oak_planks": 1,
+            "furnace": 1,
+            "coal": 6,
+            "raw_iron": 29
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "copper_ore",
+            "coal_ore",
+            "iron_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "oak_planks",
+          "raw_iron_block",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ]
+      },
+      "action": "!collectBlocks(\"iron_ore\", 16)",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    },
+    {
+      "i": 4,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1756.49,
+            "y": 89,
+            "z": -3290.5
+          },
+          "dimension": "overworld",
+          "biome": "savanna_plateau",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (1 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "cobblestone": 149,
+            "stick": 2,
+            "oak_log": 1,
+            "stone_pickaxe": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "oak_planks": 1,
+            "furnace": 1,
+            "coal": 6,
+            "raw_iron": 29
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "copper_ore",
+            "coal_ore",
+            "iron_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "oak_planks",
+          "raw_iron_block",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ]
+      },
+      "action": "!collectBlocks(\"iron_ore\", 16)",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    },
+    {
+      "i": 5,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1756.49,
+            "y": 89,
+            "z": -3290.5
+          },
+          "dimension": "overworld",
+          "biome": "savanna_plateau",
+          "timeLabel": "Night"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "stone",
+          "legs": "air",
+          "head": "air",
+          "firstBlockAboveHead": "stone (1 blocks up)"
+        },
+        "inventory": {
+          "counts": {
+            "cobblestone": 149,
+            "stick": 2,
+            "oak_log": 1,
+            "stone_pickaxe": 1,
+            "crafting_table": 1,
+            "wooden_pickaxe": 1,
+            "oak_planks": 1,
+            "furnace": 1,
+            "coal": 6,
+            "raw_iron": 29
+          },
+          "equipment": {
+            "mainHand": "stone_pickaxe"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "stone",
+            "copper_ore",
+            "coal_ore",
+            "iron_ore"
+          ],
+          "entityTypes": []
+        },
+        "craftable_items": [
+          "oak_planks",
+          "raw_iron_block",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ]
+      },
+      "action": "!collectBlocks(\"iron_ore\", 16)",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -1756.49,
+        "y": 89,
+        "z": -3290.5
+      },
+      "dimension": "overworld",
+      "biome": "savanna_plateau",
+      "timeLabel": "Night"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "stone",
+      "legs": "air",
+      "head": "air",
+      "firstBlockAboveHead": "stone (1 blocks up)"
+    },
+    "inventory": {
+      "counts": {
+        "cobblestone": 149,
+        "stick": 2,
+        "oak_log": 1,
+        "stone_pickaxe": 1,
+        "crafting_table": 1,
+        "wooden_pickaxe": 1,
+        "oak_planks": 1,
+        "furnace": 1,
+        "coal": 6,
+        "raw_iron": 29
+      },
+      "equipment": {
+        "mainHand": "stone_pickaxe"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "stone",
+        "copper_ore",
+        "coal_ore",
+        "iron_ore"
+      ],
+      "entityTypes": []
+    },
+    "craftable_items": [
+      "oak_planks",
+      "raw_iron_block",
+      "cobblestone_slab",
+      "torch",
+      "furnace",
+      "cobblestone_stairs",
+      "cobblestone_wall",
+      "lever",
+      "oak_button",
+      "wooden_shovel",
+      "stone_sword",
+      "stone_shovel",
+      "stone_pickaxe",
+      "stone_axe",
+      "stone_hoe"
+    ]
+  },
+  "summary": {
+    "step_count": 5,
+    "last_action": "!collectBlocks(\"iron_ore\", 16)",
+    "last_result_kind": "unstructured_failure_result",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!collectBlocks(\"iron_ore\", 16)",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      },
+      {
+        "i": 2,
+        "action": "!collectBlocks(\"iron_ore\", 16)",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      },
+      {
+        "i": 3,
+        "action": "!collectBlocks(\"iron_ore\", 16)",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      },
+      {
+        "i": 4,
+        "action": "!collectBlocks(\"iron_ore\", 16)",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      },
+      {
+        "i": 5,
+        "action": "!collectBlocks(\"iron_ore\", 16)",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    ]
+  }
+}

@@ -1,0 +1,553 @@
+{
+  "objective": "test",
+  "task": {
+    "target_item": "carved_pumpkin",
+    "qty": 1,
+    "action_type": "interact",
+    "parameters": {
+      "tool": "shears",
+      "target": "pumpkin"
+    }
+  },
+  "terminal_status": "fail",
+  "terminal_reason": "exhausted_inner_retries",
+  "steps": [
+    {
+      "i": 1,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1852.58,
+            "y": 61,
+            "z": -3313.3
+          },
+          "dimension": "overworld",
+          "biome": "savanna",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "cobblestone",
+          "legs": "water",
+          "head": "water",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "crafting_table": 1,
+            "stick": 2,
+            "coal": 1,
+            "oak_log": 1,
+            "raw_iron": 1,
+            "iron_block": 4,
+            "pumpkin": 1,
+            "cobblestone": 233,
+            "wooden_pickaxe": 1,
+            "oak_planks": 1,
+            "furnace": 1,
+            "shears": 1
+          },
+          "equipment": {
+            "mainHand": "cobblestone"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "water",
+            "cobblestone",
+            "dirt",
+            "grass_block",
+            "coal_ore",
+            "stone",
+            "copper_ore",
+            "pumpkin",
+            "short_grass"
+          ],
+          "entityTypes": [
+            "salmon"
+          ]
+        },
+        "craftable_items": [
+          "oak_planks",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "iron_ingot",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "pumpkin_seeds"
+        ]
+      },
+      "action": "!placeHere(\"pumpkin\")",
+      "result": {
+        "success": false,
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    },
+    {
+      "i": 2,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1853.55,
+            "y": 61.9,
+            "z": -3314.42
+          },
+          "dimension": "overworld",
+          "biome": "savanna",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "water",
+          "legs": "water",
+          "head": "water",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "crafting_table": 1,
+            "stick": 2,
+            "coal": 1,
+            "oak_log": 1,
+            "raw_iron": 1,
+            "iron_block": 4,
+            "pumpkin": 1,
+            "cobblestone": 233,
+            "wooden_pickaxe": 1,
+            "oak_planks": 1,
+            "furnace": 1,
+            "shears": 1
+          },
+          "equipment": {
+            "mainHand": "cobblestone"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "water",
+            "dirt",
+            "cobblestone",
+            "grass_block",
+            "stone",
+            "coal_ore",
+            "copper_ore",
+            "pumpkin",
+            "short_grass",
+            "sand"
+          ],
+          "entityTypes": [
+            "salmon"
+          ]
+        },
+        "craftable_items": [
+          "oak_planks",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "iron_ingot",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "pumpkin_seeds"
+        ]
+      },
+      "action": "!placeHere(\"pumpkin\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nCannot place pumpkin at (-1854, 61, -3315): nothing to place on."
+      }
+    },
+    {
+      "i": 3,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1853.55,
+            "y": 61.9,
+            "z": -3314.42
+          },
+          "dimension": "overworld",
+          "biome": "savanna",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "water",
+          "legs": "water",
+          "head": "water",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "crafting_table": 1,
+            "stick": 2,
+            "coal": 1,
+            "oak_log": 1,
+            "raw_iron": 1,
+            "iron_block": 4,
+            "pumpkin": 1,
+            "cobblestone": 233,
+            "wooden_pickaxe": 1,
+            "oak_planks": 1,
+            "furnace": 1,
+            "shears": 1
+          },
+          "equipment": {
+            "mainHand": "cobblestone"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "water",
+            "dirt",
+            "cobblestone",
+            "grass_block",
+            "stone",
+            "coal_ore",
+            "copper_ore",
+            "pumpkin",
+            "short_grass",
+            "sand"
+          ],
+          "entityTypes": [
+            "salmon"
+          ]
+        },
+        "craftable_items": [
+          "oak_planks",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "iron_ingot",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "pumpkin_seeds"
+        ]
+      },
+      "action": "!placeHere(\"pumpkin\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nCannot place pumpkin at (-1854, 61, -3315): nothing to place on."
+      }
+    },
+    {
+      "i": 4,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1853.55,
+            "y": 61.9,
+            "z": -3314.42
+          },
+          "dimension": "overworld",
+          "biome": "savanna",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "water",
+          "legs": "water",
+          "head": "water",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "crafting_table": 1,
+            "stick": 2,
+            "coal": 1,
+            "oak_log": 1,
+            "raw_iron": 1,
+            "iron_block": 4,
+            "pumpkin": 1,
+            "cobblestone": 233,
+            "wooden_pickaxe": 1,
+            "oak_planks": 1,
+            "furnace": 1,
+            "shears": 1
+          },
+          "equipment": {
+            "mainHand": "cobblestone"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "water",
+            "dirt",
+            "cobblestone",
+            "grass_block",
+            "stone",
+            "coal_ore",
+            "copper_ore",
+            "pumpkin",
+            "short_grass",
+            "sand"
+          ],
+          "entityTypes": [
+            "salmon"
+          ]
+        },
+        "craftable_items": [
+          "oak_planks",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "iron_ingot",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "pumpkin_seeds"
+        ]
+      },
+      "action": "!placeHere(\"pumpkin\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nCannot place pumpkin at (-1854, 61, -3315): nothing to place on."
+      }
+    },
+    {
+      "i": 5,
+      "state": {
+        "world": {
+          "position": {
+            "x": -1853.55,
+            "y": 61.9,
+            "z": -3314.42
+          },
+          "dimension": "overworld",
+          "biome": "savanna",
+          "timeLabel": "Morning"
+        },
+        "self": {
+          "health": 20,
+          "hunger": 20
+        },
+        "action": {
+          "isIdle": true,
+          "current": "Idle"
+        },
+        "surroundings": {
+          "below": "water",
+          "legs": "water",
+          "head": "water",
+          "firstBlockAboveHead": "none"
+        },
+        "inventory": {
+          "counts": {
+            "crafting_table": 1,
+            "stick": 2,
+            "coal": 1,
+            "oak_log": 1,
+            "raw_iron": 1,
+            "iron_block": 4,
+            "pumpkin": 1,
+            "cobblestone": 233,
+            "wooden_pickaxe": 1,
+            "oak_planks": 1,
+            "furnace": 1,
+            "shears": 1
+          },
+          "equipment": {
+            "mainHand": "cobblestone"
+          }
+        },
+        "nearby": {
+          "blocks": [
+            "water",
+            "dirt",
+            "cobblestone",
+            "grass_block",
+            "stone",
+            "coal_ore",
+            "copper_ore",
+            "pumpkin",
+            "short_grass",
+            "sand"
+          ],
+          "entityTypes": [
+            "salmon"
+          ]
+        },
+        "craftable_items": [
+          "oak_planks",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "oak_button",
+          "iron_ingot",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "pumpkin_seeds"
+        ]
+      },
+      "action": "!placeHere(\"pumpkin\")",
+      "result": {
+        "success": true,
+        "kind": "command_success",
+        "message": "Action output:\nCannot place pumpkin at (-1854, 61, -3315): nothing to place on."
+      }
+    }
+  ],
+  "final_state": {
+    "world": {
+      "position": {
+        "x": -1853.55,
+        "y": 61.9,
+        "z": -3314.42
+      },
+      "dimension": "overworld",
+      "biome": "savanna",
+      "timeLabel": "Morning"
+    },
+    "self": {
+      "health": 20,
+      "hunger": 20
+    },
+    "action": {
+      "isIdle": true,
+      "current": "Idle"
+    },
+    "surroundings": {
+      "below": "water",
+      "legs": "water",
+      "head": "water",
+      "firstBlockAboveHead": "none"
+    },
+    "inventory": {
+      "counts": {
+        "crafting_table": 1,
+        "stick": 2,
+        "coal": 1,
+        "oak_log": 1,
+        "raw_iron": 1,
+        "iron_block": 4,
+        "pumpkin": 1,
+        "cobblestone": 233,
+        "wooden_pickaxe": 1,
+        "oak_planks": 1,
+        "furnace": 1,
+        "shears": 1
+      },
+      "equipment": {
+        "mainHand": "cobblestone"
+      }
+    },
+    "nearby": {
+      "blocks": [
+        "water",
+        "dirt",
+        "cobblestone",
+        "grass_block",
+        "stone",
+        "coal_ore",
+        "copper_ore",
+        "pumpkin",
+        "short_grass",
+        "sand"
+      ],
+      "entityTypes": [
+        "salmon"
+      ]
+    },
+    "craftable_items": [
+      "oak_planks",
+      "cobblestone_slab",
+      "torch",
+      "furnace",
+      "cobblestone_stairs",
+      "cobblestone_wall",
+      "lever",
+      "oak_button",
+      "iron_ingot",
+      "wooden_shovel",
+      "stone_sword",
+      "stone_shovel",
+      "stone_pickaxe",
+      "stone_axe",
+      "stone_hoe",
+      "pumpkin_seeds"
+    ]
+  },
+  "summary": {
+    "step_count": 5,
+    "last_action": "!placeHere(\"pumpkin\")",
+    "last_result_kind": "command_success",
+    "failed_steps": [
+      {
+        "i": 1,
+        "action": "!placeHere(\"pumpkin\")",
+        "kind": "unstructured_failure_result",
+        "message": "command failed with unstructured or empty result"
+      }
+    ]
+  }
+}

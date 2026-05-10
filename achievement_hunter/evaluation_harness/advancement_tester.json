@@ -1,0 +1,50 @@
+{
+  "acquire_hardware": {
+    "type": "inventory",
+    "goal": "Smelt an Iron Ingot. Have an iron ingot in the inventory.",
+    "target": "iron_ingot",
+    "agent_count": 1,
+    "timeout": 1200
+  },
+  "hot_stuff": {
+    "type": "inventory",
+    "goal": "Fill a Bucket with lava. Have a lava bucket in the inventory.",
+    "target": "lava_bucket",
+    "agent_count": 1,
+    "timeout": 1200
+  },
+  "diamonds": {
+    "type": "inventory",
+    "goal": "Acquire diamonds. Have a diamond in the inventory.",
+    "target": "diamond",
+    "agent_count": 1,
+    "timeout": 1200
+  },
+  "moar_tools": {
+    "type": "inventory",
+    "goal": "Construct one pickaxe, one shovel, one axe, and one hoe with the same material.",
+    "target_any_of": [
+      {
+        "wooden_pickaxe": 1,
+        "wooden_shovel": 1,
+        "wooden_axe": 1,
+        "wooden_hoe": 1
+      },
+      {
+        "stone_pickaxe": 1,
+        "stone_shovel": 1,
+        "stone_axe": 1,
+        "stone_hoe": 1
+      }
+    ],
+    "agent_count": 1,
+    "timeout": 1200
+  },
+  "pork_chop": {
+    "type": "inventory",
+    "goal": "Cook a pork chop.",
+    "target": "cooked_porkchop",
+    "agent_count": 1,
+    "timeout": 1200
+  }
+}

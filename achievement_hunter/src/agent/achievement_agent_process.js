@@ -1,5 +1,5 @@
 /**
- * AchievementAgentProcess — supervises the achievement agent as a child
+ * AchievementAgentProcess - supervises the achievement agent as a child
  * process. Mirrors the base AgentProcess but spawns init_achievement_agent.js
  * instead of init_agent.js.
  */
@@ -10,22 +10,17 @@ import {logoutAgent} from '../../../src/mindcraft/mindserver.js';
 
 const MIN_RESTART_INTERVAL_MS = 10_000;
 
-/**
- * Manages the achievement agent child process lifecycle: spawn, restart on
- * unexpected exit, and graceful shutdown via SIGINT.
- */
 export class AchievementAgentProcess {
   constructor(name, port) {
     this.name = name;
     this.port = port;
+    this._stop_requested = false;
   }
 
-  /**
-   * Spawns the agent child process and wires restart logic on unexpected exit.
-   */
   start(load_memory = false, count_id = 0) {
     this.count_id = count_id;
     this.running = true;
+    this._stop_requested = false;
 
     const spawn_args = [
       'achievement_hunter/src/agent/init_achievement_agent.js',
@@ -46,10 +41,17 @@ export class AchievementAgentProcess {
     let last_restart = Date.now();
 
     child.on('exit', (code, signal) => {
+      const stop_requested = this._stop_requested;
       console.log(`Achievement agent process exited with code ${
           code} and signal ${signal}`);
       this.running = false;
+      this._stop_requested = false;
       logoutAgent(this.name);
+
+      if (stop_requested) {
+        console.log('Achievement agent stop requested; not restarting.');
+        return;
+      }
 
       if (code > 1) {
         console.log('Ending task.');
@@ -75,17 +77,14 @@ export class AchievementAgentProcess {
     this.process = child;
   }
 
-  /** Sends SIGINT to the child process to trigger a clean shutdown. */
   stop() {
     if (!this.running) return;
+    this._stop_requested = true;
     this.process.kill('SIGINT');
   }
 
-  /**
-   * Returns true if the process should be restarted.
-   * A non-zero exit code without SIGINT is treated as an unexpected crash.
-   */
   _should_restart(exit_code, exit_signal) {
-    return exit_code !== 0 && exit_signal !== 'SIGINT';
+    return !this._stop_requested &&
+        exit_code !== 0 && exit_signal !== 'SIGINT';
   }
 }

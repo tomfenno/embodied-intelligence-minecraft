@@ -1,5 +1,9 @@
 import {getBiomeName, getBlockAtPosition, getCraftableItems, getFirstBlockAboveHead, getInventoryCounts, getNearbyEntities, getNearestBlocks, getPosition,} from '../../../src/agent/library/world.js';
 
+// Water and lava source blocks (metadata 0) are collectable with a bucket.
+// Flowing blocks (metadata 1-7) share the same name but cannot be collected.
+const COLLECTIBLE_LIQUIDS = new Set(['water', 'lava']);
+
 function _get_inventory_counts(bot) {
   const raw = getInventoryCounts(bot);
   const result = {};
@@ -7,6 +11,18 @@ function _get_inventory_counts(bot) {
     if (count > 0) result[item] = count;
   }
   return result;
+}
+
+// Returns positive deltas of `current` over `baseline`. Items that decreased or
+// stayed equal are omitted — the failure_replanner cares about what this task
+// produced, not what it consumed.
+function _inventory_delta(current, baseline) {
+  const out = {};
+  for (const [item, count] of Object.entries(current ?? {})) {
+    const delta = count - (baseline?.[item] ?? 0);
+    if (delta > 0) out[item] = delta;
+  }
+  return out;
 }
 
 function _get_armor_slots(bot) {
@@ -27,6 +43,7 @@ export function get_am_state(agent) {
 
   const block_set = new Set();
   for (const block of getNearestBlocks(bot)) {
+    if (COLLECTIBLE_LIQUIDS.has(block.name) && block.metadata !== 0) continue;
     block_set.add(block.name);
   }
   const nearby_blocks = Array.from(block_set);
@@ -52,6 +69,7 @@ export function get_nts_state(agent) {
 
   const block_set = new Set();
   for (const block of getNearestBlocks(bot)) {
+    if (COLLECTIBLE_LIQUIDS.has(block.name) && block.metadata !== 0) continue;
     block_set.add(block.name);
   }
   const nearby_blocks = Array.from(block_set);
@@ -82,7 +100,18 @@ export function get_sgsg_state(agent) {
   };
 }
 
-export function get_recovery_trace_state(agent) {
+/**
+ * Builds the per-step trace state surfaced to the failure_replanner LLM.
+ *
+ * When `baseline_inventory` is provided, `inv.counts` is reported as the
+ * **delta** produced during this task (current minus baseline, positives only)
+ * rather than the absolute global inventory. This avoids confusing the LLM
+ * when prior tasks already accumulated items above `task.qty` (see BUG 11).
+ *
+ * Pass `null` (or omit) to get the raw global inventory — used for live
+ * debugging, search-result captures, etc.
+ */
+export function get_recovery_trace_state(agent, baseline_inventory = null) {
   const raw_state = get_am_state(agent);
   const bot = agent?.bot;
   const state = {};
@@ -151,7 +180,11 @@ export function get_recovery_trace_state(agent) {
   }
 
   const inv = {};
-  if (raw_state?.inventory != null) inv.counts = raw_state.inventory;
+  if (raw_state?.inventory != null) {
+    inv.counts = baseline_inventory != null ?
+        _inventory_delta(raw_state.inventory, baseline_inventory) :
+        raw_state.inventory;
+  }
 
   const main_hand = bot?.heldItem?.name ?? null;
   inv.equipment = {mainHand: main_hand};

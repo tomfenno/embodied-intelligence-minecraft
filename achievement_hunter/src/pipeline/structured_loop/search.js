@@ -1,4 +1,4 @@
-import {executeCommand as execute_command} from '../../../../src/agent/commands/index.js';
+import {executeCommandWithModeRecovery as execute_command} from '../command_utils.js';
 import {any_log_search_targets, mob_search_targets} from '../mc_sources.js';
 
 const spl = {

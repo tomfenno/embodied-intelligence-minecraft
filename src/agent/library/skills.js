@@ -491,14 +491,16 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
             }
             await bot.equip(bucket, 'hand');
         } else {
-            // [Achievement Hunter] Use requireHarvest:true instead of the original
-            // equipForBlock() + canHarvest(bot.heldItem?.type) two-step. The original
-            // pattern was racey: when a tool breaks, bot.heldItem can still reference
-            // the destroyed item's type ID after the break event fires, causing
-            // canHarvest to pass and bot.collectBlock.collect() to run with no actual
-            // tool — leading to a pathfinder memory leak and OOM crash. requireHarvest
-            // filters against fresh inventory data before any equip attempt, then
-            // throws NoItem if no valid tool exists, eliminating the stale-state window.
+            // [Achievement Hunter] Use requireHarvest:true to catch the static
+            // case (tool missing at loop start). A race remains: the server's
+            // set_slot packet removing the broken tool can arrive *after* this
+            // check but *during* the goto() await inside collectAll, so
+            // mineBlock's inner equipForBlock({getFromChest:true}) sees no tool.
+            // Upstream, retrieveTools used to silently return when chestLocations
+            // was empty, causing equipForBlock to recurse forever and OOM. That
+            // hole is closed by patches/mineflayer-tool+1.2.0.patch which makes
+            // retrieveTools throw NoChest on empty input. The catch below handles
+            // the resulting NoChest cleanly. See BUG 10.
             try {
                 await bot.tool.equipForBlock(block, {requireHarvest: true});
             } catch (err) {
@@ -532,6 +534,14 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
             if (err.name === 'NoChests') {
                 log(bot, `Failed to collect ${blockType}: Inventory full, no place to deposit.`);
                 break;
+            }
+            else if (err.name === 'NoChest' || err.name === 'NoItem') {
+                // Tool gone mid-collection: mineBlock's equipForBlock ran with no
+                // harvestable tool, then either (a) requireHarvest threw NoItem, or
+                // (b) getFromChest entered retrieveTools which now throws NoChest
+                // when chestLocations is empty (see BUG 10).
+                log(bot, `Don't have right tools to harvest ${blockType}.`);
+                return false;
             }
             else {
                 log(bot, `Failed to collect ${blockType}: ${err}.`);
@@ -2072,27 +2082,34 @@ export async function useToolOn(bot, toolName, targetName) {
     await goToPosition(bot, block.position.x, block.position.y, block.position.z, distance);
     await bot.lookAt(block.position.offset(0.5, 0.5, 0.5));
 
-    // if block in view is closer than the target block, it is in our way. try to move closer
+    // Proceed only if view is clear or bot is directly above the target.
+    // If a wall blocks the view, dig through it rather than hunting for a lucky angle.
     const viewBlocked = () => {
         const blockInView = bot.blockAtCursor(5);
         const headPos = bot.entity.position.offset(0, bot.entity.height, 0);
-        return blockInView && 
-            !blockInView.position.equals(block.position) && 
+        return blockInView &&
+            !blockInView.position.equals(block.position) &&
             blockInView.position.distanceTo(headPos) < block.position.distanceTo(headPos);
     }
-    const blockInView = bot.blockAtCursor(5);
-    if (viewBlocked()) {
-        log(bot, `Block ${blockInView.name} is in the way, moving closer...`);
-        // choose random block next to target block, go to it
-        const nearbyPos = block.position.offset(Math.random() * 2 - 1, 0, Math.random() * 2 - 1);
-        await goToPosition(bot, nearbyPos.x, nearbyPos.y, nearbyPos.z, 1);
+    // Start of AH code
+    const isAbove = () => bot.entity.position.y >= block.position.y + 1;
+
+    if (viewBlocked() && !isAbove()) {
+        const blockingBlock = bot.blockAtCursor(5);
+        if (!blockingBlock || !bot.canDigBlock(blockingBlock)) {
+            log(bot, `Block ${blockingBlock?.name ?? 'unknown'} is in the way and cannot be broken, not using ${toolName}.`);
+            return false;
+        }
+        log(bot, `Breaking ${blockingBlock.name} to reach ${block.name}...`);
+        await bot.dig(blockingBlock);
         await bot.lookAt(block.position.offset(0.5, 0.5, 0.5));
-        if (viewBlocked()) {
-            const blockInView = bot.blockAtCursor(5);
-            log(bot, `Block ${blockInView.name} is in the way, not using ${toolName}.`);
+        if (viewBlocked() && !isAbove()) {
+            const stillBlocking = bot.blockAtCursor(5);
+            log(bot, `Block ${stillBlocking?.name ?? 'unknown'} is still in the way, not using ${toolName}.`);
             return false;
         }
     }
+    // End of AH code
 
     const equipped = await equip(bot, toolName);
 
