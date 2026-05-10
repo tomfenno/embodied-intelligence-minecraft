@@ -30,6 +30,8 @@ server_data*
 src/mindcraft-py/__pycache__/
 
 # Manually added after fork
+.claude/
+CLAUDE.md
 .env
 .env.*
 venv/
@@ -41,5 +43,5 @@ logs/
 *.temp
 *.cache
 .ipynb_checkpoints/
-achievement_hunter/rollouts
-achievement_hunter/rollout_live
+achievement_hunter/rollouts/
+achievement_hunter/rollout_live/

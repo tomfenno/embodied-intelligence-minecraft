@@ -1229,17 +1229,20 @@ export async function goToPosition(bot, x, y, z, min_distance=2) {
         return true;
     }
     
+    // Start of AH code
+    const TRIVIAL_HARDNESS = 0.5;
     const checkDigProgress = () => {
         if (bot.targetDigBlock) {
             const targetBlock = bot.targetDigBlock;
             const itemId = bot.heldItem ? bot.heldItem.type : null;
-            if (!targetBlock.canHarvest(itemId)) {
+            if (!targetBlock.canHarvest(itemId) && targetBlock.hardness > TRIVIAL_HARDNESS) {
                 log(bot, `Pathfinding stopped: Cannot break ${targetBlock.name} with current tools.`);
                 bot.pathfinder.stop();
                 bot.stopDigging();
             }
         }
     };
+    // End of AH code
     
     const progressInterval = setInterval(checkDigProgress, 1000);
     

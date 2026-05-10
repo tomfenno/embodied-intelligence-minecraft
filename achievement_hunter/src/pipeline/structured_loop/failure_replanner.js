@@ -247,11 +247,10 @@ async function ensure_safe_before_llm(agent) {
   const bot = agent.bot;
   const block = bot.blockAt(bot.entity.position);
   const block_above = bot.blockAt(bot.entity.position.offset(0, 1, 0));
+  const block_below = bot.blockAt(bot.entity.position.offset(0, -1, 0));
 
-  // Match self_preservation's oxygenLevel threshold — avoids unnecessary
-  // moveAway calls during shallow wading, which reduces race opportunities with
-  // the mode.
-  const in_water = bot.oxygenLevel != null && bot.oxygenLevel < 15;
+  const in_water =
+      block_below?.name === 'water' || block_above?.name === 'water';
   const in_lava = block?.name === 'lava' || block_above?.name === 'lava';
 
   try {
