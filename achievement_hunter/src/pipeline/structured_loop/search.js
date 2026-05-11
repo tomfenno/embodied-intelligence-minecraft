@@ -178,17 +178,24 @@ async function execute_search_command(agent, item, radius, command) {
   const message =
       result?.message != null ? String(result.message).trim() : null;
 
-  // Pathfinder-bail reclassification (success-with-bail-message →
-  // success: false) is handled centrally by executeCommandWithModeRecovery
-  // for navigation commands including !searchForBlock and
-  // !searchForEntity. Here we only need to filter the search-specific
-  // "Could not find" message — mineflayer's skill explicitly reports
-  // that with success: true when no block of the requested type exists
-  // in the requested radius.
-  const success_flag = result?.success === true;
-  const has_could_not_find = typeof message === 'string' &&
-      message.includes('Could not find');
-  const found = success_flag && !has_could_not_find;
+  // Post-condition check: the only honest signal of "did this search
+  // succeed" is whether the target is now in the bot's nearby state.
+  // We deliberately ignore both the skill's `success` boolean and its
+  // message text because:
+  //   - The skill returns success=true with "Could not find" when
+  //     nothing of that type exists in the radius (false positive).
+  //   - The skill returns success=true with intermediate pathfinder
+  //     warnings ("Path not found, but attempting to navigate anyway")
+  //     followed by an actual "You have reached" success line —
+  //     regex-on-message would misclassify these as failures.
+  //   - When the pathfinder genuinely bails and the bot doesn't reach
+  //     the target, the target won't be in nearby state. Same outcome.
+  //
+  // This subsumes the previous "Could not find" filter and the
+  // pathfinder-bail regex reclassification for !searchForBlock /
+  // !searchForEntity. `command_utils.js:NAVIGATION_ONLY_COMMANDS`
+  // intentionally excludes these two skills.
+  const found = check_search_complete(item, get_am_state(agent));
 
   if (found) spl.log(`Search succeeded: "${item}" at radius ${radius}.`);
   else spl.warn(`Search failed: "${item}" at radius ${radius}.`);

@@ -22,11 +22,17 @@ const warn = (...args) => console.warn('[SPL][cmd]', ...args);
 export const PATHFINDING_MESSAGE_REGEX =
     /no path|PathStopped|Could not find a path|Path not found|Pathfinding stopped|Took to long to decide path/i;
 
+// !searchForBlock and !searchForEntity are intentionally NOT in this set,
+// even though they're nav commands. Their messages can contain
+// intermediate pathfinder warnings ("Path not found, but attempting to
+// navigate anyway") followed by a successful "You have reached" line —
+// regex-on-whole-message would flip legitimate successes to failure.
+// Search commands instead use a post-condition check
+// (`check_search_complete`) in `search.js:execute_search_command`, which
+// is the only honest signal of "did the search succeed".
 const NAVIGATION_ONLY_COMMANDS = new Set([
   '!goToCoordinates',
   '!moveAway',
-  '!searchForBlock',
-  '!searchForEntity',
   '!digDown',
   '!goToSurface',
 ]);
