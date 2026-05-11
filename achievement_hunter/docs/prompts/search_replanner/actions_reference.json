@@ -29,13 +29,13 @@
     "description": "Search for the nearest block or entity of a given type by sweeping radii 32, 64, 128, 256, 511 from the bot's current position. Equivalent to running a maximum-radius search; there is no broader scan available.",
     "category": "movement",
     "constraints": {
-      "target_must_be_concrete": "Pass concrete block or entity names, e.g. \"chicken\", \"diamond_ore\". Abstract category names, e.g. \"any_log\", are not supported and will fail.",
+      "abstract_targets_allowed": "Concrete names (e.g. \"oak_log\", \"diamond_ore\") and registered abstract category names (e.g. \"any_log\") are both accepted. Abstract searches expand internally to one !searchForBlock per concrete member at each radius — usually more efficient than searching members individually. When a candidate in CANDIDATE_TARGETS is abstract, prefer the abstract form. Use the candidate's exact name when possible.",
       "max_search_radius": 511,
-      "plan_terminates_on_success": "As soon as one !search action finds the target AND the bot reaches it, the entire plan ends successfully and execution returns to the structured loop. Subsequent actions in the plan are skipped. Issue !search aggressively — a wasted scan costs only one radius sweep.",
+      "plan_terminates_on_success": "As soon as one !search action finds a candidate AND the bot reaches it, the entire plan ends successfully and execution returns to the structured loop. Subsequent actions in the plan are skipped. Issue !search aggressively — a wasted scan costs only one radius sweep.",
       "exhaustion_is_terminal_at_position": "If !search returns 'search_exhausted', re-issuing !search from the same position will fail identically. The bot must relocate (via !goToCoordinates, !digDown, or !goToSurface) before another !search will yield new results.",
-      "no_repeat_in_sequence": "Two !search actions for the same target in one plan without a relocation between them will short-circuit to 'search_already_attempted'."
+      "no_repeat_in_sequence": "Two !search actions with the same exact target string in one plan without a relocation between them will short-circuit to 'search_already_attempted'."
     },
-    "examples": ["!search(\"chicken\")", "!search(\"diamond_ore\")"]
+    "examples": ["!search(\"chicken\")", "!search(\"diamond_ore\")", "!search(\"any_log\")"]
   },
   {
     "name": "!digDown",

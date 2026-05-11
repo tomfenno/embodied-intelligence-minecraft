@@ -1114,7 +1114,16 @@ export async function goToGoal(bot, goal) {
 
     let final_movements = destructiveMovements;
 
-    const pathfind_timeout = 1000;
+    // Start of AH code
+    // Increased from 1000ms — long-distance targets emitted by the
+    // search_replanner / failure_replanner (up to 500 horizontal blocks)
+    // need more A* budget to find a path, otherwise both getPathTo calls
+    // bail and we fall through to "Path not found, but attempting to
+    // navigate anyway", which the bot rarely completes. 15s per movement
+    // type → up to 30s of pre-flight planning total before falling
+    // through.
+    const pathfind_timeout = 15000;
+    // End of AH code
     if (await bot.pathfinder.getPathTo(nonDestructiveMovements, goal, pathfind_timeout).status === 'success') {
         final_movements = nonDestructiveMovements;
         log(bot, `Found non-destructive path.`);

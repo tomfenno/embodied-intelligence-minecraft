@@ -130,20 +130,24 @@ export function fill_failure_replanner_prompt(
 
 
 /**
- * Fills the search_replanner prompt template with the failed search target,
+ * Fills the search_replanner prompt template with the candidate target list,
  * the current search trace (state + breadcrumbs), prior attempts' summaries,
  * and the available navigation actions. Returns the filled prompt string.
  *
+ * `candidate_targets` is an array of target names (concrete or registered
+ * abstract like `any_log`). The LLM picks a relocation strategy that helps
+ * find any one of them.
+ *
  * Example:
  *   const prompt = fill_search_replanner_prompt(
- *     'diamond_ore', search_trace_obj, summaries_arr, actions_arr);
+ *     ['diamond_ore', 'iron_ore'], search_trace_obj, summaries_arr, actions_arr);
  */
 export function fill_search_replanner_prompt(
-    failed_search_target, search_trace, previous_summaries, available_actions) {
+    candidate_targets, search_trace, previous_summaries, available_actions) {
   const template = _read_template(
       '../../docs/prompts/search_replanner/search_replanner.md');
   return _fill(template, {
-    FAILED_SEARCH_TARGET: failed_search_target,
+    CANDIDATE_TARGETS: candidate_targets,
     SEARCH_TRACE: search_trace,
     PREVIOUS_SUMMARIES: previous_summaries,
     AVAILABLE_ACTIONS: available_actions,

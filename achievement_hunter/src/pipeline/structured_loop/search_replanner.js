@@ -3,13 +3,13 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 
 import {get_am_state, get_recovery_trace_state, get_search_trace_state} from '../agent_state.js';
-import {executeCommandWithModeRecovery} from '../command_utils.js';
+import {executeCommandWithModeRecovery, PATHFINDING_MESSAGE_REGEX} from '../command_utils.js';
 import {extract_json} from '../json_utils.js';
 import {fill_search_replanner_prompt} from '../prompt_utils.js';
 
 import {ensure_safe_before_llm, format_action_as_command} from './failure_replanner.js';
 import {make_spl} from './log.js';
-import {check_search_complete, run_search} from './search.js';
+import {check_search_complete, expand_search_item, run_search} from './search.js';
 import {create_action_result} from './trace.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,9 +38,10 @@ const PLAN_TERMINATING_KINDS = new Set([
 //     navigation command (unstuck/self_preservation took over).
 //   - `runner_exception`: thrown error from the bot command — pathfinder
 //     death, world unloaded, etc.
-//   - `command_failure` with a pathfinder-style message ("PathStopped",
-//     "Could not find a path", "no path").
-const PATHFINDING_MESSAGE_REGEX = /no path|PathStopped|Could not find a path/i;
+//   - `command_failure` whose message matches one of the mineflayer
+//     pathfinder bail-out strings (see PATHFINDING_MESSAGE_REGEX in
+//     failure_replanner.js). `run_action` reclassifies success-with-
+//     bail-message into this category before is_pathfinding_failure runs.
 
 function is_pathfinding_failure(result) {
   if (result == null) return false;
@@ -129,6 +130,12 @@ async function run_action(action, agent, log, searched_targets) {
 
   const command = format_action_as_command(action);
   try {
+    // executeCommandWithModeRecovery centrally reclassifies pathfinder-
+    // bail "successes" for nav commands as failures (see command_utils
+    // PATHFINDING_MESSAGE_REGEX + NAVIGATION_ONLY_COMMANDS), so the
+    // success flag here is trustworthy. The downstream
+    // is_pathfinding_failure check still fires D11 if the result is a
+    // command_failure with a pathfinder-bail message.
     const env_result = await executeCommandWithModeRecovery(agent, command);
     await sleep(action_debounce_ms);
     const success = env_result?.success === true;
@@ -179,11 +186,33 @@ async function run_search_action(action, agent, log, searched_targets) {
   }
 }
 
-// Returns true if `target` is now visible in the bot's nearby state. Used as
-// the win condition: as soon as the target is reachable, the SPL outer loop
-// can proceed via its normal `!collectBlocks`/`!attack` mediation.
-function target_now_in_nearby(target, agent) {
-  return check_search_complete(target, get_am_state(agent));
+// Returns true if ANY of the candidate targets is now visible in the bot's
+// nearby state. Used as the win condition: as soon as any one becomes
+// reachable, the SPL outer loop can proceed via its normal
+// `!collectBlocks`/`!attack` mediation. Abstract candidates (e.g.
+// `any_log`) are expanded through `expand_search_item` so a concrete
+// member appearing in nearby state satisfies the abstract. Targets whose
+// expansion throws (e.g. `any_*` without a registered expansion) are
+// soft-skipped with a warning so a misconfigured graph can't crash the
+// win check — they just don't participate. `run_breadth_first_sweep`
+// applies the same soft-skip semantics in Phase 0.5.
+function any_target_now_in_nearby(targets, agent) {
+  const state = get_am_state(agent);
+  for (const target of targets) {
+    let concrete_items;
+    try {
+      concrete_items = expand_search_item(target);
+    } catch (e) {
+      spl.warn(`Unsupported abstract target "${target}" — treating as ` +
+               `unfindable. Add an expansion in expand_search_item to ` +
+               `enable. (${e.message})`);
+      continue;
+    }
+    for (const item of concrete_items) {
+      if (check_search_complete(item, state)) return true;
+    }
+  }
+  return false;
 }
 
 function persist_search_trace(search_trace, rollout_dir) {
@@ -204,7 +233,11 @@ function persist_search_trace(search_trace, rollout_dir) {
       mkdirSync(failed_dir, {recursive: true});
 
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const target_safe = String(search_trace.target ?? 'unknown')
+      // Use the first candidate as the canonical filename identifier; it's
+      // vertex-order-stable so reruns of the same exhaustion produce
+      // comparable filenames. The full targets array is in the JSON body.
+      const primary_target = (search_trace.targets ?? ['unknown'])[0];
+      const target_safe = String(primary_target)
                               .replace(/[^a-z0-9_-]/gi, '_')
                               .slice(0, 60);
       const filename = `${timestamp}__${target_safe}__fail.json`;
@@ -219,26 +252,40 @@ function persist_search_trace(search_trace, rollout_dir) {
 }
 
 /**
- * Main entry point. Called by `actions.js` when an in-task `!search` exhausts
- * its full 511-block radius without finding the target.
+ * Main entry point. Called by `actions.js` when an in-task `!search` (or a
+ * search_sweep task — see `handle_search_sweep`) has exhausted its full
+ * 511-block radius without finding any of the candidate targets.
  *
- * Returns `'success'` if a plan relocated the bot to a position where the
- * target is now in nearby state (the SPL outer loop can then resume normal
- * task mediation). Returns `'fail'` otherwise — `actions.js` falls through
- * to the existing `failure_replanner`. Returns early on pathfinding-class
- * failures (D11) so the failure replanner can attempt a different recovery.
+ * `targets` is a non-empty array of target names. Single-target callers
+ * (the non-sweep `search_exhausted` branch in actions.js) pass an array
+ * of length 1. Multi-target callers (the sweep handler) pass the full
+ * exhausted candidate list and let the LLM pick a relocation strategy
+ * that helps any one of them.
+ *
+ * Returns `'success'` if a plan relocated the bot to a position where
+ * ANY candidate target is now in nearby state (the SPL outer loop can
+ * then resume normal task mediation). Returns `'fail'` otherwise —
+ * `actions.js` falls through to the existing `failure_replanner`.
+ * Returns early on pathfinding-class failures (D11) so the failure
+ * replanner can attempt a different recovery.
  */
 export async function recover_failed_search(
-    target, agent, model, breadcrumb_tracker, log, task = null) {
+    targets, agent, model, breadcrumb_tracker, log, task = null) {
+  if (!Array.isArray(targets) || targets.length === 0) {
+    spl.warn('recover_failed_search called with empty targets list — fail.');
+    return 'fail';
+  }
+
   const available_actions = load_available_actions();
   const previous_summaries = [];
   const started_at = new Date().toISOString();
   const initial_state = get_recovery_trace_state(agent);
   const attempts_log = [];
+  const targets_display = targets.join(', ');
 
   const finalize = (terminal_status, terminal_reason) => {
     const search_trace = {
-      target,
+      targets,
       task,
       started_at,
       ended_at: new Date().toISOString(),
@@ -253,14 +300,14 @@ export async function recover_failed_search(
     return terminal_status;
   };
 
-  spl.log(`Starting recovery for "${target}".`);
+  spl.log(`Starting recovery for: ${targets_display}`);
 
   for (let attempt = 1; attempt <= MAX_SEARCH_REPLANNER_ATTEMPTS; attempt++) {
     spl.log(`Attempt ${attempt}/${MAX_SEARCH_REPLANNER_ATTEMPTS}`);
 
     const search_trace_state = get_search_trace_state(agent, breadcrumb_tracker);
     const prompt = fill_search_replanner_prompt(
-        target, search_trace_state, previous_summaries, available_actions);
+        targets, search_trace_state, previous_summaries, available_actions);
 
     await ensure_safe_before_llm(agent);
 
@@ -287,7 +334,7 @@ export async function recover_failed_search(
 
     spl.log('Summary:', replanner_output.summary);
     log?.search_recovery_attempt?.(
-        attempt, task, target, replanner_output.summary,
+        attempt, task, targets_display, replanner_output.summary,
         replanner_output.actions);
 
     const action_results = [];
@@ -317,11 +364,12 @@ export async function recover_failed_search(
 
       action_results.push(result);
 
-      // Win check: as soon as the target is visible in nearby state, the SPL
-      // outer loop can resume normal task mediation. Catches search_success
-      // AND incidental encounters (e.g. !digDown that broke through to the
-      // target).
-      if (target_now_in_nearby(target, agent)) {
+      // Win check: as soon as ANY candidate target is visible in nearby
+      // state, the SPL outer loop can resume normal task mediation.
+      // Catches search_success AND incidental encounters (e.g. !digDown
+      // that broke through to one of the candidates). Handles abstract
+      // candidates via expand_search_item.
+      if (any_target_now_in_nearby(targets, agent)) {
         attempt_outcome = 'success';
         break;
       }
@@ -346,7 +394,7 @@ export async function recover_failed_search(
     });
 
     if (attempt_outcome === 'success') {
-      spl.log(`Target "${target}" now in nearby state — success.`);
+      spl.log(`A candidate from [${targets_display}] is now in nearby state — success.`);
       return finalize('success', 'target_reached');
     }
 

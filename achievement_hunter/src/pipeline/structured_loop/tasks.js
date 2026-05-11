@@ -23,11 +23,15 @@ export function select_next_task(candidates, state) {
     if (task) return task;
   }
 
-  for (const candidate of candidates) {
-    if (candidate.item_type !== 'resource') continue;
-    const task = make_fallback_acquisition_task(candidate, state);
-    if (task) return task;
-  }
+  // Tier 4: fallback acquisition (search-based) for resource candidates.
+  // Emits a single `search_sweep` task carrying ALL eligible resource
+  // candidates as targets — the sweep handler in actions.js tries them
+  // breadth-first across radii. Any one success exits the sweep and lets
+  // the SPL outer loop resume normally; only if every target exhausts at
+  // every radius does the search_replanner get invoked with the full
+  // exhausted list.
+  const sweep_task = make_fallback_search_sweep_task(candidates, state);
+  if (sweep_task) return sweep_task;
 
   return null;
 }
@@ -105,6 +109,62 @@ export function try_make_immediate_acquisition_task(candidate, state) {
           get_single_satisfied_input_item(candidate, 'item_dependency'),
       tool: get_single_satisfied_input_item(candidate, 'tool_dependency'),
     },
+  };
+}
+
+// Builds a multi-target search sweep task. Tier 4's emission per D1-D7:
+// when no immediate craft / collect / interact task is available, collect
+// every eligible resource candidate's fallback source into a single task
+// for breadth-first sweeping in actions.js. Excludes:
+//   - Non-resource candidates (interact / tool / workstation) per D1.
+//   - Candidates whose fallback resolves to no source (defensive — e.g.
+//     a mob with no canonical, or a block with no fallback block name).
+//
+// Returns null if no candidate produces a viable source — `select_next_task`
+// then falls through to returning null (the outer loop re-evaluates state).
+//
+// Shape:
+//   {
+//     target_item: targets[0].target_item,  // canonical for trace/filename
+//     action_type: 'search_sweep',
+//     parameters: {
+//       targets: [{target_item, source, kind: 'block'|'mob', qty}, ...]
+//     }
+//   }
+export function make_fallback_search_sweep_task(candidates, state) {
+  const targets = [];
+  for (const candidate of candidates) {
+    if (candidate.item_type !== 'resource') continue;
+    const fallback = make_fallback_acquisition_task(candidate, state);
+    if (!fallback) continue;
+
+    const params = fallback.parameters;
+    let source = null;
+    let kind = null;
+    if (fallback.action_type === 'kill' && params.source_mob != null) {
+      source = params.source_mob;
+      kind = 'mob';
+    } else if (
+        fallback.action_type === 'collect' && params.source_block != null) {
+      source = params.source_block;
+      kind = 'block';
+    }
+    if (source == null) continue;
+
+    targets.push({
+      target_item: candidate.id,
+      source,
+      kind,
+      qty: candidate.qty,
+    });
+  }
+
+  if (targets.length === 0) return null;
+
+  return {
+    target_item: targets[0].target_item,
+    action_type: 'search_sweep',
+    parameters: {targets},
   };
 }
 

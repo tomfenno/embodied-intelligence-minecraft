@@ -31,6 +31,12 @@ const HARD_FAILURE_KINDS = new Set([
   'search_already_attempted',
 ]);
 
+// `PATHFINDING_MESSAGE_REGEX` (formerly defined here) was moved to
+// `command_utils.js` so the reclassification logic and the regex live
+// in the same module. Callers that need the regex (e.g. the
+// `is_pathfinding_failure` helper in `search_replanner.js`) now import
+// it directly from `command_utils.js`.
+
 const spl = make_spl('[SPL][recovery]');
 
 let _available_actions = null;
@@ -62,6 +68,9 @@ async function run_action(action, agent, log, searched_targets) {
 
   const command = format_action_as_command(action);
   try {
+    // executeCommandWithModeRecovery centrally reclassifies pathfinder-
+    // bail "successes" for nav commands as failures, so we can trust the
+    // success flag here without per-callsite regex filtering.
     const env_result = await executeCommandWithModeRecovery(agent, command);
     await sleep(craft_debounce_ms);
     const success = env_result?.success === true;

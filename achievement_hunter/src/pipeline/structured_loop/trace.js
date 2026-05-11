@@ -35,6 +35,14 @@ export function project_failed_steps(steps) {
     if (step.result.position_after != null) {
       projected.position_after = step.result.position_after;
     }
+    // Surface per-source outcomes for search_sweep failures so the
+    // failure_replanner LLM can distinguish exhausted-at-max-radius
+    // sources from found-not-reached (pathfinder failed) and
+    // soft-skipped (unsupported abstract) sources, and tailor the
+    // recovery plan accordingly.
+    if (step.result.per_source_outcomes != null) {
+      projected.per_source_outcomes = step.result.per_source_outcomes;
+    }
     return projected;
   });
 }

@@ -28,15 +28,24 @@ The loop repeatedly:
    incoming dependencies already satisfied (i.e., have no remaining incoming
    edges inside the SCSG).
 3. **Selects one task** from those candidates via a tiered priority policy.
-4. **Mediates the task into a single bot command** (`!collectBlocks`,
-   `!craftRecipe`, `!smelt_item`, `!attack`, `!useOn`, `!placeHere`, or
-   `!search…`) and executes it.
-5. If a `!search` exhausts all radii without finding the target, the
-   **search replanner** (an LLM) is invoked first — it proposes a short
-   navigation-only plan (`!goToCoordinates`, `!digDown`, `!goToSurface`,
-   `!search`) to relocate the bot. If the target ends up in nearby state,
-   control returns to the inner attempt loop. If the replanner exhausts
-   or hits a pathfinding-class failure, fall through to step 6.
+4. Executes the task. Most tasks are **mediated into a single bot command**
+   (`!collectBlocks`, `!craftRecipe`, `!smelt_item`, `!attack`, `!useOn`,
+   `!placeHere`, or `!search…`). One task type, `'search_sweep'` (emitted
+   by tier 4 when no immediate craft / collect / interact is available),
+   is inherently multi-command and bypasses mediation — it runs a
+   breadth-first sweep of `!searchForBlock` / `!searchForEntity` across
+   every eligible resource candidate at each radius, returning success the
+   moment any one is found and reached.
+5. If a `!search` exhausts all radii without finding the target (or if the
+   sweep exhausts every candidate at every radius), the **search
+   replanner** (an LLM) is invoked — it proposes a short navigation-only
+   plan (`!goToCoordinates`, `!digDown`, `!goToSurface`, `!search`) to
+   relocate the bot. For sweep exhaustion, the full list of exhausted
+   candidates is passed to the replanner so the LLM can pick a relocation
+   strategy that helps any one of them. If any candidate ends up in
+   nearby state, control returns to the inner attempt loop. If the
+   replanner exhausts or hits a pathfinding-class failure, fall through
+   to step 6.
 6. If the command fails after inner retries (or step 5 fell through), the
    **failure replanner** (an LLM) is invoked to propose a short corrective
    action sequence.
@@ -120,7 +129,7 @@ to produce a task wins.
 | 1    | Crafting / smelting (only items, tools, workstations)      | `try_make_craft_task` / `try_make_smelt_task` |
 | 2    | Immediate nearby acquisition for `resource` candidates     | `try_make_immediate_acquisition_task` |
 | 3    | Interaction tasks (tool-on-target, e.g. shears on pumpkin) | `try_make_interact_task`            |
-| 4    | Fallback acquisition (search-based) for `resource` candidates | `make_fallback_acquisition_task`  |
+| 4    | Multi-target search sweep for `resource` candidates        | `make_fallback_search_sweep_task`   |
 
 This ordering encodes "always cash in already-collected inputs before going
 out to gather more". A task object looks like:
@@ -129,7 +138,7 @@ out to gather more". A task object looks like:
 {
   target_item: 'oak_planks',
   qty: 10,
-  action_type: 'craft' | 'collect' | 'smelt' | 'kill' | 'interact',
+  action_type: 'craft' | 'collect' | 'smelt' | 'kill' | 'interact' | 'search_sweep',
   parameters: { … },
 }
 ```
@@ -137,11 +146,27 @@ out to gather more". A task object looks like:
 `itemish_types` is `{'item', 'tool', 'workstation'}` — only these can be
 crafted/smelted.
 
+**Tier 4 behavior** has changed from the legacy single-target fallback:
+`make_fallback_search_sweep_task` collects **every** eligible resource
+candidate's fallback source into a single `'search_sweep'` task. The
+sweep handler in `actions.js` tries each source in breadth-first order
+across radii. Any one success exits and the SPL outer loop's next
+iteration resolves the found target via tier 2. Only if every source
+exhausts at every radius does the search_replanner get invoked (with the
+full list, per the multi-target search_replanner contract). The legacy
+`make_fallback_acquisition_task` is still exported and is used
+internally by the sweep builder to derive each per-target source.
+
 ### `actions.js` — task execution + inner retry loop
 
-`execute_task_action(task, agent, log, model, graph)` is the inner workhorse.
-It runs up to `max_inner_retries = 5` attempts on a single task and returns
-`'success'` or `'fail'`.
+`execute_task_action(task, agent, log, model, graph, model_search_replanner, breadcrumb_tracker)`
+is the inner workhorse. It runs up to `max_inner_retries = 5` attempts on a
+single task and returns `'success'` or `'fail'`.
+
+**Sweep dispatch (at the top of the function):** if `task.action_type ===
+'search_sweep'`, `execute_task_action` immediately delegates to
+`handle_search_sweep` and returns. Sweep tasks bypass the per-attempt
+mediation loop entirely — see `handle_search_sweep` below.
 
 **Mediation** (`mediate_action(task, state)`) turns a task into a single bot
 command via one of:
@@ -213,6 +238,46 @@ mitigation).
 - Failed traces additionally written as standalone pretty-printed JSON to
   `<rollout_dir>/task_traces/failed/<timestamp>__<action_type>__<target>__fail.json`.
 
+**`handle_search_sweep(task, agent, log, model, graph, model_search_replanner, breadcrumb_tracker)`:**
+
+Handles `action_type: 'search_sweep'` tasks (emitted by tier 4 in
+`tasks.js`). The whole sweep is a single inner-loop attempt — it never
+enters the `max_inner_retries` for-loop. Flow:
+
+1. Maps `task.parameters.targets` → `sources` (string array of block /
+   mob / abstract names).
+2. Records a single summary step in the task_trace with action
+   `search_sweep([...sources])`.
+3. Calls `run_breadth_first_sweep(sources, agent, log, searched_targets, 0)`
+   (see `search.js`).
+4. **Success path**: `{found: true, source, item, ...}` returned →
+   summary step result `'sweep_target_found'` → `terminal_reason:
+   'sweep_target_found'` → returns `'success'`. The SPL outer loop's
+   next iteration resolves the found target via tier 2.
+5. **Exhaustion path**: `{found: false, sources_exhausted: [...]}` →
+   step result `'sweep_exhausted'` → if `model_search_replanner` and
+   `breadcrumb_tracker` are wired, invokes
+   `recover_failed_search(sources_exhausted, ...)` with the **full**
+   exhausted list. On replanner success → `terminal_reason:
+   'sweep_replanner_relocated'` → returns `'success'`. On replanner
+   fail (or null model) → finalizes as fail and optionally falls
+   through to `failure_replanner` (mirrors the existing
+   `exhausted_inner_retries` path for non-sweep tasks).
+
+**Per-source outcomes:** the sweep step's result carries a
+`per_source_outcomes` map (`source → 'found_reached' | 'found_not_reached'
+| 'exhausted' | 'soft_skipped' | 'not_attempted'`). This is surfaced to
+the failure_replanner LLM via `project_failed_steps` so it can distinguish
+exhausted-at-max-radius sources from pathfinder-fail sources when planning
+recovery.
+
+**`searched_targets` interaction:** the sweep maintains its own per-call
+`searched_targets` Set, distinct from the per-attempt set used by the
+non-sweep `search_exhausted` branch. Inside the breadth-first helper,
+sources are added to the set as they hit `found_not_reached`,
+`soft_skipped`, or full-radius exhaustion — preventing redundant search
+issuance within the same sweep.
+
 ### `breadcrumbs.js` — exploration map
 
 `BreadcrumbTracker` maintains a spatial map of where the bot has been
@@ -266,12 +331,25 @@ the live dashboard never see the two-pool internal structure.
   expands the target via `expand_search_item` (notably `any_log` → list of
   log block names), fast-paths if already in state, then sweeps radii
   `[32, 64, 128, 256, 511]` issuing `!searchForBlock(...)` for blocks or
-  `!searchForEntity(...)` for mobs.
+  `!searchForEntity(...)` for mobs. Single-target.
+- `run_breadth_first_sweep(sources, agent, log, searched_targets, start_attempt)`
+  — multi-target sweep used by `handle_search_sweep`. Outer loop iterates
+  radii; inner loop iterates sources at each radius (breadth-first). Returns
+  `{found: true, source, item, message, outcomes}` on the first reached
+  target, or `{found: false, sources_exhausted, outcomes}` after every
+  source exhausts at radius 511. Unsupported abstracts (those that
+  `expand_search_item` throws on) are soft-skipped with `spl.warn` — sweep
+  continues with the remaining sources. `found_not_reached` for a source
+  removes it from the active set (bigger radii won't help — pathfinder
+  failure is the issue, not search radius).
 - `check_search_complete(target, state)` — was the target found nearby after
   the search?
 - `is_entity_target(target)` — uses `mob_search_targets` from `mc_sources.js`.
 
-Failure replanner uses the same `run_search` helper for `!search` actions.
+Failure replanner uses `run_search` (single-target) for its `!search`
+actions. Search replanner uses `run_search` internally for one-shot
+`!search(target)` actions in its plans. Only `handle_search_sweep` (in
+`actions.js`) uses `run_breadth_first_sweep`.
 
 ### `trace.js` — trace shape helpers
 
@@ -464,6 +542,29 @@ workstation_dependency, tool_dependency, item_dependency}`.
 }
 ```
 
+### Search-sweep task (selector → `handle_search_sweep`)
+
+Emitted by tier 4 when no immediate craft / collect / interact is
+available and one or more resource candidates need to be searched for.
+Carries the **full** list of eligible targets so the sweep handler can
+try them breadth-first across radii. The top-level `target_item` is set
+to `targets[0].target_item` so existing trace/filename machinery
+(`persist_task_trace`) keeps working unchanged.
+
+```jsonc
+{
+  "target_item": "oak_log",         // first target — canonical id
+  "action_type": "search_sweep",
+  "parameters": {
+    "targets": [
+      { "target_item": "oak_log", "source": "any_log", "kind": "block", "qty": 3 },
+      { "target_item": "stone",   "source": "stone",   "kind": "block", "qty": 11 },
+      { "target_item": "iron_ore","source": "iron_ore","kind": "block", "qty": 3  }
+    ]
+  }
+}
+```
+
 ### Task trace (persisted)
 
 ```jsonc
@@ -472,7 +573,11 @@ workstation_dependency, tool_dependency, item_dependency}`.
   "task": { … the task from above … },
   "terminal_status": "success" | "fail",
   "terminal_reason": "completed" | "exhausted_inner_retries"
-                   | "repeated_identical_failure" | …,
+                   | "repeated_identical_failure"
+                   | "sweep_target_found"         // search_sweep: one source resolved
+                   | "sweep_replanner_relocated"  // search_sweep: sweep failed, replanner succeeded
+                   | "sweep_exhausted"            // search_sweep: everything failed
+                   | …,
   "steps": [
     { "i": 1,
       "state": { /* recovery_trace_state at step start */ },
@@ -486,6 +591,34 @@ workstation_dependency, tool_dependency, item_dependency}`.
                "failed_steps": [ … only on fail … ] }
 }
 ```
+
+**For `search_sweep` tasks**, `steps[]` contains a single summary entry
+with `action: "search_sweep([t1, t2, …])"` and a result that carries an
+extra `per_source_outcomes` map:
+
+```jsonc
+{
+  "i": 1,
+  "action": "search_sweep([any_log, stone, iron_ore])",
+  "result": {
+    "success": false,
+    "kind": "sweep_exhausted",
+    "message": "All sources exhausted at radius 511: any_log, stone, iron_ore",
+    "per_source_outcomes": {
+      "any_log":  "exhausted",
+      "stone":    "found_not_reached",
+      "iron_ore": "soft_skipped"
+    }
+  }
+}
+```
+
+The per-radius `!searchForBlock` / `!searchForEntity` calls are NOT in
+the task_trace steps — they're logged separately into
+`rollout_trace.json` via `log.am(...)` calls inside
+`run_breadth_first_sweep`. `project_failed_steps` (in `trace.js`)
+forwards `per_source_outcomes` to the failure_replanner LLM alongside
+the other surfaced context fields.
 
 A successful rollout (see e.g. `rollouts/smelt_an_iron_ingot_success/`)
 consists of:
@@ -556,3 +689,21 @@ consists of:
   whether they belong in `is_pathfinding_failure` (bail) or
   `PLAN_TERMINATING_KINDS` (end current plan only, continue to next
   attempt). The two have very different effects on recovery duration.
+- **Sweep tasks bypass `mediate_action`.** `'search_sweep'` action_type
+  is intentionally NOT in `mediate_action`'s switch — the dispatcher in
+  `execute_task_action` short-circuits to `handle_search_sweep` before
+  mediation runs. If you add the action_type to `mediate_action`'s
+  switch, the dispatcher's branch will still win, but you've introduced
+  dead code. The `default: throw` in `mediate_action` is a fail-safe
+  against future regressions where the dispatcher is bypassed.
+- **`search_replanner` takes a list of candidate targets**, not a single
+  string. Single-target callers (the non-sweep `search_exhausted` branch
+  in `actions.js`) wrap their argument as `[search_target]`. The sweep
+  handler passes `sources_exhausted` directly. Internally,
+  `any_target_now_in_nearby` expands abstracts via `expand_search_item`
+  so an `any_log` candidate is satisfied by any concrete log appearing
+  in nearby state.
+- **Sweep is one inner-loop attempt** (D7). The whole breadth-first
+  sweep counts as one slot in `max_inner_retries`, not N targets × 5
+  retries. Without this the budget would vanish instantly on any
+  multi-target sweep.

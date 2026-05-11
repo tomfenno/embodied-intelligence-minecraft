@@ -8,7 +8,7 @@ import {get_item_batch_size} from '../recipe_utils.js';
 
 import {recover_failed_task} from './failure_replanner.js';
 import {make_spl} from './log.js';
-import {check_search_complete, parse_search_command, run_search} from './search.js';
+import {check_search_complete, parse_search_command, run_breadth_first_sweep, run_search} from './search.js';
 import {recover_failed_search} from './search_replanner.js';
 import {create_command_success_result, create_step_result, normalize_result_message, project_failed_steps} from './trace.js';
 
@@ -42,6 +42,15 @@ function has_recoverable_failure(task_trace) {
 export async function execute_task_action(
     task, agent, log, model = null, graph = null,
     model_search_replanner = null, breadcrumb_tracker = null) {
+  // Multi-target search sweep tasks are inherently multi-command and
+  // bypass `mediate_action` (which is single-command oriented). Handled
+  // inline by handle_search_sweep before any per-attempt mediation runs.
+  if (task.action_type === 'search_sweep') {
+    return await handle_search_sweep(
+        task, agent, log, model, graph, model_search_replanner,
+        breadcrumb_tracker);
+  }
+
   const task_trace = create_task_trace(task, log);
 
   // Snapshot inventory once at task start so trace steps and the failure
@@ -103,8 +112,11 @@ export async function execute_task_action(
         if (model_search_replanner != null && breadcrumb_tracker != null) {
           spl.log(`Search exhausted for "${
               search_target}" — invoking search_replanner.`);
+          // search_replanner takes a list of candidate targets. The non-
+          // sweep path wraps its single target in an array; the sweep
+          // handler (Phase 2) will pass the full exhausted candidate list.
           const search_recovery = await recover_failed_search(
-              search_target, agent, model_search_replanner,
+              [search_target], agent, model_search_replanner,
               breadcrumb_tracker, log, task);
           if (search_recovery === 'success') {
             spl.log('Search replanner relocated bot — retrying task.');
@@ -224,6 +236,100 @@ export async function execute_task_action(
   if (model)
     return await recover_failed_task(
         task_trace, agent, model, graph, log, baseline_inventory);
+  return 'fail';
+}
+
+/**
+ * Handles `action_type: 'search_sweep'` tasks (emitted by tier 4 in
+ * `tasks.js:make_fallback_search_sweep_task`). The whole sweep is one
+ * inner-loop attempt (D7); it runs `run_breadth_first_sweep` across the
+ * full target list at breadth-first radii. Any one success exits; only
+ * when every target exhausts at every radius do we escalate to
+ * `search_replanner` with the full list (D3), then to `failure_replanner`
+ * if that also fails.
+ *
+ * Trace shape: a single summary step with action
+ * `search_sweep([t1, t2, …])` and a result kind of either
+ * `sweep_target_found` or `sweep_exhausted`. The per-radius
+ * `!searchForBlock` / `!searchForEntity` commands are logged separately
+ * into the rollout_trace via `log.am(...)` calls inside the breadth-first
+ * helper — they're visible in `rollout_trace.json` but don't bloat the
+ * task_trace.
+ */
+async function handle_search_sweep(
+    task, agent, log, model, graph, model_search_replanner,
+    breadcrumb_tracker) {
+  const task_trace = create_task_trace(task, log);
+  const baseline_inventory = {...(get_am_state(agent).inventory ?? {})};
+
+  const sources = task.parameters.targets.map(t => t.source);
+  const targets_display = sources.join(', ');
+  spl.log(`Search sweep starting: targets=[${targets_display}]`);
+
+  const sweep_step = {
+    i: 1,
+    state: get_recovery_trace_state(agent, baseline_inventory),
+    action: `search_sweep([${targets_display}])`,
+    result: null,
+  };
+  task_trace.steps.push(sweep_step);
+
+  const searched_targets = new Set();
+  const sweep_result = await run_breadth_first_sweep(
+      sources, agent, log, searched_targets, /*start_attempt=*/ 0);
+
+  if (sweep_result.found) {
+    spl.log(`Sweep found "${sweep_result.item}" (from "${
+        sweep_result.source}") — SPL outer loop will resume.`);
+    sweep_step.result = create_step_result(
+        true, 'sweep_target_found',
+        `Found "${sweep_result.item}" via candidate "${sweep_result.source}"`);
+    // Per-source outcomes surface which sources won, which were tried,
+    // and which were never reached. Useful for offline analysis and any
+    // downstream consumers (e.g. failure_replanner if a future
+    // success-side recovery path is wired).
+    sweep_step.result.per_source_outcomes = sweep_result.outcomes;
+    return finalize_task_trace(
+        task_trace, agent, log, 'success', 'sweep_target_found',
+        baseline_inventory);
+  }
+
+  // All sources exhausted at all radii. Per D3, escalate to search_replanner
+  // with the FULL exhausted list — the LLM picks a relocation strategy that
+  // helps any one of them, rather than committing to vertex-0.
+  spl.log(`Sweep exhausted: [${sweep_result.sources_exhausted.join(', ')}]`);
+  sweep_step.result = create_step_result(
+      false, 'sweep_exhausted',
+      `All sources exhausted at radius 511: ${
+          sweep_result.sources_exhausted.join(', ')}`);
+  // Per-source outcomes distinguish exhaustion-at-max-radius from
+  // found-not-reached (pathfinder failed) from soft-skipped (unsupported
+  // abstract). Surfaces this info into project_failed_steps for the
+  // failure_replanner fall-through.
+  sweep_step.result.per_source_outcomes = sweep_result.outcomes;
+
+  if (model_search_replanner != null && breadcrumb_tracker != null) {
+    spl.log('Invoking search_replanner with full exhausted target list.');
+    const recovery = await recover_failed_search(
+        sweep_result.sources_exhausted, agent, model_search_replanner,
+        breadcrumb_tracker, log, task);
+    if (recovery === 'success') {
+      spl.log(
+          'Search replanner relocated bot — sweep task succeeds by proxy.');
+      return finalize_task_trace(
+          task_trace, agent, log, 'success', 'sweep_replanner_relocated',
+          baseline_inventory);
+    }
+    spl.log(
+        'Search replanner failed — falling through to failure_replanner.');
+  }
+
+  finalize_task_trace(
+      task_trace, agent, log, 'fail', 'sweep_exhausted', baseline_inventory);
+  if (model) {
+    return await recover_failed_task(
+        task_trace, agent, model, graph, log, baseline_inventory);
+  }
   return 'fail';
 }
 

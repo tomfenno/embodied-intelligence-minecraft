@@ -29,7 +29,7 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
   //    `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
   // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
-  // './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
+  //    './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
   // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
   // './achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
   graph = load_graph ? await load_graph_from_file(graph_file_path) :
@@ -186,12 +186,22 @@ function get_source_candidates(subgraph, original_graph, agent, log) {
 
     const original_vertex =
         original_vertex_map.get(subgraph_vertex.id) ?? subgraph_vertex;
+    // Scale consumed-edge qty by the remaining-work ratio. Satisfied inputs
+    // come from the original graph (pruned edges) and otherwise carry the
+    // full original recipe qty — so when SCSG reduces a sink (e.g. iron_ingot
+    // 3 → 2 because inventory already has 1), the smelt task would otherwise
+    // still ask for 3 raw_iron and 3 fuel. Non-quantitative dependencies
+    // (workstation, tool) keep their original qty.
+    const remaining_scale =
+        original_vertex.qty > 0 ? subgraph_vertex.qty / original_vertex.qty : 1;
     const satisfied_inputs =
         (original_incoming.get(subgraph_vertex.id) ?? [])
             .filter(edge => !edge_in_subgraph(edge, subgraph_edge_set))
             .map(({from, qty, type, consumed}) => ({
                    item: from,
-                   qty,
+                   qty: consumed ?
+                       Math.max(1, Math.ceil(qty * remaining_scale)) :
+                       qty,
                    type,
                    consumed,
                  }));
