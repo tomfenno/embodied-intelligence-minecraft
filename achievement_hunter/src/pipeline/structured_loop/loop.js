@@ -8,6 +8,7 @@ import {compute_scsg} from '../scsg.js';
 import {generate_primary_task_dag_self_refined} from '../self_refine.js';
 
 import {execute_task_action} from './actions.js';
+import {BreadcrumbTracker} from './breadcrumbs.js';
 import {build_incoming_edge_map, edge_in_subgraph, edge_key,} from './graph.js';
 import {make_spl} from './log.js';
 import {make_fallback_acquisition_task, select_next_task, try_make_craft_task, try_make_immediate_acquisition_task, try_make_interact_task, try_make_smelt_task,} from './tasks.js';
@@ -46,9 +47,18 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   let death_pending = false;
   let post_respawn_promise = Promise.resolve();
 
+  const breadcrumb_tracker = new BreadcrumbTracker(agent, {
+    min_dist: 24,
+    recent_pool_size: 16,
+    landmark_pool_size: 48,
+    period_ms: 1000,
+  });
+  breadcrumb_tracker.start();
+
   const on_death = () => {
     spl.log('Bot died — awaiting respawn to recompute SCSG.');
     death_pending = true;
+    breadcrumb_tracker.reset();
     post_respawn_promise = new Promise(
         resolve => bot.once('spawn', () => setTimeout(resolve, 500)));
   };
@@ -64,6 +74,10 @@ export async function structured_loop(models, agent, task_name, graph = null) {
         consecutive_failures = 0;
         continue;
       }
+
+      // TEMP (Phase 1 verification): drop after confirming cadence.
+      spl.log(
+          `breadcrumbs held: ${breadcrumb_tracker.get_breadcrumbs().length}`);
 
       const state_conditioned_subgraph =
           build_state_conditioned_subgraph(graph, agent, log);
@@ -101,6 +115,7 @@ export async function structured_loop(models, agent, task_name, graph = null) {
     }
   } finally {
     bot.off('death', on_death);
+    breadcrumb_tracker.stop();
   }
 
   spl.error('Max outer retries exceeded. Aborting.');
