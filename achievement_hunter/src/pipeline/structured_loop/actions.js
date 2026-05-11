@@ -484,9 +484,12 @@ export function is_successful_command_result(result) {
     return false;
   }
 
-  if (/Collected 0 \S/.test(result.message ?? '')) {
-    return false;
-  }
+  // The legacy /Collected 0 \S/ message filter was removed when the
+  // !collectBlocks verifier shipped in Phase 1 of the command_verifier
+  // plan. The verifier checks the actual inventory delta in
+  // `executeCommandWithModeRecovery` and flips `success: false` when no
+  // blocks were collected — so this function no longer needs to detect
+  // it via message regex.
 
   return true;
 }

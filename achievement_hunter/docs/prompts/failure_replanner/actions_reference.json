@@ -8,7 +8,7 @@
   },
   {
     "name": "!goToCoordinates",
-    "description": "Go to the given x, y, z location.",
+    "description": "Go to the given x, y, z location within the given closeness value.",
     "category": "movement",
     "constraints": {
       "y": {
@@ -16,10 +16,11 @@
         "max": 320
       },
       "closeness": {
-        "min": 0
+        "min": 0,
+        "recommended use": "Use as large of a closeness value to maximize the chance of success. Closeness values near 1 are much more likely to fail than larger closeness values."
       },
       "horizontal_distance_from_current_position": {
-        "max": 500,
+        "max": 250,
         "metric": "euclidean",
         "applies_to": ["x", "z"],
         "description": "The target x/z coordinate must be within 500 horizontal blocks of the agent's current x/z position."
@@ -27,6 +28,7 @@
       "max_uses_per_recovery_plan": 1
     },
     "examples": [
+      "!goToCoordinates(x, y, z, closeness)",
       "!goToCoordinates(100, 64, -200, 1)",
       "!goToCoordinates(0, 70, 0, 3)"
     ]

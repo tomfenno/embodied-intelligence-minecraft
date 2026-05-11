@@ -1,4 +1,5 @@
 import {executeCommand} from '../../../src/agent/commands/index.js';
+import {extract_command_name, required_pre_state, snapshot_state, verify_command_outcome} from './command_verifier.js';
 
 const MAX_MODE_INTERRUPTS = 5;
 const MODE_IDLE_TIMEOUT_MS = 30_000;
@@ -6,48 +7,24 @@ const MODE_IDLE_TIMEOUT_MS = 30_000;
 const log = (...args) => console.log('[SPL][cmd]', ...args);
 const warn = (...args) => console.warn('[SPL][cmd]', ...args);
 
-// Mineflayer's pathfinder skill (and its callers like searchForBlock /
-// goToCoordinates / goToNearestBlock) catches its own errors and returns
-// false. Upstream `runAsAction` ignores that boolean and reports
-// `success: true` whenever the wrapped function completes without
-// throwing — so a navigation command that bailed mid-path shows up here
-// as success-with-bail-message. We reclassify those for the commands in
-// `NAVIGATION_ONLY_COMMANDS` only; multi-phase commands (collectBlocks,
-// craftRecipe, attack, etc.) can have pathfinder warnings appear in the
-// message from an intermediate phase while ultimately succeeding, so the
-// reclassification stays narrowly scoped.
+// Regex still exported because `is_pathfinding_failure` in
+// `search_replanner.js` uses it to classify command_failure result
+// **kinds** for the D11 escape path (a separate concern from the
+// success/failure decision that used to live here).
+//
+// As of Phase 2 of the command_verifier rollout, no command in
+// achievement_hunter uses this regex for success-flag reclassification
+// anymore — every nav command has a post-condition verifier instead.
+// The legacy `looks_like_pathfinder_bail_success` and
+// `NAVIGATION_ONLY_COMMANDS` were dead code and have been removed.
 //
 // Note: `Took to long` is the literal upstream typo. Do not "fix" the
 // spelling — the regex must match what the skill actually emits.
 export const PATHFINDING_MESSAGE_REGEX =
     /no path|PathStopped|Could not find a path|Path not found|Pathfinding stopped|Took to long to decide path/i;
 
-// !searchForBlock and !searchForEntity are intentionally NOT in this set,
-// even though they're nav commands. Their messages can contain
-// intermediate pathfinder warnings ("Path not found, but attempting to
-// navigate anyway") followed by a successful "You have reached" line —
-// regex-on-whole-message would flip legitimate successes to failure.
-// Search commands instead use a post-condition check
-// (`check_search_complete`) in `search.js:execute_search_command`, which
-// is the only honest signal of "did the search succeed".
-const NAVIGATION_ONLY_COMMANDS = new Set([
-  '!goToCoordinates',
-  '!moveAway',
-  '!digDown',
-  '!goToSurface',
-]);
-
-function extract_command_name(command) {
-  const match = typeof command === 'string' ? command.match(/^(!\w+)/) : null;
-  return match?.[1] ?? null;
-}
-
-function looks_like_pathfinder_bail_success(command, result) {
-  if (result?.success !== true) return false;
-  if (typeof result?.message !== 'string') return false;
-  if (!NAVIGATION_ONLY_COMMANDS.has(extract_command_name(command))) return false;
-  return PATHFINDING_MESSAGE_REGEX.test(result.message);
-}
+// `extract_command_name` lives in `command_verifier.js` now (imported
+// above) — single source of truth for parsing command strings.
 
 /**
  * Executes a bot command, transparently retrying if a survival mode
@@ -70,16 +47,37 @@ export async function executeCommandWithModeRecovery(
   const interrupt_counts_by_mode = {};
   const position_before = agent.bot.entity.position.clone();
 
+  // Pre-state snapshot for the post-condition verifier (if a verifier
+  // is registered for this command). Commands without a verifier get
+  // `EMPTY_NEEDS` → snapshot_state returns `{}` → no work done.
+  const verifier_needs = required_pre_state(command);
+  const verifier_pre_state = snapshot_state(agent, verifier_needs);
+
   while (true) {
     const result = await executeCommand(agent, command);
 
     if (result?.success === true) {
-      if (looks_like_pathfinder_bail_success(command, result)) {
+      // Post-condition verifier check. `verify_command_outcome`
+      // short-circuits to `{verified: false}` for unregistered
+      // commands, so this is a cheap pass-through there. Registered
+      // verifiers with `needs: new Set()` (e.g. !goToSurface, which
+      // reads surroundings directly off `agent`) are still consulted —
+      // we don't gate on `verifier_needs.size > 0`.
+      const verifier_post_state = snapshot_state(agent, verifier_needs);
+      const verdict = verify_command_outcome(
+          command, verifier_pre_state, verifier_post_state, agent);
+      if (verdict.verified && !verdict.ok) {
         warn(
-            'Reclassifying pathfinder-bail "success" as failure for nav command:',
-            command);
-        return {...result, success: false};
+            `Verifier reclassified "${command}" as failure: ${
+                verdict.reason}`);
+        return {
+          ...result,
+          success: false,
+          message: `verifier_failed:${verdict.reason} | ${
+              result.message ?? ''}`,
+        };
       }
+
       return result;
     }
 

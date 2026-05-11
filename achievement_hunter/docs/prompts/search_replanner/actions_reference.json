@@ -1,7 +1,7 @@
 [
   {
     "name": "!goToCoordinates",
-    "description": "Go to the given x, y, z location.",
+    "description": "Go to the given x, y, z location within the given closeness value.",
     "category": "movement",
     "constraints": {
       "y": {
@@ -9,17 +9,19 @@
         "max": 320
       },
       "closeness": {
-        "min": 0
+        "min": 0,
+        "recommended use": "Use as large of a closeness value as to maximize the chance of success. Closeness values near 1 are much more likely to fail than larger closeness values."
       },
       "horizontal_distance_from_current_position": {
-        "max": 500,
+        "max": 250,
         "metric": "euclidean",
         "applies_to": ["x", "z"],
-        "description": "The target x/z coordinate must be within 500 horizontal blocks of the agent's current x/z position. Pick a destination that meaningfully changes the bot's situation rather than a small nudge."
+        "description": "The target x/z coordinate must be within 500 horizontal blocks of the agent's current x/z position."
       },
-      "max_uses_per_plan": 1
+      "max_uses_per_recovery_plan": 1
     },
     "examples": [
+      "!goToCoordinates(x, y, z, closeness)",
       "!goToCoordinates(100, 64, -200, 1)",
       "!goToCoordinates(0, 70, 0, 3)"
     ]
@@ -35,7 +37,11 @@
       "exhaustion_is_terminal_at_position": "If !search returns 'search_exhausted', re-issuing !search from the same position will fail identically. The bot must relocate (via !goToCoordinates, !digDown, or !goToSurface) before another !search will yield new results.",
       "no_repeat_in_sequence": "Two !search actions with the same exact target string in one plan without a relocation between them will short-circuit to 'search_already_attempted'."
     },
-    "examples": ["!search(\"chicken\")", "!search(\"diamond_ore\")", "!search(\"any_log\")"]
+    "examples": [
+      "!search(\"chicken\")",
+      "!search(\"diamond_ore\")",
+      "!search(\"any_log\")"
+    ]
   },
   {
     "name": "!digDown",

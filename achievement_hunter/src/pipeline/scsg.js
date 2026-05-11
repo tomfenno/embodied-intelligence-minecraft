@@ -1,4 +1,4 @@
-import {ABSTRACT_CLASS_MEMBERS} from './mc_sources.js';
+import {ABSTRACT_CLASS_MEMBERS, ITEM_SYNONYMS} from './mc_sources.js';
 
 // Compute the remaining-work subgraph for the current inventory state.
 export function compute_scsg(graph, inventory) {
@@ -92,13 +92,28 @@ function update_quantities_and_prune(removed_vertices, graph) {
 }
 
 // Count concrete or abstract inventory for an item id.
+// - Abstract ids (`any_*`): sum across ABSTRACT_CLASS_MEMBERS.
+// - Concrete ids with synonyms (e.g. `egg` ↔ `brown_egg` ↔ `blue_egg`):
+//   sum across ITEM_SYNONYMS members so the SCSG treats functionally-
+//   interchangeable items as one. The synonym relation is symmetric —
+//   a graph asking for `brown_egg` is also satisfied by `egg` /
+//   `blue_egg`.
+// - Plain concrete ids: direct inventory lookup.
 function inventory_count(id, inventory) {
-  if (!id.startsWith('any_')) return inventory[id] ?? 0;
-  let total = 0;
-  for (const member_id of ABSTRACT_CLASS_MEMBERS[id] ?? []) {
-    total += inventory[member_id] ?? 0;
+  if (id.startsWith('any_')) {
+    let total = 0;
+    for (const member_id of ABSTRACT_CLASS_MEMBERS[id] ?? []) {
+      total += inventory[member_id] ?? 0;
+    }
+    return total;
   }
-  return total;
+  const synonyms = ITEM_SYNONYMS[id];
+  if (synonyms) {
+    let total = 0;
+    for (const synonym of synonyms) total += inventory[synonym] ?? 0;
+    return total;
+  }
+  return inventory[id] ?? 0;
 }
 
 // Check whether inventory meets a vertex quantity.

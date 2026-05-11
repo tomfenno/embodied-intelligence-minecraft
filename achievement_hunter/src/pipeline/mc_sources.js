@@ -1,3 +1,29 @@
+// Synonym groups: items that are functionally interchangeable in
+// recipes / SCSG inventory checks. Distinct from `ABSTRACT_CLASS_MEMBERS`
+// in that these are *concrete* item names (no `any_*` prefix) — when a
+// PTD graph asks for "egg", we want any egg variant in the bot's
+// inventory to count.
+//
+// Each entry maps an item name → the set of all interchangeable items
+// (including itself). Membership is symmetric: any member can stand in
+// for any other.
+//
+// Currently used for the 1.21.5+ chicken-variant eggs:
+//   - egg        (temperate chicken)
+//   - brown_egg  (warm chicken)
+//   - blue_egg   (cold chicken)
+// All three function identically for cake / pumpkin_pie / etc.
+const _SYNONYM_GROUPS = [
+  ['egg', 'brown_egg', 'blue_egg'],
+];
+export const ITEM_SYNONYMS = (() => {
+  const out = {};
+  for (const group of _SYNONYM_GROUPS) {
+    for (const member of group) out[member] = group;
+  }
+  return out;
+})();
+
 export const ABSTRACT_CLASS_MEMBERS = {
   any_log: [
     'oak_log',

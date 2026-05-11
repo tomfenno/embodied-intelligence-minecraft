@@ -559,6 +559,69 @@ const QUERY_TEMPLATES = [
 ];
 
 // --------------------------------------------------------------------------
+// Verifier templates
+// --------------------------------------------------------------------------
+//
+// `command_verifier.js` (see `command_verifier_plan.md`) reclassifies
+// success-with-bad-postcondition results as `success: false` and
+// prepends `verifier_failed:<reason>` to the message. These templates
+// catch the reclassified messages and assign a semantic kind so the
+// experiment metrics (dependency_error_rate, etc.) reflect what really
+// went wrong instead of falling into a generic-failure bucket.
+//
+// Each template is scoped via `actions` to its specific command — the
+// same verifier reason can mean different things for different commands
+// (e.g. `no_inventory_delta` from !collectBlocks vs !craftRecipe has
+// different root causes).
+
+const VERIFIER_TEMPLATES = [
+  // Inventory-delta verifiers.
+  t('verifier.collect_no_delta',
+    /^verifier_failed:no_inventory_delta/m,
+    KIND.DEPENDENCY_TARGET_UNREACHABLE, 'command_verifier.js',
+    ['!collectBlocks']),
+  t('verifier.craft_no_delta',
+    /^verifier_failed:no_inventory_delta/m,
+    KIND.DEPENDENCY_RESOURCE, 'command_verifier.js', ['!craftRecipe']),
+  t('verifier.smelt_no_delta',
+    /^verifier_failed:no_\w+_delta/m,
+    KIND.DEPENDENCY_RESOURCE, 'command_verifier.js',
+    ['!smelt_item', '!smeltItem']),
+
+  // Inventory-decrease verifiers.
+  t('verifier.place_blocked',
+    /^verifier_failed:item_still_in_inventory/m,
+    KIND.DEPENDENCY_ENVIRONMENT, 'command_verifier.js', ['!placeHere']),
+  t('verifier.consume_failed',
+    /^verifier_failed:item_still_in_inventory/m,
+    KIND.AGENT_STATE, 'command_verifier.js', ['!consume']),
+
+  // Position-based nav verifiers.
+  t('verifier.goto_off_target',
+    /^verifier_failed:[\d.]+_blocks_off_target/m,
+    KIND.DEPENDENCY_TARGET_UNREACHABLE, 'command_verifier.js',
+    ['!goToCoordinates']),
+  t('verifier.moveaway_stuck',
+    /^verifier_failed:no_movement/m,
+    KIND.DEPENDENCY_TARGET_UNREACHABLE, 'command_verifier.js', ['!moveAway']),
+  t('verifier.digdown_blocked',
+    /^verifier_failed:no_descent/m,
+    KIND.DEPENDENCY_ENVIRONMENT, 'command_verifier.js', ['!digDown']),
+  t('verifier.surface_obstructed',
+    /^verifier_failed:block_above_head:/m,
+    KIND.DEPENDENCY_TARGET_UNREACHABLE, 'command_verifier.js',
+    ['!goToSurface']),
+
+  // Entity-state verifiers.
+  t('verifier.attack_no_drop',
+    /^verifier_failed:no_drop_for_/m,
+    KIND.DEPENDENCY_ENTITY_NOT_FOUND, 'command_verifier.js', ['!attack']),
+  t('verifier.equip_failed',
+    /^verifier_failed:held=/m,
+    KIND.AGENT_STATE, 'command_verifier.js', ['!equip']),
+];
+
+// --------------------------------------------------------------------------
 // Catalog
 // --------------------------------------------------------------------------
 
@@ -568,6 +631,7 @@ export const TEMPLATES = [
   ...ACTION_DIRECT_TEMPLATES,
   ...SKILL_TEMPLATES,
   ...QUERY_TEMPLATES,
+  ...VERIFIER_TEMPLATES,
 ];
 
 export const TEMPLATES_BY_ID =

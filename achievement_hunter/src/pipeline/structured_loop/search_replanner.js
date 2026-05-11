@@ -357,9 +357,13 @@ export async function recover_failed_search(
         log?.search_recovery_action_result?.(attempt, i, result);
 
         if (result.success) break;
-        if (is_pathfinding_failure(result)) break;
         if (PLAN_TERMINATING_KINDS.has(result.kind)) break;
-        // else: retry
+        // Pathfinding failures (mode_interrupted / runner_exception /
+        // command_failure with bail message) used to break out here. They
+        // now fall through into the retry loop — the wasted attempts are
+        // bounded by MAX_ACTION_RETRIES and the small chance of a
+        // different outcome (slightly different bot position, world
+        // state) is worth it before abandoning the plan.
       }
 
       action_results.push(result);
@@ -374,16 +378,17 @@ export async function recover_failed_search(
         break;
       }
 
-      if (is_pathfinding_failure(result)) {
-        attempt_outcome = 'pathfinding_bail';
-        break;
-      }
-
-      if (PLAN_TERMINATING_KINDS.has(result.kind)) {
-        // End this plan, but continue to the next attempt with the same
-        // summary added to previous_summaries below.
-        break;
-      }
+      // Pathfinding failures and plan-terminating kinds both end the
+      // current plan, but neither aborts the recovery. The outer
+      // attempt loop continues with a fresh LLM-generated plan
+      // informed by previous_summaries — only after exhausting
+      // MAX_SEARCH_REPLANNER_ATTEMPTS does the recovery bail to
+      // failure_replanner via finalize('fail', ...). This is the
+      // current iteration of D11 (the original D11 short-circuited
+      // immediately on pathfinding failure; that was too aggressive
+      // and burned through legitimate recovery opportunities).
+      if (is_pathfinding_failure(result)) break;
+      if (PLAN_TERMINATING_KINDS.has(result.kind)) break;
     }
 
     attempts_log.push({
@@ -398,11 +403,10 @@ export async function recover_failed_search(
       return finalize('success', 'target_reached');
     }
 
-    if (attempt_outcome === 'pathfinding_bail') {
-      spl.warn('Pathfinding failure during plan — bailing to failure_replanner.');
-      return finalize('fail', 'pathfinding_failure');
-    }
-
+    // Plan ended without finding any candidate. Push the summary so the
+    // next attempt's LLM call can adapt, and loop. If this was the last
+    // attempt, the for-loop exits and falls through to the exhausted-
+    // recovery path below.
     previous_summaries.push({
       attempt,
       summary: replanner_output.summary,
