@@ -39,6 +39,7 @@ const LIVE_FILE = {
   SCSG: 'current_scsg.md',
   DASHBOARD: 'current_rollout.md',
   LEGACY_DASHBOARD: 'current_graphs.md',
+  BREADCRUMBS: 'current_breadcrumbs.md',
 };
 
 const PLACEHOLDER = {
@@ -48,6 +49,7 @@ const PLACEHOLDER = {
   CANDIDATES: '_Candidates not yet computed._',
   TASK: '**Current Task**\n\n_No task selected yet._',
   AM: '**Current Action**\n\n_No action executed yet._',
+  BREADCRUMBS: '# Breadcrumbs\n\n_No breadcrumbs recorded yet._\n',
 };
 
 // ── Generic helpers
@@ -148,6 +150,11 @@ function render_elapsed_panel(elapsed, status) {
 function format_recovery_command(action) {
   const args = (action.args ?? []).map(a => JSON.stringify(a)).join(', ');
   return `${action.name}(${args})`;
+}
+
+function format_kind_list(kinds) {
+  if (!kinds || kinds.length === 0) return '_(none)_';
+  return escape_markdown(kinds.join(', '));
 }
 
 // Strips fields whose value would be the structural default so the persisted
@@ -388,6 +395,32 @@ const stage_renderer = {
     return parts.join('');
   },
 
+  breadcrumbs(breadcrumbs) {
+    if (!breadcrumbs || breadcrumbs.length === 0) {
+      return PLACEHOLDER.BREADCRUMBS;
+    }
+
+    const lines = [
+      header(
+          'Breadcrumbs',
+          `${breadcrumbs.length} held · sorted by distance from bot (closest first)`),
+      '| # | Coords | Biome | Nearby blocks | Nearby mobs |',
+      '|---|--------|-------|---------------|-------------|',
+    ];
+
+    for (let i = 0; i < breadcrumbs.length; i++) {
+      const b = breadcrumbs[i];
+      const coords = `(${Math.round(b.x)}, ${Math.round(b.y)}, ${
+          Math.round(b.z)})`;
+      const biome = b.biome ? escape_markdown(b.biome) : '_(unknown)_';
+      const blocks = format_kind_list(b.nearby_block_kinds);
+      const mobs = format_kind_list(b.nearby_mob_kinds);
+      lines.push(`| ${i + 1} | ${coords} | ${biome} | ${blocks} | ${mobs} |`);
+    }
+
+    return lines.join('\n') + '\n';
+  },
+
   recovery_actions(recovery) {
     if (!recovery) return PLACEHOLDER.AM;
     const current = recovery.attempts.at(-1);
@@ -548,6 +581,7 @@ export function createRolloutLogger(objective) {
 
   live_writer.remove_file(LIVE_FILE.LEGACY_DASHBOARD);
   live_writer.write_file(LIVE_FILE.PTD_REFINEMENT, PLACEHOLDER.PTD_REFINEMENT);
+  live_writer.write_file(LIVE_FILE.BREADCRUMBS, PLACEHOLDER.BREADCRUMBS);
 
   // ── Private helpers
   // ───────────────────────────────────────────────────────────
@@ -763,6 +797,23 @@ export function createRolloutLogger(objective) {
       record_stage({stage: STAGE.RECOVERY, type: 'end', status: final_status});
       live_state.recovery = null;
       render_live();
+    },
+
+    // Snapshots the current breadcrumb map. Not recorded as a stage — this is
+    // a continuously-overwritten view, not an event. Persists JSON to the
+    // rollout directory and refreshes the live markdown view.
+    breadcrumbs(breadcrumbs_list) {
+      try {
+        writeFileSync(
+            path.join(rollout_dir, 'breadcrumbs.json'),
+            JSON.stringify(breadcrumbs_list ?? [], null, 2), 'utf8');
+      } catch (e) {
+        console.warn(
+            '[rollout_logger] Failed to write breadcrumbs.json:', e.message);
+      }
+
+      live_writer.write_file(
+          LIVE_FILE.BREADCRUMBS, stage_renderer.breadcrumbs(breadcrumbs_list));
     },
 
     complete(reason) {

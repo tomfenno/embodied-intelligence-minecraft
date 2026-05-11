@@ -72,6 +72,29 @@ export class BreadcrumbTracker {
   }
 
   /**
+   * Repopulates the tracker from a previously-serialized flat breadcrumb
+   * list (e.g. read from the SPL checkpoint after a crash). Pool membership
+   * is not preserved across the save/load boundary — every restored
+   * breadcrumb is fed through `_offer_to_landmarks`, so over-capacity
+   * inputs are trimmed by score and under-capacity inputs all keep.
+   * Recent-pool re-fills naturally as the bot samples new positions.
+   */
+  restore(breadcrumbs_list) {
+    this.reset();
+    if (!Array.isArray(breadcrumbs_list)) return;
+    for (const b of breadcrumbs_list) {
+      this._offer_to_landmarks({
+        x: b.x,
+        y: b.y,
+        z: b.z,
+        biome: b.biome,
+        nearby_block_kinds: b.nearby_block_kinds ?? [],
+        nearby_mob_kinds: b.nearby_mob_kinds ?? [],
+      });
+    }
+  }
+
+  /**
    * Returns RECENT ++ LANDMARKS sorted by horizontal distance from the bot's
    * current position (closest first). Defensive copy — internal `_score`
    * cache is stripped on the way out.

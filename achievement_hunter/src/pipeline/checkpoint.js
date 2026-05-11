@@ -8,23 +8,27 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CHECKPOINT_PATH = path.join(__dirname, '../../rollouts/checkpoint.json');
 
 /**
- * Persists the current SPL objective and PTD graph to disk.
- * Called immediately after PTD succeeds so any subsequent crash
- * can resume from the outer SCSG loop without rebuilding the graph.
+ * Persists the current SPL objective, PTD graph, and (optionally) the
+ * BreadcrumbTracker's current map to disk. Called once after PTD succeeds
+ * (without breadcrumbs) and once per outer loop iteration (with the live
+ * breadcrumb list) so any subsequent crash can resume both the graph and
+ * the exploration map.
  */
-export function saveCheckpoint(objective, graph) {
+export function saveCheckpoint(objective, graph, breadcrumbs = null) {
   mkdirSync(path.dirname(CHECKPOINT_PATH), {recursive: true});
   writeFileSync(
       CHECKPOINT_PATH,
       JSON.stringify(
-          {objective, graph, saved_at: new Date().toISOString()}, null, 2),
+          {objective, graph, breadcrumbs, saved_at: new Date().toISOString()},
+          null, 2),
       'utf8');
-  console.log('[SPL] Checkpoint saved.');
 }
 
 /**
  * Loads a checkpoint from disk.
- * Returns { objective, graph, saved_at } or null if none exists.
+ * Returns { objective, graph, breadcrumbs?, saved_at } or null if none exists.
+ * `breadcrumbs` may be absent or null in legacy checkpoints written before
+ * persistence was added.
  */
 export function loadCheckpoint() {
   if (!existsSync(CHECKPOINT_PATH)) return null;

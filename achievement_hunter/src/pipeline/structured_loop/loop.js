@@ -1,7 +1,7 @@
 import {readFile as read_file} from 'fs/promises';
 
 import {get_nts_state as get_state_for_candidates, get_sgsg_state} from '../agent_state.js';
-import {clearCheckpoint as clear_checkpoint, saveCheckpoint as save_checkpoint,} from '../checkpoint.js';
+import {clearCheckpoint as clear_checkpoint, loadCheckpoint as load_checkpoint, saveCheckpoint as save_checkpoint,} from '../checkpoint.js';
 import {get_canonical_source_for_target, get_grounded_nearby_source, get_source_kind_for_target,} from '../mc_sources.js';
 import {createRolloutLogger as create_rollout_logger} from '../rollout_logger.js';
 import {compute_scsg} from '../scsg.js';
@@ -37,8 +37,6 @@ export async function structured_loop(models, agent, task_name, graph = null) {
                            models, task_name, graph, log);
   if (!graph) return;
 
-  save_checkpoint(task_name, graph);
-
   // Track death within this SPL run. When the bot dies the server cancels all
   // actions; on the next loop iteration we wait for respawn, then let the loop
   // recompute a fresh SCSG against the post-death (empty) inventory. Death is
@@ -53,7 +51,19 @@ export async function structured_loop(models, agent, task_name, graph = null) {
     landmark_pool_size: 48,
     period_ms: 1000,
   });
+
+  // Resume exploration map from a prior checkpoint if it matches this
+  // objective. Mismatched checkpoints (different rollout) are ignored.
+  const prior_checkpoint = load_checkpoint();
+  if (prior_checkpoint?.objective === task_name &&
+      Array.isArray(prior_checkpoint.breadcrumbs)) {
+    breadcrumb_tracker.restore(prior_checkpoint.breadcrumbs);
+    spl.log(`Restored ${
+        prior_checkpoint.breadcrumbs.length} breadcrumbs from checkpoint.`);
+  }
+
   breadcrumb_tracker.start();
+  save_checkpoint(task_name, graph, breadcrumb_tracker.get_breadcrumbs());
 
   const on_death = () => {
     spl.log('Bot died — awaiting respawn to recompute SCSG.');
@@ -75,9 +85,9 @@ export async function structured_loop(models, agent, task_name, graph = null) {
         continue;
       }
 
-      // TEMP (Phase 1 verification): drop after confirming cadence.
-      spl.log(
-          `breadcrumbs held: ${breadcrumb_tracker.get_breadcrumbs().length}`);
+      const current_breadcrumbs = breadcrumb_tracker.get_breadcrumbs();
+      log.breadcrumbs(current_breadcrumbs);
+      save_checkpoint(task_name, graph, current_breadcrumbs);
 
       const state_conditioned_subgraph =
           build_state_conditioned_subgraph(graph, agent, log);
