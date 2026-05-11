@@ -9,6 +9,7 @@ import {get_item_batch_size} from '../recipe_utils.js';
 import {recover_failed_task} from './failure_replanner.js';
 import {make_spl} from './log.js';
 import {check_search_complete, parse_search_command, run_search} from './search.js';
+import {recover_failed_search} from './search_replanner.js';
 import {create_command_success_result, create_step_result, normalize_result_message, project_failed_steps} from './trace.js';
 
 const spl = make_spl('[SPL]');
@@ -39,7 +40,8 @@ function has_recoverable_failure(task_trace) {
 }
 
 export async function execute_task_action(
-    task, agent, log, model = null, graph = null) {
+    task, agent, log, model = null, graph = null,
+    model_search_replanner = null, breadcrumb_tracker = null) {
   const task_trace = create_task_trace(task, log);
 
   // Snapshot inventory once at task start so trace steps and the failure
@@ -89,6 +91,28 @@ export async function execute_task_action(
       current_step.result = await handle_search_action(
           search_target, state, agent, log, attempt_number);
       if (current_step.result.kind === 'search_exhausted') {
+        // Search exhausted at radius 511. Before adding to searched_targets
+        // and falling through to failure_replanner, give the search replanner
+        // a chance to relocate the bot. On success it has moved the bot to a
+        // position where the target is now in nearby state — re-enter the
+        // inner attempt loop so mediation can resolve the task with the new
+        // state. On failure, fall through to the existing failure-replanner
+        // path (pathfinding-class failures in particular bail early from
+        // recover_failed_search so failure_replanner can attempt a different
+        // recovery).
+        if (model_search_replanner != null && breadcrumb_tracker != null) {
+          spl.log(`Search exhausted for "${
+              search_target}" — invoking search_replanner.`);
+          const search_recovery = await recover_failed_search(
+              search_target, agent, model_search_replanner,
+              breadcrumb_tracker, log, task);
+          if (search_recovery === 'success') {
+            spl.log('Search replanner relocated bot — retrying task.');
+            continue;
+          }
+          spl.log(
+              'Search replanner did not recover — falling through to failure_replanner.');
+        }
         searched_targets.add(search_target);  // Only block re-search when not found.
         break;
       }

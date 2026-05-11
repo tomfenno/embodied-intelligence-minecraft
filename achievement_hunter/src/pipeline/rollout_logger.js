@@ -24,6 +24,7 @@ const STAGE = {
   AM: 'AM',
   AM_WARN: 'AM_WARN',
   RECOVERY: 'RECOVERY',
+  SEARCH_RECOVERY: 'SEARCH_RECOVERY',
 };
 
 const SOURCE = {
@@ -40,6 +41,7 @@ const LIVE_FILE = {
   DASHBOARD: 'current_rollout.md',
   LEGACY_DASHBOARD: 'current_graphs.md',
   BREADCRUMBS: 'current_breadcrumbs.md',
+  SEARCH_RECOVERY: 'current_search_recovery.md',
 };
 
 const PLACEHOLDER = {
@@ -50,6 +52,8 @@ const PLACEHOLDER = {
   TASK: '**Current Task**\n\n_No task selected yet._',
   AM: '**Current Action**\n\n_No action executed yet._',
   BREADCRUMBS: '# Breadcrumbs\n\n_No breadcrumbs recorded yet._\n',
+  SEARCH_RECOVERY:
+      '# Search Recovery\n\n_No search recovery currently active._\n',
 };
 
 // ── Generic helpers
@@ -186,6 +190,7 @@ function build_rollout_summary(rollout) {
     tasks_attempted: 0,
     am_attempts: 0,
     recovery_attempts: 0,
+    search_recovery_attempts: 0,
   };
   for (const stage of rollout.stages) {
     if (stage.stage === STAGE.SCSG) summary.outer_iterations += 1;
@@ -193,6 +198,10 @@ function build_rollout_summary(rollout) {
     else if (stage.stage === STAGE.AM) summary.am_attempts += 1;
     else if (stage.stage === STAGE.RECOVERY && stage.type === 'attempt_start') {
       summary.recovery_attempts += 1;
+    } else if (
+        stage.stage === STAGE.SEARCH_RECOVERY &&
+        stage.type === 'attempt_start') {
+      summary.search_recovery_attempts += 1;
     }
   }
   return summary;
@@ -441,6 +450,64 @@ const stage_renderer = {
     }
     return parts.join('');
   },
+
+  search_recovery_status(search_recovery) {
+    if (!search_recovery) return null;
+    const target = escape_markdown(search_recovery.target ?? 'unknown');
+    const current = search_recovery.attempts.at(-1);
+    if (!current) {
+      return `**Search Recovery** _(target: \`${target}\`)_\n\n_Awaiting LLM..._`;
+    }
+
+    const parts = [
+      `**Search Recovery** _(attempt ${current.attempt}, target: \`${
+          target}\`)_\n\n`,
+      `**Summary:** ${escape_markdown(current.summary)}\n\n`,
+      `**Plan:**\n`,
+    ];
+    for (const action of current.planned_actions) {
+      parts.push(`- ${inline_code(format_recovery_command(action))}\n`);
+    }
+
+    const previous = search_recovery.attempts.slice(0, -1);
+    if (previous.length > 0) {
+      parts.push('\n**Previous summaries:**\n');
+      for (const prev of [...previous].reverse()) {
+        parts.push(`- _(attempt ${prev.attempt})_ ${
+            escape_markdown(prev.summary)}\n`);
+      }
+    }
+
+    return parts.join('');
+  },
+
+  search_recovery_actions(search_recovery) {
+    if (!search_recovery) return PLACEHOLDER.AM;
+    const current = search_recovery.attempts.at(-1);
+    if (!current) {
+      return '**Search Recovery Actions**\n\n_Awaiting actions..._';
+    }
+
+    const parts = [
+      `**Search Recovery Actions** _(attempt ${current.attempt})_\n\n`,
+    ];
+    for (let i = 0; i < current.planned_actions.length; i++) {
+      const command =
+          inline_code(format_recovery_command(current.planned_actions[i]));
+      const result = current.results[i];
+      if (!result) {
+        parts.push(`- ⏳ ${command}\n`);
+      } else if (result.success) {
+        parts.push(`- ✅ ${command}\n`);
+      } else {
+        const msg = result.message ?
+            ` — ${escape_markdown(result.message)}` :
+            '';
+        parts.push(`- ❌ ${command}${msg}\n`);
+      }
+    }
+    return parts.join('');
+  },
 };
 
 const am_renderer = {
@@ -577,11 +644,14 @@ export function createRolloutLogger(objective) {
     am_history: [],
     completion: null,
     recovery: null,
+    search_recovery: null,
   };
 
   live_writer.remove_file(LIVE_FILE.LEGACY_DASHBOARD);
   live_writer.write_file(LIVE_FILE.PTD_REFINEMENT, PLACEHOLDER.PTD_REFINEMENT);
   live_writer.write_file(LIVE_FILE.BREADCRUMBS, PLACEHOLDER.BREADCRUMBS);
+  live_writer.write_file(
+      LIVE_FILE.SEARCH_RECOVERY, PLACEHOLDER.SEARCH_RECOVERY);
 
   // ── Private helpers
   // ───────────────────────────────────────────────────────────
@@ -614,20 +684,47 @@ export function createRolloutLogger(objective) {
         stage_renderer.completion(objective, live_state.completion) :
         stage_renderer.scsg(live_state.scsg_result, objective);
 
-    const in_recovery = live_state.recovery != null;
+    // Search recovery takes precedence over failure recovery in dashboard
+    // overrides — the two never actually coexist (search runs first; failure
+    // runs only if search returned 'fail' and was already cleared), but the
+    // explicit precedence keeps the conditional readable.
+    const in_search_recovery = live_state.search_recovery != null;
+    const in_recovery = !in_search_recovery && live_state.recovery != null;
 
-    const candidates_content = rollout.status === STATUS.COMPLETED ? null :
-        in_recovery ? stage_renderer.recovery_status(live_state.recovery) :
-                      stage_renderer.candidates(objective, live_state.candidates);
+    const candidates_content = rollout.status === STATUS.COMPLETED ?
+        null :
+        in_search_recovery ?
+        stage_renderer.search_recovery_status(live_state.search_recovery) :
+        in_recovery ?
+        stage_renderer.recovery_status(live_state.recovery) :
+        stage_renderer.candidates(objective, live_state.candidates);
 
     const task_content = stage_renderer.task(live_state.task_state);
 
-    const am_content = in_recovery ?
+    const am_content = in_search_recovery ?
+        stage_renderer.search_recovery_actions(live_state.search_recovery) :
+        in_recovery ?
         stage_renderer.recovery_actions(live_state.recovery) :
         am_renderer.panel(live_state.am_history);
 
     live_writer.write_file(LIVE_FILE.PTD, ptd_content);
     live_writer.write_file(LIVE_FILE.SCSG, scsg_content || PLACEHOLDER.SCSG);
+
+    // Dedicated standalone view: refreshes whether or not search recovery is
+    // active so the file stays in sync with the dashboard. Clears to the
+    // placeholder once the recovery ends (live_state.search_recovery = null).
+    if (live_state.search_recovery != null) {
+      const status =
+          stage_renderer.search_recovery_status(live_state.search_recovery);
+      const actions =
+          stage_renderer.search_recovery_actions(live_state.search_recovery);
+      live_writer.write_file(
+          LIVE_FILE.SEARCH_RECOVERY,
+          `${status}\n\n---\n\n${actions}\n`);
+    } else {
+      live_writer.write_file(
+          LIVE_FILE.SEARCH_RECOVERY, PLACEHOLDER.SEARCH_RECOVERY);
+    }
 
     live_writer.write_dashboard({
       ptd: ptd_content,
@@ -796,6 +893,49 @@ export function createRolloutLogger(objective) {
     recovery_end(final_status) {
       record_stage({stage: STAGE.RECOVERY, type: 'end', status: final_status});
       live_state.recovery = null;
+      render_live();
+    },
+
+    // Search-replanner equivalents of the recovery_* methods. Kept as a
+    // parallel API rather than discriminator-on-recovery so the live view
+    // can label panels distinctly ("Search Recovery" vs "Recovery") and so
+    // build_rollout_summary can track the two replanner kinds separately.
+    search_recovery_attempt(attempt, task, target, summary, planned_actions) {
+      if (!live_state.search_recovery) {
+        live_state.search_recovery = {task, target, attempts: []};
+      }
+      live_state.search_recovery.attempts.push(
+          {attempt, summary, planned_actions, results: []});
+      record_stage({
+        stage: STAGE.SEARCH_RECOVERY,
+        type: 'attempt_start',
+        attempt,
+        task,
+        target,
+        summary,
+        planned_actions,
+      });
+      render_live();
+    },
+
+    search_recovery_action_result(attempt_num, action_index, result) {
+      const entry = live_state.search_recovery?.attempts.find(
+          a => a.attempt === attempt_num);
+      if (entry) entry.results[action_index] = result;
+      record_stage({
+        stage: STAGE.SEARCH_RECOVERY,
+        type: 'action_result',
+        attempt: attempt_num,
+        action_index,
+        result,
+      });
+      render_live();
+    },
+
+    search_recovery_end(final_status) {
+      record_stage(
+          {stage: STAGE.SEARCH_RECOVERY, type: 'end', status: final_status});
+      live_state.search_recovery = null;
       render_live();
     },
 

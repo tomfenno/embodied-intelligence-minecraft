@@ -25,13 +25,13 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   // This hard coded option to load a graph is intended. Do not remove.
   const load_graph = true;
   const graph_file_path =
-      //    './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
-      //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
-      //    `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
-      // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
-      // './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
-      // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
-      './achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
+      './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
+  //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
+  //    `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
+  // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
+  // './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
+  // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
+  // './achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
   graph = load_graph ? await load_graph_from_file(graph_file_path) :
                        await generate_primary_task_dag_self_refined(
                            models, task_name, graph, log);
@@ -50,6 +50,16 @@ export async function structured_loop(models, agent, task_name, graph = null) {
     recent_pool_size: 16,
     landmark_pool_size: 48,
     period_ms: 1000,
+    // Fires after every successful sample tick (1 Hz), and after restore()
+    // and reset(). Decouples live-view + checkpoint freshness from outer-
+    // loop iteration cadence, which can stall for minutes during long-
+    // running tasks (e.g. a 511-radius search sweep). The rollout logger's
+    // write cache skips redundant writes when the rendered markdown hasn't
+    // changed.
+    on_update: list => {
+      log.breadcrumbs(list);
+      save_checkpoint(task_name, graph, list);
+    },
   });
 
   // Resume exploration map from a prior checkpoint if it matches this
@@ -62,8 +72,12 @@ export async function structured_loop(models, agent, task_name, graph = null) {
         prior_checkpoint.breadcrumbs.length} breadcrumbs from checkpoint.`);
   }
 
-  breadcrumb_tracker.start();
+  // Initial save covers the case where neither restore() nor the first
+  // sample tick has fired yet (no matching prior checkpoint, bot still
+  // spawning). on_update will subsequently refresh the checkpoint on every
+  // sample.
   save_checkpoint(task_name, graph, breadcrumb_tracker.get_breadcrumbs());
+  breadcrumb_tracker.start();
 
   const on_death = () => {
     spl.log('Bot died — awaiting respawn to recompute SCSG.');
@@ -84,10 +98,6 @@ export async function structured_loop(models, agent, task_name, graph = null) {
         consecutive_failures = 0;
         continue;
       }
-
-      const current_breadcrumbs = breadcrumb_tracker.get_breadcrumbs();
-      log.breadcrumbs(current_breadcrumbs);
-      save_checkpoint(task_name, graph, current_breadcrumbs);
 
       const state_conditioned_subgraph =
           build_state_conditioned_subgraph(graph, agent, log);
@@ -114,8 +124,8 @@ export async function structured_loop(models, agent, task_name, graph = null) {
       }
 
       if (await execute_task_action(
-              task, agent, log, models.failure_replanner, graph) ===
-          'success') {
+              task, agent, log, models.failure_replanner, graph,
+              models.search_replanner, breadcrumb_tracker) === 'success') {
         consecutive_failures = 0;
         continue;
       }

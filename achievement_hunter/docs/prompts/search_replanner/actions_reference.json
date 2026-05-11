@@ -1,0 +1,67 @@
+[
+  {
+    "name": "!goToCoordinates",
+    "description": "Go to the given x, y, z location.",
+    "category": "movement",
+    "constraints": {
+      "y": {
+        "min": -64,
+        "max": 320
+      },
+      "closeness": {
+        "min": 0
+      },
+      "horizontal_distance_from_current_position": {
+        "max": 500,
+        "metric": "euclidean",
+        "applies_to": ["x", "z"],
+        "description": "The target x/z coordinate must be within 500 horizontal blocks of the agent's current x/z position. Pick a destination that meaningfully changes the bot's situation rather than a small nudge."
+      },
+      "max_uses_per_plan": 1
+    },
+    "examples": [
+      "!goToCoordinates(100, 64, -200, 1)",
+      "!goToCoordinates(0, 70, 0, 3)"
+    ]
+  },
+  {
+    "name": "!search",
+    "description": "Search for the nearest block or entity of a given type by sweeping radii 32, 64, 128, 256, 511 from the bot's current position. Equivalent to running a maximum-radius search; there is no broader scan available.",
+    "category": "movement",
+    "constraints": {
+      "target_must_be_concrete": "Pass concrete block or entity names, e.g. \"chicken\", \"diamond_ore\". Abstract category names, e.g. \"any_log\", are not supported and will fail.",
+      "max_search_radius": 511,
+      "plan_terminates_on_success": "As soon as one !search action finds the target AND the bot reaches it, the entire plan ends successfully and execution returns to the structured loop. Subsequent actions in the plan are skipped. Issue !search aggressively — a wasted scan costs only one radius sweep.",
+      "exhaustion_is_terminal_at_position": "If !search returns 'search_exhausted', re-issuing !search from the same position will fail identically. The bot must relocate (via !goToCoordinates, !digDown, or !goToSurface) before another !search will yield new results.",
+      "no_repeat_in_sequence": "Two !search actions for the same target in one plan without a relocation between them will short-circuit to 'search_already_attempted'."
+    },
+    "examples": ["!search(\"chicken\")", "!search(\"diamond_ore\")"]
+  },
+  {
+    "name": "!digDown",
+    "description": "Digs straight down a specified distance from the bot's current position. Stops if it reaches lava, water, or a fall >=4 blocks below the bot.",
+    "category": "movement",
+    "constraints": {
+      "distance": {
+        "min": 1,
+        "max": 32,
+        "recommended_max": 16
+      },
+      "stops_at_lava": true,
+      "stops_at_water": true,
+      "stops_at_drop_gte_4": true,
+      "recommended_use": "Useful for accessing underground biomes when searching for ores or caves. Each !digDown moves the bot 1-32 blocks closer to a different y-level slice, where the next !search will sweep a fresh region."
+    },
+    "examples": ["!digDown(5)", "!digDown(20)"]
+  },
+  {
+    "name": "!goToSurface",
+    "description": "Moves the bot to the highest block above it, usually the surface.",
+    "category": "movement",
+    "constraints": {
+      "only_use_when_below_surface_or_obstructed": true,
+      "recommended_use": "Use after underground searches exhaust to return the bot to surface terrain before heading to a new biome."
+    },
+    "examples": ["!goToSurface()"]
+  }
+]

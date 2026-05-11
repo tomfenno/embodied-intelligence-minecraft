@@ -37,7 +37,9 @@ Do not invent actions or pseudo-actions.
 
 There is no custom-action escape hatch. If the available primitives cannot express the full ideal recovery, output the best bounded primitive sequence that moves the bot closer to completing the failed task.
 
-Do not emit abstract ids such as `any_log`, `any_plank`, or `any_ore` as action arguments. Resolve abstract ids using, in order: task parameters, `final_state` evidence, inventory variants, then common Minecraft defaults.
+`!search` may use the abstract resource convention defined in the PTD prompt: an `any_`-prefixed id (e.g. `any_log`, `any_plank`, `any_wool`) denotes a class of interchangeable in-game equivalents, and is permitted as a `!search` argument when the grouped variants are truly interchangeable for the failed task's requirement.
+
+For all other actions, do not emit abstract ids such as `any_log` or `any_plank` as action arguments. Resolve abstract ids using, in order: task parameters, `final_state` evidence, inventory variants, then common Minecraft defaults.
 
 Use strings, numbers, booleans, or null as action arguments.
 

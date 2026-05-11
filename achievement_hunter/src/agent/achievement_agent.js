@@ -148,6 +148,8 @@ export class AchievementAgent extends Agent {
           profile.ptd_refinement_model || profile.ptd_model || fallback),
       failure_replanner: new LlmClient(
           profile.failure_replanner_model || fallback),
+      search_replanner: new LlmClient(
+          profile.search_replanner_model || fallback),
     };
   }
 

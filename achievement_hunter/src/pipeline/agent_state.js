@@ -101,18 +101,12 @@ export function get_sgsg_state(agent) {
 }
 
 /**
- * Builds the per-step trace state surfaced to the failure_replanner LLM.
- *
- * When `baseline_inventory` is provided, `inv.counts` is reported as the
- * **delta** produced during this task (current minus baseline, positives only)
- * rather than the absolute global inventory. This avoids confusing the LLM
- * when prior tasks already accumulated items above `task.qty` (see BUG 11).
- *
- * Pass `null` (or omit) to get the raw global inventory — used for live
- * debugging, search-result captures, etc.
+ * Builds the `world` + `self` blocks. These come first in both recovery
+ * and search traces; split out so consumers can layer trace-specific
+ * blocks (action / surroundings for recovery; nothing for search) between
+ * `self` and the inventory/nearby block without duplicating ~40 lines.
  */
-export function get_recovery_trace_state(agent, baseline_inventory = null) {
-  const raw_state = get_am_state(agent);
+function _build_world_self_blocks(agent) {
   const bot = agent?.bot;
   const state = {};
 
@@ -144,6 +138,63 @@ export function get_recovery_trace_state(agent, baseline_inventory = null) {
   if (bot?.health != null) self.health = Math.round(bot.health);
   if (bot?.food != null) self.hunger = Math.round(bot.food);
   if (Object.keys(self).length > 0) state.self = self;
+
+  return state;
+}
+
+/**
+ * Builds the `inventory` + `nearby` + `craftable_items` blocks. Mutates
+ * `state` in place so callers control insertion order relative to other
+ * blocks they've added.
+ *
+ * When `baseline_inventory` is provided, `inventory.counts` is reported
+ * as the **delta** produced during this task (current minus baseline,
+ * positives only) rather than the absolute global inventory. This avoids
+ * confusing the failure_replanner LLM when prior tasks already
+ * accumulated items above `task.qty` (see BUG 11). Pass `null` (or omit)
+ * for absolute counts.
+ */
+function _append_inventory_nearby_craftable_blocks(
+    state, agent, baseline_inventory = null) {
+  const raw_state = get_am_state(agent);
+  const bot = agent?.bot;
+
+  const inv = {};
+  if (raw_state?.inventory != null) {
+    inv.counts = baseline_inventory != null ?
+        _inventory_delta(raw_state.inventory, baseline_inventory) :
+        raw_state.inventory;
+  }
+
+  const main_hand = bot?.heldItem?.name ?? null;
+  inv.equipment = {mainHand: main_hand};
+
+  if (Object.keys(inv).length > 0) state.inventory = inv;
+
+  const nearby = {};
+  if (raw_state?.nearby_blocks != null) nearby.blocks = raw_state.nearby_blocks;
+  if (raw_state?.nearby_entities?.mobs != null) {
+    nearby.entityTypes = raw_state.nearby_entities.mobs;
+  }
+  if (Object.keys(nearby).length > 0) state.nearby = nearby;
+
+  if (raw_state?.craftable_items != null) {
+    state.craftable_items = raw_state.craftable_items;
+  }
+}
+
+/**
+ * Builds the per-step trace state surfaced to the failure_replanner LLM.
+ * Key order: world, self, action, surroundings, inventory, nearby,
+ * craftable_items — preserved byte-identical with the pre-refactor
+ * implementation so persisted task_traces stay diff-stable.
+ *
+ * Pass `baseline_inventory` to get task-relative inventory deltas, or
+ * `null` for absolute counts.
+ */
+export function get_recovery_trace_state(agent, baseline_inventory = null) {
+  const state = _build_world_self_blocks(agent);
+  const bot = agent?.bot;
 
   try {
     const action = {};
@@ -179,28 +230,22 @@ export function get_recovery_trace_state(agent, baseline_inventory = null) {
   } catch {
   }
 
-  const inv = {};
-  if (raw_state?.inventory != null) {
-    inv.counts = baseline_inventory != null ?
-        _inventory_delta(raw_state.inventory, baseline_inventory) :
-        raw_state.inventory;
-  }
+  _append_inventory_nearby_craftable_blocks(state, agent, baseline_inventory);
 
-  const main_hand = bot?.heldItem?.name ?? null;
-  inv.equipment = {mainHand: main_hand};
+  return state;
+}
 
-  if (Object.keys(inv).length > 0) state.inventory = inv;
-
-  const nearby = {};
-  if (raw_state?.nearby_blocks != null) nearby.blocks = raw_state.nearby_blocks;
-  if (raw_state?.nearby_entities?.mobs != null) {
-    nearby.entityTypes = raw_state.nearby_entities.mobs;
-  }
-  if (Object.keys(nearby).length > 0) state.nearby = nearby;
-
-  if (raw_state?.craftable_items != null) {
-    state.craftable_items = raw_state.craftable_items;
-  }
-
+/**
+ * Builds the trace state surfaced to the search_replanner LLM.
+ * Key order: world, self, inventory, nearby, craftable_items, breadcrumbs.
+ *
+ * Inventory counts are always absolute — the search replanner needs to
+ * know what tools the bot actually has on hand, not what changed during
+ * a single task.
+ */
+export function get_search_trace_state(agent, breadcrumb_tracker) {
+  const state = _build_world_self_blocks(agent);
+  _append_inventory_nearby_craftable_blocks(state, agent);
+  state.breadcrumbs = breadcrumb_tracker?.get_breadcrumbs?.() ?? [];
   return state;
 }

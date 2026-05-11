@@ -31,15 +31,23 @@ The loop repeatedly:
 4. **Mediates the task into a single bot command** (`!collectBlocks`,
    `!craftRecipe`, `!smelt_item`, `!attack`, `!useOn`, `!placeHere`, or
    `!search…`) and executes it.
-5. If the command fails after inner retries, the **failure replanner** (an
-   LLM) is invoked to propose a short corrective action sequence.
-6. Loops until SCSG is empty (all sinks satisfied), or until
+5. If a `!search` exhausts all radii without finding the target, the
+   **search replanner** (an LLM) is invoked first — it proposes a short
+   navigation-only plan (`!goToCoordinates`, `!digDown`, `!goToSurface`,
+   `!search`) to relocate the bot. If the target ends up in nearby state,
+   control returns to the inner attempt loop. If the replanner exhausts
+   or hits a pathfinding-class failure, fall through to step 6.
+6. If the command fails after inner retries (or step 5 fell through), the
+   **failure replanner** (an LLM) is invoked to propose a short corrective
+   action sequence.
+7. Loops until SCSG is empty (all sinks satisfied), or until
    `max_outer_retries` (10) consecutive failures are accumulated, or until
    `recover_failed_task` returns `fail` after a hard error.
 
 The loop is otherwise fully deterministic: there is **no LLM in the happy
-path**. The LLM is only consulted when a task has exhausted its retries and
-the failure is classified as recoverable.
+path**. The LLMs are only consulted on failure — search replanner on
+search exhaustion, failure replanner on any other recoverable command
+failure.
 
 ---
 
@@ -155,9 +163,14 @@ command via one of:
 1. `mediate_action` → command.
 2. Snapshot a `trace_step` (state + action).
 3. If command is a `!search`, route through `handle_search_action`
-   (see `search.js`). On `search_exhausted`, mark target seen so we don't
-   re-search; on `search_success` or `search_found_not_reached`, continue
-   (the bot may have moved and a follow-up attempt may now succeed).
+   (see `search.js`). On `search_exhausted`, first delegate to
+   `recover_failed_search` (see `search_replanner.js`) — if it returns
+   `'success'` the bot has been relocated and the inner loop `continue`s
+   to retry mediation with the new state. Only if the search replanner
+   also fails do we mark the target seen and break out to the
+   `failure_replanner` path. On `search_success` or
+   `search_found_not_reached`, continue (the bot may have moved and a
+   follow-up attempt may now succeed).
 4. Otherwise call
    `executeCommandWithModeRecovery(agent, action.command)` from
    `../command_utils.js`.
@@ -199,6 +212,52 @@ mitigation).
   - `<rollouts_root>/_datasets/{success|failure}_task_traces.jsonl`
 - Failed traces additionally written as standalone pretty-printed JSON to
   `<rollout_dir>/task_traces/failed/<timestamp>__<action_type>__<target>__fail.json`.
+
+### `breadcrumbs.js` — exploration map
+
+`BreadcrumbTracker` maintains a spatial map of where the bot has been
+during a rollout. Sampled at 1 Hz; a new breadcrumb is recorded only when
+the bot is at least `BREADCRUMB_MIN_DIST = 24` blocks (horizontal) from
+every breadcrumb currently held. Capacity is split across two pools:
+
+- **Recent pool** (FIFO, size 16) — preserves the current trajectory.
+- **Landmark pool** (score-ranked, size 48) — preserves diverse waypoints.
+
+When a breadcrumb ages out of the recent pool it is *offered* to the
+landmark pool: if its score
+(`biome_rarity + block_novelty + spatial_isolation`) beats the weakest
+current landmark, it swaps in. Otherwise it is discarded. Total cap is
+64 breadcrumbs, so the prompt token budget is bounded.
+
+Each breadcrumb stores `{x, y, z, biome, nearby_block_kinds,
+nearby_mob_kinds}`. **No timestamp** — the collection is treated as a
+spatial map, not a temporal trail. Pool membership is implicit; FIFO
+behavior in the recent pool relies on array insertion order.
+
+`get_breadcrumbs()` returns `RECENT ++ LANDMARKS` sorted by horizontal
+distance from the bot's current position (closest first). The LLM and
+the live dashboard never see the two-pool internal structure.
+
+**Lifecycle (owned by `loop.js`):**
+
+- Constructed and `start()`ed before the main `while`.
+- `restore(list)` is called immediately after construction if the SPL
+  checkpoint contains a matching-objective breadcrumb list (crash
+  resume).
+- `reset()` is called from `on_death` (post-respawn the bot is at a fresh
+  spawn location; old breadcrumbs no longer correlate with the search
+  space).
+- `stop()` is called in the `finally` block.
+
+**Persistence:**
+
+- Each outer loop iteration:
+  - `<rollout_dir>/breadcrumbs.json` is overwritten with the flat list
+    via `log.breadcrumbs(...)`.
+  - The SPL checkpoint is re-written with the current breadcrumbs as the
+    third field so a process crash can resume the map.
+- `rollout_live/current_breadcrumbs.md` is updated by the rollout logger
+  with a sorted-by-distance markdown table.
 
 ### `search.js` — search command handling
 
@@ -280,6 +339,80 @@ path. To understand the shape of replanner I/O, read
 `achievement_hunter/docs/prompts/failure_replanner/failure_replanner.md`,
 `actions_reference.json`, and the JSON envelope validated by
 `validate_replanner_output` above.
+
+### `search_replanner.js` — LLM-driven search recovery
+
+Invoked from `actions.js` when an in-task `!search` exhausts its full
+511-block radius. Tries to relocate the bot to a position where the
+target is in nearby state. Up to `MAX_SEARCH_REPLANNER_ATTEMPTS = 3`
+LLM rounds, each producing up to `MAX_ACTIONS_PER_PLAN = 10` actions;
+each action is retried up to `MAX_ACTION_RETRIES = 2`.
+
+Reaches into `failure_replanner.js` for two shared helpers
+(`format_action_as_command`, `ensure_safe_before_llm`) so the two
+replanners stay aligned on bot-command serialization and pre-LLM
+safety escapes.
+
+**Flow:**
+
+1. Load `actions_reference.json` (from
+   `achievement_hunter/docs/prompts/search_replanner/`) — exactly four
+   navigation actions (`!goToCoordinates`, `!search`, `!digDown`,
+   `!goToSurface`). No collection, crafting, smelting, or combat.
+2. Build a search trace via `get_search_trace_state(agent, tracker)` —
+   `world` / `self` / `inventory` / `nearby` / `craftable_items`
+   (absolute inventory counts, no baseline delta) **plus** the
+   breadcrumb map.
+3. `ensure_safe_before_llm(agent)` then send the prompt
+   (template in `achievement_hunter/docs/prompts/search_replanner/search_replanner.md`).
+4. LLM returns `{summary, actions: [{name, args}, …]}` validated by
+   `validate_search_replanner_output` (exactly two top-level keys; 1..10
+   actions; allowed-name only; primitive args).
+5. Execute the action sequence:
+   - `!search` actions go through `run_search_action` with a per-plan
+     `searched_targets` set — same target searched twice in one plan
+     short-circuits to `search_already_attempted`.
+   - Other actions go through `executeCommandWithModeRecovery` + a
+     750 ms debounce.
+   - **After every action, `target_now_in_nearby(target, agent)`** is
+     the win condition. Returns `'success'` and exits as soon as the
+     target appears in nearby state — catches both `search_success` and
+     incidental encounters (e.g. a `!digDown` that breaks through to
+     the target).
+   - `PLAN_TERMINATING_KINDS` (`invalid_command`, `unavailable_action`,
+     `search_already_attempted`) end the current plan but the outer
+     attempt loop continues with the LLM summary appended to
+     `previous_summaries`.
+   - **`is_pathfinding_failure(result)`** (D11): `mode_interrupted`,
+     `runner_exception`, or `command_failure` matching
+     `/no path|PathStopped|Could not find a path/i` bails the entire
+     recovery and returns `'fail'`. `actions.js` then routes the
+     original task to `failure_replanner` via its existing
+     fall-through.
+6. If the sequence finishes without a `target_now_in_nearby` hit, push
+   `{attempt, summary, actions}` to `previous_summaries` and loop.
+
+**Rollout logger integration:** uses dedicated `log.search_recovery_*`
+methods that maintain a parallel `live_state.search_recovery` field so
+search-replanner activity is distinguishable from failure-replanner
+activity in the rollout trace, the dashboard, and
+`build_rollout_summary` (separate `search_recovery_attempts` counter).
+The live dashboard's third row overrides candidates+am with
+search-recovery panels when active; a dedicated standalone view is
+written to `rollout_live/current_search_recovery.md`. All clears back
+to placeholder on `search_recovery_end`.
+
+**Persistence (`persist_search_trace`):**
+
+- Every search-replanner invocation appended to:
+  - `<rollout_dir>/search_traces/full_search_trace.jsonl`
+- Failed invocations additionally written as standalone pretty-printed
+  JSON to
+  `<rollout_dir>/search_traces/failed/<timestamp>__<target>__fail.json`.
+
+Trace shape: `{target, task, started_at, ended_at, terminal_status,
+terminal_reason, attempts, initial_state, final_state}`. Each entry in
+`attempts` is `{attempt, summary, plan_actions, results}`.
 
 ---
 
@@ -395,3 +528,31 @@ consists of:
 - **Edits to files outside `achievement_hunter/`** must follow the
   project-wide marker-comment convention (see top-level `CLAUDE.md`).
   Everything inside this directory is AH-only and does *not* use markers.
+- **`searched_targets` is NOT updated on search-replanner success.** When
+  `recover_failed_search` returns `'success'`, the inner attempt loop
+  `continue`s — the target was just relocated into nearby state, so
+  blocking re-search would defeat the recovery. The `searched_targets`
+  add happens only when the replanner returns `'fail'`.
+- **Breadcrumb tracker uses horizontal distance only.** Vertical bot
+  movement (e.g. `!digDown` for ores) does not create new breadcrumbs.
+  This is intentional — `!search` radii (max 511) span every realistic
+  y-level traversal, so the surface xz position is what determines
+  reachability. Do not "fix" this to be 3D.
+- **Breadcrumbs persist across crashes via the checkpoint.** The
+  `BreadcrumbTracker` is in-memory, but each outer loop iteration calls
+  `save_checkpoint(task_name, graph, breadcrumb_tracker.get_breadcrumbs())`.
+  On resume, `loop.js` calls `breadcrumb_tracker.restore(...)` if the
+  prior checkpoint's `objective` matches the current `task_name`.
+  Mismatches are skipped silently — the breadcrumbs are objective-keyed,
+  not world-keyed, so switching Minecraft worlds with the same
+  objective name would (incorrectly) restore stale breadcrumbs.
+- **Search-replanner success means target-in-nearby, NOT task-complete.**
+  Unlike `failure_replanner.recover_failed_task`, which short-circuits
+  on `scsg_task_complete_check`, the search replanner only guarantees
+  the target is reachable. The SPL inner attempt loop has to actually
+  perform `!collectBlocks`/`!attack` on the next iteration.
+- **Pathfinding-class failures in the search-replanner plan bail to
+  `failure_replanner`** (D11). If you add new failure kinds, decide
+  whether they belong in `is_pathfinding_failure` (bail) or
+  `PLAN_TERMINATING_KINDS` (end current plan only, continue to next
+  attempt). The two have very different effects on recovery duration.

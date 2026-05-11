@@ -44,6 +44,12 @@ export class BreadcrumbTracker {
     this._recent_pool_size = opts.recent_pool_size ?? 16;
     this._landmark_pool_size = opts.landmark_pool_size ?? 48;
     this._period_ms = opts.period_ms ?? 1000;
+    // Fires synchronously with the flat breadcrumb list (RECENT ++ LANDMARKS,
+    // sorted by distance from bot) after every successful sample tick, after
+    // restore(), and after reset(). The loop wires this to persist the live
+    // view + checkpoint so updates aren't tied to outer-loop iteration
+    // (which can stall for minutes during a long-running task).
+    this._on_update = opts.on_update ?? null;
 
     this._recent = [];
     this._landmarks = [];
@@ -66,9 +72,10 @@ export class BreadcrumbTracker {
         this._landmarks.length}).`);
   }
 
-  reset() {
+  reset({notify = true} = {}) {
     this._recent = [];
     this._landmarks = [];
+    if (notify) this._notify_update();
   }
 
   /**
@@ -80,18 +87,20 @@ export class BreadcrumbTracker {
    * Recent-pool re-fills naturally as the bot samples new positions.
    */
   restore(breadcrumbs_list) {
-    this.reset();
-    if (!Array.isArray(breadcrumbs_list)) return;
-    for (const b of breadcrumbs_list) {
-      this._offer_to_landmarks({
-        x: b.x,
-        y: b.y,
-        z: b.z,
-        biome: b.biome,
-        nearby_block_kinds: b.nearby_block_kinds ?? [],
-        nearby_mob_kinds: b.nearby_mob_kinds ?? [],
-      });
+    this.reset({notify: false});
+    if (Array.isArray(breadcrumbs_list)) {
+      for (const b of breadcrumbs_list) {
+        this._offer_to_landmarks({
+          x: b.x,
+          y: b.y,
+          z: b.z,
+          biome: b.biome,
+          nearby_block_kinds: b.nearby_block_kinds ?? [],
+          nearby_mob_kinds: b.nearby_mob_kinds ?? [],
+        });
+      }
     }
+    this._notify_update();
   }
 
   /**
@@ -119,14 +128,29 @@ export class BreadcrumbTracker {
     const pos = this._safe_get_position();
     if (pos == null) return;
 
-    if (!this._far_enough_from_all_kept(pos)) return;
+    if (this._far_enough_from_all_kept(pos)) {
+      const breadcrumb = this._build_breadcrumb(pos);
+      this._recent.push(breadcrumb);
 
-    const breadcrumb = this._build_breadcrumb(pos);
-    this._recent.push(breadcrumb);
+      if (this._recent.length > this._recent_pool_size) {
+        const aged = this._recent.shift();
+        this._offer_to_landmarks(aged);
+      }
+    }
 
-    if (this._recent.length > this._recent_pool_size) {
-      const aged = this._recent.shift();
-      this._offer_to_landmarks(aged);
+    // Notify on every successful sample (even when no new breadcrumb is
+    // added): the sort order in get_breadcrumbs() depends on the bot's
+    // current position, so the rendered view changes as the bot moves
+    // through space, not just when a new breadcrumb is recorded.
+    this._notify_update();
+  }
+
+  _notify_update() {
+    if (this._on_update == null) return;
+    try {
+      this._on_update(this.get_breadcrumbs());
+    } catch (e) {
+      spl.warn('on_update callback threw:', e.message);
     }
   }
 

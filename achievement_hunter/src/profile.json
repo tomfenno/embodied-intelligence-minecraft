@@ -30,6 +30,7 @@
   "ptd_feedback_model": "",
   "ptd_refinement_model": "",
   "failure_replanner_model": "",
+  "search_replanner_model": "",
 
   "//": [
     "Modes for this agent are defined in achievement_hunter/src/agent/ah_modes.js",

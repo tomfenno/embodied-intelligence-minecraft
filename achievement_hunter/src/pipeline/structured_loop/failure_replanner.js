@@ -44,7 +44,8 @@ function load_available_actions() {
 
 // Converts {name, args} into a bot command string e.g.
 // !search("pumpkin")
-function format_action_as_command(action) {
+// Exported so search_replanner.js can reuse the same serialization.
+export function format_action_as_command(action) {
   const formatted_args = action.args.map(arg => {
     if (typeof arg === 'string') return JSON.stringify(arg);
     if (typeof arg === 'boolean') return arg ? 'true' : 'false';
@@ -218,7 +219,8 @@ function validate_replanner_output(output, available_actions) {
   }
 }
 
-async function ensure_safe_before_llm(agent) {
+// Exported so search_replanner.js can reuse the same pre-LLM safety check.
+export async function ensure_safe_before_llm(agent) {
   const bot = agent.bot;
   const block = bot.blockAt(bot.entity.position);
   const block_above = bot.blockAt(bot.entity.position.offset(0, 1, 0));
