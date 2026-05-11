@@ -35,11 +35,11 @@
   },
   {
     "name": "!search",
-    "description": "Search for the nearest block or entity of a given type by sweeping radii 32, 64, 128, 256, 511 from the bot's current position. Equivalent to running a maximum-radius search; there is no broader scan available.",
+    "description": "Search for the nearest block or entity of a given type by sweeping radii 32, 64, 128, 256 from the bot's current position. Equivalent to running a maximum-radius search; there is no broader scan available.",
     "category": "movement",
     "constraints": {
       "target_must_be_concrete": "Pass concrete block or entity names, e.g. \"chicken\", \"diamond_ore\". Abstract category names, e.g. \"any_log\", are not supported and will fail.",
-      "max_search_radius": 511,
+      "max_search_radius": 256,
       "exhaustion_is_terminal": "If a previous !search for the same target returned 'search_exhausted', re-issuing !search from the same position will fail identically. Relocate first before searching again.",
       "no_repeat_in_sequence": "A second !search for the same target inside one recovery action sequence will short-circuit to 'search_already_attempted'.",
       "requires_relocation_after_exhaustion": true

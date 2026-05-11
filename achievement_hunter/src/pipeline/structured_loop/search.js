@@ -10,7 +10,7 @@ const log_source = {
   search: 'search',
 };
 
-const search_radii = [32, 64, 128, 256, 511];
+const search_radii = [32, 64, 128, 256];
 
 export function parse_search_command(action) {
   const match = action.trim().match(/^!search\("([^"]+)"\)$/);
@@ -92,8 +92,9 @@ export async function run_breadth_first_sweep(
     try {
       items = expand_search_item(source);
     } catch (e) {
-      spl.warn(`Sweep: unsupported abstract target "${source}" — skipping. ` +
-               `Add expansion in expand_search_item. (${e.message})`);
+      spl.warn(
+          `Sweep: unsupported abstract target "${source}" — skipping. ` +
+          `Add expansion in expand_search_item. (${e.message})`);
       searched_targets.add(source);
       outcomes[source] = 'soft_skipped';
       continue;
@@ -110,15 +111,16 @@ export async function run_breadth_first_sweep(
   for (const {source, items} of expanded) {
     for (const item of items) {
       if (check_search_complete(item, initial_state)) {
-        spl.log(`Sweep fast-path: "${item}" (from "${source}") already in state.`);
+        spl.log(
+            `Sweep fast-path: "${item}" (from "${source}") already in state.`);
         outcomes[source] = 'found_reached';
         return {found: true, source, item, message: null, outcomes};
       }
     }
   }
 
-  spl.log(`Sweep starting: sources=[${
-      expanded.map(e => e.source).join(', ')}]`);
+  spl.log(
+      `Sweep starting: sources=[${expanded.map(e => e.source).join(', ')}]`);
 
   // Active list: sources still being attempted at the next radius. Mutated
   // as targets are ruled out (search_found_not_reached). Snapshot via
@@ -146,8 +148,9 @@ export async function run_breadth_first_sweep(
           }
           // search_found_not_reached: location known, pathfinder failed.
           // Bigger radii won't help — remove this source from active.
-          spl.warn(`Sweep: "${item}" (from "${source}") found but bot did ` +
-                   `not reach it. Marking source done for this sweep.`);
+          spl.warn(
+              `Sweep: "${item}" (from "${source}") found but bot did ` +
+              `not reach it. Marking source done for this sweep.`);
           searched_targets.add(source);
           outcomes[source] = 'found_not_reached';
           target_done = true;
@@ -197,8 +200,10 @@ async function execute_search_command(agent, item, radius, command) {
   // intentionally excludes these two skills.
   const found = check_search_complete(item, get_am_state(agent));
 
-  if (found) spl.log(`Search succeeded: "${item}" at radius ${radius}.`);
-  else spl.warn(`Search failed: "${item}" at radius ${radius}.`);
+  if (found)
+    spl.log(`Search succeeded: "${item}" at radius ${radius}.`);
+  else
+    spl.warn(`Search failed: "${item}" at radius ${radius}.`);
   return {found, message};
 }
 
