@@ -3,7 +3,6 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 
 import {graph_to_mermaid} from './graph_utils.js';
-import {extract_json} from './json_utils.js';
 
 // ── Paths + constants
 // ─────────────────────────────────────────────────────────────
@@ -21,7 +20,7 @@ const STAGE = {
   PTD: 'PTD',
   SCSG: 'SCSG',
   CANDIDATES: 'CANDIDATES',
-  NTS: 'NTS',
+  TASK: 'TASK',
   AM: 'AM',
   AM_WARN: 'AM_WARN',
   RECOVERY: 'RECOVERY',
@@ -31,6 +30,7 @@ const SOURCE = {
   LLM: 'llm',
   SEARCH: 'search',
   CHECKPOINT: 'checkpoint',
+  DETERMINISTIC: 'deterministic',
 };
 
 const LIVE_FILE = {
@@ -44,10 +44,10 @@ const LIVE_FILE = {
 const PLACEHOLDER = {
   PTD: '_PTD not yet generated._',
   PTD_REFINEMENT: '_PTD self-refine not yet started._',
-  SCSG: '_SCSG not yet generated._',
+  SCSG: '_SCSG not yet computed._',
   CANDIDATES: '_Candidates not yet computed._',
-  NTS: '**Current Task**\n\n_NTS not yet run._',
-  AM: '**Current Action**\n\n_AM not yet run._',
+  TASK: '**Current Task**\n\n_No task selected yet._',
+  AM: '**Current Action**\n\n_No action executed yet._',
 };
 
 // ── Generic helpers
@@ -150,6 +150,47 @@ function format_recovery_command(action) {
   return `${action.name}(${args})`;
 }
 
+// Strips fields whose value would be the structural default so the persisted
+// candidate is the minimum information needed to reconstruct the original.
+// Consumers should treat any missing key as the listed default.
+function compact_candidate(candidate) {
+  const result = {id: candidate.id, qty: candidate.qty};
+  if (candidate.item_type != null) result.item_type = candidate.item_type;
+  if (candidate.acquisition_dependency &&
+      candidate.acquisition_dependency !== 'none') {
+    result.acquisition_dependency = candidate.acquisition_dependency;
+  }
+  if (candidate.satisfied_inputs?.length > 0) {
+    result.satisfied_inputs = candidate.satisfied_inputs;
+  }
+  if (candidate.source_hint != null) result.source_hint = candidate.source_hint;
+  if (candidate.source_kind != null) result.source_kind = candidate.source_kind;
+  if (candidate.grounded_nearby_source != null) {
+    result.grounded_nearby_source = candidate.grounded_nearby_source;
+  }
+  return result;
+}
+
+// Builds a one-shot rollout-level summary so offline consumers don't need
+// to re-scan all stages to compute basic counts.
+function build_rollout_summary(rollout) {
+  const summary = {
+    outer_iterations: 0,
+    tasks_attempted: 0,
+    am_attempts: 0,
+    recovery_attempts: 0,
+  };
+  for (const stage of rollout.stages) {
+    if (stage.stage === STAGE.SCSG) summary.outer_iterations += 1;
+    else if (stage.stage === STAGE.TASK) summary.tasks_attempted += 1;
+    else if (stage.stage === STAGE.AM) summary.am_attempts += 1;
+    else if (stage.stage === STAGE.RECOVERY && stage.type === 'attempt_start') {
+      summary.recovery_attempts += 1;
+    }
+  }
+  return summary;
+}
+
 // ── Renderers
 // ─────────────────────────────────────────────────────────────
 
@@ -245,20 +286,23 @@ const stage_renderer = {
 
   scsg(parsed, objective) {
     if (parsed?.r === 2) {
-      return header('SCSG') +
-          '**All sinks satisfied (r=2) — task complete.**\n';
+      return header('SCSG') + '**All sinks satisfied — task complete.**\n';
     }
 
     if (!parsed?.final) return null;
 
+    const vertices = parsed.final.vertices || [];
+    const note_parts = [`${vertices.length} node(s) remaining`];
+    if (parsed.why) note_parts.push(parsed.why);
+
     const graph = {
       objective,
       sinks: parsed.s,
-      vertices: parsed.final.vertices || [],
+      vertices,
       edges: parsed.final.edges || [],
     };
 
-    return header(`SCSG — ${objective}`, `r=${parsed.r}`) +
+    return header(`SCSG — ${objective}`, note_parts.join(' · ')) +
         graph_to_mermaid(graph);
   },
 
@@ -278,14 +322,36 @@ const stage_renderer = {
         graph_to_mermaid(graph);
   },
 
-  nts(nts_state) {
-    if (!nts_state) return PLACEHOLDER.NTS;
+  task(task_state) {
+    if (!task_state) return PLACEHOLDER.TASK;
 
-    const body = nts_state.parsed ?
-        json_block(nts_state.parsed) :
-        `_NTS parse failed._\n\n${code_block(nts_state.raw)}`;
+    const {task} = task_state;
+    const action_type = escape_markdown(task.action_type);
+    const target = escape_markdown(task.target_item);
+    const qty = task.qty;
 
-    return `**Current Task**\n\n${body}`;
+    const param_lines = [];
+    for (const [key, value] of Object.entries(task.parameters ?? {})) {
+      if (value == null) continue;
+      if (Array.isArray(value)) {
+        if (value.length === 0) continue;
+        const items = value
+            .map(v => v && typeof v === 'object' && 'item' in v ?
+                     `${v.item}${v.qty != null ? ` ×${v.qty}` : ''}` :
+                     String(v))
+            .join(', ');
+        param_lines.push(`- **${escape_markdown(key)}:** ${escape_markdown(items)}`);
+      } else {
+        param_lines.push(
+            `- **${escape_markdown(key)}:** ${escape_markdown(String(value))}`);
+      }
+    }
+
+    const params_block =
+        param_lines.length > 0 ? `\n${param_lines.join('\n')}` : '';
+
+    return `**Current Task** _(${action_type})_\n\n` +
+        `${action_type} \`${target}\` ×${qty}${params_block}`;
   },
 
   completion(objective, completion_state) {
@@ -346,8 +412,7 @@ const stage_renderer = {
 
 const am_renderer = {
   current(entry) {
-    const body =
-        entry.parsed ? json_block(entry.parsed) : code_block(entry.raw);
+    const body = inline_code(entry.raw);
 
     let title = `**Current Action** _(attempt ${entry.attempt}`;
     if (entry.source === SOURCE.SEARCH) title += ' · search';
@@ -363,10 +428,7 @@ const am_renderer = {
   },
 
   history_entry(entry) {
-    const body = entry.parsed ? entry.parsed.status === 'TASK_COMPLETE' ?
-                                inline_code('TASK_COMPLETE') :
-                                inline_code(JSON.stringify(entry.parsed)) :
-                                inline_code(preview_text(entry.raw));
+    const body = inline_code(preview_text(entry.raw));
 
     const source = entry.source === SOURCE.SEARCH ? ' · search' : '';
     const warn =
@@ -414,7 +476,7 @@ const live_writer = {
     this.cache.delete(filename);
   },
 
-  write_dashboard({ptd, elapsed_panel, scsg, candidates, nts, am}) {
+  write_dashboard({ptd, elapsed_panel, scsg, candidates, task, am}) {
     const divider = '\n\n---\n\n';
     const card_style =
         'border: 1px solid #d0d7de; border-radius: 14px; padding: 18px 16px; box-sizing: border-box;';
@@ -434,7 +496,7 @@ const live_writer = {
     const sections = [
       make_row(ptd, elapsed_panel, '72%', '26%'),
       make_row(scsg, candidates || PLACEHOLDER.CANDIDATES),
-      make_row(nts, am),
+      make_row(task, am),
     ].filter(Boolean);
 
     this.write_file(LIVE_FILE.DASHBOARD, sections.join(divider));
@@ -478,7 +540,7 @@ export function createRolloutLogger(objective) {
     ptd_refinement_rounds: [],
     scsg_result: null,
     candidates: null,
-    nts_result: null,
+    task_state: null,
     am_history: [],
     completion: null,
     recovery: null,
@@ -524,7 +586,7 @@ export function createRolloutLogger(objective) {
         in_recovery ? stage_renderer.recovery_status(live_state.recovery) :
                       stage_renderer.candidates(objective, live_state.candidates);
 
-    const nts_content = stage_renderer.nts(live_state.nts_result);
+    const task_content = stage_renderer.task(live_state.task_state);
 
     const am_content = in_recovery ?
         stage_renderer.recovery_actions(live_state.recovery) :
@@ -539,7 +601,7 @@ export function createRolloutLogger(objective) {
       scsg: scsg_content || PLACEHOLDER.SCSG,
       candidates: candidates_content ||
           (rollout.status === STATUS.COMPLETED ? null : PLACEHOLDER.CANDIDATES),
-      nts: nts_content,
+      task: task_content,
       am: am_content,
     });
   }
@@ -597,9 +659,12 @@ export function createRolloutLogger(objective) {
     },
 
     scsg(raw, parsed, state = null) {
+      // `raw` is intentionally not persisted: the structured loop only ever
+      // passes the constant string '[deterministic]' (SCSG has no LLM path),
+      // so it adds bytes without information. Kept in the signature for
+      // forward-compat with any future non-deterministic SCSG source.
       record_stage({
         stage: STAGE.SCSG,
-        raw,
         parsed,
         ...(state && {state}),
       });
@@ -608,38 +673,48 @@ export function createRolloutLogger(objective) {
     },
 
     candidates(candidates) {
-      record_stage({stage: STAGE.CANDIDATES, candidates});
+      record_stage({
+        stage: STAGE.CANDIDATES,
+        candidates: candidates.map(compact_candidate),
+      });
       live_state.candidates = candidates;
       render_live();
     },
 
-    nts(raw, parsed, meta = {}) {
-      record_stage({
-        stage: STAGE.NTS,
-        raw,
-        parsed,
-        ...(Object.keys(meta).length > 0 ? {meta} : {}),
-      });
-
-      live_state.nts_result = {raw, parsed};
-
+    // Records the deterministically-selected task for the current outer
+    // iteration. Resets the AM history so the "Current Action" panel only
+    // shows attempts belonging to this task — without the reset, retries
+    // from previous tasks bleed into the new task's panel.
+    task(task) {
+      record_stage({stage: STAGE.TASK, task});
+      live_state.task_state = {task};
+      live_state.am_history = [];
       render_live();
     },
 
     am(attempt, raw, state = null, meta = {}) {
+      // Suppress `meta` when it carries only the default deterministic
+      // source — that's the implicit default for any AM entry and adds
+      // ~30 bytes to every attempt. The `'search'` source (from search.js)
+      // is the only value that needs to be persisted explicitly.
+      const meta_to_persist = {...meta};
+      if (meta_to_persist.source === SOURCE.DETERMINISTIC) {
+        delete meta_to_persist.source;
+      }
+
       record_stage({
         stage: STAGE.AM,
         attempt,
         raw,
         ...(state && {state}),
-        ...(Object.keys(meta).length > 0 ? {meta} : {}),
+        ...(Object.keys(meta_to_persist).length > 0 ? {meta: meta_to_persist} :
+                                                      {}),
       });
 
       live_state.am_history.push({
         attempt,
         raw,
-        parsed: extract_json(raw),
-        source: meta.source ?? SOURCE.LLM,
+        source: meta.source ?? SOURCE.DETERMINISTIC,
       });
 
       render_live();
@@ -697,6 +772,7 @@ export function createRolloutLogger(objective) {
       rollout.completed_at = iso_now();
       rollout.total_elapsed = total_elapsed;
       rollout.completion_reason = reason;
+      rollout.summary = build_rollout_summary(rollout);
 
       live_state.completion = {
         reason,

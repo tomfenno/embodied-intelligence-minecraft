@@ -43,7 +43,7 @@ vi.mock('../../rollout_logger.js', () => ({
                                                  ptd: vi.fn(),
                                                  scsg: vi.fn(),
                                                  candidates: vi.fn(),
-                                                 nts: vi.fn(),
+                                                 task: vi.fn(),
                                                  am: vi.fn(),
                                                  complete: vi.fn(),
                                                })),
