@@ -1,0 +1,164 @@
+diff --git a/node_modules/mineflayer/lib/plugins/digging.js b/node_modules/mineflayer/lib/plugins/digging.js
+index 5ae5552..9dd496b 100644
+--- a/node_modules/mineflayer/lib/plugins/digging.js
++++ b/node_modules/mineflayer/lib/plugins/digging.js
+@@ -15,6 +15,24 @@ function inject (bot) {
+   bot.targetDigFace = null
+   bot.lastDigTime = null
+ 
++  // Start of AH code
++  // BUG 16: 1.21's block_dig packet schema requires a `sequence` field.
++  // Without it, protodef serializes `sequence=0` for every dig, and the server
++  // rejects dig-completion packets whose sequence is stale (i.e. all of them
++  // after the first input action). The visible symptom is "block cracks then
++  // resets right before breaking." Provide a bot-level monotonic counter
++  // shared with other plugins that send sequence-carrying input packets
++  // (use_item, block_place) so digs and item uses don't interleave with
++  // independent streams that both look stale to the server.
++  if (bot._nextInputSequence == null) {
++    bot._inputSequence = 0
++    bot._nextInputSequence = function () {
++      bot._inputSequence += 1
++      return bot._inputSequence
++    }
++  }
++  // End of AH code
++
+   async function dig (block, forceLook, digFace) {
+     if (block === null || block === undefined) {
+       throw new Error('dig was called with an undefined or null block')
+@@ -127,11 +145,14 @@ function inject (bot) {
+     if (bot.targetDigBlock) bot.stopDigging()
+ 
+     diggingTask = createTask()
++    // Start of AH code — BUG 16: include `sequence` (1.21 schema)
+     bot._client.write('block_dig', {
+       status: 0, // start digging
+       location: block.position,
+-      face: bot.targetDigFace // default face is 1 (top)
++      face: bot.targetDigFace, // default face is 1 (top)
++      sequence: bot._nextInputSequence()
+     })
++    // End of AH code
+     waitTimeout = setTimeout(finishDigging, waitTime)
+     bot.targetDigBlock = block
+     bot.swingArm()
+@@ -146,11 +167,14 @@ function inject (bot) {
+       swingInterval = null
+       waitTimeout = null
+       if (bot.targetDigBlock) {
++        // Start of AH code — BUG 16: include `sequence` (1.21 schema)
+         bot._client.write('block_dig', {
+           status: 2, // finish digging
+           location: bot.targetDigBlock.position,
+-          face: bot.targetDigFace // always the same as the start face
++          face: bot.targetDigFace, // always the same as the start face
++          sequence: bot._nextInputSequence()
+         })
++        // End of AH code
+       }
+       bot.targetDigBlock = null
+       bot.targetDigFace = null
+@@ -175,11 +199,14 @@ function inject (bot) {
+       clearTimeout(waitTimeout)
+       swingInterval = null
+       waitTimeout = null
++      // Start of AH code — BUG 16: include `sequence` (1.21 schema)
+       bot._client.write('block_dig', {
+         status: 1, // cancel digging
+         location: bot.targetDigBlock.position,
+-        face: cancellationDiggingFace
++        face: cancellationDiggingFace,
++        sequence: bot._nextInputSequence()
+       })
++      // End of AH code
+       const block = bot.targetDigBlock
+       bot.targetDigBlock = null
+       bot.targetDigFace = null
+@@ -244,6 +271,20 @@ function inject (bot) {
+       enchantments = enchantments.concat(helmetEnchantments)
+     }
+ 
++    // Start of AH code
++    // Iron ore (and other 1.21 ores) have material === 'incorrect_for_wooden_tool'.
++    // prismarine-block's material→tool-multiplier table for that material only
++    // contains wooden tools, so for a stone/iron/etc. pickaxe `isBestTool` is
++    // false and the bot computes digTime ~4500ms while the server completes in
++    // ~1150ms. The bot's late finish packet is treated as stale, the block
++    // restores, and the mining "swings without breaking." Rewrite to the
++    // generic mineable/pickaxe table so the bot agrees with the server on dig
++    // time. See BUG 16 (root cause of the SPL livelock in BUG 15).
++    if (block.material === 'incorrect_for_wooden_tool') {
++      block.material = 'mineable/pickaxe'
++    }
++    // End of AH code
++
+     const creative = bot.game.gameMode === 'creative'
+     return block.digTime(
+       type,
+diff --git a/node_modules/mineflayer/lib/plugins/inventory.js b/node_modules/mineflayer/lib/plugins/inventory.js
+index 0636faa..0461a20 100644
+--- a/node_modules/mineflayer/lib/plugins/inventory.js
++++ b/node_modules/mineflayer/lib/plugins/inventory.js
+@@ -27,7 +27,21 @@ function inject (bot, { hideErrors }) {
+   const windows = require('prismarine-windows')(bot.version)
+ 
+   let eatingTask = createDoneTask()
+-  let sequence = 0
++
++  // Start of AH code
++  // BUG 16: share a monotonic input-sequence counter with digging.js (and any
++  // future plugin that sends sequence-carrying input packets). A per-plugin
++  // counter would interleave with digging's counter and the server would see
++  // duplicate / non-monotonic sequences. Initialize lazily — whichever plugin
++  // loads first wins.
++  if (bot._nextInputSequence == null) {
++    bot._inputSequence = 0
++    bot._nextInputSequence = function () {
++      bot._inputSequence += 1
++      return bot._inputSequence
++    }
++  }
++  // End of AH code
+ 
+   let nextActionNumber = 0 // < 1.17
+   let stateId = -1
+@@ -114,7 +128,9 @@ function inject (bot, { hideErrors }) {
+ 
+   function activateItem (offHand = false) {
+     bot.usingHeldItem = true
+-    sequence++
++    // Start of AH code — BUG 16: pull from shared counter instead of local
++    const sequence = bot._nextInputSequence()
++    // End of AH code
+ 
+     if (bot.supportFeature('useItemWithBlockPlace')) {
+       bot._client.write('block_place', {
+@@ -146,7 +162,9 @@ function inject (bot, { hideErrors }) {
+ 
+     if (bot.supportFeature('useItemWithOwnPacket')) {
+       body.face = 0
+-      body.sequence = 0
++      // Start of AH code — BUG 16: include real sequence from shared counter
++      body.sequence = bot._nextInputSequence()
++      // End of AH code
+     }
+ 
+     bot._client.write('block_dig', body)
+diff --git a/node_modules/mineflayer/lib/plugins/place_block.js b/node_modules/mineflayer/lib/plugins/place_block.js
+index fdaec6b..611efb8 100644
+--- a/node_modules/mineflayer/lib/plugins/place_block.js
++++ b/node_modules/mineflayer/lib/plugins/place_block.js
+@@ -11,7 +11,11 @@ function inject (bot) {
+     let newBlock = bot.blockAt(dest)
+     if (oldBlock.type === newBlock.type) {
+       [oldBlock, newBlock] = await onceWithCleanup(bot, `blockUpdate:${dest}`, {
+-        timeout: 5000,
++        // Start of AH code — 500ms is the typical block-update RTT on a local
++        // server; 5s makes craftRecipe (which place-cycles a crafting_table)
++        // stall five seconds per cycle on legitimately-failing placements.
++        timeout: 500,
++        // End of AH code
+         // Condition to wait to receive block update actually changing the block type, in case the bot receives block updates with no changes
+         // oldBlock and newBlock will both be null when the world unloads
+         checkCondition: (oldBlock, newBlock) => !oldBlock || !newBlock || oldBlock.type !== newBlock.type

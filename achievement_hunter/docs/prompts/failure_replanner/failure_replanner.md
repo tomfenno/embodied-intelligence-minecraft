@@ -51,6 +51,8 @@ Infer the real blocker, not just the last command.
 
 Consider whether the failure was caused by navigation, search radius, bad location, missing tool, missing workstation, missing fuel, wrong source entity/block, abstract item grounding, malformed `null` parameters, or stopping too early.
 
+If a failed step has `kind: "mode_interrupted"`, the command was repeatedly preempted by a survival mode (typically `unstuck`) before it could complete. `mode_interrupt_counts` shows which mode fired and how many times; `position_before` / `position_after` show the bot's net displacement across retries. Re-issuing the same command will produce the same livelock — choose an action that changes the bot's situation: relocate with `!moveAway` or `!goToCoordinates` away from `position_after`, pick a different source block from nearby state, or `!search` for a fresh target with a larger radius. Do not respond with the same `!collectBlocks`, `!useOn`, or `!attack` on the same target.
+
 Use the current inventory and nearby state before planning from scratch. If the agent already has useful prerequisites, continue from there.
 
 Use `previous_diagnoses` to avoid loops. Do not repeat a prior failed strategy unless the final state has changed in a way that makes it newly viable.

@@ -38,7 +38,9 @@ export function try_make_craft_task(candidate, state) {
 
   const concrete_target =
       resolve_concrete_craft_target(candidate.id, state.craftable_items ?? []);
-  return concrete_target ? {
+  if (!concrete_target) return null;
+
+  return {
     target_item: concrete_target,
     qty: candidate.qty,
     action_type: 'craft',
@@ -48,8 +50,7 @@ export function try_make_craft_task(candidate, state) {
       workstation:
           get_single_satisfied_input_item(candidate, 'workstation_dependency'),
     },
-  } :
-                           null;
+  };
 }
 
 // Builds a smelt task when smelting prerequisites are satisfied.
@@ -62,14 +63,16 @@ export function try_make_smelt_task(candidate) {
   const workstation =
       get_single_satisfied_input_item(candidate, 'workstation_dependency');
 
-  return smelting_inputs.length && fuel_inputs.length && workstation != null ?
-      {
-        target_item: candidate.id,
-        qty: candidate.qty,
-        action_type: 'smelt',
-        parameters: {smelting_inputs, fuel_inputs, workstation},
-      } :
-      null;
+  if (!smelting_inputs.length || !fuel_inputs.length || workstation == null) {
+    return null;
+  }
+
+  return {
+    target_item: candidate.id,
+    qty: candidate.qty,
+    action_type: 'smelt',
+    parameters: {smelting_inputs, fuel_inputs, workstation},
+  };
 }
 
 // Builds an immediate nearby collect or kill task.
@@ -77,7 +80,8 @@ export function try_make_immediate_acquisition_task(candidate, state) {
   if (candidate.acquisition_dependency === 'mob') {
     const source_mob =
         resolve_nearby_mob_source(candidate, state.nearby_entities?.mobs ?? []);
-    return source_mob ? {
+    if (!source_mob) return null;
+    return {
       target_item: candidate.id,
       qty: candidate.qty,
       action_type: 'kill',
@@ -85,13 +89,13 @@ export function try_make_immediate_acquisition_task(candidate, state) {
         source_mob,
         weapon: get_single_satisfied_input_item(candidate, 'tool_dependency'),
       },
-    } :
-                        null;
+    };
   }
 
   const source_block =
       resolve_nearby_block_source(candidate, state.nearby_blocks ?? []);
-  return source_block ? {
+  if (!source_block) return null;
+  return {
     target_item: candidate.id,
     qty: candidate.qty,
     action_type: 'collect',
@@ -101,8 +105,7 @@ export function try_make_immediate_acquisition_task(candidate, state) {
           get_single_satisfied_input_item(candidate, 'item_dependency'),
       tool: get_single_satisfied_input_item(candidate, 'tool_dependency'),
     },
-  } :
-                        null;
+  };
 }
 
 // Builds a fallback collect or kill task.
@@ -156,8 +159,9 @@ export function try_make_interact_task(candidate, state) {
   const target =
       resolve_nearby_block_source(candidate, state.nearby_blocks ?? []) ??
       resolve_acquisition_dependency(candidate);
+  if (target == null) return null;
 
-  return target != null ? {
+  return {
     target_item: candidate.id,
     qty: candidate.qty,
     action_type: 'interact',
@@ -165,8 +169,7 @@ export function try_make_interact_task(candidate, state) {
       tool: crafting_input,
       target,
     },
-  } :
-                          null;
+  };
 }
 
 export function resolve_acquisition_dependency(candidate) {

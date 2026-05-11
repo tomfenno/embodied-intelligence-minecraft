@@ -9,20 +9,12 @@ import {generate_primary_task_dag_self_refined} from '../self_refine.js';
 
 import {execute_task_action} from './actions.js';
 import {build_incoming_edge_map, edge_in_subgraph, edge_key,} from './graph.js';
+import {make_spl} from './log.js';
 import {make_fallback_acquisition_task, select_next_task, try_make_craft_task, try_make_immediate_acquisition_task, try_make_interact_task, try_make_smelt_task,} from './tasks.js';
 
 const max_outer_retries = 10;
 
-const spl = {
-  log: (...args) => console.log('[SPL]', ...args),
-  warn: (...args) => console.warn('[SPL]', ...args),
-  error: (...args) => console.error('[SPL]', ...args),
-};
-
-const log_source = {
-  llm: 'llm',
-  deterministic: 'deterministic',
-};
+const spl = make_spl('[SPL]');
 
 // Runs the full structured task loop.
 export async function structured_loop(models, agent, task_name, graph = null) {
@@ -33,10 +25,10 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   const load_graph = true;
   const graph_file_path =
       //    './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
-      //  `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
-      //   `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
-      // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
-      './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
+      //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
+      `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
+  // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
+  // './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
   // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
   // './achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
   graph = load_graph ? await load_graph_from_file(graph_file_path) :
@@ -89,7 +81,7 @@ export async function structured_loop(models, agent, task_name, graph = null) {
         return;
       }
 
-      const task = get_next_task(candidate_result.candidates, agent, log);
+      const task = get_next_task(candidate_result.candidates, agent);
 
       if (!task) {
         spl.warn('get_next_task returned NULL; re-evaluating state...');
@@ -190,9 +182,8 @@ function get_source_candidates(subgraph, original_graph, agent, log) {
 }
 
 // Selects the next task deterministically.
-function get_next_task(candidates, agent, log) {
+function get_next_task(candidates, agent) {
   const task = select_next_task(candidates, get_state_for_candidates(agent));
-  log.nts('[deterministic]', task, {source: log_source.deterministic});
 
   if (!task) {
     spl.warn('No task selected by get_next_task.');

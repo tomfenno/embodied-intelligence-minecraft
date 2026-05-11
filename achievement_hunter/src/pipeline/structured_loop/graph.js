@@ -36,8 +36,5 @@ export function resolve_concrete_craft_target(candidate_id, craftable_items) {
   }
 
   const members = ABSTRACT_CLASS_MEMBERS[candidate_id] ?? [];
-  for (const item of craftable_items) {
-    if (members.includes(item)) return item;
-  }
-  return null;
+  return craftable_items.find(item => members.includes(item)) ?? null;
 }

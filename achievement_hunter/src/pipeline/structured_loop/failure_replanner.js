@@ -9,7 +9,9 @@ import {extract_json} from '../json_utils.js';
 import {fill_failure_replanner_prompt} from '../prompt_utils.js';
 import {compute_scsg} from '../scsg.js';
 
+import {make_spl} from './log.js';
 import {check_search_complete, run_search} from './search.js';
+import {create_action_result, project_failed_steps} from './trace.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const AVAILABLE_ACTIONS_PATH = path.join(
@@ -29,11 +31,7 @@ const HARD_FAILURE_KINDS = new Set([
   'search_already_attempted',
 ]);
 
-const spl = {
-  log: (...args) => console.log('[SPL][recovery]', ...args),
-  warn: (...args) => console.warn('[SPL][recovery]', ...args),
-  error: (...args) => console.error('[SPL][recovery]', ...args),
-};
+const spl = make_spl('[SPL][recovery]');
 
 let _available_actions = null;
 function load_available_actions() {
@@ -65,19 +63,12 @@ async function run_action(action, agent, log, searched_targets) {
   try {
     const env_result = await executeCommandWithModeRecovery(agent, command);
     await sleep(craft_debounce_ms);
-    return {
-      command,
-      success: env_result?.success === true,
-      kind: env_result?.success === true ? 'command_success' : 'command_failure',
-      message: env_result?.message ?? null,
-    };
+    const success = env_result?.success === true;
+    return create_action_result(
+        command, success, success ? 'command_success' : 'command_failure',
+        env_result?.message ?? null);
   } catch (e) {
-    return {
-      command,
-      success: false,
-      kind: 'runner_exception',
-      message: String(e),
-    };
+    return create_action_result(command, false, 'runner_exception', String(e));
   }
 }
 
@@ -86,22 +77,15 @@ async function run_search_action(action, agent, log, searched_targets) {
   const target = action.args?.[0];
 
   if (typeof target !== 'string' || target.length === 0) {
-    return {
-      command,
-      success: false,
-      kind: 'invalid_command',
-      message: '!search requires a non-empty string target',
-    };
+    return create_action_result(
+        command, false, 'invalid_command',
+        '!search requires a non-empty string target');
   }
 
   if (searched_targets.has(target)) {
-    return {
-      command,
-      success: false,
-      kind: 'search_already_attempted',
-      message:
-          `Search for "${target}" already attempted in this recovery sequence`,
-    };
+    return create_action_result(
+        command, false, 'search_already_attempted',
+        `Search for "${target}" already attempted in this recovery sequence`);
   }
 
   try {
@@ -111,21 +95,18 @@ async function run_search_action(action, agent, log, searched_targets) {
 
     if (!found) {
       searched_targets.add(target);
-      return {command, success: false, kind: 'search_exhausted', message};
+      return create_action_result(
+          command, false, 'search_exhausted', message);
     }
 
     const target_reached =
         check_search_complete(target, get_am_state(agent));
     return target_reached ?
-        {command, success: true, kind: 'search_success', message} :
-        {command, success: false, kind: 'search_found_not_reached', message};
+        create_action_result(command, true, 'search_success', message) :
+        create_action_result(
+            command, false, 'search_found_not_reached', message);
   } catch (e) {
-    return {
-      command,
-      success: false,
-      kind: 'runner_exception',
-      message: String(e),
-    };
+    return create_action_result(command, false, 'runner_exception', String(e));
   }
 }
 
@@ -164,13 +145,7 @@ function build_failed_trace_from_attempt(
                                      },
                                    }));
 
-  const failed_steps =
-      steps.filter(s => !s.result.success).map(s => ({
-                                                 i: s.i,
-                                                 action: s.action,
-                                                 kind: s.result.kind,
-                                                 message: s.result.message,
-                                               }));
+  const failed_steps = project_failed_steps(steps);
 
   return {
     objective: original_failed_trace.objective,
@@ -332,15 +307,16 @@ export async function recover_failed_task(
     for (let action_index = 0; action_index < replanner_output.actions.length;
          action_index++) {
       const action = replanner_output.actions[action_index];
+      const action_command = format_action_as_command(action);
 
       let result = null;
       for (let retry = 0; retry < MAX_ACTION_RETRIES; retry++) {
         if (retry > 0)
           spl.log(
               `Retrying action (${retry}/${MAX_ACTION_RETRIES - 1}):`,
-              format_action_as_command(action));
+              action_command);
         else
-          spl.log('Executing:', format_action_as_command(action));
+          spl.log('Executing:', action_command);
 
         result = await run_action(action, agent, log, searched_targets);
         spl.log('Result:', result);

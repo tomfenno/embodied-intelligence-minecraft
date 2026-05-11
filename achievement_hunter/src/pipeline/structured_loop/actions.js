@@ -7,13 +7,11 @@ import {ABSTRACT_CLASS_MEMBERS, is_environmental_use_target} from '../mc_sources
 import {get_item_batch_size} from '../recipe_utils.js';
 
 import {recover_failed_task} from './failure_replanner.js';
+import {make_spl} from './log.js';
 import {check_search_complete, parse_search_command, run_search} from './search.js';
+import {create_command_success_result, create_step_result, normalize_result_message, project_failed_steps} from './trace.js';
 
-const spl = {
-  log: (...args) => console.log('[SPL]', ...args),
-  warn: (...args) => console.warn('[SPL]', ...args),
-  error: (...args) => console.error('[SPL]', ...args),
-};
+const spl = make_spl('[SPL]');
 
 const log_source = {
   deterministic: 'deterministic',
@@ -29,6 +27,7 @@ const max_collect_qty = 16;
 // recovery.
 const RECOVERABLE_FAILURE_KINDS = new Set([
   'command_failure',
+  'mode_interrupted',
   'unstructured_failure_result',
   'runner_exception',
   'unexpected_action_kind',
@@ -85,15 +84,13 @@ export async function execute_task_action(
             false, 'search_already_attempted',
             `Search for "${
                 search_target}" already attempted in this action sequence`);
-        attempt_index = max_inner_retries;
-        continue;
+        break;
       }
       current_step.result = await handle_search_action(
           search_target, state, agent, log, attempt_number);
       if (current_step.result.kind === 'search_exhausted') {
-        searched_targets.add(
-            search_target);  // Only block re-search when not found.
-        attempt_index = max_inner_retries;
+        searched_targets.add(search_target);  // Only block re-search when not found.
+        break;
       }
       // On search_success or search_found_not_reached (PathStopped): allow
       // reattempt — bot may be closer now or path obstruction may have changed.
@@ -146,8 +143,20 @@ export async function execute_task_action(
 
     spl.warn('Command error:', command_result);
 
+    const failure_kind = command_result?.mode_interrupted === true ?
+        'mode_interrupted' :
+        'command_failure';
     current_step.result = create_step_result(
-        false, 'command_failure', normalize_result_message(command_result));
+        false, failure_kind, normalize_result_message(command_result));
+    if (command_result?.mode_interrupted === true) {
+      // Surface per-mode tallies and net displacement to the replanner so it
+      // can reason about which mode (typically unstuck) is blocking progress
+      // and pick a relocation action rather than re-issuing the same command.
+      current_step.result.mode_interrupt_counts =
+          command_result.mode_interrupt_counts;
+      current_step.result.position_before = command_result.position_before;
+      current_step.result.position_after = command_result.position_after;
+    }
 
     const failure_signature =
         get_command_failure_signature(action.command, command_result);
@@ -357,6 +366,17 @@ export function get_command_failure_signature(command, result) {
     return null;
   }
 
+  // mode_interrupted messages embed per-retry counts and a numeric
+  // displacement (e.g. "unstuck×10; bot Δ=(5.2,3.0,-1.5)..."). Those numbers
+  // change between attempts even when the underlying failure is the same, so
+  // they would defeat repeated_failure_signature matching. Use a stable
+  // signature derived from the structural flag + sorted mode names instead.
+  if (result?.mode_interrupted === true) {
+    const mode_names =
+        Object.keys(result.mode_interrupt_counts ?? {}).sort().join(',');
+    return `${command} || mode_interrupted:${mode_names || 'unknown'}`;
+  }
+
   const message = (result?.message ?? String(result ?? ''))
                       .replace(/\d+ms/g, '<TIMEOUT>')
                       .replace(/\s+/g, ' ')
@@ -367,6 +387,16 @@ export function get_command_failure_signature(command, result) {
 
 export function should_abort_repeated_failure(command, result, repeated_count) {
   const message = result?.message ?? '';
+
+  // Fix B for BUG 15 (tightened): a single mode_interrupted failure already
+  // represents MAX_MODE_INTERRUPTS (=5) consecutive mode firings on the same
+  // command within one SPL attempt. That alone is conclusive evidence of a
+  // livelock — there is no information gained by waiting for a second outer
+  // attempt to reproduce it. Short-circuit to the failure_replanner so it can
+  // choose a relocation action.
+  if (result?.mode_interrupted === true && repeated_count >= 1) {
+    return true;
+  }
 
   return command.startsWith('!craftRecipe(') &&
       message.includes('Event updateSlot:0 did not fire within timeout') &&
@@ -411,23 +441,6 @@ function create_command_action(command) {
     kind: 'command',
     command,
   };
-}
-
-function create_step_result(success, kind, message) {
-  return {
-    success,
-    kind,
-    message,
-  };
-}
-
-function create_command_success_result(result) {
-  return create_step_result(
-      true, 'command_success', normalize_result_message(result));
-}
-
-function normalize_result_message(result) {
-  return result?.message != null ? String(result.message).trim() : null;
 }
 
 function log_am_action(log, attempt_number, action, state) {
@@ -527,13 +540,7 @@ function build_summary(steps, terminal_status) {
   };
 
   if (terminal_status === 'fail') {
-    summary.failed_steps = steps.filter(step => step.result?.success === false)
-                               .map(step => ({
-                                      i: step.i,
-                                      action: step.action,
-                                      kind: step.result.kind,
-                                      message: step.result.message,
-                                    }));
+    summary.failed_steps = project_failed_steps(steps);
   }
 
   return summary;

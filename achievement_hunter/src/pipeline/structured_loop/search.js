@@ -1,11 +1,9 @@
 import {executeCommandWithModeRecovery as execute_command} from '../command_utils.js';
 import {any_log_search_targets, mob_search_targets} from '../mc_sources.js';
 
-const spl = {
-  log: (...args) => console.log('[SPL]', ...args),
-  warn: (...args) => console.warn('[SPL]', ...args),
-  error: (...args) => console.error('[SPL]', ...args),
-};
+import {make_spl} from './log.js';
+
+const spl = make_spl('[SPL]');
 
 const log_source = {
   search: 'search',
@@ -52,8 +50,8 @@ async function execute_search_command(agent, item, radius, command) {
   const message =
       result?.message != null ? String(result.message).trim() : null;
 
-  found ? spl.log(`Search succeeded: "${item}" at radius ${radius}.`) :
-          spl.warn(`Search failed: "${item}" at radius ${radius}.`);
+  if (found) spl.log(`Search succeeded: "${item}" at radius ${radius}.`);
+  else spl.warn(`Search failed: "${item}" at radius ${radius}.`);
   return {found, message};
 }
 

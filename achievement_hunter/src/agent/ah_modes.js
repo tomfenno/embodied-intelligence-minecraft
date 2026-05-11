@@ -475,6 +475,10 @@ class ModeController {
     return modes_list.some(m => m.active);
   }
 
+  getActiveModeNames() {
+    return modes_list.filter(m => m.active).map(m => m.name);
+  }
+
   async waitForIdle(timeoutMs = 30_000) {
     const deadline = Date.now() + timeoutMs;
     while (Date.now() < deadline) {
