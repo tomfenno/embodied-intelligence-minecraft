@@ -251,38 +251,21 @@ export function get_search_trace_state(agent, breadcrumb_tracker) {
 }
 
 /**
- * Computes a delta between two search-trace states (as returned by
- * `get_search_trace_state`). Surfaces only the fields a planner needs to
- * reason about what changed during one search-recovery attempt:
- *   - `position`: `{from, to}` if the bot moved.
- *   - `inventory_gained`: positive-only inventory diff (items acquired).
- *   - `new_nearby_blocks` / `removed_nearby_blocks`: set diffs on nearby
- *     blocks so the LLM sees the world flipped from one biome/depth to
- *     another, etc.
- * `craftable_items` is intentionally omitted — it's already present in
- * the live search_trace input for the next attempt and is large/noisy
- * when diffed.
+ * Picks the fields from a search-trace state (as returned by
+ * `get_search_trace_state`) that the search-replanner needs to attach
+ * to a finished attempt in `previous_summaries`:
+ *   - `position`: where the bot ended up.
+ *   - `inventory`: full absolute counts (materials, fuel, tools, food).
+ *   - `craftable_items`: full list of recipes craftable from this
+ *     position. Position-dependent because it considers nearby
+ *     `crafting_table` and `crafting_table` in inventory.
+ * The LLM uses these snapshots to decide whether to craft/smelt/collect
+ * on the next attempt rather than re-derive from a delta.
  */
-export function diff_search_state(before, after) {
-  const delta = {};
-
-  const pos_b = before?.world?.position;
-  const pos_a = after?.world?.position;
-  if (pos_b && pos_a &&
-      (pos_b.x !== pos_a.x || pos_b.y !== pos_a.y || pos_b.z !== pos_a.z)) {
-    delta.position = {from: pos_b, to: pos_a};
-  }
-
-  const inv_gained =
-      _inventory_delta(after?.inventory?.counts, before?.inventory?.counts);
-  if (Object.keys(inv_gained).length > 0) delta.inventory_gained = inv_gained;
-
-  const nb_before = new Set(before?.nearby?.blocks ?? []);
-  const nb_after = new Set(after?.nearby?.blocks ?? []);
-  const new_blocks = [...nb_after].filter(b => !nb_before.has(b));
-  const removed_blocks = [...nb_before].filter(b => !nb_after.has(b));
-  if (new_blocks.length > 0) delta.new_nearby_blocks = new_blocks;
-  if (removed_blocks.length > 0) delta.removed_nearby_blocks = removed_blocks;
-
-  return delta;
+export function pick_attempt_end_state(state) {
+  return {
+    position: state?.world?.position ?? null,
+    inventory: state?.inventory?.counts ?? {},
+    craftable_items: state?.craftable_items ?? [],
+  };
 }

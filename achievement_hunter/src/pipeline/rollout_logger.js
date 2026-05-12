@@ -161,36 +161,38 @@ function format_kind_list(kinds) {
   return escape_markdown(kinds.join(', '));
 }
 
-// One-line markdown rendering of a search_replanner state_delta. Returns
-// null when the delta is empty/absent so callers can skip the line.
-function format_state_delta(delta) {
-  if (!delta || typeof delta !== 'object') return null;
-  const parts = [];
+// Multi-line markdown rendering of a search_replanner attempt's
+// end_state ({position, inventory, craftable_items}). Returns null when
+// the snapshot is empty/absent so callers can skip the section.
+function format_end_state(state) {
+  if (!state || typeof state !== 'object') return null;
 
-  if (delta.position?.from && delta.position?.to) {
-    const f = delta.position.from;
-    const t = delta.position.to;
-    parts.push(`pos ${f.x},${f.y},${f.z} → ${t.x},${t.y},${t.z}`);
+  const lines = [];
+
+  const pos = state.position;
+  if (pos && pos.x != null) {
+    lines.push(`pos: \`${pos.x}, ${pos.y}, ${pos.z}\``);
   }
 
-  if (delta.inventory_gained &&
-      Object.keys(delta.inventory_gained).length > 0) {
-    const items = Object.entries(delta.inventory_gained)
-                      .map(([k, v]) => `${k} +${v}`)
+  const inv = state.inventory;
+  if (inv && Object.keys(inv).length > 0) {
+    const items = Object.entries(inv)
+                      .map(([k, v]) => `${k} ×${v}`)
                       .join(', ');
-    parts.push(`gained ${items}`);
+    lines.push(`inventory: ${escape_markdown(items)}`);
+  } else if (inv) {
+    lines.push('inventory: _(empty)_');
   }
 
-  if (delta.new_nearby_blocks?.length > 0) {
-    parts.push(`new blocks: ${delta.new_nearby_blocks.join(', ')}`);
+  const craft = state.craftable_items;
+  if (craft && craft.length > 0) {
+    lines.push(`craftable: ${escape_markdown(craft.join(', '))}`);
+  } else if (craft) {
+    lines.push('craftable: _(none)_');
   }
 
-  if (delta.removed_nearby_blocks?.length > 0) {
-    parts.push(`gone: ${delta.removed_nearby_blocks.join(', ')}`);
-  }
-
-  if (parts.length === 0) return null;
-  return escape_markdown(parts.join(' · '));
+  if (lines.length === 0) return null;
+  return lines.join('; ');
 }
 
 // Strips fields whose value would be the structural default so the persisted
@@ -507,8 +509,8 @@ const stage_renderer = {
       for (const prev of [...previous].reverse()) {
         parts.push(`- _(attempt ${prev.attempt})_ ${
             escape_markdown(prev.summary)}\n`);
-        const delta_line = format_state_delta(prev.state_delta);
-        if (delta_line) parts.push(`  - _delta:_ ${delta_line}\n`);
+        const end_line = format_end_state(prev.end_state);
+        if (end_line) parts.push(`  - _end state:_ ${end_line}\n`);
       }
     }
 
@@ -939,7 +941,7 @@ export function createRolloutLogger(objective) {
         live_state.search_recovery = {task, target, attempts: []};
       }
       live_state.search_recovery.attempts.push(
-          {attempt, summary, planned_actions, results: [], state_delta: null});
+          {attempt, summary, planned_actions, results: [], end_state: null});
       record_stage({
         stage: STAGE.SEARCH_RECOVERY,
         type: 'attempt_start',
@@ -966,15 +968,15 @@ export function createRolloutLogger(objective) {
       render_live();
     },
 
-    search_recovery_attempt_end(attempt_num, state_delta) {
+    search_recovery_attempt_end(attempt_num, end_state) {
       const entry = live_state.search_recovery?.attempts.find(
           a => a.attempt === attempt_num);
-      if (entry) entry.state_delta = state_delta;
+      if (entry) entry.end_state = end_state;
       record_stage({
         stage: STAGE.SEARCH_RECOVERY,
         type: 'attempt_end',
         attempt: attempt_num,
-        state_delta,
+        end_state,
       });
       render_live();
     },

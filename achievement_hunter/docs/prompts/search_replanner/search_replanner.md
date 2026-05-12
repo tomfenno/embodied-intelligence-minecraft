@@ -33,8 +33,8 @@ You receive:
    - `summary`: the 1-2 sentence rationale that attempt's LLM call produced.
    - `actions`: the action plan that was executed.
    - `results`: per-action outcomes — `{command, success, kind, message}`. `kind` values include `command_success`, `command_failure`, `search_success`, `search_exhausted`, `search_found_not_reached`, `search_already_attempted`, `invalid_command`, `mode_interrupted`, `runner_exception`.
-   - `state_delta`: how the world state changed during that attempt. May include `position` (`{from, to}`), `inventory_gained` (positive-only item diffs), `new_nearby_blocks`, and `removed_nearby_blocks`. Fields are omitted when empty.
-   Use this history to avoid repeating strategies that already failed, to build on partial progress (e.g. items gained, terrain reached), and to recognize when a different direction or altitude is warranted. If empty, this is the first attempt; reason directly from `search_trace`.
+   - `end_state`: the bot's state at the end of that attempt — `{position, inventory, craftable_items}`. `inventory` is absolute counts; `craftable_items` lists every recipe currently craftable from that position (already accounts for nearby `crafting_table` or a `crafting_table` in inventory).
+   Use this history to avoid repeating strategies that already failed, to build on accumulated inventory (a `wooden_pickaxe` you crafted last attempt is still in inventory now), and to decide whether a craft/smelt/collect step would be useful before the next `!search`. If empty, this is the first attempt; reason directly from `search_trace`.
 
 4. `available_actions`
    JSON array of legal actions. 
