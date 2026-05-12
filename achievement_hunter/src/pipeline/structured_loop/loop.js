@@ -9,13 +9,7 @@ import {generate_primary_task_dag_self_refined} from '../self_refine.js';
 
 import {execute_task_action} from './actions.js';
 import {BreadcrumbTracker} from './breadcrumbs.js';
-import {
-  BREADCRUMB_LANDMARK_POOL_SIZE,
-  BREADCRUMB_MIN_DIST,
-  BREADCRUMB_PERIOD_MS,
-  BREADCRUMB_RECENT_POOL_SIZE,
-  MAX_OUTER_RETRIES,
-} from './config.js';
+import {BREADCRUMB_LANDMARK_POOL_SIZE, BREADCRUMB_MIN_DIST, BREADCRUMB_PERIOD_MS, BREADCRUMB_RECENT_POOL_SIZE, MAX_OUTER_RETRIES,} from './config.js';
 import {build_incoming_edge_map, edge_in_subgraph, edge_key,} from './graph.js';
 import {make_spl} from './log.js';
 import {make_fallback_acquisition_task, select_next_task, try_make_craft_task, try_make_immediate_acquisition_task, try_make_interact_task, try_make_smelt_task,} from './tasks.js';
@@ -30,13 +24,13 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   // This hard coded option to load a graph is intended. Do not remove.
   const load_graph = true;
   const graph_file_path =
-      //    './achievement_hunter/docs/ptd_jsons/shear_a_sheep_and_sleep_in_a_colored_bed.json';
-      //   './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
-      //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
-      `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
+      './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_diamond.json'
+  //   './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
+  //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
+  //  `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
   // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
   //    './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
-  // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
+  './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
   // './achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
   graph = load_graph ? await load_graph_from_file(graph_file_path) :
                        await generate_primary_task_dag_self_refined(
@@ -100,10 +94,9 @@ export async function structured_loop(models, agent, task_name, graph = null) {
     restored_failures = prior_runtime?.outer?.consecutive_failures ?? 0;
     if (prior_runtime?.active_task != null) {
       restored_failures += 1;
-      spl.warn(
-          `Detected mid-task crash (active_task=${
-              prior_runtime.active_task.key}). consecutive_failures bumped to ${
-              restored_failures}.`);
+      spl.warn(`Detected mid-task crash (active_task=${
+          prior_runtime.active_task.key}). consecutive_failures bumped to ${
+          restored_failures}.`);
     }
     save_runtime_state({outer: {consecutive_failures: restored_failures}});
   }

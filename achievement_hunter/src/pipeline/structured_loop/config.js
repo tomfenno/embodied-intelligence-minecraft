@@ -44,7 +44,7 @@ export const MAX_COLLECT_QTY = 16;
 // --- Failure replanner (failure_replanner.js) ---
 
 // Maximum number of recovery attempts (replanner invocations) per failed task.
-export const MAX_RECOVERY_ATTEMPTS = 3;
+export const MAX_RECOVERY_ATTEMPTS = 10;
 
 // Maximum retries per individual action inside a recovery plan.
 export const FAILURE_REPLANNER_MAX_ACTION_RETRIES = 3;
@@ -52,13 +52,13 @@ export const FAILURE_REPLANNER_MAX_ACTION_RETRIES = 3;
 // --- Search replanner (search_replanner.js) ---
 
 // Maximum number of search-recovery attempts per failed search.
-export const MAX_SEARCH_REPLANNER_ATTEMPTS = 3;
+export const MAX_SEARCH_REPLANNER_ATTEMPTS = 10;
 
 // Hard cap on the number of actions a single search-recovery plan may emit.
 export const MAX_ACTIONS_PER_PLAN = 10;
 
 // Maximum retries per individual action inside a search-recovery plan.
-export const SEARCH_REPLANNER_MAX_ACTION_RETRIES = 2;
+export const SEARCH_REPLANNER_MAX_ACTION_RETRIES = 3;
 
 // Debounce delay (ms) between actions in a search-recovery plan.
 export const ACTION_DEBOUNCE_MS = 750;
