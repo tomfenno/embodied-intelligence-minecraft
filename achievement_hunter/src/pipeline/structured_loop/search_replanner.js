@@ -2,7 +2,7 @@ import {appendFileSync, mkdirSync, readFileSync, writeFileSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
-import {get_am_state, get_recovery_trace_state, get_search_trace_state} from '../agent_state.js';
+import {diff_search_state, get_am_state, get_recovery_trace_state, get_search_trace_state} from '../agent_state.js';
 import {clearActiveReplanner as clear_active_replanner, loadCheckpoint as load_checkpoint, saveRuntimeState as save_runtime_state,} from '../checkpoint.js';
 import {executeCommandWithModeRecovery, PATHFINDING_MESSAGE_REGEX} from '../command_utils.js';
 import {extract_json} from '../json_utils.js';
@@ -337,6 +337,7 @@ export async function recover_failed_search(
     spl.log(`Attempt ${attempt}/${MAX_SEARCH_REPLANNER_ATTEMPTS}`);
 
     const search_trace_state = get_search_trace_state(agent, breadcrumb_tracker);
+    const attempt_start_state = search_trace_state;
     const prompt = fill_search_replanner_prompt(
         targets, search_trace_state, previous_summaries, available_actions);
 
@@ -454,14 +455,27 @@ export async function recover_failed_search(
       return finalize('success', 'target_reached');
     }
 
-    // Plan ended without finding any candidate. Push the summary so the
-    // next attempt's LLM call can adapt, and loop. If this was the last
-    // attempt, the for-loop exits and falls through to the exhausted-
-    // recovery path below.
+    // Plan ended without finding any candidate. Push the summary, the
+    // per-action results, and a state delta so the next attempt's LLM
+    // call can see what changed (items gained, new biome blocks, how
+    // far the bot moved) rather than re-reasoning from scratch. If
+    // this was the last attempt, the for-loop exits and falls through
+    // to the exhausted-recovery path below.
+    const attempt_end_state =
+        get_search_trace_state(agent, breadcrumb_tracker);
+    const state_delta = diff_search_state(attempt_start_state, attempt_end_state);
+    log?.search_recovery_attempt_end?.(attempt, state_delta);
     previous_summaries.push({
       attempt,
       summary: replanner_output.summary,
       actions: replanner_output.actions,
+      results: action_results.map(r => ({
+        command: r.command,
+        success: r.success,
+        kind: r.kind,
+        message: r.message,
+      })),
+      state_delta,
     });
   }
 

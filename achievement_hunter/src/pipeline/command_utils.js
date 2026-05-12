@@ -54,7 +54,15 @@ export async function executeCommandWithModeRecovery(
   const verifier_pre_state = snapshot_state(agent, verifier_needs);
 
   while (true) {
+    if (agent.bot._ah_death_pending) {
+      log(`Bot death observed before command — aborting: ${command}`);
+      return build_bot_died_result(command);
+    }
     const result = await executeCommand(agent, command);
+    if (agent.bot._ah_death_pending) {
+      log(`Bot death observed during command — aborting: ${command}`);
+      return build_bot_died_result(command);
+    }
 
     if (result?.success === true) {
       // Post-condition verifier check. `verify_command_outcome`
@@ -102,6 +110,10 @@ export async function executeCommandWithModeRecovery(
           command);
 
       const idled = await agent.bot.modes.waitForIdle(MODE_IDLE_TIMEOUT_MS);
+      if (agent.bot._ah_death_pending) {
+        log(`Bot death observed during mode-idle wait — aborting: ${command}`);
+        return build_bot_died_result(command);
+      }
       if (!idled) {
         warn('Modes did not idle within timeout, treating as failure:', command);
         return build_mode_interrupted_result(
@@ -115,6 +127,14 @@ export async function executeCommandWithModeRecovery(
 
     return result;
   }
+}
+
+function build_bot_died_result(command) {
+  return {
+    success: false,
+    message: `bot_died: aborted ${command} after bot death — SPL will re-enter SCSG on respawn`,
+    bot_died: true,
+  };
 }
 
 function build_mode_interrupted_result(

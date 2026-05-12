@@ -32,6 +32,10 @@ export async function run_search(target, state, agent, log, start_attempt) {
       log.am(++attempt, command, null, {source: log_source.search});
       const {found, message} =
           await execute_search_command(agent, item, radius, command);
+      if (agent.bot._ah_death_pending) {
+        spl.log(`Bot death observed during run_search — aborting radii loop for "${target}".`);
+        return {found: false, message: null, bot_died: true};
+      }
       if (found) return {found: true, message};
     }
   }
@@ -139,6 +143,15 @@ export async function run_breadth_first_sweep(
         log.am(++attempt, command, null, {source: log_source.search});
         const {found, message} =
             await execute_search_command(agent, item, radius, command);
+        if (agent.bot._ah_death_pending) {
+          spl.log(`Bot death observed during sweep — aborting at "${item}" r=${radius}.`);
+          return {
+            found: false,
+            sources_exhausted: sources.slice(),
+            outcomes,
+            bot_died: true,
+          };
+        }
         if (found) {
           if (check_search_complete(item, get_am_state(agent))) {
             // Target found AND reached. SPL outer loop can resume.

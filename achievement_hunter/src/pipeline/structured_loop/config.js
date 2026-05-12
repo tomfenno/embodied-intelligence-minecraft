@@ -23,7 +23,7 @@ export const BREADCRUMB_LANDMARK_POOL_SIZE = 48;
 
 // Sampling interval (ms) at which the breadcrumb tracker considers recording
 // a new breadcrumb.
-export const BREADCRUMB_PERIOD_MS = 1000;
+export const BREADCRUMB_PERIOD_MS = 10000;
 
 // Caps the spatial_isolation contribution to a landmark's score (in units of
 // BREADCRUMB_MIN_DIST). Prevents a single faraway outlier from dominating.

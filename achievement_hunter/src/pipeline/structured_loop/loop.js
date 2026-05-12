@@ -24,13 +24,13 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   // This hard coded option to load a graph is intended. Do not remove.
   const load_graph = true;
   const graph_file_path =
-      './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_diamond.json'
-  //   './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
+      //    './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_diamond.json'
+      './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
   //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
   //  `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
-  // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
+  //  './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
   //    './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
-  './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
+  //  './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
   // './achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
   graph = load_graph ? await load_graph_from_file(graph_file_path) :
                        await generate_primary_task_dag_self_refined(
@@ -101,9 +101,26 @@ export async function structured_loop(models, agent, task_name, graph = null) {
     save_runtime_state({outer: {consecutive_failures: restored_failures}});
   }
 
+  // Cleared at the top of structured_loop and after the death-respawn branch
+  // consumes it. Inner async loops (executeCommandWithModeRecovery's mode-
+  // retry while-loop, run_search / run_breadth_first_sweep's radii loops,
+  // execute_task_action's attempt loop) check this flag after each await and
+  // bail with a bot_died-tagged result that bubbles up as a 'death' return,
+  // so the next outer iteration enters the death_pending branch and SCSG
+  // re-runs against the post-respawn (empty) inventory.
+  bot._ah_death_pending = false;
+
   const on_death = () => {
     spl.log('Bot died — awaiting respawn to recompute SCSG.');
     death_pending = true;
+    bot._ah_death_pending = true;
+    // Break any in-flight pathfinder.goto so executeCommand returns promptly.
+    // Best-effort: pathfinder may not exist on very early deaths, and stop()
+    // is a no-op when no goal is active.
+    try {
+      bot.pathfinder?.stop();
+    } catch {
+    }
     breadcrumb_tracker.reset();
     post_respawn_promise = new Promise(
         resolve => bot.once('spawn', () => setTimeout(resolve, 500)));
@@ -118,6 +135,7 @@ export async function structured_loop(models, agent, task_name, graph = null) {
       if (death_pending) {
         death_pending = false;
         await post_respawn_promise;
+        bot._ah_death_pending = false;
         spl.log('Respawned — recomputing SCSG with post-death inventory.');
         consecutive_failures = 0;
         persist_failures();
@@ -150,11 +168,19 @@ export async function structured_loop(models, agent, task_name, graph = null) {
         continue;
       }
 
-      if (await execute_task_action(
-              task, agent, log, models.failure_replanner, graph,
-              models.search_replanner, breadcrumb_tracker) === 'success') {
+      const task_result = await execute_task_action(
+          task, agent, log, models.failure_replanner, graph,
+          models.search_replanner, breadcrumb_tracker);
+      if (task_result === 'success') {
         consecutive_failures = 0;
         persist_failures();
+        continue;
+      }
+      if (task_result === 'death') {
+        // Death event already set death_pending; next iteration's top-of-loop
+        // branch handles respawn + SCSG re-eval. Skip the failure bump so a
+        // death near MAX_OUTER_RETRIES doesn't trip the cap.
+        spl.log('Task aborted due to bot death — re-entering SCSG on respawn.');
         continue;
       }
 

@@ -161,6 +161,38 @@ function format_kind_list(kinds) {
   return escape_markdown(kinds.join(', '));
 }
 
+// One-line markdown rendering of a search_replanner state_delta. Returns
+// null when the delta is empty/absent so callers can skip the line.
+function format_state_delta(delta) {
+  if (!delta || typeof delta !== 'object') return null;
+  const parts = [];
+
+  if (delta.position?.from && delta.position?.to) {
+    const f = delta.position.from;
+    const t = delta.position.to;
+    parts.push(`pos ${f.x},${f.y},${f.z} → ${t.x},${t.y},${t.z}`);
+  }
+
+  if (delta.inventory_gained &&
+      Object.keys(delta.inventory_gained).length > 0) {
+    const items = Object.entries(delta.inventory_gained)
+                      .map(([k, v]) => `${k} +${v}`)
+                      .join(', ');
+    parts.push(`gained ${items}`);
+  }
+
+  if (delta.new_nearby_blocks?.length > 0) {
+    parts.push(`new blocks: ${delta.new_nearby_blocks.join(', ')}`);
+  }
+
+  if (delta.removed_nearby_blocks?.length > 0) {
+    parts.push(`gone: ${delta.removed_nearby_blocks.join(', ')}`);
+  }
+
+  if (parts.length === 0) return null;
+  return escape_markdown(parts.join(' · '));
+}
+
 // Strips fields whose value would be the structural default so the persisted
 // candidate is the minimum information needed to reconstruct the original.
 // Consumers should treat any missing key as the listed default.
@@ -475,6 +507,8 @@ const stage_renderer = {
       for (const prev of [...previous].reverse()) {
         parts.push(`- _(attempt ${prev.attempt})_ ${
             escape_markdown(prev.summary)}\n`);
+        const delta_line = format_state_delta(prev.state_delta);
+        if (delta_line) parts.push(`  - _delta:_ ${delta_line}\n`);
       }
     }
 
@@ -905,7 +939,7 @@ export function createRolloutLogger(objective) {
         live_state.search_recovery = {task, target, attempts: []};
       }
       live_state.search_recovery.attempts.push(
-          {attempt, summary, planned_actions, results: []});
+          {attempt, summary, planned_actions, results: [], state_delta: null});
       record_stage({
         stage: STAGE.SEARCH_RECOVERY,
         type: 'attempt_start',
@@ -928,6 +962,19 @@ export function createRolloutLogger(objective) {
         attempt: attempt_num,
         action_index,
         result,
+      });
+      render_live();
+    },
+
+    search_recovery_attempt_end(attempt_num, state_delta) {
+      const entry = live_state.search_recovery?.attempts.find(
+          a => a.attempt === attempt_num);
+      if (entry) entry.state_delta = state_delta;
+      record_stage({
+        stage: STAGE.SEARCH_RECOVERY,
+        type: 'attempt_end',
+        attempt: attempt_num,
+        state_delta,
       });
       render_live();
     },

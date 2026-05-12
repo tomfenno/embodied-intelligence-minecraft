@@ -66,21 +66,6 @@ export function initBot(username) {
 
     const bot = createBot(options);
     bot.loadPlugin(pathfinder);
-    // Start of AH code
-    // Raise pathfinder's per-goto A* budget from the library default of 5000ms.
-    // Long-distance targets emitted by search_replanner / failure_replanner
-    // (radius up to 256+) regularly exceed 5s of planning and trigger
-    // "Took to long to decide path to goal!". Matches the 15000ms used by the
-    // pre-flight getPathTo calls in skills.js (goToPosition).
-    //
-    // Deferred until `inject_allowed` because mineflayer's plugin loader
-    // (node_modules/mineflayer/lib/plugin_loader.js) only runs each plugin's
-    // inject function after that event — `bot.pathfinder` does not exist
-    // synchronously after `loadPlugin(pathfinder)`.
-    bot.once('inject_allowed', () => {
-        bot.pathfinder.thinkTimeout = 15000;
-    });
-    // End of AH code
     bot.loadPlugin(pvp);
     bot.loadPlugin(collectblock);
     bot.loadPlugin(autoEat);

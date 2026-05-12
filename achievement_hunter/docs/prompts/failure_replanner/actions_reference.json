@@ -127,8 +127,7 @@
       "item_must_be_smeltable": true,
       "input_item_must_be_in_inventory": true,
       "fuel_must_be_available": true,
-      "furnace_must_be_nearby": true,
-      "restarts_agent_on_success": true
+      "furnace_must_be_in_inventory": true
     },
     "examples": ["!smeltItem(\"raw_iron\", 8)", "!smeltItem(\"raw_gold\", 4)"]
   },

@@ -10,13 +10,13 @@
       },
       "closeness": {
         "min": 0,
-        "recommended use": "Use as large of a closeness value as to maximize the chance of success. Closeness values near 1 are much more likely to fail than larger closeness values."
+        "recommended use": "Use as large of a closeness value to maximize the chance of success. Closeness values near 1 are much more likely to fail than larger closeness values."
       },
       "horizontal_distance_from_current_position": {
         "max": 250,
         "metric": "euclidean",
         "applies_to": ["x", "z"],
-        "description": "The target x/z coordinate must be within 500 horizontal blocks of the agent's current x/z position."
+        "description": "The target x/z coordinate must be within 250 horizontal blocks of the agent's current x/z position."
       },
       "max_uses_per_recovery_plan": 1
     },
@@ -31,22 +31,68 @@
     "description": "Search for the nearest block or entity of a given type by sweeping radii 32, 64, 128, 256 from the bot's current position. Equivalent to running a maximum-radius search; there is no broader scan available.",
     "category": "movement",
     "constraints": {
-      "abstract_targets_allowed": "Concrete names (e.g. \"oak_log\", \"diamond_ore\") and registered abstract category names (e.g. \"any_log\") are both accepted. Abstract searches expand internally to one !searchForBlock per concrete member at each radius — usually more efficient than searching members individually. When a candidate in CANDIDATE_TARGETS is abstract, prefer the abstract form. Use the candidate's exact name when possible.",
+      "target_must_be_concrete": "Pass concrete block or entity names, e.g. \"chicken\", \"diamond_ore\" or abstract category names, e.g. \"any_log\" when appropriate.",
       "max_search_radius": 256,
-      "plan_terminates_on_success": "As soon as one !search action finds a candidate AND the bot reaches it, the entire plan ends successfully and execution returns to the structured loop. Subsequent actions in the plan are skipped. Issue !search aggressively — a wasted scan costs only one radius sweep.",
-      "exhaustion_is_terminal_at_position": "If !search returns 'search_exhausted', re-issuing !search from the same position will fail identically. The bot must relocate (via !goToCoordinates, !digDown, or !goToSurface) before another !search will yield new results.",
-      "no_repeat_in_sequence": "Two !search actions with the same exact target string in one plan without a relocation between them will short-circuit to 'search_already_attempted'."
+      "exhaustion_is_terminal": "If a previous !search for the same target returned 'search_exhausted', re-issuing !search from the same position will fail identically. Relocate first before searching again.",
+      "no_repeat_in_sequence": "A second !search for the same target inside one recovery action sequence will short-circuit to 'search_already_attempted'.",
+      "requires_relocation_after_exhaustion": true
+    },
+    "examples": ["!search(\"chicken\")", "!search(\"diamond_ore\")"]
+  },
+  {
+    "name": "!collectBlocks",
+    "description": "Collect the nearest blocks of a given type. Only works if the block is currently present in the state.",
+    "category": "collection",
+    "constraints": {
+      "num": {
+        "min": 1
+      },
+      "target_must_be_in_state": true,
+      "recommended_use": "Use only after !search succeeds for the same block type, or when the block is already visible in nearby.blocks.",
+      "do_not_use_after_failed_search": "If !search for this block returned search_exhausted from the current position, !collectBlocks will not help.",
+      "timeout_minutes": 10
     },
     "examples": [
-      "!search(\"chicken\")",
-      "!search(\"diamond_ore\")",
-      "!search(\"any_log\")"
+      "!collectBlocks(\"oak_log\", 10)",
+      "!collectBlocks(\"stone\", 32)"
     ]
   },
   {
+    "name": "!craftRecipe",
+    "description": "Craft the given recipe a given number of times.",
+    "category": "crafting",
+    "constraints": {
+      "num": {
+        "min": 1
+      },
+      "recipe_must_be_known": true,
+      "required_inputs_must_be_in_inventory": true,
+      "crafting_table_required_for_some_recipes": true
+    },
+    "examples": [
+      "!craftRecipe(\"stick\", 4)",
+      "!craftRecipe(\"crafting_table\", 1)"
+    ]
+  },
+  {
+    "name": "!smeltItem",
+    "description": "Smelt the given item the given number of times.",
+    "category": "crafting",
+    "constraints": {
+      "num": {
+        "min": 1
+      },
+      "item_must_be_smeltable": true,
+      "input_item_must_be_in_inventory": true,
+      "fuel_must_be_available": true,
+      "furnace_must_be_in_inventory": true
+    },
+    "examples": ["!smeltItem(\"raw_iron\", 8)", "!smeltItem(\"raw_gold\", 4)"]
+  },
+  {
     "name": "!digDown",
-    "description": "Digs straight down a specified distance from the bot's current position. Stops if it reaches lava, water, or a fall >=4 blocks below the bot.",
-    "category": "movement",
+    "description": "Digs down a specified distance. Stops if it reaches lava, water, or a fall >=4 blocks below the bot.",
+    "category": "collection",
     "constraints": {
       "distance": {
         "min": 1,
@@ -56,7 +102,7 @@
       "stops_at_lava": true,
       "stops_at_water": true,
       "stops_at_drop_gte_4": true,
-      "recommended_use": "Useful for accessing underground biomes when searching for ores or caves. Each !digDown moves the bot 1-32 blocks closer to a different y-level slice, where the next !search will sweep a fresh region."
+      "do_not_use_for_navigation": "Do not use to reach distant targets or escape failed surface searches."
     },
     "examples": ["!digDown(5)", "!digDown(20)"]
   },
@@ -65,8 +111,7 @@
     "description": "Moves the bot to the highest block above it, usually the surface.",
     "category": "movement",
     "constraints": {
-      "only_use_when_below_surface_or_obstructed": true,
-      "recommended_use": "Use after underground searches exhaust to return the bot to surface terrain before heading to a new biome."
+      "only_use_when_below_surface_or_obstructed": true
     },
     "examples": ["!goToSurface()"]
   }

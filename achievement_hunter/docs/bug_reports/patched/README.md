@@ -16,6 +16,7 @@ Bugs whose fixes have been applied on branch `hard-code-nts-am`.
 | 14 | `BUG14_pathfinder_canHarvest_aborts_on_snow_block_without_shovel.md` | Medium | `src/agent/library/skills.js:1232–1245` (hardness-gated `canHarvest` abort in `goToPosition`'s watchdog) |
 | 15 | `BUG15_unstuck_collectblocks_livelock_on_buried_iron_ore.md` | High | `command_utils.js` (rich `mode_interrupted` result), `actions.js` (kind + Fix B early-abort), `trace.js`, `ah_modes.js` (`getActiveModeNames`), `docs/prompts/failure_replanner/failure_replanner.md` (reasoning guidance) — Fix B only; Fix A deferred |
 | 16 | `BUG16_block_dig_missing_sequence_field_server_rejects_completion.md` | High | `patches/mineflayer+4.37.1.patch` — bot-level `sequence` counter threaded into all `block_dig` write sites (`digging.js`) + `use_item`/`block_dig`-release (`inventory.js`); also folds in still-relevant hunks from the now-deleted `mineflayer+4.33.0.patch` (digTime material rewrite, place_block timeout). Fix 2 (subscribe to `acknowledge_player_digging`) deferred |
+| 20 | `BUG20_raised_thinktimeout_amplifies_search_wander_and_unstuck_wedge.md` | High | `src/utils/mcdata.js:67–69` — revert of the `bot.once('inject_allowed', …)` block that set `bot.pathfinder.thinkTimeout = 15000`; pathfinder library default of `5000` ms is now in effect again. `goToGoal`'s explicit `pathfind_timeout=15000` pre-flights (`src/agent/library/skills.js:1127, 1131`) are unaffected. Fix B (skill-level `Promise.race` watchdog on `goToNearestBlock`) and Fix C (digCost audit) deferred |
 
 ## Verifying a fix
 

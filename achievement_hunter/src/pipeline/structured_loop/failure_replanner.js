@@ -2,19 +2,15 @@ import {readFileSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
-import {executeCommandWithModeRecovery} from '../command_utils.js';
 import * as skills from '../../../../src/agent/library/skills.js';
 import {get_am_state, get_recovery_trace_state, get_sgsg_state} from '../agent_state.js';
 import {clearActiveReplanner as clear_active_replanner, loadCheckpoint as load_checkpoint, saveRuntimeState as save_runtime_state,} from '../checkpoint.js';
+import {executeCommandWithModeRecovery} from '../command_utils.js';
 import {extract_json} from '../json_utils.js';
 import {fill_failure_replanner_prompt} from '../prompt_utils.js';
 import {compute_scsg} from '../scsg.js';
 
-import {
-  CRAFT_DEBOUNCE_MS,
-  FAILURE_REPLANNER_MAX_ACTION_RETRIES as MAX_ACTION_RETRIES,
-  MAX_RECOVERY_ATTEMPTS,
-} from './config.js';
+import {CRAFT_DEBOUNCE_MS, FAILURE_REPLANNER_MAX_ACTION_RETRIES as MAX_ACTION_RETRIES, MAX_RECOVERY_ATTEMPTS,} from './config.js';
 import {make_spl} from './log.js';
 import {check_search_complete, run_search} from './search.js';
 import {task_key} from './tasks.js';
@@ -32,12 +28,6 @@ const HARD_FAILURE_KINDS = new Set([
   'search_exhausted',
   'search_already_attempted',
 ]);
-
-// `PATHFINDING_MESSAGE_REGEX` (formerly defined here) was moved to
-// `command_utils.js` so the reclassification logic and the regex live
-// in the same module. Callers that need the regex (e.g. the
-// `is_pathfinding_failure` helper in `search_replanner.js`) now import
-// it directly from `command_utils.js`.
 
 const spl = make_spl('[SPL][recovery]');
 
@@ -107,12 +97,10 @@ async function run_search_action(action, agent, log, searched_targets) {
 
     if (!found) {
       searched_targets.add(target);
-      return create_action_result(
-          command, false, 'search_exhausted', message);
+      return create_action_result(command, false, 'search_exhausted', message);
     }
 
-    const target_reached =
-        check_search_complete(target, get_am_state(agent));
+    const target_reached = check_search_complete(target, get_am_state(agent));
     return target_reached ?
         create_action_result(command, true, 'search_success', message) :
         create_action_result(
@@ -266,8 +254,7 @@ export async function ensure_safe_before_llm(agent) {
  * Returns 'success' if recovery completed the task, or 'fail' otherwise.
  */
 export async function recover_failed_task(
-    failed_trace, agent, model, graph, log = null,
-    baseline_inventory = null) {
+    failed_trace, agent, model, graph, log = null, baseline_inventory = null) {
   const available_actions = load_available_actions();
   const task = failed_trace.task;
   const previous_diagnoses = [];
@@ -280,9 +267,8 @@ export async function recover_failed_task(
   const current_task_key = task_key(task);
   const prior_replanner =
       load_checkpoint()?.runtime_state?.active_replanner ?? null;
-  const resume_attempt =
-      (prior_replanner?.kind === 'failure' &&
-       prior_replanner.task_key === current_task_key) ?
+  const resume_attempt = (prior_replanner?.kind === 'failure' &&
+                          prior_replanner.task_key === current_task_key) ?
       Math.max(1, prior_replanner.outer_attempt ?? 1) :
       1;
   if (resume_attempt > 1) {
@@ -291,133 +277,132 @@ export async function recover_failed_task(
   }
 
   try {
-
-  for (let attempt = resume_attempt; attempt <= MAX_RECOVERY_ATTEMPTS;
-       attempt++) {
-    save_runtime_state({
-      active_replanner: {
-        kind: 'failure',
-        task_key: current_task_key,
-        outer_attempt: attempt,
-        action_index: 0,
-        action_retry: 0,
-        plan: null,
-      },
-    });
-    spl.log(`Attempt ${attempt}/${MAX_RECOVERY_ATTEMPTS}`);
-
-    const prompt = fill_failure_replanner_prompt(
-        failed_trace, previous_diagnoses, available_actions);
-
-    await ensure_safe_before_llm(agent);
-
-    let replanner_output = null;
-    try {
-      const raw = await model.send_prompt(prompt);
-      replanner_output = extract_json(raw);
-    } catch (e) {
-      spl.error('LLM call failed:', e.message);
-      break;
-    }
-
-    if (replanner_output === null) {
-      spl.warn('LLM returned null or unparseable output, skipping attempt.');
-      continue;
-    }
-
-    try {
-      validate_replanner_output(replanner_output, available_actions);
-    } catch (e) {
-      spl.warn('Validation failed:', e.message);
-      break;
-    }
-
-    spl.log('Diagnosis:', replanner_output.diagnosis);
-
-    previous_diagnoses.push({
-      attempt,
-      diagnosis: replanner_output.diagnosis,
-      actions: replanner_output.actions,
-    });
-
-    log?.recovery_attempt(
-        attempt, task, replanner_output.diagnosis, replanner_output.actions);
-
-    const action_results = [];
-    let latest_state = null;
-    let hard_failed = false;
-
-    for (let action_index = 0; action_index < replanner_output.actions.length;
-         action_index++) {
+    for (let attempt = resume_attempt; attempt <= MAX_RECOVERY_ATTEMPTS;
+         attempt++) {
       save_runtime_state({
         active_replanner: {
           kind: 'failure',
           task_key: current_task_key,
           outer_attempt: attempt,
-          action_index,
+          action_index: 0,
           action_retry: 0,
           plan: null,
         },
       });
-      const action = replanner_output.actions[action_index];
-      const action_command = format_action_as_command(action);
+      spl.log(`Attempt ${attempt}/${MAX_RECOVERY_ATTEMPTS}`);
 
-      let result = null;
-      for (let retry = 0; retry < MAX_ACTION_RETRIES; retry++) {
+      const prompt = fill_failure_replanner_prompt(
+          failed_trace, previous_diagnoses, available_actions);
+
+      await ensure_safe_before_llm(agent);
+
+      let replanner_output = null;
+      try {
+        const raw = await model.send_prompt(prompt);
+        replanner_output = extract_json(raw);
+      } catch (e) {
+        spl.error('LLM call failed:', e.message);
+        break;
+      }
+
+      if (replanner_output === null) {
+        spl.warn('LLM returned null or unparseable output, skipping attempt.');
+        continue;
+      }
+
+      try {
+        validate_replanner_output(replanner_output, available_actions);
+      } catch (e) {
+        spl.warn('Validation failed:', e.message);
+        break;
+      }
+
+      spl.log('Diagnosis:', replanner_output.diagnosis);
+
+      previous_diagnoses.push({
+        attempt,
+        diagnosis: replanner_output.diagnosis,
+        actions: replanner_output.actions,
+      });
+
+      log?.recovery_attempt(
+          attempt, task, replanner_output.diagnosis, replanner_output.actions);
+
+      const action_results = [];
+      let latest_state = null;
+      let hard_failed = false;
+
+      for (let action_index = 0; action_index < replanner_output.actions.length;
+           action_index++) {
         save_runtime_state({
           active_replanner: {
             kind: 'failure',
             task_key: current_task_key,
             outer_attempt: attempt,
             action_index,
-            action_retry: retry,
+            action_retry: 0,
             plan: null,
           },
         });
-        if (retry > 0)
-          spl.log(
-              `Retrying action (${retry}/${MAX_ACTION_RETRIES - 1}):`,
-              action_command);
-        else
-          spl.log('Executing:', action_command);
+        const action = replanner_output.actions[action_index];
+        const action_command = format_action_as_command(action);
 
-        result = await run_action(action, agent, log, searched_targets);
-        spl.log('Result:', result);
+        let result = null;
+        for (let retry = 0; retry < MAX_ACTION_RETRIES; retry++) {
+          save_runtime_state({
+            active_replanner: {
+              kind: 'failure',
+              task_key: current_task_key,
+              outer_attempt: attempt,
+              action_index,
+              action_retry: retry,
+              plan: null,
+            },
+          });
+          if (retry > 0)
+            spl.log(
+                `Retrying action (${retry}/${MAX_ACTION_RETRIES - 1}):`,
+                action_command);
+          else
+            spl.log('Executing:', action_command);
 
-        log?.recovery_action_result(attempt, action_index, result);
-        latest_state = get_recovery_trace_state(agent, baseline_inventory);
+          result = await run_action(action, agent, log, searched_targets);
+          spl.log('Result:', result);
 
-        if (scsg_task_complete_check(task, graph, agent)) {
-          spl.log('Task complete after recovery.');
-          log?.recovery_end('success');
-          return 'success';
+          log?.recovery_action_result(attempt, action_index, result);
+          latest_state = get_recovery_trace_state(agent, baseline_inventory);
+
+          if (scsg_task_complete_check(task, graph, agent)) {
+            spl.log('Task complete after recovery.');
+            log?.recovery_end('success');
+            return 'success';
+          }
+
+          if (result.success || result_indicates_hard_failure(result)) break;
         }
 
-        if (result.success || result_indicates_hard_failure(result)) break;
+        action_results.push(result);
+
+        if (result_indicates_hard_failure(result)) {
+          spl.warn('Hard failure, stopping action sequence:', result.kind);
+          hard_failed = true;
+          break;
+        }
       }
 
-      action_results.push(result);
-
-      if (result_indicates_hard_failure(result)) {
-        spl.warn('Hard failure, stopping action sequence:', result.kind);
-        hard_failed = true;
-        break;
+      if (latest_state === null) {
+        latest_state = get_recovery_trace_state(agent, baseline_inventory);
       }
+
+      if (hard_failed) break;
+
+      failed_trace = build_failed_trace_from_attempt(
+          failed_trace, action_results, latest_state);
     }
 
-    if (latest_state === null) {
-      latest_state = get_recovery_trace_state(agent, baseline_inventory);
-    }
-
-    if (hard_failed) break;
-
-    failed_trace = build_failed_trace_from_attempt(
-        failed_trace, action_results, latest_state);
-  }
-
-  spl.warn(`Recovery exhausted after ${MAX_RECOVERY_ATTEMPTS} attempts.`);
-  log?.recovery_end('fail');
-  return 'fail';
+    spl.warn(`Recovery exhausted after ${MAX_RECOVERY_ATTEMPTS} attempts.`);
+    log?.recovery_end('fail');
+    return 'fail';
 
   } finally {
     clear_active_replanner();

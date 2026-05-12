@@ -139,6 +139,10 @@ export async function execute_task_action(
       }
       current_step.result = await handle_search_action(
           search_target, state, agent, log, attempt_number);
+      if (agent.bot._ah_death_pending) {
+        spl.log(`Bot death observed after handle_search_action — aborting task.`);
+        return 'death';
+      }
       if (current_step.result.kind === 'search_exhausted') {
         // Search exhausted at radius 511. Before adding to searched_targets
         // and falling through to failure_replanner, give the search replanner
@@ -158,6 +162,10 @@ export async function execute_task_action(
           const search_recovery = await recover_failed_search(
               [search_target], agent, model_search_replanner,
               breadcrumb_tracker, log, task);
+          if (agent.bot._ah_death_pending) {
+            spl.log(`Bot death observed after search_replanner — aborting task.`);
+            return 'death';
+          }
           if (search_recovery === 'success') {
             spl.log('Search replanner relocated bot — retrying task.');
             continue;
@@ -176,11 +184,20 @@ export async function execute_task_action(
     const command_result = await executeCommandWithModeRecovery(agent, action.command);
     spl.log('Command result:', command_result);
 
+    if (command_result?.bot_died === true) {
+      spl.log(`Bot death observed in command result — aborting task.`);
+      return 'death';
+    }
+
     if (task.action_type === 'interact' &&
         is_successful_command_result(command_result)) {
       const interact_result = await handle_interact_success(
           task, agent, log, task_trace, attempt_number, command_result,
           baseline_inventory);
+      if (agent.bot._ah_death_pending) {
+        spl.log(`Bot death observed after interact success handler — aborting task.`);
+        return 'death';
+      }
 
       if (interact_result.status === 'success') {
         return finalize_task_trace(
@@ -263,9 +280,15 @@ export async function execute_task_action(
       finalize_task_trace(
           task_trace, agent, log, 'fail', 'repeated_identical_failure',
           baseline_inventory);
-      if (model && has_recoverable_failure(task_trace))
-        return await recover_failed_task(
+      if (model && has_recoverable_failure(task_trace)) {
+        const recovery = await recover_failed_task(
             task_trace, agent, model, graph, log, baseline_inventory);
+        if (agent.bot._ah_death_pending) {
+          spl.log(`Bot death observed after failure_replanner — aborting task.`);
+          return 'death';
+        }
+        return recovery;
+      }
       return 'fail';
     }
   }
@@ -273,9 +296,15 @@ export async function execute_task_action(
   finalize_task_trace(
       task_trace, agent, log, 'fail', 'exhausted_inner_retries',
       baseline_inventory);
-  if (model)
-    return await recover_failed_task(
+  if (model) {
+    const recovery = await recover_failed_task(
         task_trace, agent, model, graph, log, baseline_inventory);
+    if (agent.bot._ah_death_pending) {
+      spl.log(`Bot death observed after failure_replanner (exhausted retries) — aborting task.`);
+      return 'death';
+    }
+    return recovery;
+  }
   return 'fail';
 
   } finally {
@@ -344,6 +373,11 @@ async function handle_search_sweep(
   const sweep_result = await run_breadth_first_sweep(
       sources, agent, log, searched_targets, /*start_attempt=*/ 0);
 
+  if (sweep_result.bot_died === true || agent.bot._ah_death_pending) {
+    spl.log(`Bot death observed after sweep — aborting sweep task.`);
+    return 'death';
+  }
+
   if (sweep_result.found) {
     spl.log(`Sweep found "${sweep_result.item}" (from "${
         sweep_result.source}") — SPL outer loop will resume.`);
@@ -379,6 +413,10 @@ async function handle_search_sweep(
     const recovery = await recover_failed_search(
         sweep_result.sources_exhausted, agent, model_search_replanner,
         breadcrumb_tracker, log, task);
+    if (agent.bot._ah_death_pending) {
+      spl.log(`Bot death observed after sweep search_replanner — aborting task.`);
+      return 'death';
+    }
     if (recovery === 'success') {
       spl.log(
           'Search replanner relocated bot — sweep task succeeds by proxy.');
@@ -393,8 +431,13 @@ async function handle_search_sweep(
   finalize_task_trace(
       task_trace, agent, log, 'fail', 'sweep_exhausted', baseline_inventory);
   if (model) {
-    return await recover_failed_task(
+    const recovery = await recover_failed_task(
         task_trace, agent, model, graph, log, baseline_inventory);
+    if (agent.bot._ah_death_pending) {
+      spl.log(`Bot death observed after sweep failure_replanner — aborting task.`);
+      return 'death';
+    }
+    return recovery;
   }
   return 'fail';
 
