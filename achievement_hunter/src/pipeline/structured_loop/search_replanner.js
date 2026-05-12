@@ -3,25 +3,27 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 
 import {get_am_state, get_recovery_trace_state, get_search_trace_state} from '../agent_state.js';
+import {clearActiveReplanner as clear_active_replanner, loadCheckpoint as load_checkpoint, saveRuntimeState as save_runtime_state,} from '../checkpoint.js';
 import {executeCommandWithModeRecovery, PATHFINDING_MESSAGE_REGEX} from '../command_utils.js';
 import {extract_json} from '../json_utils.js';
 import {fill_search_replanner_prompt} from '../prompt_utils.js';
 
+import {
+  ACTION_DEBOUNCE_MS,
+  MAX_ACTIONS_PER_PLAN,
+  MAX_SEARCH_REPLANNER_ATTEMPTS,
+  SEARCH_REPLANNER_MAX_ACTION_RETRIES as MAX_ACTION_RETRIES,
+} from './config.js';
 import {ensure_safe_before_llm, format_action_as_command} from './failure_replanner.js';
 import {make_spl} from './log.js';
 import {check_search_complete, expand_search_item, run_search} from './search.js';
+import {task_key} from './tasks.js';
 import {create_action_result} from './trace.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const AVAILABLE_ACTIONS_PATH = path.join(
     __dirname,
     '../../../docs/prompts/search_replanner/actions_reference.json');
-
-const MAX_SEARCH_REPLANNER_ATTEMPTS = 3;
-const MAX_ACTIONS_PER_PLAN = 10;
-const MAX_ACTION_RETRIES = 2;
-
-const action_debounce_ms = 750;
 
 // Plan-terminating but NOT recovery-terminating: the current plan ends, but
 // the outer attempt loop continues (the LLM may produce a better plan next).
@@ -137,7 +139,7 @@ async function run_action(action, agent, log, searched_targets) {
     // is_pathfinding_failure check still fires D11 if the result is a
     // command_failure with a pathfinder-bail message.
     const env_result = await executeCommandWithModeRecovery(agent, command);
-    await sleep(action_debounce_ms);
+    await sleep(ACTION_DEBOUNCE_MS);
     const success = env_result?.success === true;
     return create_action_result(
         command, success, success ? 'command_success' : 'command_failure',
@@ -169,7 +171,7 @@ async function run_search_action(action, agent, log, searched_targets) {
   try {
     const state = get_am_state(agent);
     const {found, message} = await run_search(target, state, agent, log, 0);
-    await sleep(action_debounce_ms);
+    await sleep(ACTION_DEBOUNCE_MS);
 
     if (!found) {
       searched_targets.add(target);
@@ -300,9 +302,38 @@ export async function recover_failed_search(
     return terminal_status;
   };
 
+  // Restore the outer-attempt counter from a prior crash within this same
+  // search recovery so the MAX_SEARCH_REPLANNER_ATTEMPTS budget is preserved
+  // across crashes (policy (c): prior plan body is discarded).
+  const current_task_key = task_key(task);
+  const prior_replanner =
+      load_checkpoint()?.runtime_state?.active_replanner ?? null;
+  const resume_attempt =
+      (prior_replanner?.kind === 'search' &&
+       prior_replanner.task_key === current_task_key) ?
+      Math.max(1, prior_replanner.outer_attempt ?? 1) :
+      1;
+  if (resume_attempt > 1) {
+    spl.log(`Resuming search recovery at attempt ${resume_attempt}/${
+        MAX_SEARCH_REPLANNER_ATTEMPTS} (prior crash, plan discarded).`);
+  }
+
+  try {
+
   spl.log(`Starting recovery for: ${targets_display}`);
 
-  for (let attempt = 1; attempt <= MAX_SEARCH_REPLANNER_ATTEMPTS; attempt++) {
+  for (let attempt = resume_attempt; attempt <= MAX_SEARCH_REPLANNER_ATTEMPTS;
+       attempt++) {
+    save_runtime_state({
+      active_replanner: {
+        kind: 'search',
+        task_key: current_task_key,
+        outer_attempt: attempt,
+        action_index: 0,
+        action_retry: 0,
+        plan: null,
+      },
+    });
     spl.log(`Attempt ${attempt}/${MAX_SEARCH_REPLANNER_ATTEMPTS}`);
 
     const search_trace_state = get_search_trace_state(agent, breadcrumb_tracker);
@@ -342,10 +373,30 @@ export async function recover_failed_search(
     let attempt_outcome = null;
 
     for (let i = 0; i < replanner_output.actions.length; i++) {
+      save_runtime_state({
+        active_replanner: {
+          kind: 'search',
+          task_key: current_task_key,
+          outer_attempt: attempt,
+          action_index: i,
+          action_retry: 0,
+          plan: null,
+        },
+      });
       const action = replanner_output.actions[i];
       let result = null;
 
       for (let retry = 0; retry <= MAX_ACTION_RETRIES; retry++) {
+        save_runtime_state({
+          active_replanner: {
+            kind: 'search',
+            task_key: current_task_key,
+            outer_attempt: attempt,
+            action_index: i,
+            action_retry: retry,
+            plan: null,
+          },
+        });
         if (retry > 0) {
           spl.log(`Retry ${retry}/${MAX_ACTION_RETRIES} on action ${i + 1}`);
         } else {
@@ -416,6 +467,10 @@ export async function recover_failed_search(
 
   spl.warn(`Recovery exhausted after ${MAX_SEARCH_REPLANNER_ATTEMPTS} attempts.`);
   return finalize('fail', 'search_replanner_exhausted');
+
+  } finally {
+    clear_active_replanner();
+  }
 }
 
 function sleep(ms) {

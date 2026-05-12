@@ -4,6 +4,28 @@ import {get_satisfied_inputs_by_type, get_single_satisfied_input_item, resolve_c
 
 const itemish_types = new Set(['item', 'tool', 'workstation']);
 
+// Stable string identity for a task. Used by the crash-resilient checkpoint
+// to verify that restored counters belong to the task we're about to execute.
+// Includes action_type + target_item + qty + parameters (which carry the
+// source-block / source-mob disambiguation for collect/kill tasks). The
+// search_sweep task type has no single target_item, so we fall back to a
+// sorted list of its candidate ids.
+export function task_key(task) {
+  if (!task) return null;
+  if (task.action_type === 'search_sweep') {
+    const ids = (task.parameters?.targets ?? [])
+                    .map(t => t.target_item ?? '')
+                    .filter(Boolean)
+                    .sort()
+                    .join(',');
+    return `search_sweep::${ids}`;
+  }
+  const target = task.target_item ?? '';
+  const qty = task.qty ?? '';
+  const params = JSON.stringify(task.parameters ?? {});
+  return `${task.action_type}:${target}:${qty}:${params}`;
+}
+
 // Applies tiered task selection.
 export function select_next_task(candidates, state) {
   for (const candidate of candidates) {

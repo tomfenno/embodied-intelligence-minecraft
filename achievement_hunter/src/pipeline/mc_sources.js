@@ -219,7 +219,10 @@ export function get_canonical_block_source(target_id) {
 }
 
 export function get_canonical_mob_source(target_id) {
-  return canonical_mob_source_by_target[target_id] ?? null;
+  const explicit = canonical_mob_source_by_target[target_id];
+  if (explicit) return explicit;
+  if (target_id.endsWith('_wool')) return 'sheep';
+  return null;
 }
 
 export function get_canonical_source_for_target(target_id) {

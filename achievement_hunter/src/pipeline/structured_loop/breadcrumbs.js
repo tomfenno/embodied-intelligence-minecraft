@@ -5,15 +5,18 @@ import {
   getPosition,
 } from '../../../../src/agent/library/world.js';
 
+import {
+  BREADCRUMB_LANDMARK_POOL_SIZE,
+  BREADCRUMB_MIN_DIST,
+  BREADCRUMB_PERIOD_MS,
+  BREADCRUMB_RECENT_POOL_SIZE,
+  BREADCRUMB_SPATIAL_ISOLATION_CAP,
+} from './config.js';
 import {make_spl} from './log.js';
 
 // Flowing water/lava share names with their source blocks; metadata 0 is a
 // source, metadata 1-7 is flowing. We only want source liquids as map features.
 const COLLECTIBLE_LIQUIDS = new Set(['water', 'lava']);
-
-// spatial_isolation is normalized to BREADCRUMB_MIN_DIST units; capping
-// prevents a single faraway outlier from dominating the score.
-const SPATIAL_ISOLATION_CAP = 8;
 
 const spl = make_spl('[SPL][breadcrumbs]');
 
@@ -40,10 +43,10 @@ const spl = make_spl('[SPL][breadcrumbs]');
 export class BreadcrumbTracker {
   constructor(agent, opts = {}) {
     this._agent = agent;
-    this._min_dist = opts.min_dist ?? 24;
-    this._recent_pool_size = opts.recent_pool_size ?? 16;
-    this._landmark_pool_size = opts.landmark_pool_size ?? 48;
-    this._period_ms = opts.period_ms ?? 1000;
+    this._min_dist = opts.min_dist ?? BREADCRUMB_MIN_DIST;
+    this._recent_pool_size = opts.recent_pool_size ?? BREADCRUMB_RECENT_POOL_SIZE;
+    this._landmark_pool_size = opts.landmark_pool_size ?? BREADCRUMB_LANDMARK_POOL_SIZE;
+    this._period_ms = opts.period_ms ?? BREADCRUMB_PERIOD_MS;
     // Fires synchronously with the flat breadcrumb list (RECENT ++ LANDMARKS,
     // sorted by distance from bot) after every successful sample tick, after
     // restore(), and after reset(). The loop wires this to persist the live
@@ -259,7 +262,7 @@ export class BreadcrumbTracker {
 
     let spatial_isolation;
     if (others.length === 0) {
-      spatial_isolation = SPATIAL_ISOLATION_CAP;
+      spatial_isolation = BREADCRUMB_SPATIAL_ISOLATION_CAP;
     } else {
       let min_dist_sq = Infinity;
       for (const l of others) {
@@ -267,7 +270,7 @@ export class BreadcrumbTracker {
         if (d < min_dist_sq) min_dist_sq = d;
       }
       spatial_isolation = Math.min(
-          Math.sqrt(min_dist_sq) / this._min_dist, SPATIAL_ISOLATION_CAP);
+          Math.sqrt(min_dist_sq) / this._min_dist, BREADCRUMB_SPATIAL_ISOLATION_CAP);
     }
 
     return biome_rarity + block_novelty + spatial_isolation;

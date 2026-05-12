@@ -1,7 +1,7 @@
 import {readFile as read_file} from 'fs/promises';
 
 import {get_nts_state as get_state_for_candidates, get_sgsg_state} from '../agent_state.js';
-import {clearCheckpoint as clear_checkpoint, loadCheckpoint as load_checkpoint, saveCheckpoint as save_checkpoint,} from '../checkpoint.js';
+import {clearCheckpoint as clear_checkpoint, loadCheckpoint as load_checkpoint, saveCheckpoint as save_checkpoint, saveRuntimeState as save_runtime_state,} from '../checkpoint.js';
 import {get_canonical_source_for_target, get_grounded_nearby_source, get_source_kind_for_target,} from '../mc_sources.js';
 import {createRolloutLogger as create_rollout_logger} from '../rollout_logger.js';
 import {compute_scsg} from '../scsg.js';
@@ -9,11 +9,16 @@ import {generate_primary_task_dag_self_refined} from '../self_refine.js';
 
 import {execute_task_action} from './actions.js';
 import {BreadcrumbTracker} from './breadcrumbs.js';
+import {
+  BREADCRUMB_LANDMARK_POOL_SIZE,
+  BREADCRUMB_MIN_DIST,
+  BREADCRUMB_PERIOD_MS,
+  BREADCRUMB_RECENT_POOL_SIZE,
+  MAX_OUTER_RETRIES,
+} from './config.js';
 import {build_incoming_edge_map, edge_in_subgraph, edge_key,} from './graph.js';
 import {make_spl} from './log.js';
 import {make_fallback_acquisition_task, select_next_task, try_make_craft_task, try_make_immediate_acquisition_task, try_make_interact_task, try_make_smelt_task,} from './tasks.js';
-
-const max_outer_retries = 10;
 
 const spl = make_spl('[SPL]');
 
@@ -25,9 +30,10 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   // This hard coded option to load a graph is intended. Do not remove.
   const load_graph = true;
   const graph_file_path =
-      './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
-  //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
-  //    `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
+      //    './achievement_hunter/docs/ptd_jsons/shear_a_sheep_and_sleep_in_a_colored_bed.json';
+      //   './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
+      //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
+      `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
   // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
   //    './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
   // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
@@ -46,10 +52,10 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   let post_respawn_promise = Promise.resolve();
 
   const breadcrumb_tracker = new BreadcrumbTracker(agent, {
-    min_dist: 24,
-    recent_pool_size: 16,
-    landmark_pool_size: 48,
-    period_ms: 1000,
+    min_dist: BREADCRUMB_MIN_DIST,
+    recent_pool_size: BREADCRUMB_RECENT_POOL_SIZE,
+    landmark_pool_size: BREADCRUMB_LANDMARK_POOL_SIZE,
+    period_ms: BREADCRUMB_PERIOD_MS,
     // Fires after every successful sample tick (1 Hz), and after restore()
     // and reset(). Decouples live-view + checkpoint freshness from outer-
     // loop iteration cadence, which can stall for minutes during long-
@@ -65,8 +71,8 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   // Resume exploration map from a prior checkpoint if it matches this
   // objective. Mismatched checkpoints (different rollout) are ignored.
   const prior_checkpoint = load_checkpoint();
-  if (prior_checkpoint?.objective === task_name &&
-      Array.isArray(prior_checkpoint.breadcrumbs)) {
+  const prior_matches = prior_checkpoint?.objective === task_name;
+  if (prior_matches && Array.isArray(prior_checkpoint.breadcrumbs)) {
     breadcrumb_tracker.restore(prior_checkpoint.breadcrumbs);
     spl.log(`Restored ${
         prior_checkpoint.breadcrumbs.length} breadcrumbs from checkpoint.`);
@@ -79,6 +85,29 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   save_checkpoint(task_name, graph, breadcrumb_tracker.get_breadcrumbs());
   breadcrumb_tracker.start();
 
+  // Hydrate the outer-loop failure counter from the prior checkpoint. If the
+  // prior process died mid-task (active_task non-null) treat the crash as a
+  // consecutive failure so crash-looping eventually trips MAX_OUTER_RETRIES
+  // instead of spinning forever.
+  //
+  // Leave `active_task` and `active_replanner` intact — `execute_task_action`
+  // and the replanners consume them on entry to restore their own counters
+  // (or overwrite if the task_key has changed). Clearing here would erase the
+  // crash context before the consumers could read it.
+  let restored_failures = 0;
+  if (prior_matches) {
+    const prior_runtime = prior_checkpoint.runtime_state ?? null;
+    restored_failures = prior_runtime?.outer?.consecutive_failures ?? 0;
+    if (prior_runtime?.active_task != null) {
+      restored_failures += 1;
+      spl.warn(
+          `Detected mid-task crash (active_task=${
+              prior_runtime.active_task.key}). consecutive_failures bumped to ${
+              restored_failures}.`);
+    }
+    save_runtime_state({outer: {consecutive_failures: restored_failures}});
+  }
+
   const on_death = () => {
     spl.log('Bot died — awaiting respawn to recompute SCSG.');
     death_pending = true;
@@ -88,7 +117,9 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   };
   bot.on('death', on_death);
 
-  let consecutive_failures = 0;
+  let consecutive_failures = restored_failures;
+  const persist_failures = () =>
+      save_runtime_state({outer: {consecutive_failures}});
   try {
     while (true) {
       if (death_pending) {
@@ -96,6 +127,7 @@ export async function structured_loop(models, agent, task_name, graph = null) {
         await post_respawn_promise;
         spl.log('Respawned — recomputing SCSG with post-death inventory.');
         consecutive_failures = 0;
+        persist_failures();
         continue;
       }
 
@@ -119,7 +151,9 @@ export async function structured_loop(models, agent, task_name, graph = null) {
 
       if (!task) {
         spl.warn('get_next_task returned NULL; re-evaluating state...');
-        if (++consecutive_failures >= max_outer_retries) break;
+        consecutive_failures += 1;
+        persist_failures();
+        if (consecutive_failures >= MAX_OUTER_RETRIES) break;
         continue;
       }
 
@@ -127,11 +161,14 @@ export async function structured_loop(models, agent, task_name, graph = null) {
               task, agent, log, models.failure_replanner, graph,
               models.search_replanner, breadcrumb_tracker) === 'success') {
         consecutive_failures = 0;
+        persist_failures();
         continue;
       }
 
       spl.log('Task failed after max retries, re-evaluating state...');
-      if (++consecutive_failures >= max_outer_retries) break;
+      consecutive_failures += 1;
+      persist_failures();
+      if (consecutive_failures >= MAX_OUTER_RETRIES) break;
     }
   } finally {
     bot.off('death', on_death);

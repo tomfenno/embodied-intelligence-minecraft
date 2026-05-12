@@ -2,6 +2,7 @@ import {get_am_state} from '../agent_state.js';
 import {executeCommandWithModeRecovery as execute_command} from '../command_utils.js';
 import {any_log_search_targets, mob_search_targets} from '../mc_sources.js';
 
+import {SEARCH_RADII} from './config.js';
 import {make_spl} from './log.js';
 
 const spl = make_spl('[SPL]');
@@ -9,8 +10,6 @@ const spl = make_spl('[SPL]');
 const log_source = {
   search: 'search',
 };
-
-const search_radii = [32, 64, 128, 256];
 
 export function parse_search_command(action) {
   const match = action.trim().match(/^!search\("([^"]+)"\)$/);
@@ -27,7 +26,7 @@ export async function run_search(target, state, agent, log, start_attempt) {
   }
 
   let attempt = start_attempt;
-  for (const radius of search_radii) {
+  for (const radius of SEARCH_RADII) {
     for (const item of concrete_items) {
       const command = make_search_command(item, radius);
       log.am(++attempt, command, null, {source: log_source.search});
@@ -129,7 +128,7 @@ export async function run_breadth_first_sweep(
   let active = expanded.slice();
 
   let attempt = start_attempt;
-  for (const radius of search_radii) {
+  for (const radius of SEARCH_RADII) {
     for (const entry of active.slice()) {
       const {source, items} = entry;
       if (searched_targets.has(source)) continue;

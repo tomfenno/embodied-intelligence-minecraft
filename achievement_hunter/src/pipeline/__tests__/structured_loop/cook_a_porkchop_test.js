@@ -29,6 +29,9 @@ vi.mock('../../checkpoint.js', () => ({
                                  saveCheckpoint: vi.fn(),
                                  clearCheckpoint: vi.fn(),
                                  loadCheckpoint: vi.fn(),
+                                 saveRuntimeState: vi.fn(),
+                                 clearActiveTask: vi.fn(),
+                                 clearActiveReplanner: vi.fn(),
                                }));
 vi.mock('../../json_utils.js', () => ({
                                  extract_json: vi.fn(),

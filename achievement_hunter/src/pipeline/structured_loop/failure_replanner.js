@@ -5,23 +5,25 @@ import {fileURLToPath} from 'url';
 import {executeCommandWithModeRecovery} from '../command_utils.js';
 import * as skills from '../../../../src/agent/library/skills.js';
 import {get_am_state, get_recovery_trace_state, get_sgsg_state} from '../agent_state.js';
+import {clearActiveReplanner as clear_active_replanner, loadCheckpoint as load_checkpoint, saveRuntimeState as save_runtime_state,} from '../checkpoint.js';
 import {extract_json} from '../json_utils.js';
 import {fill_failure_replanner_prompt} from '../prompt_utils.js';
 import {compute_scsg} from '../scsg.js';
 
+import {
+  CRAFT_DEBOUNCE_MS,
+  FAILURE_REPLANNER_MAX_ACTION_RETRIES as MAX_ACTION_RETRIES,
+  MAX_RECOVERY_ATTEMPTS,
+} from './config.js';
 import {make_spl} from './log.js';
 import {check_search_complete, run_search} from './search.js';
+import {task_key} from './tasks.js';
 import {create_action_result, project_failed_steps} from './trace.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const AVAILABLE_ACTIONS_PATH = path.join(
     __dirname,
     '../../../docs/prompts/failure_replanner/actions_reference.json');
-
-const MAX_RECOVERY_ATTEMPTS = 3;
-const MAX_ACTION_RETRIES = 3;
-
-const craft_debounce_ms = 750;
 
 const HARD_FAILURE_KINDS = new Set([
   'runner_exception',
@@ -72,7 +74,7 @@ async function run_action(action, agent, log, searched_targets) {
     // bail "successes" for nav commands as failures, so we can trust the
     // success flag here without per-callsite regex filtering.
     const env_result = await executeCommandWithModeRecovery(agent, command);
-    await sleep(craft_debounce_ms);
+    await sleep(CRAFT_DEBOUNCE_MS);
     const success = env_result?.success === true;
     return create_action_result(
         command, success, success ? 'command_success' : 'command_failure',
@@ -101,7 +103,7 @@ async function run_search_action(action, agent, log, searched_targets) {
   try {
     const state = get_am_state(agent);
     const {found, message} = await run_search(target, state, agent, log, 0);
-    await sleep(craft_debounce_ms);
+    await sleep(CRAFT_DEBOUNCE_MS);
 
     if (!found) {
       searched_targets.add(target);
@@ -271,7 +273,37 @@ export async function recover_failed_task(
   const previous_diagnoses = [];
   const searched_targets = new Set();
 
-  for (let attempt = 1; attempt <= MAX_RECOVERY_ATTEMPTS; attempt++) {
+  // Restore the outer-attempt counter from a prior crash within this same
+  // recovery, so the MAX_RECOVERY_ATTEMPTS budget is preserved across crashes
+  // (policy (c): the prior plan body is discarded; we just don't reset the
+  // attempt count to 1).
+  const current_task_key = task_key(task);
+  const prior_replanner =
+      load_checkpoint()?.runtime_state?.active_replanner ?? null;
+  const resume_attempt =
+      (prior_replanner?.kind === 'failure' &&
+       prior_replanner.task_key === current_task_key) ?
+      Math.max(1, prior_replanner.outer_attempt ?? 1) :
+      1;
+  if (resume_attempt > 1) {
+    spl.log(`Resuming failure recovery at attempt ${resume_attempt}/${
+        MAX_RECOVERY_ATTEMPTS} (prior crash, plan discarded).`);
+  }
+
+  try {
+
+  for (let attempt = resume_attempt; attempt <= MAX_RECOVERY_ATTEMPTS;
+       attempt++) {
+    save_runtime_state({
+      active_replanner: {
+        kind: 'failure',
+        task_key: current_task_key,
+        outer_attempt: attempt,
+        action_index: 0,
+        action_retry: 0,
+        plan: null,
+      },
+    });
     spl.log(`Attempt ${attempt}/${MAX_RECOVERY_ATTEMPTS}`);
 
     const prompt = fill_failure_replanner_prompt(
@@ -317,11 +349,31 @@ export async function recover_failed_task(
 
     for (let action_index = 0; action_index < replanner_output.actions.length;
          action_index++) {
+      save_runtime_state({
+        active_replanner: {
+          kind: 'failure',
+          task_key: current_task_key,
+          outer_attempt: attempt,
+          action_index,
+          action_retry: 0,
+          plan: null,
+        },
+      });
       const action = replanner_output.actions[action_index];
       const action_command = format_action_as_command(action);
 
       let result = null;
       for (let retry = 0; retry < MAX_ACTION_RETRIES; retry++) {
+        save_runtime_state({
+          active_replanner: {
+            kind: 'failure',
+            task_key: current_task_key,
+            outer_attempt: attempt,
+            action_index,
+            action_retry: retry,
+            plan: null,
+          },
+        });
         if (retry > 0)
           spl.log(
               `Retrying action (${retry}/${MAX_ACTION_RETRIES - 1}):`,
@@ -366,6 +418,10 @@ export async function recover_failed_task(
   spl.warn(`Recovery exhausted after ${MAX_RECOVERY_ATTEMPTS} attempts.`);
   log?.recovery_end('fail');
   return 'fail';
+
+  } finally {
+    clear_active_replanner();
+  }
 }
 
 function sleep(ms) {

@@ -3,13 +3,20 @@ import path from 'path';
 
 import {executeCommandWithModeRecovery} from '../command_utils.js';
 import {get_am_state, get_recovery_trace_state} from '../agent_state.js';
+import {clearActiveReplanner as clear_active_replanner, clearActiveTask as clear_active_task, loadCheckpoint as load_checkpoint, saveRuntimeState as save_runtime_state,} from '../checkpoint.js';
 import {ABSTRACT_CLASS_MEMBERS, is_environmental_use_target} from '../mc_sources.js';
 import {get_item_batch_size} from '../recipe_utils.js';
 
+import {
+  CRAFT_DEBOUNCE_MS,
+  MAX_COLLECT_QTY,
+  MAX_INNER_RETRIES,
+} from './config.js';
 import {recover_failed_task} from './failure_replanner.js';
 import {make_spl} from './log.js';
 import {check_search_complete, parse_search_command, run_breadth_first_sweep, run_search} from './search.js';
 import {recover_failed_search} from './search_replanner.js';
+import {task_key} from './tasks.js';
 import {create_command_success_result, create_step_result, normalize_result_message, project_failed_steps} from './trace.js';
 
 const spl = make_spl('[SPL]');
@@ -17,10 +24,6 @@ const spl = make_spl('[SPL]');
 const log_source = {
   deterministic: 'deterministic',
 };
-
-const max_inner_retries = 5;
-const craft_debounce_ms = 750;
-const max_collect_qty = 16;
 
 // Only these kinds represent genuine command failures worth replanning.
 // Search-outcome kinds (search_found_not_reached, search_exhausted, etc.)
@@ -60,12 +63,49 @@ export async function execute_task_action(
   // (see BUG 11).
   const baseline_inventory = {...(get_am_state(agent).inventory ?? {})};
 
-  let repeated_failure_signature = null;
-  let repeated_failure_count = 0;
-  const searched_targets = new Set();
+  // Restore inner-loop counters from the checkpoint if a prior process died
+  // executing this same task. Mismatched task_key means the prior crash was
+  // on a different task — overwrite with fresh state (and drop any stale
+  // active_replanner, which was scoped to that prior task).
+  const current_task_key = task_key(task);
+  const prior_active_task =
+      load_checkpoint()?.runtime_state?.active_task ?? null;
+  const resume_from_crash = prior_active_task?.key === current_task_key;
 
-  for (let attempt_index = 0; attempt_index < max_inner_retries;
+  let repeated_failure_signature =
+      resume_from_crash ? prior_active_task.repeated_failure_signature : null;
+  let repeated_failure_count =
+      resume_from_crash ? prior_active_task.repeated_failure_count ?? 0 : 0;
+  const searched_targets = new Set(
+      resume_from_crash ? prior_active_task.searched_targets ?? [] : []);
+  const initial_attempt_index =
+      resume_from_crash ? prior_active_task.attempt_index ?? 0 : 0;
+
+  if (resume_from_crash) {
+    spl.log(`Resuming task ${current_task_key} from attempt_index=${
+        initial_attempt_index} (searched=${searched_targets.size}).`);
+  } else if (prior_active_task != null) {
+    // Stale replanner state from a different task — drop it now so the next
+    // replanner invocation starts fresh.
+    clear_active_replanner();
+  }
+
+  const persist_active_task = (attempt_index) => save_runtime_state({
+    active_task: {
+      key: current_task_key,
+      attempt_index,
+      searched_targets: [...searched_targets],
+      repeated_failure_signature,
+      repeated_failure_count,
+    },
+  });
+
+  try {
+
+  for (let attempt_index = initial_attempt_index;
+       attempt_index < MAX_INNER_RETRIES;
        attempt_index++) {
+    persist_active_task(attempt_index);
     const attempt_number = attempt_index + 1;
     const state = get_am_state(agent);
     const action = mediate_action(task, state);
@@ -76,7 +116,7 @@ export async function execute_task_action(
 
     log_am_action(log, attempt_number, action, state);
     spl.log(
-        `Action (attempt ${attempt_number}/${max_inner_retries}):`,
+        `Action (attempt ${attempt_number}/${MAX_INNER_RETRIES}):`,
         serialize_am_output(action));
 
     if (action.kind !== 'command') {
@@ -169,8 +209,8 @@ export async function execute_task_action(
 
       if (is_craft_command(action.command)) {
         spl.log(`Craft debounce: sleeping ${
-            craft_debounce_ms}ms before continuing.`);
-        await sleep(craft_debounce_ms);
+            CRAFT_DEBOUNCE_MS}ms before continuing.`);
+        await sleep(CRAFT_DEBOUNCE_MS);
       }
 
       return finalize_task_trace(
@@ -237,6 +277,14 @@ export async function execute_task_action(
     return await recover_failed_task(
         task_trace, agent, model, graph, log, baseline_inventory);
   return 'fail';
+
+  } finally {
+    // Whichever way we exit (success, fail, recovery, exception), this task
+    // is done — clear its checkpoint slice so the next task starts fresh and
+    // a crash in the *next* iteration doesn't get misattributed to this one.
+    clear_active_task();
+    clear_active_replanner();
+  }
 }
 
 /**
@@ -261,6 +309,24 @@ async function handle_search_sweep(
     breadcrumb_tracker) {
   const task_trace = create_task_trace(task, log);
   const baseline_inventory = {...(get_am_state(agent).inventory ?? {})};
+
+  // Record the active task so a crash mid-sweep is detected by the
+  // crash-bump rule in loop.js. The sweep itself is a single inner attempt
+  // with no per-attempt counter to restore, so we just persist a marker.
+  const current_task_key = task_key(task);
+  save_runtime_state({
+    active_task: {
+      key: current_task_key,
+      attempt_index: 0,
+      searched_targets: [],
+      repeated_failure_signature: null,
+      repeated_failure_count: 0,
+    },
+  });
+  // Drop any stale active_replanner from a prior task.
+  clear_active_replanner();
+
+  try {
 
   const sources = task.parameters.targets.map(t => t.source);
   const targets_display = sources.join(', ');
@@ -331,6 +397,11 @@ async function handle_search_sweep(
         task_trace, agent, model, graph, log, baseline_inventory);
   }
   return 'fail';
+
+  } finally {
+    clear_active_task();
+    clear_active_replanner();
+  }
 }
 
 export function mediate_action(task, state) {
@@ -365,7 +436,7 @@ export function mediate_collect(task, state) {
   }
 
   return create_command_action(`!collectBlocks("${concrete_block}", ${
-      Math.min(task.qty, max_collect_qty)})`);
+      Math.min(task.qty, MAX_COLLECT_QTY)})`);
 }
 
 function resolve_concrete_block(source_block, nearby_blocks) {
@@ -618,7 +689,7 @@ async function handle_interact_success(
   }
 
   const collect_command = `!collectBlocks("${task.target_item}", ${
-      Math.min(task.qty, max_collect_qty)})`;
+      Math.min(task.qty, MAX_COLLECT_QTY)})`;
 
   const collect_step = {
     i: `${attempt_number}a`,
