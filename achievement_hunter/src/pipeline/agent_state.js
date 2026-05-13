@@ -155,8 +155,11 @@ function _build_world_self_blocks(agent) {
  * for absolute counts.
  */
 function _append_inventory_nearby_craftable_blocks(
-    state, agent, baseline_inventory = null) {
-  const raw_state = get_am_state(agent);
+    state, agent, baseline_inventory = null, am_state = null) {
+  // Callers that already have a fresh `get_am_state` snapshot (e.g. the
+  // per-attempt cache in actions.js) pass it through to skip the redundant
+  // inventory + nearby-block + entity walk.
+  const raw_state = am_state ?? get_am_state(agent);
   const bot = agent?.bot;
 
   const inv = {};
@@ -192,7 +195,8 @@ function _append_inventory_nearby_craftable_blocks(
  * Pass `baseline_inventory` to get task-relative inventory deltas, or
  * `null` for absolute counts.
  */
-export function get_recovery_trace_state(agent, baseline_inventory = null) {
+export function get_recovery_trace_state(
+    agent, baseline_inventory = null, am_state = null) {
   const state = _build_world_self_blocks(agent);
   const bot = agent?.bot;
 
@@ -230,7 +234,8 @@ export function get_recovery_trace_state(agent, baseline_inventory = null) {
   } catch {
   }
 
-  _append_inventory_nearby_craftable_blocks(state, agent, baseline_inventory);
+  _append_inventory_nearby_craftable_blocks(
+      state, agent, baseline_inventory, am_state);
 
   return state;
 }

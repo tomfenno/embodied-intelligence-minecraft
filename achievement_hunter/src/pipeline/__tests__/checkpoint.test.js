@@ -12,7 +12,12 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {clearCheckpoint, loadCheckpoint, saveCheckpoint} from '../checkpoint.js';
+import {
+  _resetCheckpointCacheForTests,
+  clearCheckpoint,
+  loadCheckpoint,
+  saveCheckpoint,
+} from '../checkpoint.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Mirrors the path resolution inside checkpoint.js:
@@ -36,6 +41,10 @@ beforeEach(() => {
   saved_prior = existsSync(CHECKPOINT_PATH) ?
       readFileSync(CHECKPOINT_PATH, 'utf8') :
       null;
+  // Drop the in-memory cache so each test starts in a known state and
+  // tests that write the checkpoint file directly (e.g. validator branch
+  // checks) don't see stale cached data from a prior test.
+  _resetCheckpointCacheForTests();
 });
 
 afterEach(() => {
@@ -45,33 +54,34 @@ afterEach(() => {
   } else if (existsSync(CHECKPOINT_PATH)) {
     unlinkSync(CHECKPOINT_PATH);
   }
+  _resetCheckpointCacheForTests();
 });
 
 // ── saveCheckpoint ──────────────────────────────────────────────────────────
 
 describe('saveCheckpoint', () => {
-  it('creates the checkpoint file', () => {
-    saveCheckpoint(OBJECTIVE, GRAPH);
+  it('creates the checkpoint file', async () => {
+    await saveCheckpoint(OBJECTIVE, GRAPH);
     expect(existsSync(CHECKPOINT_PATH)).toBe(true);
   });
 
-  it('writes objective and graph into the file', () => {
-    saveCheckpoint(OBJECTIVE, GRAPH);
+  it('writes objective and graph into the file', async () => {
+    await saveCheckpoint(OBJECTIVE, GRAPH);
     const data = JSON.parse(readFileSync(CHECKPOINT_PATH, 'utf8'));
     expect(data.objective).toBe(OBJECTIVE);
     expect(data.graph).toEqual(GRAPH);
   });
 
-  it('writes a valid ISO saved_at timestamp', () => {
-    saveCheckpoint(OBJECTIVE, GRAPH);
+  it('writes a valid ISO saved_at timestamp', async () => {
+    await saveCheckpoint(OBJECTIVE, GRAPH);
     const data = JSON.parse(readFileSync(CHECKPOINT_PATH, 'utf8'));
     expect(data.saved_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
   });
 
-  it('overwrites an existing checkpoint', () => {
-    saveCheckpoint(OBJECTIVE, GRAPH);
+  it('overwrites an existing checkpoint', async () => {
+    await saveCheckpoint(OBJECTIVE, GRAPH);
     const updated_graph = {...GRAPH, sinks: ['different_item']};
-    saveCheckpoint(OBJECTIVE, updated_graph);
+    await saveCheckpoint(OBJECTIVE, updated_graph);
     const data = JSON.parse(readFileSync(CHECKPOINT_PATH, 'utf8'));
     expect(data.graph.sinks).toEqual(['different_item']);
   });
@@ -85,15 +95,15 @@ describe('loadCheckpoint', () => {
     expect(loadCheckpoint()).toBeNull();
   });
 
-  it('returns the saved objective and graph', () => {
-    saveCheckpoint(OBJECTIVE, GRAPH);
+  it('returns the saved objective and graph', async () => {
+    await saveCheckpoint(OBJECTIVE, GRAPH);
     const result = loadCheckpoint();
     expect(result.objective).toBe(OBJECTIVE);
     expect(result.graph).toEqual(GRAPH);
   });
 
-  it('returns a saved_at field', () => {
-    saveCheckpoint(OBJECTIVE, GRAPH);
+  it('returns a saved_at field', async () => {
+    await saveCheckpoint(OBJECTIVE, GRAPH);
     const result = loadCheckpoint();
     expect(result.saved_at).toBeDefined();
   });
@@ -122,15 +132,15 @@ describe('loadCheckpoint', () => {
 // ── clearCheckpoint ─────────────────────────────────────────────────────────
 
 describe('clearCheckpoint', () => {
-  it('deletes the checkpoint file', () => {
-    saveCheckpoint(OBJECTIVE, GRAPH);
+  it('deletes the checkpoint file', async () => {
+    await saveCheckpoint(OBJECTIVE, GRAPH);
     expect(existsSync(CHECKPOINT_PATH)).toBe(true);
-    clearCheckpoint();
+    await clearCheckpoint();
     expect(existsSync(CHECKPOINT_PATH)).toBe(false);
   });
 
-  it('does not throw when no checkpoint file exists', () => {
+  it('does not throw when no checkpoint file exists', async () => {
     if (existsSync(CHECKPOINT_PATH)) unlinkSync(CHECKPOINT_PATH);
-    expect(() => clearCheckpoint()).not.toThrow();
+    await expect(clearCheckpoint()).resolves.not.toThrow();
   });
 });
