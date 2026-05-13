@@ -1,8 +1,13 @@
-import {existsSync, mkdirSync, unlinkSync, writeFileSync} from 'fs';
+import {existsSync, mkdirSync, unlinkSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
 import {graph_to_mermaid} from './graph_utils.js';
+import {ioQueue} from './io_queue.js';
+import {
+  ENABLE_LIVE_VIEWER,
+  ENABLE_ROLLOUT_LOGGING,
+} from './structured_loop/config.js';
 
 // ── Paths + constants
 // ─────────────────────────────────────────────────────────────
@@ -597,16 +602,20 @@ const live_writer = {
   cache: new Map(),
 
   write_file(filename, content) {
+    if (!ENABLE_LIVE_VIEWER) return;
+
     const next = String(content ?? '');
     const previous = this.cache.get(filename);
 
     if (previous === next) return;
 
-    writeFileSync(path.join(LIVE_DIR, filename), next, 'utf8');
+    ioQueue.write(path.join(LIVE_DIR, filename), next);
     this.cache.set(filename, next);
   },
 
   remove_file(filename) {
+    if (!ENABLE_LIVE_VIEWER) return;
+
     const file_path = path.join(LIVE_DIR, filename);
     if (existsSync(file_path)) unlinkSync(file_path);
     this.cache.delete(filename);
@@ -646,7 +655,7 @@ const live_writer = {
  * Creates a new rollout log file for a single structured loop run.
  */
 export function createRolloutLogger(objective) {
-  mkdirSync(LIVE_DIR, {recursive: true});
+  if (ENABLE_LIVE_VIEWER) mkdirSync(LIVE_DIR, {recursive: true});
 
   const started_at = iso_now();
   const started_ms = Date.now();
@@ -654,7 +663,7 @@ export function createRolloutLogger(objective) {
   const safe_objective = objective.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
   const rollout_dir = path.join(ROLLOUTS_DIR, `${timestamp}_${safe_objective}`);
   const rollout_path = path.join(rollout_dir, 'rollout_trace.json');
-  mkdirSync(rollout_dir, {recursive: true});
+  if (ENABLE_ROLLOUT_LOGGING) mkdirSync(rollout_dir, {recursive: true});
 
   const rollout = {
     objective,
@@ -693,10 +702,16 @@ export function createRolloutLogger(objective) {
   // ───────────────────────────────────────────────────────────
 
   function flush_rollout() {
-    writeFileSync(rollout_path, JSON.stringify(rollout, null, 2), 'utf8');
+    if (!ENABLE_ROLLOUT_LOGGING) return;
+    // Thunk form: coalesced calls skip the stringify of all but the latest
+    // `rollout` state. The closure captures the mutable object by reference,
+    // so the deferred read picks up every stage pushed before the write
+    // actually runs.
+    ioQueue.write(rollout_path, () => JSON.stringify(rollout, null, 2));
   }
 
   function record_stage(entry) {
+    if (!ENABLE_ROLLOUT_LOGGING) return;
     rollout.stages.push({
       timestamp: iso_now(),
       elapsed: format_elapsed(started_ms),
@@ -712,6 +727,8 @@ export function createRolloutLogger(objective) {
   }
 
   function render_live() {
+    if (!ENABLE_LIVE_VIEWER) return;
+
     const ptd_content = stage_renderer.ptd(live_state.ptd);
     const elapsed_panel =
         render_elapsed_panel(current_elapsed(), rollout.status);
@@ -777,7 +794,7 @@ export function createRolloutLogger(objective) {
   // ───────────────────────────────────────────────────────────
 
   return {
-    rollout_dir,
+    rollout_dir: ENABLE_ROLLOUT_LOGGING ? rollout_dir : null,
     objective,
 
     ptd(raw, parsed, meta = {}) {
@@ -992,20 +1009,17 @@ export function createRolloutLogger(objective) {
     // a continuously-overwritten view, not an event. Persists JSON to the
     // rollout directory and refreshes the live markdown view.
     breadcrumbs(breadcrumbs_list) {
-      try {
-        writeFileSync(
+      if (ENABLE_ROLLOUT_LOGGING) {
+        ioQueue.write(
             path.join(rollout_dir, 'breadcrumbs.json'),
-            JSON.stringify(breadcrumbs_list ?? [], null, 2), 'utf8');
-      } catch (e) {
-        console.warn(
-            '[rollout_logger] Failed to write breadcrumbs.json:', e.message);
+            () => JSON.stringify(breadcrumbs_list ?? [], null, 2));
       }
 
       live_writer.write_file(
           LIVE_FILE.BREADCRUMBS, stage_renderer.breadcrumbs(breadcrumbs_list));
     },
 
-    complete(reason) {
+    async complete(reason) {
       const total_elapsed = format_elapsed(started_ms);
 
       rollout.status = STATUS.COMPLETED;
@@ -1022,7 +1036,14 @@ export function createRolloutLogger(objective) {
       flush_rollout();
       render_live();
 
-      console.log('[SPL] Rollout saved to', rollout_path);
+      // Drain the async write queue so the final rollout JSON + live view
+      // are on disk before the SPL run returns. Without this, fast-finishing
+      // runs (e.g. tests) can race the queue and observe stale files.
+      await ioQueue.drain();
+
+      if (ENABLE_ROLLOUT_LOGGING) {
+        console.log('[SPL] Rollout saved to', rollout_path);
+      }
     },
   };
 }

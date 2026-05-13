@@ -68,3 +68,17 @@ export const ACTION_DEBOUNCE_MS = 750;
 // BFS radius schedule for the multi-target search sweep. Each radius is tried
 // against every still-active source before incrementing.
 export const SEARCH_RADII = [32, 64, 128, 256];
+
+// --- Observability (rollout_logger.js) ---
+
+// When true, writes per-run rollout artifacts under
+// `rollouts/<timestamp>_<task>/` (rollout_trace.json, breadcrumbs.json,
+// task_traces/, search_traces/). Disable to remove all rollout-directory
+// sync I/O from the agent's hot path; the agent itself does not read these
+// files at runtime, so behavior is unchanged.
+export const ENABLE_ROLLOUT_LOGGING = false;
+
+// When true, writes the live dashboard markdown files under `rollout_live/`
+// and runs the per-stage markdown rendering. Disable to remove all
+// live-viewer sync I/O and rendering work from the agent's hot path.
+export const ENABLE_LIVE_VIEWER = false;

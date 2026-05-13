@@ -47,7 +47,7 @@ export async function generate_self_refined_ptd(
   const resolved_models =
       resolve_stage_models(models, opts.fail_on_missing_models);
   if (!resolved_models.ok) {
-    safe_log_complete(log, resolved_models.failure_reason);
+    await safe_log_complete(log, resolved_models.failure_reason);
     return make_failure_result(
         {failure_reason: resolved_models.failure_reason});
   }
@@ -66,7 +66,7 @@ export async function generate_self_refined_ptd(
   trace.push(generation.trace_entry);
 
   if (!generation.ok) {
-    safe_log_complete(log, generation.failure_reason);
+    await safe_log_complete(log, generation.failure_reason);
     return make_failure_result({
       failure_reason: generation.failure_reason,
       trace,
@@ -88,7 +88,7 @@ export async function generate_self_refined_ptd(
     trace.push(validation.trace_entry);
 
     if (!validation.ok) {
-      safe_log_complete(log, validation.failure_reason);
+      await safe_log_complete(log, validation.failure_reason);
       return make_failure_result({
         failure_reason: validation.failure_reason,
         trace,
@@ -118,7 +118,7 @@ export async function generate_self_refined_ptd(
       const failure_reason =
           `PTD failed validation after ${opts.max_rounds} refinement rounds`;
       spl.error(failure_reason);
-      safe_log_complete(log, failure_reason);
+      await safe_log_complete(log, failure_reason);
 
       return make_failure_result({
         failure_reason,
@@ -139,7 +139,7 @@ export async function generate_self_refined_ptd(
     trace.push(refinement.trace_entry);
 
     if (!refinement.ok) {
-      safe_log_complete(log, refinement.failure_reason);
+      await safe_log_complete(log, refinement.failure_reason);
       return make_failure_result({
         failure_reason: refinement.failure_reason,
         trace,
@@ -153,7 +153,7 @@ export async function generate_self_refined_ptd(
 
   const failure_reason = 'Unexpected SELF-REFINE termination';
   spl.error(failure_reason);
-  safe_log_complete(log, failure_reason);
+  await safe_log_complete(log, failure_reason);
 
   return make_failure_result({
     failure_reason,
@@ -447,10 +447,10 @@ function safe_log_ptd(log, raw, parsed, meta) {
   }
 }
 
-function safe_log_complete(log, reason) {
+async function safe_log_complete(log, reason) {
   try {
     if (log && typeof log.complete === 'function') {
-      log.complete(reason);
+      await log.complete(reason);
     }
   } catch (error) {
     spl.warn('log.complete failed:', error);

@@ -25,12 +25,12 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   const load_graph = true;
   const graph_file_path =
       //    './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_diamond.json'
-      './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
-  //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
-  //  `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
-  //  './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
-  //    './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
-  //  './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
+      //  './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
+      //   `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
+      //  `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
+      //  './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
+      //    './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
+      './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
   // './achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
   graph = load_graph ? await load_graph_from_file(graph_file_path) :
                        await generate_primary_task_dag_self_refined(
@@ -145,16 +145,16 @@ export async function structured_loop(models, agent, task_name, graph = null) {
       const state_conditioned_subgraph =
           build_state_conditioned_subgraph(graph, agent, log);
       if (state_conditioned_subgraph.status === 'complete') {
-        clear_checkpoint();
-        log.complete(state_conditioned_subgraph.reason);
+        await clear_checkpoint();
+        await log.complete(state_conditioned_subgraph.reason);
         return;
       }
 
       const candidate_result = get_source_candidates(
           state_conditioned_subgraph.subgraph, graph, agent, log);
       if (candidate_result.status === 'complete') {
-        clear_checkpoint();
-        log.complete(candidate_result.reason);
+        await clear_checkpoint();
+        await log.complete(candidate_result.reason);
         return;
       }
 
@@ -195,7 +195,7 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   }
 
   spl.error('Max outer retries exceeded. Aborting.');
-  log.complete('max outer retries exceeded');
+  await log.complete('max outer retries exceeded');
 }
 
 

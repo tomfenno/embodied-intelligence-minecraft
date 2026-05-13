@@ -1,9 +1,10 @@
-import {appendFileSync, mkdirSync, writeFileSync} from 'fs';
+import {mkdirSync} from 'fs';
 import path from 'path';
 
 import {executeCommandWithModeRecovery} from '../command_utils.js';
 import {get_am_state, get_recovery_trace_state} from '../agent_state.js';
 import {clearActiveReplanner as clear_active_replanner, clearActiveTask as clear_active_task, loadCheckpoint as load_checkpoint, saveRuntimeState as save_runtime_state,} from '../checkpoint.js';
+import {ioQueue} from '../io_queue.js';
 import {ABSTRACT_CLASS_MEMBERS, is_environmental_use_target} from '../mc_sources.js';
 import {get_item_batch_size} from '../recipe_utils.js';
 
@@ -56,12 +57,19 @@ export async function execute_task_action(
 
   const task_trace = create_task_trace(task, log);
 
+  // Per-attempt state cache: shared between the `get_am_state` reads at
+  // the top of each iteration and the `get_recovery_trace_state` call used
+  // to build the trace step (which internally also needs am_state).
+  // Invalidated after each executed command — see comments on
+  // `make_attempt_state_cache`.
+  const state_cache = make_attempt_state_cache(agent);
+
   // Snapshot inventory once at task start so trace steps and the failure
   // replanner see this task's *delta* (current - baseline), not the global
   // absolute count. Without this the LLM gets confused on capped collect
   // tasks where prior tasks already pushed the global count above task.qty
   // (see BUG 11).
-  const baseline_inventory = {...(get_am_state(agent).inventory ?? {})};
+  const baseline_inventory = {...(state_cache.read_am().inventory ?? {})};
 
   // Restore inner-loop counters from the checkpoint if a prior process died
   // executing this same task. Mismatched task_key means the prior crash was
@@ -107,11 +115,13 @@ export async function execute_task_action(
        attempt_index++) {
     persist_active_task(attempt_index);
     const attempt_number = attempt_index + 1;
-    const state = get_am_state(agent);
+    state_cache.invalidate();
+    const state = state_cache.read_am();
     const action = mediate_action(task, state);
 
     const current_step = create_trace_step(
-        attempt_number, agent, serialize_am_output(action), baseline_inventory);
+        attempt_number, serialize_am_output(action),
+        state_cache.read_recovery(baseline_inventory));
     task_trace.steps.push(current_step);
 
     log_am_action(log, attempt_number, action, state);
@@ -182,6 +192,7 @@ export async function execute_task_action(
     }
 
     const command_result = await executeCommandWithModeRecovery(agent, action.command);
+    state_cache.invalidate();
     spl.log('Command result:', command_result);
 
     if (command_result?.bot_died === true) {
@@ -193,7 +204,7 @@ export async function execute_task_action(
         is_successful_command_result(command_result)) {
       const interact_result = await handle_interact_success(
           task, agent, log, task_trace, attempt_number, command_result,
-          baseline_inventory);
+          baseline_inventory, state_cache);
       if (agent.bot._ah_death_pending) {
         spl.log(`Bot death observed after interact success handler — aborting task.`);
         return 'death';
@@ -673,14 +684,35 @@ function create_task_trace(task, log) {
   };
 }
 
-function create_trace_step(
-    step_index, agent, action_output, baseline_inventory = null) {
+function create_trace_step(step_index, action_output, recovery_state) {
   return {
     i: step_index,
-    state: get_recovery_trace_state(agent, baseline_inventory),
+    state: recovery_state,
     action: action_output,
     result: null,
   };
+}
+
+// Memoizes `get_am_state` across reads that fall between executed commands.
+// `get_am_state` walks inventory, nearby blocks (32-block radius), and
+// nearby entities — non-trivial work, and within a single attempt the
+// world state doesn't change until `executeCommandWithModeRecovery` runs.
+// Callers `invalidate()` after every awaited command and at the top of
+// each attempt iteration. `read_recovery_state` threads the cached
+// `am_state` into `get_recovery_trace_state` so its internal
+// `get_am_state` call hits the same cache.
+function make_attempt_state_cache(agent) {
+  let am = null;
+  const read_am = () => {
+    if (am === null) am = get_am_state(agent);
+    return am;
+  };
+  const read_recovery = baseline_inventory =>
+      get_recovery_trace_state(agent, baseline_inventory, read_am());
+  const invalidate = () => {
+    am = null;
+  };
+  return {read_am, read_recovery, invalidate};
 }
 
 function create_command_action(command) {
@@ -720,8 +752,13 @@ async function handle_search_action(
 
 async function handle_interact_success(
     task, agent, log, task_trace, attempt_number, command_result,
-    baseline_inventory = null) {
-  const post_command_state = get_am_state(agent);
+    baseline_inventory = null, state_cache = null) {
+  // Caller (the main attempt loop) invalidated the cache after the
+  // command that triggered this success path, so `read_am()` here is the
+  // fresh post-command state. The two reads inside this function (post-
+  // command satisfaction check + trace step) share that snapshot.
+  const post_command_state =
+      state_cache ? state_cache.read_am() : get_am_state(agent);
 
   if (interact_target_satisfied(task, post_command_state)) {
     return {status: 'success'};
@@ -736,7 +773,8 @@ async function handle_interact_success(
 
   const collect_step = {
     i: `${attempt_number}a`,
-    state: get_recovery_trace_state(agent, baseline_inventory),
+    state: state_cache ? state_cache.read_recovery(baseline_inventory) :
+                         get_recovery_trace_state(agent, baseline_inventory),
     action: collect_command,
     result: null,
   };
@@ -749,10 +787,12 @@ async function handle_interact_success(
   spl.log('Interact produced collectable target; collecting:', collect_command);
 
   const collect_result = await executeCommandWithModeRecovery(agent, collect_command);
+  if (state_cache) state_cache.invalidate();
   spl.log('Collect-after-interact result:', collect_result);
 
   if (is_successful_command_result(collect_result)) {
-    const final_state = get_am_state(agent);
+    const final_state =
+        state_cache ? state_cache.read_am() : get_am_state(agent);
     if (interact_target_satisfied(task, final_state)) {
       collect_step.result = create_command_success_result(collect_result);
       return {status: 'success'};
@@ -809,8 +849,8 @@ function persist_task_trace(task_trace, rollout_dir) {
 
     const full_trace_dir = path.join(rollout_dir, 'task_traces');
     mkdirSync(full_trace_dir, {recursive: true});
-    appendFileSync(
-        path.join(full_trace_dir, 'full_task_trace.jsonl'), trace_line, 'utf8');
+    ioQueue.append(
+        path.join(full_trace_dir, 'full_task_trace.jsonl'), trace_line);
 
     const datasets_dir = path.join(parent_rollouts_dir, '_datasets');
     mkdirSync(datasets_dir, {recursive: true});
@@ -818,7 +858,7 @@ function persist_task_trace(task_trace, rollout_dir) {
     const dataset_file = task_trace.terminal_status === 'success' ?
         'success_task_traces.jsonl' :
         'failure_task_traces.jsonl';
-    appendFileSync(path.join(datasets_dir, dataset_file), trace_line, 'utf8');
+    ioQueue.append(path.join(datasets_dir, dataset_file), trace_line);
 
     if (task_trace.terminal_status === 'fail') {
       const failed_trace_dir = path.join(rollout_dir, 'task_traces', 'failed');
@@ -832,9 +872,9 @@ function persist_task_trace(task_trace, rollout_dir) {
       const filename =
           `${timestamp}__${action_type}__${target_item}__fail.json`;
 
-      writeFileSync(
+      ioQueue.write(
           path.join(failed_trace_dir, filename),
-          JSON.stringify(task_trace, null, 2), 'utf8');
+          () => JSON.stringify(task_trace, null, 2));
     }
   } catch (err) {
     spl.error('Failed to persist task trace:', err.message);

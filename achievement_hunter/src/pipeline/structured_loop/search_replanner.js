@@ -1,10 +1,11 @@
-import {appendFileSync, mkdirSync, readFileSync, writeFileSync} from 'fs';
+import {mkdirSync, readFileSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
 import {get_am_state, get_recovery_trace_state, get_search_trace_state, pick_attempt_end_state} from '../agent_state.js';
 import {clearActiveReplanner as clear_active_replanner, loadCheckpoint as load_checkpoint, saveRuntimeState as save_runtime_state,} from '../checkpoint.js';
 import {executeCommandWithModeRecovery, PATHFINDING_MESSAGE_REGEX} from '../command_utils.js';
+import {ioQueue} from '../io_queue.js';
 import {extract_json} from '../json_utils.js';
 import {fill_search_replanner_prompt} from '../prompt_utils.js';
 
@@ -227,8 +228,7 @@ function persist_search_trace(search_trace, rollout_dir) {
     const trace_line = JSON.stringify(search_trace) + '\n';
     const dir = path.join(rollout_dir, 'search_traces');
     mkdirSync(dir, {recursive: true});
-    appendFileSync(
-        path.join(dir, 'full_search_trace.jsonl'), trace_line, 'utf8');
+    ioQueue.append(path.join(dir, 'full_search_trace.jsonl'), trace_line);
 
     if (search_trace.terminal_status === 'fail') {
       const failed_dir = path.join(dir, 'failed');
@@ -244,9 +244,9 @@ function persist_search_trace(search_trace, rollout_dir) {
                               .slice(0, 60);
       const filename = `${timestamp}__${target_safe}__fail.json`;
 
-      writeFileSync(
+      ioQueue.write(
           path.join(failed_dir, filename),
-          JSON.stringify(search_trace, null, 2), 'utf8');
+          () => JSON.stringify(search_trace, null, 2));
     }
   } catch (err) {
     spl.error('Failed to persist search trace:', err.message);
