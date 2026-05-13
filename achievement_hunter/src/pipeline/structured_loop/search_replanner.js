@@ -15,7 +15,7 @@ import {
   MAX_SEARCH_REPLANNER_ATTEMPTS,
   SEARCH_REPLANNER_MAX_ACTION_RETRIES as MAX_ACTION_RETRIES,
 } from './config.js';
-import {ensure_safe_before_llm, format_action_as_command} from './failure_replanner.js';
+import {format_action_as_command} from './failure_replanner.js';
 import {make_spl} from './log.js';
 import {check_search_complete, expand_search_item, run_search} from './search.js';
 import {task_key} from './tasks.js';
@@ -339,8 +339,6 @@ export async function recover_failed_search(
     const search_trace_state = get_search_trace_state(agent, breadcrumb_tracker);
     const prompt = fill_search_replanner_prompt(
         targets, search_trace_state, previous_summaries, available_actions);
-
-    await ensure_safe_before_llm(agent);
 
     let replanner_output = null;
     try {

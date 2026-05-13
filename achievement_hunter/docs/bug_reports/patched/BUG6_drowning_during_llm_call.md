@@ -1,11 +1,11 @@
 # BUG 6 — Bot Drowns During LLM Call: Water Check Misses Submerged Case and Does Not Actively Escape
 
 **Severity:** High (causes death and item loss; recoverable but adds 5–15 minutes of rebuild)
-**Status:** Fixed — both patches applied on branch `hard-code-nts-am`
+**Status:** Partially fixed — Fix A applied on branch `hard-code-nts-am`; Fix B removed on branch `search-agent` after owner determined the pre-LLM escape was ineffective in practice (`ensure_safe_before_llm` was deleted entirely, including its 3 s lava sprint sleep).
 **Trace:** `2026-04-27T22-40-04-985Z_Test_Lava_Bucket`
 **Patches:**
-- Fix A — `achievement_hunter/src/agent/ah_modes.js:46–49` (`self_preservation` water branch)
-- Fix B — `achievement_hunter/src/pipeline/structured_loop/failure_replanner.js:180–196` (function), `:216` (call site)
+- Fix A — `achievement_hunter/src/agent/ah_modes.js:46–49` (`self_preservation` water branch) — still in place
+- Fix B — `achievement_hunter/src/pipeline/structured_loop/failure_replanner.js` (`ensure_safe_before_llm` function + call sites in failure/search replanners) — **removed**, see BUG 9 for the related removal rationale
 
 ---
 

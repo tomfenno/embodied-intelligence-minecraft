@@ -2,7 +2,6 @@ import {readFileSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
-import * as skills from '../../../../src/agent/library/skills.js';
 import {get_am_state, get_recovery_trace_state, get_sgsg_state} from '../agent_state.js';
 import {clearActiveReplanner as clear_active_replanner, loadCheckpoint as load_checkpoint, saveRuntimeState as save_runtime_state,} from '../checkpoint.js';
 import {executeCommandWithModeRecovery} from '../command_utils.js';
@@ -218,35 +217,6 @@ function validate_replanner_output(output, available_actions) {
   }
 }
 
-// Exported so search_replanner.js can reuse the same pre-LLM safety check.
-export async function ensure_safe_before_llm(agent) {
-  const bot = agent.bot;
-  const block = bot.blockAt(bot.entity.position);
-  const block_above = bot.blockAt(bot.entity.position.offset(0, 1, 0));
-  const block_below = bot.blockAt(bot.entity.position.offset(0, -1, 0));
-
-  const in_water =
-      block_below?.name === 'water' || block_above?.name === 'water';
-  const in_lava = block?.name === 'lava' || block_above?.name === 'lava';
-
-  try {
-    if (in_water) {
-      await skills.moveAway(bot, 10);
-    } else if (in_lava) {
-      await bot.lookAt(bot.entity.position.offset(5, 1, 0), true);
-      bot.setControlState('jump', true);
-      bot.setControlState('sprint', true);
-      await new Promise(r => setTimeout(r, 3000));
-      bot.clearControlStates();
-    }
-  } catch (e) {
-    // A mode (self_preservation) raced with this escape and won — it moved the
-    // bot to safety already. Log and proceed; the mode's escape is sufficient.
-    spl.warn(`ensure_safe_before_llm: escape interrupted (${
-        e.message}) — mode moved bot to safety.`);
-  }
-}
-
 /**
  * Main recovery entry point. Called when a task fails in the structured loop.
  *
@@ -293,8 +263,6 @@ export async function recover_failed_task(
 
       const prompt = fill_failure_replanner_prompt(
           failed_trace, previous_diagnoses, available_actions);
-
-      await ensure_safe_before_llm(agent);
 
       let replanner_output = null;
       try {
