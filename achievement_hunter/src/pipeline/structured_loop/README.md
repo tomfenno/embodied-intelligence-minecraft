@@ -381,17 +381,14 @@ to 8 actions; each action is retried up to `MAX_ACTION_RETRIES = 3`.
    `achievement_hunter/docs/prompts/failure_replanner/`) — the menu of legal
    recovery actions (`!stop`, `!goToCoordinates`, `!search`, `!moveAway`,
    etc.) with constraints.
-2. `ensure_safe_before_llm(agent)` — if the bot is in water/lava, escape
-   first so the LLM call doesn't time out while the bot is dying. Races with
-   `self_preservation` mode are caught and logged.
-3. `fill_failure_replanner_prompt(failed_trace, previous_diagnoses,
+2. `fill_failure_replanner_prompt(failed_trace, previous_diagnoses,
    available_actions)` — builds the prompt (template in
    `achievement_hunter/docs/prompts/failure_replanner/failure_replanner.md`).
-4. `model.send_prompt(prompt)` → JSON `{diagnosis, actions: [{name, args}]}`.
+3. `model.send_prompt(prompt)` → JSON `{diagnosis, actions: [{name, args}]}`.
    Parsed by `extract_json` and validated by `validate_replanner_output`
    (exactly two top-level keys; `actions` is a non-empty array ≤ 8 of
    allowed-name objects with array `args` of primitives).
-5. Execute the action sequence:
+4. Execute the action sequence:
    - `format_action_as_command({name, args})` → `!name(arg, arg, …)`.
    - `!search` actions go through `run_search_action`, sharing
      `searched_targets` across attempts so the LLM can't loop on a search
@@ -406,7 +403,7 @@ to 8 actions; each action is retried up to `MAX_ACTION_RETRIES = 3`.
    - `HARD_FAILURE_KINDS` (`runner_exception`, `invalid_command`,
      `unavailable_action`, `search_exhausted`, `search_already_attempted`)
      terminate the action sequence (and the recovery loop) immediately.
-6. If the sequence finishes without success, build a *new* failed trace from
+5. If the sequence finishes without success, build a *new* failed trace from
    the executed actions and feed it back to the next attempt with the
    accumulated `previous_diagnoses` so the LLM doesn't propose the same fix
    twice.
@@ -426,10 +423,9 @@ target is in nearby state. Up to `MAX_SEARCH_REPLANNER_ATTEMPTS = 3`
 LLM rounds, each producing up to `MAX_ACTIONS_PER_PLAN = 10` actions;
 each action is retried up to `MAX_ACTION_RETRIES = 2`.
 
-Reaches into `failure_replanner.js` for two shared helpers
-(`format_action_as_command`, `ensure_safe_before_llm`) so the two
-replanners stay aligned on bot-command serialization and pre-LLM
-safety escapes.
+Reaches into `failure_replanner.js` for one shared helper
+(`format_action_as_command`) so the two replanners stay aligned on
+bot-command serialization.
 
 **Flow:**
 
@@ -441,8 +437,8 @@ safety escapes.
    `world` / `self` / `inventory` / `nearby` / `craftable_items`
    (absolute inventory counts, no baseline delta) **plus** the
    breadcrumb map.
-3. `ensure_safe_before_llm(agent)` then send the prompt
-   (template in `achievement_hunter/docs/prompts/search_replanner/search_replanner.md`).
+3. Send the prompt (template in
+   `achievement_hunter/docs/prompts/search_replanner/search_replanner.md`).
 4. LLM returns `{summary, actions: [{name, args}, …]}` validated by
    `validate_search_replanner_output` (exactly two top-level keys; 1..10
    actions; allowed-name only; primitive args).

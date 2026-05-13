@@ -2,9 +2,11 @@
 
 ## Status
 
-**Fixed** — applied on branch `hard-code-nts-am`.
+**Removed** on branch `search-agent` — owner determined the underlying patch (`ensure_safe_before_llm`) was ineffective at protecting the bot in practice. The function and both call sites (`failure_replanner.js`, `search_replanner.js`) were deleted entirely, which also eliminates the `GoalChanged` race this bug report describes (no more `moveAway` call inside the recovery boundary to race with).
 
-**Patch:** `achievement_hunter/src/pipeline/structured_loop/failure_replanner.js:246–273` (`ensure_safe_before_llm` — positional water check on block-below / block-above + try-catch around the escape).
+Originally **Fixed** on branch `hard-code-nts-am` via the patch below; the patch was removed because it didn't deliver the safety it claimed.
+
+**Patch (now removed):** was at `achievement_hunter/src/pipeline/structured_loop/failure_replanner.js` (`ensure_safe_before_llm` — positional water check on block-below / block-above + try-catch around the escape).
 
 ## Severity
 

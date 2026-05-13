@@ -36,25 +36,28 @@ const GRAPH = {
 
 let saved_prior = null;
 
-beforeEach(() => {
+beforeEach(async () => {
+  // Drain any orphan write from the previous test before snapshotting the
+  // file, so a fire-and-forget save can't land between snapshot and the
+  // next test starting.
+  await _resetCheckpointCacheForTests();
   // Preserve any real checkpoint that may already exist
   saved_prior = existsSync(CHECKPOINT_PATH) ?
       readFileSync(CHECKPOINT_PATH, 'utf8') :
       null;
-  // Drop the in-memory cache so each test starts in a known state and
-  // tests that write the checkpoint file directly (e.g. validator branch
-  // checks) don't see stale cached data from a prior test.
-  _resetCheckpointCacheForTests();
 });
 
-afterEach(() => {
+afterEach(async () => {
+  // Drain in-flight writes first — otherwise an orphan flush from the
+  // test could rename(tmp, final) after our writeFileSync(saved_prior)
+  // restoration, clobbering it with stale data.
+  await _resetCheckpointCacheForTests();
   // Restore or remove to leave the filesystem exactly as found
   if (saved_prior !== null) {
     writeFileSync(CHECKPOINT_PATH, saved_prior, 'utf8');
   } else if (existsSync(CHECKPOINT_PATH)) {
     unlinkSync(CHECKPOINT_PATH);
   }
-  _resetCheckpointCacheForTests();
 });
 
 // ── saveCheckpoint ──────────────────────────────────────────────────────────

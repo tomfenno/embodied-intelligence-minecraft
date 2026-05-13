@@ -212,13 +212,25 @@ export function clearActiveReplanner() {
 }
 
 /**
- * Test-only: drops the in-memory cache so the next `read_cached` call
- * cold-loads from disk. Useful in tests that mutate the checkpoint file
- * externally between cases.
+ * Test-only: drops the in-memory cache and drains any in-flight write so
+ * the next `read_cached` call cold-loads from disk. Awaiting the in-flight
+ * promise (rather than just nulling the variable) is what prevents an
+ * orphan flush from completing after the next test's `afterEach` has
+ * already restored the file — without this, the orphan's `rename(tmp,
+ * final)` would clobber the restoration with the prior test's data.
  */
-export function _resetCheckpointCacheForTests() {
+export async function _resetCheckpointCacheForTests() {
+  // Clear pending first so the in-flight flush exits its loop after the
+  // current write completes (rather than picking up whatever was last
+  // queued).
+  _pending_data = null;
+  if (_flush_promise) {
+    try {
+      await _flush_promise;
+    } catch {
+    }
+  }
   _cached_checkpoint = null;
   _cache_loaded = false;
-  _pending_data = null;
   _flush_promise = null;
 }

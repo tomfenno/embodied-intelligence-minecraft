@@ -258,8 +258,8 @@ const modes_list = [
       const bot = agent.bot;
       const block = bot.blockAt(bot.entity.position);
       if (block?.name === 'lava') {
-        // Already in lava — clear sneak so self_preservation and
-        // ensure_safe_before_llm can sprint to escape unimpeded.
+        // Already in lava — clear sneak so self_preservation can sprint to
+        // escape unimpeded.
         bot.setControlState('sneak', false);
         return;
       }

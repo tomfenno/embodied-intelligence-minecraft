@@ -1015,8 +1015,15 @@ export function createRolloutLogger(objective) {
             () => JSON.stringify(breadcrumbs_list ?? [], null, 2));
       }
 
-      live_writer.write_file(
-          LIVE_FILE.BREADCRUMBS, stage_renderer.breadcrumbs(breadcrumbs_list));
+      // Gate the markdown render at the call site (not just at the
+      // write): the second argument is evaluated before write_file is
+      // entered, so a gate inside write_file would still pay the
+      // formatting cost on every breadcrumb tick.
+      if (ENABLE_LIVE_VIEWER) {
+        live_writer.write_file(
+            LIVE_FILE.BREADCRUMBS,
+            stage_renderer.breadcrumbs(breadcrumbs_list));
+      }
     },
 
     async complete(reason) {

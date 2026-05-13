@@ -48,11 +48,12 @@ export function get_am_state(agent) {
   }
   const nearby_blocks = Array.from(block_set);
 
-  const mobs = [];
+  const mob_set = new Set();
   for (const entity of getNearbyEntities(bot)) {
     if (entity.type === 'player' || entity.name === 'item') continue;
-    if (!mobs.includes(entity.name)) mobs.push(entity.name);
+    mob_set.add(entity.name);
   }
+  const mobs = Array.from(mob_set);
 
   return {
     inventory,
@@ -74,11 +75,12 @@ export function get_nts_state(agent) {
   }
   const nearby_blocks = Array.from(block_set);
 
-  const mobs = [];
+  const mob_set = new Set();
   for (const entity of getNearbyEntities(bot)) {
     if (entity.type === 'player' || entity.name === 'item') continue;
-    if (!mobs.includes(entity.name)) mobs.push(entity.name);
+    mob_set.add(entity.name);
   }
+  const mobs = Array.from(mob_set);
 
   return {
     craftable_items,

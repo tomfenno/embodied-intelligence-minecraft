@@ -50,12 +50,12 @@ export async function structured_loop(models, agent, task_name, graph = null) {
     recent_pool_size: BREADCRUMB_RECENT_POOL_SIZE,
     landmark_pool_size: BREADCRUMB_LANDMARK_POOL_SIZE,
     period_ms: BREADCRUMB_PERIOD_MS,
-    // Fires after every successful sample tick (1 Hz), and after restore()
-    // and reset(). Decouples live-view + checkpoint freshness from outer-
-    // loop iteration cadence, which can stall for minutes during long-
-    // running tasks (e.g. a 511-radius search sweep). The rollout logger's
-    // write cache skips redundant writes when the rendered markdown hasn't
-    // changed.
+    // Fires after every sample tick (cadence set by BREADCRUMB_PERIOD_MS
+    // in config.js — currently 10 s) and after restore() / reset().
+    // Decouples live-view + checkpoint freshness from outer-loop iteration
+    // cadence, which can stall for minutes during long-running tasks
+    // (e.g. a 511-radius search sweep). The rollout logger's write cache
+    // skips redundant writes when the rendered markdown hasn't changed.
     on_update: list => {
       log.breadcrumbs(list);
       save_checkpoint(task_name, graph, list);
