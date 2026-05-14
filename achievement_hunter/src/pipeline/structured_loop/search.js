@@ -16,6 +16,14 @@ export function parse_search_command(action) {
   return match?.[1] ?? null;
 }
 
+// Detects the skill's "located target but couldn't reach it" log line. When
+// this fires, bigger radii won't help — the target's position is already
+// known and the failure is navigation/tooling, not absence. Defer to the
+// search_replanner instead of burning the next three radii on the same
+// blocker.
+const FOUND_BUT_NOT_REACHED_PATTERN =
+    /Found .+? at \([^)]+\)\. Navigating\.\.\./;
+
 export async function run_search(target, state, agent, log, start_attempt) {
   const concrete_items = expand_search_item(target);
   for (const item of concrete_items) {
@@ -31,8 +39,14 @@ export async function run_search(target, state, agent, log, start_attempt) {
   // loses the diagnostic context (e.g. "Cannot break stone with current
   // tools") that drives the retry-vs-relocate decision.
   let last_message = null;
+  // Items whose location was already established at a smaller radius but
+  // which the bot couldn't reach. Skipped at larger radii so abstract
+  // searches (multi-item) still try alternatives, but a single repeatedly-
+  // unreachable item doesn't burn budget on every radius.
+  const found_but_not_reached = new Set();
   for (const radius of SEARCH_RADII) {
     for (const item of concrete_items) {
+      if (found_but_not_reached.has(item)) continue;
       const command = make_search_command(item, radius);
       log.am(++attempt, command, null, {source: log_source.search});
       const {found, message} =
@@ -43,6 +57,16 @@ export async function run_search(target, state, agent, log, start_attempt) {
         return {found: false, message: last_message, bot_died: true};
       }
       if (found) return {found: true, message};
+      if (message && FOUND_BUT_NOT_REACHED_PATTERN.test(message)) {
+        spl.log(
+            `Search: "${item}" located at radius ${radius} but not reached — skipping larger radii for this item (defer to search_replanner).`);
+        found_but_not_reached.add(item);
+      }
+    }
+    if (found_but_not_reached.size >= concrete_items.length) {
+      spl.log(
+          `All ${concrete_items.length} item(s) located but unreachable — exhausting search early to invoke search_replanner.`);
+      break;
     }
   }
 
