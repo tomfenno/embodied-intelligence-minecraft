@@ -274,9 +274,15 @@ export async function execute_task_action(
         get_command_failure_signature(action.command, command_result);
 
     if (failure_signature == null) {
+      // The skill returned a truthy result with no usable message
+      // (success=false, no recognisable error text). Surface whatever
+      // structure the raw result *does* have so the replanner gets
+      // something better than an empty-feeling stock string. Lists the
+      // top-level keys and serialises primitive values for each; nested
+      // objects are summarised as `<object>` to keep the message short.
       current_step.result = create_step_result(
           false, 'unstructured_failure_result',
-          'command failed with unstructured or empty result');
+          build_unstructured_failure_message(action.command, command_result));
       repeated_failure_signature = null;
       repeated_failure_count = 0;
       continue;
@@ -674,6 +680,38 @@ export function is_craft_command(command) {
   return typeof command === 'string' &&
       (command.startsWith('!craftRecipe(') ||
        command.startsWith('!smeltItem(') || command.startsWith('!smelt_item('));
+}
+
+// Builds a message for the `unstructured_failure_result` kind: a command
+// returned a truthy result with no recognisable error text. Surfaces the
+// raw object's top-level keys + primitive values so the replanner sees
+// at least the shape of what came back. Nested objects/arrays collapse
+// to `<object>` / `<array>` to keep the message short and safe to log
+// (no chance of circular-reference issues from JSON.stringify).
+export function build_unstructured_failure_message(command, result) {
+  if (result == null || typeof result !== 'object') {
+    return `unstructured_failure_result: cmd=${command}; raw=${String(result)}`;
+  }
+  const keys = Object.keys(result);
+  const parts = [];
+  for (const key of keys) {
+    const value = result[key];
+    if (value === null || value === undefined) {
+      parts.push(`${key}=${String(value)}`);
+    } else if (typeof value === 'string') {
+      const trimmed = value.replace(/\s+/g, ' ').trim();
+      parts.push(`${key}="${
+          trimmed.length > 60 ? trimmed.slice(0, 60) + '…' : trimmed}"`);
+    } else if (typeof value === 'number' || typeof value === 'boolean') {
+      parts.push(`${key}=${String(value)}`);
+    } else if (Array.isArray(value)) {
+      parts.push(`${key}=<array len=${value.length}>`);
+    } else {
+      parts.push(`${key}=<object>`);
+    }
+  }
+  return `unstructured_failure_result: cmd=${command}; raw_keys=[${
+      keys.join(',')}]; ${parts.join('; ')}`;
 }
 
 function create_task_trace(task, log) {

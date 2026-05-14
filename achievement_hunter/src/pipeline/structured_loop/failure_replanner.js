@@ -65,9 +65,23 @@ async function run_action(action, agent, log, searched_targets) {
     const env_result = await executeCommandWithModeRecovery(agent, command);
     await sleep(CRAFT_DEBOUNCE_MS);
     const success = env_result?.success === true;
-    return create_action_result(
-        command, success, success ? 'command_success' : 'command_failure',
-        env_result?.message ?? null);
+    // Preserve mode-interrupt classification: the SPL outer loop in
+    // actions.js distinguishes mode_interrupted from command_failure and
+    // attaches mode counts + bot displacement; mirror that here so
+    // recovery actions get the same classification when the wrapper
+    // hits the mode-recovery cap.
+    const mode_interrupted = env_result?.mode_interrupted === true;
+    const kind = success
+        ? 'command_success'
+        : (mode_interrupted ? 'mode_interrupted' : 'command_failure');
+    const result = create_action_result(
+        command, success, kind, env_result?.message ?? null);
+    if (mode_interrupted) {
+      result.mode_interrupt_counts = env_result.mode_interrupt_counts;
+      result.position_before = env_result.position_before;
+      result.position_after = env_result.position_after;
+    }
+    return result;
   } catch (e) {
     return create_action_result(command, false, 'runner_exception', String(e));
   }
@@ -299,11 +313,18 @@ export async function recover_failed_task(
 
       spl.log('Diagnosis:', replanner_output.diagnosis);
 
-      previous_diagnoses.push({
+      // Build the diagnosis entry up front but defer pushing it into
+      // `previous_diagnoses` until the action loop completes so we can
+      // attach per-action `results` to it. Without `results`, prior
+      // recovery attempts only told the LLM what was tried, not what
+      // happened — the message-quality work in later steps would be
+      // invisible across attempts.
+      const attempt_entry = {
         attempt,
         diagnosis: replanner_output.diagnosis,
         actions: replanner_output.actions,
-      });
+        results: null,
+      };
 
       log?.recovery_attempt(
           attempt, task, replanner_output.diagnosis, replanner_output.actions);
@@ -374,6 +395,14 @@ export async function recover_failed_task(
       if (latest_state === null) {
         latest_state = get_recovery_trace_state(agent, baseline_inventory);
       }
+
+      // Attach the per-action results to this attempt's diagnosis entry
+      // and push it. This runs on every non-early-return exit from the
+      // action loop, including the `hard_failed` break below — so even
+      // attempts that hit a hard failure are visible to subsequent
+      // recovery attempts.
+      attempt_entry.results = action_results.map(r => ({...r}));
+      previous_diagnoses.push(attempt_entry);
 
       if (hard_failed) {
         exit_status = 'hard_failure';

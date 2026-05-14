@@ -68,10 +68,10 @@
             "consumed": true
         },
         {
-            "from": "stick",
+            "from": "any_plank",
             "to": "cooked_porkchop",
             "type": "fuel_input",
-            "qty": 2,
+            "qty": 1,
             "consumed": true
         },
         {
@@ -96,17 +96,24 @@
             "consumed": false
         },
         {
-            "from": "any_plank",
-            "to": "crafting_table",
+            "from": "wooden_pickaxe",
+            "to": "cobblestone",
+            "type": "tool_dependency",
+            "qty": 1,
+            "consumed": false
+        },
+        {
+            "from": "stick",
+            "to": "wooden_pickaxe",
             "type": "crafting_input",
-            "qty": 4,
+            "qty": 2,
             "consumed": true
         },
         {
             "from": "any_plank",
-            "to": "stick",
+            "to": "wooden_pickaxe",
             "type": "crafting_input",
-            "qty": 2,
+            "qty": 3,
             "consumed": true
         },
         {
@@ -118,24 +125,17 @@
         },
         {
             "from": "any_plank",
-            "to": "wooden_pickaxe",
-            "type": "crafting_input",
-            "qty": 3,
-            "consumed": true
-        },
-        {
-            "from": "stick",
-            "to": "wooden_pickaxe",
+            "to": "stick",
             "type": "crafting_input",
             "qty": 2,
             "consumed": true
         },
         {
-            "from": "wooden_pickaxe",
-            "to": "cobblestone",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
+            "from": "any_plank",
+            "to": "crafting_table",
+            "type": "crafting_input",
+            "qty": 4,
+            "consumed": true
         },
         {
             "from": "any_log",
