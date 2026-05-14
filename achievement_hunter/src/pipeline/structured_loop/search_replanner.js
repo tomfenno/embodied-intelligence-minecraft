@@ -24,8 +24,6 @@ import {
   build_search_exhausted_message,
   build_search_found_not_reached_message,
 } from './result_messages.js';
-// PR-A-D verification
-import {verify_log, verify_log_action_result} from './_pr_a_d_verify_log.js';
 import {check_search_complete, expand_search_item, run_search} from './search.js';
 import {task_key} from './tasks.js';
 import {create_action_result} from './trace.js';
@@ -182,21 +180,6 @@ async function run_action(
         skill_output: message,
         position: agent?.bot?.entity?.position ?? null,
       });
-    } else if (kind === 'command_failure' &&
-        env_result?.verifier_reason != null) {
-      // PR-A-D verification
-      verify_log('double_wrap_skipped', {
-        command,
-        source: 'search_replanner_run_action',
-        reason: 'verifier_reason',
-      });
-    } else if (kind === 'command_failure' && env_result?.bot_died === true) {
-      // PR-A-D verification
-      verify_log('double_wrap_skipped', {
-        command,
-        source: 'search_replanner_run_action',
-        reason: 'bot_died',
-      });
     }
     const result = create_action_result(command, success, kind, message);
     if (mode_interrupted) {
@@ -207,11 +190,15 @@ async function run_action(
       result.position_before = env_result.position_before;
       result.position_after = env_result.position_after;
     }
-    // PR-A-D verification
-    verify_log_action_result('search_replanner_run_action', result);
+    if (env_result?.verifier_reason != null) {
+      // Mirror the SPL outer loop and the mode_interrupt fields above:
+      // when the verifier reclassified the wrapper's result, surface
+      // its identifier as a structured field on the action result.
+      result.verifier_reason = env_result.verifier_reason;
+    }
     return result;
   } catch (e) {
-    const exc_result = create_action_result(
+    return create_action_result(
         command, false, 'runner_exception',
         build_runner_exception_message({
           command,
@@ -220,9 +207,6 @@ async function run_action(
           stack_top:
               (e?.stack ?? '').split('\n').slice(0, 3).join(' / ') || null,
         }));
-    // PR-A-D verification
-    verify_log_action_result('search_replanner_run_action', exc_result);
-    return exc_result;
   }
 }
 
@@ -232,13 +216,9 @@ async function run_search_action(
   const target = action.args?.[0];
 
   if (typeof target !== 'string' || target.length === 0) {
-    const invalid_result = create_action_result(
+    return create_action_result(
         command, false, 'invalid_command',
         '!search requires a non-empty string target');
-    // PR-A-D verification
-    verify_log_action_result(
-        'search_replanner_run_search_action', invalid_result);
-    return invalid_result;
   }
 
   // Per-plan dedup. A relocation between plans clears this set (the search
@@ -246,17 +226,13 @@ async function run_search_action(
   // can re-search the same target after the bot has moved.
   if (searched_targets.has(target)) {
     const prior = searched_targets_outcomes?.get(target);
-    const dedup_result = create_action_result(
+    return create_action_result(
         command, false, 'search_already_attempted',
         build_search_already_attempted_message({
           target,
           prior_kind: prior?.kind,
           prior_detail: prior?.detail,
         }));
-    // PR-A-D verification
-    verify_log_action_result(
-        'search_replanner_run_search_action', dedup_result);
-    return dedup_result;
   }
 
   try {
@@ -267,12 +243,8 @@ async function run_search_action(
     // run_search now classifies the outcome itself (Step 2). Trust its
     // post-check; no re-running of check_search_complete required.
     if (search_result.found) {
-      const success_result = create_action_result(
+      return create_action_result(
           command, true, 'search_success', search_result.message);
-      // PR-A-D verification
-      verify_log_action_result(
-          'search_replanner_run_search_action', success_result);
-      return success_result;
     }
     const kind = search_result.outcome === 'found_not_reached'
         ? 'search_found_not_reached'
@@ -282,14 +254,9 @@ async function run_search_action(
       kind,
       detail: extract_prior_detail(search_result.message),
     });
-    const fail_result =
-        create_action_result(command, false, kind, search_result.message);
-    // PR-A-D verification
-    verify_log_action_result(
-        'search_replanner_run_search_action', fail_result);
-    return fail_result;
+    return create_action_result(command, false, kind, search_result.message);
   } catch (e) {
-    const exc_result = create_action_result(
+    return create_action_result(
         command, false, 'runner_exception',
         build_runner_exception_message({
           command,
@@ -298,10 +265,6 @@ async function run_search_action(
           stack_top:
               (e?.stack ?? '').split('\n').slice(0, 3).join(' / ') || null,
         }));
-    // PR-A-D verification
-    verify_log_action_result(
-        'search_replanner_run_search_action', exc_result);
-    return exc_result;
   }
 }
 
@@ -461,17 +424,6 @@ export async function recover_failed_search(
       }),
       end_state: pick_attempt_end_state(seed_search_state),
     });
-    // PR-A-D verification
-    verify_log('sweep_seed', {
-      sources: targets,
-      outcomes: Object.fromEntries(
-          Object.entries(seed_sweep_outcomes).map(([k, v]) => [k, {
-            outcome: v.outcome ?? null,
-            has_located_at: v.located_at != null,
-            has_located_distance: v.located_distance != null,
-            blocker_kind: v.blocker_kind ?? null,
-          }])),
-    });
   } else if (seed_failure_message != null) {
     const seed_search_state =
         get_search_trace_state(agent, breadcrumb_tracker);
@@ -488,15 +440,6 @@ export async function recover_failed_search(
         message: seed_failure_message,
       }],
       end_state: pick_attempt_end_state(seed_search_state),
-    });
-    // PR-A-D verification
-    verify_log('single_target_seed', {
-      target: targets[0],
-      kind: seed_failure_kind,
-      message_prefix:
-          typeof seed_failure_message === 'string'
-              ? seed_failure_message.slice(0, 120)
-              : null,
     });
   }
 

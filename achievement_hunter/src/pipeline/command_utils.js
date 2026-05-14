@@ -2,8 +2,6 @@ import {executeCommand} from '../../../src/agent/commands/index.js';
 import {extract_command_name, required_pre_state, snapshot_state, verify_command_outcome} from './command_verifier.js';
 import {SERVER_DRIVEN_SHARDS, VERIFIER_SETTLE_TICKS} from './inventory_drops.js';
 import {build_command_failure_message, build_mode_interrupted_message} from './structured_loop/result_messages.js';
-// PR-A-D verification
-import {verify_log} from './structured_loop/_pr_a_d_verify_log.js';
 
 const MAX_MODE_INTERRUPTS = 5;
 const MODE_IDLE_TIMEOUT_MS = 30_000;
@@ -110,12 +108,6 @@ export async function executeCommandWithModeRecovery(
           verifier_reason: verdict.reason,
           skill_output: result.message,
           position: bot_pos,
-        });
-        // PR-A-D verification
-        verify_log('verifier_reclassified', {
-          command,
-          verifier_reason: verdict.reason,
-          message_prefix: reclassified_message.slice(0, 160),
         });
         return {
           ...result,

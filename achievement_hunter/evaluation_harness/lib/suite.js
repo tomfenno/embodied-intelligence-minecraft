@@ -324,6 +324,12 @@ async function runSingleBenchmarkEpisode({
       }),
       BENCHMARK_EPISODE_MODE: 'true',
       BENCHMARK_EPISODE_DIR: resultDir,
+      // Per-episode envelope for the action-message log. See
+      // achievement_hunter/docs/action_message_logging_plan.md and
+      // achievement_hunter/src/agent/_action_message_log.js.
+      BENCHMARK_AGENT_LABEL: agentLabel,
+      BENCHMARK_SEED: String(seed),
+      BENCHMARK_TASK_ID: taskId,
       TASK_SERVER_ROOT: serverRuntime.serverRoot ?? '',
       TASK_WORLD_PATH: serverRuntime.worldPath ?? '',
     };

@@ -1,6 +1,9 @@
 import { getBlockId, getItemId } from "../../utils/mcdata.js";
 import { actionsList } from './actions.js';
 import { queryList } from './queries.js';
+// Start of AH code
+import { log_action_result } from '../../../achievement_hunter/src/agent/_action_message_log.js';
+// End of AH code
 
 let suppressNoDomainWarning = true;
 
@@ -219,8 +222,13 @@ function numParams(command) {
 export async function executeCommand(agent, message) {
     let parsed = parseCommandMessage(message);
     // [Achievement Hunter Project] Parse/validation errors wrapped as {success, message} to match action command shape.
-    if (typeof parsed === 'string')
-        return { success: false, message: parsed };
+    if (typeof parsed === 'string') {
+        const _parseErrResult = { success: false, message: parsed };
+        // Start of AH code
+        log_action_result(message, _parseErrResult);
+        // End of AH code
+        return _parseErrResult;
+    }
     else {
         console.log('parsed command:', parsed);
         const command = getCommand(parsed.commandName);
@@ -228,11 +236,19 @@ export async function executeCommand(agent, message) {
         if (parsed.args) {
             numArgs = parsed.args.length;
         }
-        if (numArgs !== numParams(command))
-            return { success: false, message: `Command ${command.name} was given ${numArgs} args, but requires ${numParams(command)} args.` };
+        if (numArgs !== numParams(command)) {
+            const _argErrResult = { success: false, message: `Command ${command.name} was given ${numArgs} args, but requires ${numParams(command)} args.` };
+            // Start of AH code
+            log_action_result(message, _argErrResult);
+            // End of AH code
+            return _argErrResult;
+        }
         else {
             // Action commands (via runAsAction) return {success, message}; query commands return a plain string.
             const result = await command.perform(agent, ...parsed.args);
+            // Start of AH code
+            log_action_result(message, result);
+            // End of AH code
             return result;
         }
     }

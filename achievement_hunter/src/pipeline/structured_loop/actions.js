@@ -20,8 +20,6 @@ import {
   build_command_failure_message,
   build_search_already_attempted_message,
 } from './result_messages.js';
-// PR-A-D verification
-import {verify_log, verify_log_action_result} from './_pr_a_d_verify_log.js';
 import {check_search_complete, parse_search_command, run_breadth_first_sweep, run_search} from './search.js';
 import {recover_failed_search} from './search_replanner.js';
 import {build_dependency_context} from './dependency_context.js';
@@ -167,14 +165,10 @@ export async function execute_task_action(
               prior_kind: prior?.kind,
               prior_detail: prior?.detail,
             }));
-        // PR-A-D verification
-        verify_log_action_result('spl_outer', current_step.result);
         break;
       }
       current_step.result = await handle_search_action(
           search_target, state, agent, log, attempt_number);
-      // PR-A-D verification
-      verify_log_action_result('spl_outer_search', current_step.result);
       if (agent.bot._ah_death_pending) {
         spl.log(`Bot death observed after handle_search_action — aborting task.`);
         return 'death';
@@ -308,12 +302,6 @@ export async function execute_task_action(
     let failure_message;
     if (failure_kind === 'command_failure') {
       if (command_result?.verifier_reason != null) {
-        // PR-A-D verification
-        verify_log('double_wrap_skipped', {
-          command: action.command,
-          source: 'spl_outer',
-          reason: 'verifier_reason',
-        });
         failure_message = normalize_result_message(command_result);
       } else {
         failure_message = build_command_failure_message({
@@ -341,8 +329,15 @@ export async function execute_task_action(
       current_step.result.position_before = command_result.position_before;
       current_step.result.position_after = command_result.position_after;
     }
-    // PR-A-D verification
-    verify_log_action_result('spl_outer', current_step.result);
+    if (command_result?.verifier_reason != null) {
+      // Mirror the mode_interrupt_counts pattern above: when the
+      // verifier reclassified the result, surface its identifier as a
+      // structured field on the trace step. The LLM still reads
+      // `verifier=<reason>` from the message string, but downstream
+      // consumers (project_failed_steps, dashboards) get direct
+      // access without parsing prose.
+      current_step.result.verifier_reason = command_result.verifier_reason;
+    }
 
     const failure_signature =
         get_command_failure_signature(action.command, command_result);
@@ -357,8 +352,6 @@ export async function execute_task_action(
       current_step.result = create_step_result(
           false, 'unstructured_failure_result',
           build_unstructured_failure_message(action.command, command_result));
-      // PR-A-D verification
-      verify_log_action_result('spl_outer', current_step.result);
       repeated_failure_signature = null;
       repeated_failure_count = 0;
       continue;

@@ -5,7 +5,7 @@
  */
 
 import {registerCommands} from '../../../src/agent/commands/index.js';
-import {collectBlock, goToNearestBlock, log, placeBlock} from '../../../src/agent/library/skills.js';
+import {collectBlock, goToNearestBlock, log, moveAway, placeBlock} from '../../../src/agent/library/skills.js';
 import * as world from '../../../src/agent/library/world.js';
 import * as mc from '../../../src/utils/mcdata.js';
 
@@ -28,9 +28,50 @@ async function smelt_item(bot, item_name, num = 1, fuel_name = null) {
   if (!furnace_block) {
     const has_furnace = world.getInventoryCounts(bot)['furnace'] > 0;
     if (has_furnace) {
-      const pos = world.getNearestFreeSpace(bot, 1, furnace_range);
+      let pos = world.getNearestFreeSpace(bot, 1, furnace_range);
+      // Mirrors the smeltItem AH fix in upstream src/agent/library/skills.js:
+      // getNearestFreeSpace returns undefined when no 1x1 free space
+      // exists within range (cramped caves, surrounded by non-air on all
+      // sides). Without this guard the next line throws
+      // "Cannot read properties of undefined (reading 'x')" — a
+      // runner_exception the replanner can't act on. Try a small
+      // moveAway-and-retry to escape wedge cases automatically; bail
+      // with a clear message if there's still no space afterward so
+      // the replanner can plan a larger relocation.
+      if (!pos) {
+        log(bot, `No free space within ${
+            furnace_range} blocks to place furnace; moving away to retry.`);
+        try {
+          await moveAway(bot, 5);
+        } catch (err) {
+          log(bot, `moveAway during smelt recovery failed: ${
+              err.message}. Retrying space search anyway.`);
+        }
+        pos = world.getNearestFreeSpace(bot, 1, furnace_range);
+        if (!pos) {
+          log(bot, `Smelting ${item_name} requires placing a furnace, but ` +
+              `no free space was found within ${furnace_range} blocks ` +
+              `even after moving. Move to a more open area first.`);
+          return false;
+        }
+      }
       await placeBlock(bot, 'furnace', pos.x, pos.y, pos.z);
       furnace_block = world.getNearestBlock(bot, 'furnace', furnace_range);
+      // placeBlock can silently fail (returns false, logs the cause to
+      // bot.output, but doesn't throw). Without this guard the
+      // fall-through below emits "There is no furnace nearby and you
+      // have no furnace." — misleading because the agent DOES have a
+      // furnace in inventory; placement is what failed. placeBlock has
+      // already logged the actual cause (e.g. "Failed to place furnace
+      // at (x, y, z).") to bot.output, so returning false here surfaces
+      // the real message to the replanner rather than the stale
+      // post-placement-check artifact. Also avoids setting
+      // placed_furnace=true when nothing was actually placed (which
+      // would otherwise trigger a stray collectBlock('furnace', 1)
+      // attempt on the failure cleanup path below).
+      if (!furnace_block) {
+        return false;
+      }
       placed_furnace = true;
     }
   }

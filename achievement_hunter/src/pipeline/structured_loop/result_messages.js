@@ -258,17 +258,23 @@ function format_root_cause(kind, detail, parsed) {
 // Pick the most informative line for the `| "<tail>"` segment.
 //   1. If the chosen root_cause kind already embeds the primary line's
 //      data in the headline (e.g. workstation_placement_failed has
-//      `at (x,y,z)`), a secondary evidence line carries more
-//      non-redundant info. Use it.
-//   2. Otherwise prefer the line that established the chosen root_cause
-//      (root_cause_line) — it's the diagnostic line by construction.
+//      `at (x,y,z)`):
+//        a. Prefer a secondary evidence line — it carries non-redundant
+//           info (a distinct diagnostic).
+//        b. If no distinct secondary exists, return `null` and omit the
+//           tail entirely. Echoing root_cause_line here would just
+//           repeat what the headline already says (e.g. `"Failed to
+//           place furnace at (256, 51, -17)."` next to a headline that
+//           already names the kind + same coords).
+//   2. For other kinds, prefer the line that established the chosen
+//      root_cause (root_cause_line) — it's the diagnostic line by
+//      construction and the headline doesn't already encode its data.
 //   3. Fall back to last_line for the `unknown` case where no evidence
 //      matched.
 function pick_tail_line(parsed) {
   if (parsed?.root_cause_kind &&
-      HEADLINE_EMBEDS_PRIMARY_LINE.has(parsed.root_cause_kind) &&
-      parsed.secondary_line) {
-    return parsed.secondary_line;
+      HEADLINE_EMBEDS_PRIMARY_LINE.has(parsed.root_cause_kind)) {
+    return parsed.secondary_line ?? null;
   }
   return parsed?.root_cause_line ?? parsed?.last_line ?? null;
 }

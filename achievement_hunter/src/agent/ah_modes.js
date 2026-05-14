@@ -20,8 +20,6 @@ import * as skills from '../../../src/agent/library/skills.js';
 import * as world from '../../../src/agent/library/world.js';
 import settings from '../../../src/agent/settings.js';
 import * as mc from '../../../src/utils/mcdata.js';
-// PR-A-D verification
-import {verify_log} from '../pipeline/structured_loop/_pr_a_d_verify_log.js';
 
 /**
  * Returns true if the bot is in water by any of four signals: the physics
@@ -506,9 +504,6 @@ class ModeController {
     if (typeof mode_name !== 'string' || mode_name.length === 0) return;
     this._last_trigger[mode_name] =
         reason_obj && typeof reason_obj === 'object' ? reason_obj : null;
-    // PR-A-D verification
-    verify_log('mode_trigger',
-        {mode: mode_name, reason: reason_obj ?? null});
   }
 
   /**

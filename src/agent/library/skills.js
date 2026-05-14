@@ -215,8 +215,50 @@ export async function smeltItem(bot, itemName, num=1) {
         let hasFurnace = world.getInventoryCounts(bot)['furnace'] > 0;
         if (hasFurnace) {
             let pos = world.getNearestFreeSpace(bot, 1, furnaceRange);
+            // Start of AH code
+            // Mirrors the craftRecipe AH fix above: getNearestFreeSpace
+            // returns undefined when no 1x1 space exists within range
+            // (cramped caves, surrounded by non-air on all sides).
+            // Without this guard the next line throws "Cannot read
+            // properties of undefined (reading 'x')" — a
+            // runner_exception the replanner can't act on. Try a small
+            // moveAway-and-retry to escape wedge cases automatically;
+            // moveAway uses the pathfinder which can navigate where the
+            // strict block-criteria check can't see past. If still no
+            // space after the move, surface a real message so recovery
+            // can plan a larger relocation.
+            if (!pos) {
+                log(bot, `No free space within ${furnaceRange} blocks to place furnace; moving away to retry.`);
+                try {
+                    await moveAway(bot, 5);
+                } catch (err) {
+                    log(bot, `moveAway during smelt recovery failed: ${err.message}. Retrying space search anyway.`);
+                }
+                pos = world.getNearestFreeSpace(bot, 1, furnaceRange);
+                if (!pos) {
+                    log(bot, `Smelting ${itemName} requires placing a furnace, but no free space was found within ${furnaceRange} blocks even after moving. Move to a more open area first.`);
+                    return false;
+                }
+            }
+            // End of AH code
             await placeBlock(bot, 'furnace', pos.x, pos.y, pos.z);
             furnaceBlock = world.getNearestBlock(bot, 'furnace', furnaceRange);
+            // Start of AH code
+            // placeBlock can silently fail (returns false, logs the
+            // specific cause to bot.output, but doesn't throw). Without
+            // this guard the fall-through to the next `if (!furnaceBlock)`
+            // emits "There is no furnace nearby and you have no furnace."
+            // — misleading because the agent DOES have a furnace in
+            // inventory; placement is what failed. placeBlock has
+            // already logged the actual cause to bot.output, so
+            // returning false here surfaces the real message to the
+            // replanner rather than the stale post-placement-check
+            // artifact. Also avoids setting placedFurnace=true when
+            // nothing was actually placed.
+            if (!furnaceBlock) {
+                return false;
+            }
+            // End of AH code
             placedFurnace = true;
         }
     }

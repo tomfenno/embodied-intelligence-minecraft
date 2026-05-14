@@ -54,6 +54,14 @@ export function project_failed_steps(steps) {
     if (step.result.position_after != null) {
       projected.position_after = step.result.position_after;
     }
+    // Surface verifier_reason as a structured field for verifier-
+    // reclassified failures. The LLM also gets it via the message
+    // headline's `verifier=<reason>` segment; this duplication exists
+    // so non-prompt consumers (dashboards, downstream classifiers)
+    // get direct access without parsing the message string.
+    if (step.result.verifier_reason != null) {
+      projected.verifier_reason = step.result.verifier_reason;
+    }
     // Surface per-source outcomes for search_sweep failures so the
     // failure_replanner LLM can distinguish exhausted-at-max-radius
     // sources from found-not-reached (pathfinder failed) and

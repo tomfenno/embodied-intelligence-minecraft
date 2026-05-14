@@ -6,8 +6,6 @@ import {any_log_search_targets, mob_search_targets} from '../mc_sources.js';
 
 import {SEARCH_RADII} from './config.js';
 import {make_spl} from './log.js';
-// PR-A-D verification
-import {verify_log} from './_pr_a_d_verify_log.js';
 import {
   build_search_exhausted_message,
   build_search_found_not_reached_message,
@@ -111,9 +109,6 @@ export async function run_search(target, state, agent, log, start_attempt) {
     spl.warn(`Unsupported abstract target "${target}" — treating as absent. (${
         e.message})`);
     const ctx = snapshot_bot_context(agent);
-    // PR-A-D verification
-    verify_log('run_search_classified',
-        {target, outcome: 'absent', reason: 'unsupported_abstract'});
     return {
       found: false,
       outcome: 'absent',
@@ -125,9 +120,6 @@ export async function run_search(target, state, agent, log, start_attempt) {
   for (const item of concrete_items) {
     if (check_search_complete(item, state)) {
       spl.log(`Search fast-path: "${item}" already in state.`);
-      // PR-A-D verification
-      verify_log('run_search_classified',
-          {target, outcome: 'reached', reason: 'fast_path'});
       return {
         found: true,
         outcome: 'reached',
@@ -165,13 +157,6 @@ export async function run_search(target, state, agent, log, start_attempt) {
         };
       }
       if (found) {
-        // PR-A-D verification
-        verify_log('run_search_classified', {
-          target,
-          outcome: 'reached',
-          located_at: accum.located_at ?? null,
-          located_distance: accum.located_distance ?? null,
-        });
         return {
           found: true,
           outcome: 'reached',
@@ -209,14 +194,6 @@ export async function run_search(target, state, agent, log, start_attempt) {
   const located_anywhere =
       accum.located_at != null || accum.located_distance != null;
   if (located_anywhere) {
-    // PR-A-D verification
-    verify_log('run_search_classified', {
-      target,
-      outcome: 'found_not_reached',
-      located_at: accum.located_at ?? null,
-      located_distance: accum.located_distance ?? null,
-      blocker_kind: accum.blocker_kind ?? null,
-    });
     return {
       found: false,
       outcome: 'found_not_reached',
@@ -234,9 +211,6 @@ export async function run_search(target, state, agent, log, start_attempt) {
       blocker_detail: accum.blocker_detail,
     };
   }
-  // PR-A-D verification
-  verify_log('run_search_classified',
-      {target, outcome: 'absent', bot_pos: ctx.bot_pos});
   return {
     found: false,
     outcome: 'absent',

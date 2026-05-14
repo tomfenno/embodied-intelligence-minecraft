@@ -272,12 +272,59 @@ describe('build_command_failure_message', () => {
     });
     // Headline carries the placement coords; tail carries the "no furnace
     // nearby" secondary diagnostic (a distinct fact, not a redundant echo).
+    // NOTE: after the upstream smeltItem AH fix (skills.js), this exact
+    // dual-line combination shouldn't appear in real skill output anymore
+    // — but the parser stays robust to it for hypothetical inputs and
+    // for blobs from older skills/recipes that may emit both lines.
     expect(msg).toBe(
         'command_failure: cmd=!smelt_item("raw_iron",1,"oak_planks"); ' +
         'verifier=no_iron_ingot_delta; ' +
         'root_cause=workstation_placement_failed at (104,130,-24); ' +
         'pos=(108,130,-25) | ' +
         '"There is no furnace nearby and you have no furnace."');
+  });
+
+  // Regression: post-upstream-skills-fix smelt path emits only the
+  // place_failed line (the misleading "no furnace nearby" log no
+  // longer fires after a placement attempt). The headline already
+  // names workstation_placement_failed at the same coords as the
+  // placement line, so the tail would be a redundant echo —
+  // pick_tail_line omits it.
+  it('omits the tail when workstation_placement_failed has no distinct secondary line', () => {
+    const skill_output =
+        'Action output:\nFailed to place furnace at (256, 51, -17).\n';
+    const msg = build_command_failure_message({
+      command: '!smelt_item("raw_iron", 1, "oak_planks")',
+      verifier_reason: 'no_iron_ingot_delta',
+      skill_output,
+      position: {x: 256.5, y: 53, z: -17.5},
+    });
+    expect(msg).toBe(
+        'command_failure: cmd=!smelt_item("raw_iron", 1, "oak_planks"); ' +
+        'verifier=no_iron_ingot_delta; ' +
+        'root_cause=workstation_placement_failed at (256,51,-17); ' +
+        'pos=(256.5,53,-17.5)');
+    expect(msg).not.toContain(' | ');
+  });
+
+  // Same shape as above but for craftRecipe (the AH craftRecipe fix
+  // returns false right after placeBlock fails, so the only diagnostic
+  // line in the blob is the place_failed line emitted by placeBlock).
+  it('omits the tail for craftRecipe workstation_placement_failed', () => {
+    const skill_output =
+        'Action output:\nFailed to place crafting_table at (256, 67, -18).\n';
+    const msg = build_command_failure_message({
+      command: '!craftRecipe("furnace", 1)',
+      verifier_reason: 'no_inventory_delta',
+      skill_output,
+      position: {x: 257.5, y: 69, z: -17.5},
+    });
+    expect(msg).toBe(
+        'command_failure: cmd=!craftRecipe("furnace", 1); ' +
+        'verifier=no_inventory_delta; ' +
+        'root_cause=workstation_placement_failed at (256,67,-18); ' +
+        'pos=(257.5,69,-17.5)');
+    expect(msg).not.toContain(' | ');
   });
 });
 
