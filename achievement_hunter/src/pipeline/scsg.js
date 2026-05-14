@@ -14,7 +14,7 @@ export function compute_scsg(graph, inventory) {
     return {
       r: 1,
       why: 'S.inventory==Nothing',
-      final: clone_graph_content(graph),
+      final: apply_acquisition_buffer(clone_graph_content(graph)),
     };
   }
 
@@ -28,10 +28,7 @@ export function compute_scsg(graph, inventory) {
     return {r: 2, why: 'all original sinks satisfied', final: empty_graph()};
   }
 
-  let pruned_graph = deep_copy_graph(graph);
-  for (const vertex of pruned_graph.vertices) {
-    vertex.qty += BUFFER_QTY_BY_ID[vertex.id] ?? 0;
-  }
+  let pruned_graph = apply_acquisition_buffer(deep_copy_graph(graph));
   update_quantities_from_state(pruned_graph, inventory);
 
   while (true) {
@@ -259,6 +256,16 @@ function graph_signature(graph) {
                   `${from}->${to}:${type}:${qty}:${consumed ? 1 : 0}`)
           .sort()
           .join('|')}`;
+}
+
+// Inflate each vertex's qty by its BUFFER_QTY_BY_ID entry (if any) so the
+// agent acquires a buffer above the recipe requirement. Mutates and returns
+// the same graph for convenient chaining off deep_copy_graph / clone_graph_content.
+function apply_acquisition_buffer(graph) {
+  for (const vertex of graph.vertices) {
+    vertex.qty += BUFFER_QTY_BY_ID[vertex.id] ?? 0;
+  }
+  return graph;
 }
 
 // Deep-copy graph structure and payload objects.
