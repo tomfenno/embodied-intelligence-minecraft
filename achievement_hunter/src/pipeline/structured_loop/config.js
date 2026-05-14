@@ -99,7 +99,7 @@ export const PATHFINDING_WRAPPER_LOG_DIR =
 // task_traces/, search_traces/). Disable to remove all rollout-directory
 // sync I/O from the agent's hot path; the agent itself does not read these
 // files at runtime, so behavior is unchanged.
-export const ENABLE_ROLLOUT_LOGGING = false;
+export const ENABLE_ROLLOUT_LOGGING = true;
 
 // When true, writes the live dashboard markdown files under `rollout_live/`
 // and runs the per-stage markdown rendering. Disable to remove all

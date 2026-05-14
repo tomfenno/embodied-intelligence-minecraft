@@ -26,21 +26,27 @@ export async function run_search(target, state, agent, log, start_attempt) {
   }
 
   let attempt = start_attempt;
+  // Track the most recent per-radius failure message so we can surface it
+  // to the caller on exhaustion. Without this, the search_replanner LLM
+  // loses the diagnostic context (e.g. "Cannot break stone with current
+  // tools") that drives the retry-vs-relocate decision.
+  let last_message = null;
   for (const radius of SEARCH_RADII) {
     for (const item of concrete_items) {
       const command = make_search_command(item, radius);
       log.am(++attempt, command, null, {source: log_source.search});
       const {found, message} =
           await execute_search_command(agent, item, radius, command);
+      if (message != null) last_message = message;
       if (agent.bot._ah_death_pending) {
         spl.log(`Bot death observed during run_search — aborting radii loop for "${target}".`);
-        return {found: false, message: null, bot_died: true};
+        return {found: false, message: last_message, bot_died: true};
       }
       if (found) return {found: true, message};
     }
   }
 
-  return {found: false, message: null};
+  return {found: false, message: last_message};
 }
 
 /**
@@ -106,7 +112,12 @@ export async function run_breadth_first_sweep(
   }
 
   if (expanded.length === 0) {
-    return {found: false, sources_exhausted: sources.slice(), outcomes};
+    return {
+      found: false,
+      sources_exhausted: sources.slice(),
+      outcomes,
+      message: null,
+    };
   }
 
   // Fast path: any concrete item of any expanded source already nearby?
@@ -132,6 +143,11 @@ export async function run_breadth_first_sweep(
   let active = expanded.slice();
 
   let attempt = start_attempt;
+  // Most recent per-attempt failure message across the whole sweep. Caller
+  // can surface this to the search_replanner seed entry if it wants; note
+  // that for multi-source sweeps this represents only the last attempt
+  // and may not characterize every exhausted source.
+  let last_message = null;
   for (const radius of SEARCH_RADII) {
     for (const entry of active.slice()) {
       const {source, items} = entry;
@@ -143,12 +159,14 @@ export async function run_breadth_first_sweep(
         log.am(++attempt, command, null, {source: log_source.search});
         const {found, message} =
             await execute_search_command(agent, item, radius, command);
+        if (message != null) last_message = message;
         if (agent.bot._ah_death_pending) {
           spl.log(`Bot death observed during sweep — aborting at "${item}" r=${radius}.`);
           return {
             found: false,
             sources_exhausted: sources.slice(),
             outcomes,
+            message: last_message,
             bot_died: true,
           };
         }
@@ -181,7 +199,12 @@ export async function run_breadth_first_sweep(
     searched_targets.add(source);
     outcomes[source] = 'exhausted';
   }
-  return {found: false, sources_exhausted: sources.slice(), outcomes};
+  return {
+    found: false,
+    sources_exhausted: sources.slice(),
+    outcomes,
+    message: last_message,
+  };
 }
 
 async function execute_search_command(agent, item, radius, command) {

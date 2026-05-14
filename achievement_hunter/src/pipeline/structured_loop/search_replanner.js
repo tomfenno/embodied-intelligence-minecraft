@@ -272,7 +272,8 @@ function persist_search_trace(search_trace, rollout_dir) {
  * replanner can attempt a different recovery.
  */
 export async function recover_failed_search(
-    targets, agent, model, breadcrumb_tracker, log, task = null) {
+    targets, agent, model, breadcrumb_tracker, log, task = null,
+    seed_failure_message = null) {
   if (!Array.isArray(targets) || targets.length === 0) {
     spl.warn('recover_failed_search called with empty targets list — fail.');
     return 'fail';
@@ -284,6 +285,29 @@ export async function recover_failed_search(
   const initial_state = get_recovery_trace_state(agent);
   const attempts_log = [];
   const targets_display = targets.join(', ');
+
+  // Seed previous_summaries with the original !search that triggered
+  // recovery (attempt: 0) so the LLM has concrete evidence of why it was
+  // called — not just world state. Only added for single-target callers
+  // where there's a meaningful per-target message; the sweep caller
+  // passes null since per-source messages aren't captured.
+  if (seed_failure_message != null) {
+    const seed_search_state =
+        get_search_trace_state(agent, breadcrumb_tracker);
+    previous_summaries.push({
+      attempt: 0,
+      summary: `Original !search("${targets[0]}") exhausted across the ` +
+          `full radius schedule, triggering recovery.`,
+      actions: [{name: '!search', args: [targets[0]]}],
+      results: [{
+        command: `!search("${targets[0]}")`,
+        success: false,
+        kind: 'search_exhausted',
+        message: seed_failure_message,
+      }],
+      end_state: pick_attempt_end_state(seed_search_state),
+    });
+  }
 
   const finalize = (terminal_status, terminal_reason) => {
     const search_trace = {

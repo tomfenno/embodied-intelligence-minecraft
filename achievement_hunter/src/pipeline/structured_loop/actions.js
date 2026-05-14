@@ -171,7 +171,8 @@ export async function execute_task_action(
           // handler (Phase 2) will pass the full exhausted candidate list.
           const search_recovery = await recover_failed_search(
               [search_target], agent, model_search_replanner,
-              breadcrumb_tracker, log, task);
+              breadcrumb_tracker, log, task,
+              current_step.result?.message ?? null);
           if (agent.bot._ah_death_pending) {
             spl.log(`Bot death observed after search_replanner — aborting task.`);
             return 'death';

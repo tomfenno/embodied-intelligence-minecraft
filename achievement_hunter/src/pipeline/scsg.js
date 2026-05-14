@@ -1,5 +1,13 @@
 import {ABSTRACT_CLASS_MEMBERS, ITEM_SYNONYMS} from './mc_sources.js';
 
+// Extra units of each vertex to acquire beyond the recipe requirement.
+// Bumps the SCSG-computed remaining-work qty so the agent collects a buffer
+// that survives normal recipe consumption — useful e.g. as spare wood for
+// re-crafting a pickaxe mid-rollout. The buffer applies only to acquisition
+// (vertex qty); recipe edges (e.g. any_log → any_plank) are left untouched
+// so downstream craft tasks still consume only the recipe-required amount.
+const BUFFER_QTY_BY_ID = {any_log: 2};
+
 // Compute the remaining-work subgraph for the current inventory state.
 export function compute_scsg(graph, inventory) {
   if (inventory === 'Nothing') {
@@ -21,6 +29,9 @@ export function compute_scsg(graph, inventory) {
   }
 
   let pruned_graph = deep_copy_graph(graph);
+  for (const vertex of pruned_graph.vertices) {
+    vertex.qty += BUFFER_QTY_BY_ID[vertex.id] ?? 0;
+  }
   update_quantities_from_state(pruned_graph, inventory);
 
   while (true) {
@@ -198,7 +209,8 @@ function recompute_returned_vertex_quantities(
           qty: Math.max(
               0,
               (original_sink_id_set.has(vertex.id) ||
-                       reusable_vertex_id_set.has(vertex.id) ?
+                       reusable_vertex_id_set.has(vertex.id) ||
+                       BUFFER_QTY_BY_ID[vertex.id] ?
                    vertex.qty :
                    (outgoing_consumed_qty_by_id.get(vertex.id) ?? 0)) -
                   inventory_count(vertex.id, inventory)),
