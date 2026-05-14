@@ -10,6 +10,34 @@
 // Maximum number of outer-loop iterations attempted per task before giving up.
 export const MAX_OUTER_RETRIES = 10;
 
+// --- PTD source (loop.js) ---
+
+// When true, structured_loop loads the PTD from disk instead of invoking the
+// LLM-driven self-refine generator. Hard-fails if the resolved file is
+// missing. Flip on for eval runs that need deterministic, no-LLM PTDs.
+// Checkpoint-resumed graphs still take precedence.
+export const LOAD_PTD_FROM_DISK = true;
+
+// Directory (repo-root-relative) holding pre-generated PTD JSONs. Matches
+// self_refine.js's DEFAULT_OPTIONS.output_dir so saved PTDs are reloadable
+// by task_name alone via to_snake_case(task_name) + '.json'.
+export const PTD_JSON_DIR = 'achievement_hunter/docs/ptd_jsons';
+
+// Optional ad-hoc override for one-off dev work: when set (and
+// LOAD_PTD_FROM_DISK is true), structured_loop loads exactly this file and
+// ignores the task_name → filename mapping. Leave null for normal operation.
+//
+// Example menu (uncomment one):
+//   'achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json'
+//   'achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json'
+//   'achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json'
+//   'achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json'
+//   'achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
+//   'achievement_hunter/docs/ptd_jsons/bake_a_cake.json'
+//   'achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_diamond.json'
+//   'achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json'
+export const PTD_JSON_OVERRIDE_PATH = null;
+
 // --- Breadcrumb tracker (breadcrumbs.js, constructed in loop.js) ---
 
 // Minimum horizontal distance (blocks) between any two breadcrumbs.

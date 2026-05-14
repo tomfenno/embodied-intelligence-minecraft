@@ -2,6 +2,7 @@ import {readFile as read_file} from 'fs/promises';
 
 import {get_nts_state as get_state_for_candidates, get_sgsg_state} from '../agent_state.js';
 import {clearCheckpoint as clear_checkpoint, loadCheckpoint as load_checkpoint, saveCheckpoint as save_checkpoint, saveRuntimeState as save_runtime_state,} from '../checkpoint.js';
+import {to_snake_case} from '../json_utils.js';
 import {get_canonical_source_for_target, get_grounded_nearby_source, get_source_kind_for_target,} from '../mc_sources.js';
 import {createRolloutLogger as create_rollout_logger} from '../rollout_logger.js';
 import {compute_scsg} from '../scsg.js';
@@ -9,7 +10,7 @@ import {generate_primary_task_dag_self_refined} from '../self_refine.js';
 
 import {execute_task_action} from './actions.js';
 import {BreadcrumbTracker} from './breadcrumbs.js';
-import {BREADCRUMB_LANDMARK_POOL_SIZE, BREADCRUMB_MIN_DIST, BREADCRUMB_PERIOD_MS, BREADCRUMB_RECENT_POOL_SIZE, MAX_OUTER_RETRIES,} from './config.js';
+import {BREADCRUMB_LANDMARK_POOL_SIZE, BREADCRUMB_MIN_DIST, BREADCRUMB_PERIOD_MS, BREADCRUMB_RECENT_POOL_SIZE, LOAD_PTD_FROM_DISK, MAX_OUTER_RETRIES, PTD_JSON_DIR, PTD_JSON_OVERRIDE_PATH,} from './config.js';
 import {build_incoming_edge_map, edge_in_subgraph, edge_key,} from './graph.js';
 import {make_spl} from './log.js';
 import {make_fallback_acquisition_task, select_next_task, try_make_craft_task, try_make_immediate_acquisition_task, try_make_interact_task, try_make_smelt_task,} from './tasks.js';
@@ -21,20 +22,21 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   const log = create_rollout_logger(task_name);
   const bot = agent.bot;
 
-  // This hard coded option to load a graph is intended. Do not remove.
-  const load_graph = false;
-  const graph_file_path =
-      //    './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_diamond.json'
-      //  './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
-      // `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
-      // `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
-      // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
-      // './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
-      // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
-      // './achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
-      graph = load_graph ? await load_graph_from_file(graph_file_path) :
-                           await generate_primary_task_dag_self_refined(
-                               models, task_name, graph, log);
+  // PTD source — see config.js (LOAD_PTD_FROM_DISK, PTD_JSON_DIR,
+  // PTD_JSON_OVERRIDE_PATH). Two branches by design: when the flag is on
+  // but `graph` is already populated (checkpoint resume), we still want
+  // the LLM-helper branch because generate_primary_task_dag_self_refined
+  // short-circuits to resume_from_existing_graph and that path emits the
+  // `source: 'checkpoint'` rollout log line.
+  if (LOAD_PTD_FROM_DISK && !graph) {
+    const file_path = PTD_JSON_OVERRIDE_PATH ??
+        `${PTD_JSON_DIR}/${to_snake_case(task_name)}.json`;
+    spl.log(`LOAD_PTD_FROM_DISK=true — loading PTD from ${file_path}`);
+    graph = await load_graph_from_file(file_path);
+  } else {
+    graph = await generate_primary_task_dag_self_refined(
+        models, task_name, graph, log);
+  }
   if (!graph) return;
 
   // Track death within this SPL run. When the bot dies the server cancels all
