@@ -12,9 +12,16 @@ import {
   CRAFT_DEBOUNCE_MS,
   MAX_COLLECT_QTY,
   MAX_INNER_RETRIES,
+  SEARCH_RADII,
 } from './config.js';
 import {recover_failed_task} from './failure_replanner.js';
 import {make_spl} from './log.js';
+import {
+  build_command_failure_message,
+  build_search_already_attempted_message,
+} from './result_messages.js';
+// PR-A-D verification
+import {verify_log, verify_log_action_result} from './_pr_a_d_verify_log.js';
 import {check_search_complete, parse_search_command, run_breadth_first_sweep, run_search} from './search.js';
 import {recover_failed_search} from './search_replanner.js';
 import {build_dependency_context} from './dependency_context.js';
@@ -87,6 +94,15 @@ export async function execute_task_action(
       resume_from_crash ? prior_active_task.repeated_failure_count ?? 0 : 0;
   const searched_targets = new Set(
       resume_from_crash ? prior_active_task.searched_targets ?? [] : []);
+  // Parallel map carrying the structured outcome of each dedup-recorded
+  // search. Read when the dedup short-circuit fires so the
+  // `search_already_attempted` message can include the prior_kind /
+  // prior_detail rather than a bare "already attempted" string. Stored
+  // alongside `searched_targets` so the two stay in lockstep; persisted
+  // as an entries array since Map isn't JSON-serialisable.
+  const searched_targets_outcomes = new Map(
+      resume_from_crash ? prior_active_task.searched_targets_outcomes ?? [] :
+                          []);
   const initial_attempt_index =
       resume_from_crash ? prior_active_task.attempt_index ?? 0 : 0;
 
@@ -104,6 +120,7 @@ export async function execute_task_action(
       key: current_task_key,
       attempt_index,
       searched_targets: [...searched_targets],
+      searched_targets_outcomes: [...searched_targets_outcomes.entries()],
       repeated_failure_signature,
       repeated_failure_count,
     },
@@ -142,38 +159,47 @@ export async function execute_task_action(
     if (search_target != null) {
       if (searched_targets.has(search_target)) {
         spl.warn(`Search for "${search_target}" already attempted, stopping.`);
+        const prior = searched_targets_outcomes.get(search_target);
         current_step.result = create_step_result(
             false, 'search_already_attempted',
-            `Search for "${
-                search_target}" already attempted in this action sequence`);
+            build_search_already_attempted_message({
+              target: search_target,
+              prior_kind: prior?.kind,
+              prior_detail: prior?.detail,
+            }));
+        // PR-A-D verification
+        verify_log_action_result('spl_outer', current_step.result);
         break;
       }
       current_step.result = await handle_search_action(
           search_target, state, agent, log, attempt_number);
+      // PR-A-D verification
+      verify_log_action_result('spl_outer_search', current_step.result);
       if (agent.bot._ah_death_pending) {
         spl.log(`Bot death observed after handle_search_action — aborting task.`);
         return 'death';
       }
-      if (current_step.result.kind === 'search_exhausted') {
-        // Search exhausted at radius 511. Before adding to searched_targets
-        // and falling through to failure_replanner, give the search replanner
-        // a chance to relocate the bot. On success it has moved the bot to a
-        // position where the target is now in nearby state — re-enter the
-        // inner attempt loop so mediation can resolve the task with the new
-        // state. On failure, fall through to the existing failure-replanner
-        // path (pathfinding-class failures in particular bail early from
-        // recover_failed_search so failure_replanner can attempt a different
-        // recovery).
+      // Both search_exhausted (no instance anywhere) and
+      // search_found_not_reached (located but pathfinder failed) are
+      // outcomes the search_replanner can act on. Today's routing
+      // historically only fired on search_exhausted, which left the
+      // located-but-unreachable case to fall straight through to the
+      // failure_replanner with less context than the search_replanner
+      // would have. Route both to search_replanner; if it can't recover,
+      // we still fall through to failure_replanner below.
+      const result_kind = current_step.result.kind;
+      if (result_kind === 'search_exhausted' ||
+          result_kind === 'search_found_not_reached') {
         if (model_search_replanner != null && breadcrumb_tracker != null) {
-          spl.log(`Search exhausted for "${
-              search_target}" — invoking search_replanner.`);
-          // search_replanner takes a list of candidate targets. The non-
-          // sweep path wraps its single target in an array; the sweep
-          // handler (Phase 2) will pass the full exhausted candidate list.
+          spl.log(`Search ${result_kind === 'search_exhausted'
+              ? 'exhausted'
+              : 'found-not-reached'} for "${search_target}" — invoking search_replanner.`);
           const search_recovery = await recover_failed_search(
               [search_target], agent, model_search_replanner,
               breadcrumb_tracker, log, task,
-              current_step.result?.message ?? null);
+              current_step.result?.message ?? null,
+              /*seed_sweep_outcomes=*/ null,
+              /*seed_failure_kind=*/ result_kind);
           if (agent.bot._ah_death_pending) {
             spl.log(`Bot death observed after search_replanner — aborting task.`);
             return 'death';
@@ -185,7 +211,13 @@ export async function execute_task_action(
           spl.log(
               'Search replanner did not recover — falling through to failure_replanner.');
         }
-        searched_targets.add(search_target);  // Only block re-search when not found.
+        // Record the structured outcome so a later !search for the same
+        // target in this task hits the dedup path with prior context.
+        searched_targets.add(search_target);
+        searched_targets_outcomes.set(search_target, {
+          kind: result_kind,
+          detail: search_step_prior_detail(current_step.result),
+        });
         break;
       }
       // On search_success: don't consume an attempt slot. A successful
@@ -224,7 +256,8 @@ export async function execute_task_action(
       }
 
       if (interact_result.status === 'continue') {
-        current_step.result = create_command_success_result(command_result);
+        current_step.result =
+            create_command_success_result(command_result, action.command);
         repeated_failure_signature = null;
         repeated_failure_count = 0;
         continue;
@@ -241,7 +274,8 @@ export async function execute_task_action(
       repeated_failure_signature = null;
       repeated_failure_count = 0;
 
-      current_step.result = create_command_success_result(command_result);
+      current_step.result =
+          create_command_success_result(command_result, action.command);
 
       if (is_craft_command(action.command)) {
         spl.log(`Craft debounce: sleeping ${
@@ -258,17 +292,57 @@ export async function execute_task_action(
     const failure_kind = command_result?.mode_interrupted === true ?
         'mode_interrupted' :
         'command_failure';
+    // command_failure messages flow from three sources:
+    //   1. Verifier reclassification (command_utils.js): already
+    //      composed via build_command_failure_message, signalled by
+    //      command_result.verifier_reason != null.
+    //   2. Skill returned success=false outright: raw skill blob in
+    //      command_result.message. Wrap here so the replanner sees the
+    //      same `cmd=...; verifier=n/a; root_cause=...; pos=...` shape.
+    //   3. mode_interrupted: carries a structured message from
+    //      build_mode_interrupted_result; keep that path untouched.
+    // Without the verifier_reason discriminator, case (1) would be
+    // double-wrapped: parse_skill_output on an already-formatted
+    // headline returns root_cause=unknown, and the verifier reason and
+    // located coords would both be lost.
+    let failure_message;
+    if (failure_kind === 'command_failure') {
+      if (command_result?.verifier_reason != null) {
+        // PR-A-D verification
+        verify_log('double_wrap_skipped', {
+          command: action.command,
+          source: 'spl_outer',
+          reason: 'verifier_reason',
+        });
+        failure_message = normalize_result_message(command_result);
+      } else {
+        failure_message = build_command_failure_message({
+          command: action.command,
+          verifier_reason: null,
+          skill_output: normalize_result_message(command_result),
+          position: agent?.bot?.entity?.position ?? null,
+        });
+      }
+    } else {
+      failure_message = normalize_result_message(command_result);
+    }
     current_step.result = create_step_result(
-        false, failure_kind, normalize_result_message(command_result));
+        false, failure_kind, failure_message);
     if (command_result?.mode_interrupted === true) {
-      // Surface per-mode tallies and net displacement to the replanner so it
-      // can reason about which mode (typically unstuck) is blocking progress
-      // and pick a relocation action rather than re-issuing the same command.
+      // Surface per-mode tallies, per-mode trigger reasons, and net
+      // displacement to the replanner so it can reason about which mode
+      // (and why) is blocking progress and pick a relocation action
+      // rather than re-issuing the same command.
       current_step.result.mode_interrupt_counts =
           command_result.mode_interrupt_counts;
+      if (command_result.mode_reasons != null) {
+        current_step.result.mode_reasons = command_result.mode_reasons;
+      }
       current_step.result.position_before = command_result.position_before;
       current_step.result.position_after = command_result.position_after;
     }
+    // PR-A-D verification
+    verify_log_action_result('spl_outer', current_step.result);
 
     const failure_signature =
         get_command_failure_signature(action.command, command_result);
@@ -283,6 +357,8 @@ export async function execute_task_action(
       current_step.result = create_step_result(
           false, 'unstructured_failure_result',
           build_unstructured_failure_message(action.command, command_result));
+      // PR-A-D verification
+      verify_log_action_result('spl_outer', current_step.result);
       repeated_failure_signature = null;
       repeated_failure_count = 0;
       continue;
@@ -426,8 +502,9 @@ async function handle_search_sweep(
   spl.log(`Sweep exhausted: [${sweep_result.sources_exhausted.join(', ')}]`);
   sweep_step.result = create_step_result(
       false, 'sweep_exhausted',
-      `All sources exhausted at radius 511: ${
-          sweep_result.sources_exhausted.join(', ')}`);
+      `sweep_exhausted: sources=[${
+          sweep_result.sources_exhausted.join(',')}]; radii_tried=[${
+          SEARCH_RADII.join(',')}]`);
   // Per-source outcomes distinguish exhaustion-at-max-radius from
   // found-not-reached (pathfinder failed) from soft-skipped (unsupported
   // abstract). Surfaces this info into project_failed_steps for the
@@ -438,7 +515,9 @@ async function handle_search_sweep(
     spl.log('Invoking search_replanner with full exhausted target list.');
     const recovery = await recover_failed_search(
         sweep_result.sources_exhausted, agent, model_search_replanner,
-        breadcrumb_tracker, log, task);
+        breadcrumb_tracker, log, task,
+        /*seed_failure_message=*/ null,
+        /*seed_sweep_outcomes=*/ sweep_result.outcomes);
     if (agent.bot._ah_death_pending) {
       spl.log(`Bot death observed after sweep search_replanner — aborting task.`);
       return 'death';
@@ -682,6 +761,24 @@ export function is_craft_command(command) {
        command.startsWith('!smeltItem(') || command.startsWith('!smelt_item('));
 }
 
+// Compact textual summary of a search-step result, used to populate the
+// `prior_detail` field of a subsequent `search_already_attempted`
+// message. We don't store the full message verbatim — it's already in
+// the trace — just the few fields that change the LLM's relocate/fix
+// decision: located_at / distance and blocker_kind.
+function search_step_prior_detail(step_result) {
+  const parts = [];
+  if (step_result?.message) {
+    // The structured message itself ("search_exhausted: …", etc.) is the
+    // best detail we have; strip the kind prefix so it composes nicely
+    // inside `prior_detail="…"`.
+    const idx = step_result.message.indexOf(': ');
+    parts.push(idx === -1 ? step_result.message
+                          : step_result.message.slice(idx + 2));
+  }
+  return parts.join('; ');
+}
+
 // Builds a message for the `unstructured_failure_result` kind: a command
 // returned a truthy result with no recognisable error text. Surfaces the
 // raw object's top-level keys + primitive values so the replanner sees
@@ -785,24 +882,32 @@ function log_am_action(log, attempt_number, action, state) {
 
 async function handle_search_action(
     search_target, state, agent, log, attempt_number) {
-  const {found, message: search_message} =
+  const search_result =
       await run_search(search_target, state, agent, log, attempt_number);
 
-  if (found) {
-    // Trust run_search's `found` directly. We used to re-run
-    // check_search_complete here, but that was redundant with the
-    // identical check already performed inside run_search →
-    // execute_search_command; the two reads were back-to-back against
-    // the same state and only ever differed when the bot moved a tiny
-    // amount between them — a case the next AM iteration handles
-    // anyway.
+  if (search_result.found) {
+    // Trust run_search's classification: it already checked
+    // check_search_complete post-skill before returning. Re-running it
+    // here would be redundant and only ever drift when the bot moved
+    // between reads — handled by the next AM iteration.
     spl.log(`Search found "${search_target}", re-running AM with fresh state.`);
-    return create_step_result(true, 'search_success', search_message);
+    return create_step_result(true, 'search_success', search_result.message);
   }
 
-  spl.warn(`Search exhausted all radii for "${search_target}", re-evaluating.`);
-
-  return create_step_result(false, 'search_exhausted', search_message);
+  // run_search distinguishes 'absent' (no instance found anywhere)
+  // from 'found_not_reached' (located but pathfinder failed). Route
+  // both kinds through; the SPL outer loop now invokes the search
+  // replanner for either, but the kind label and the structured
+  // message tell the LLM which case it is.
+  const kind = search_result.outcome === 'found_not_reached'
+      ? 'search_found_not_reached'
+      : 'search_exhausted';
+  if (kind === 'search_exhausted') {
+    spl.warn(`Search exhausted all radii for "${search_target}", re-evaluating.`);
+  } else {
+    spl.warn(`Search located "${search_target}" but bot did not reach it — invoking search_replanner.`);
+  }
+  return create_step_result(false, kind, search_result.message);
 }
 
 async function handle_interact_success(
@@ -861,7 +966,8 @@ async function handle_interact_success(
     const final_state =
         state_cache ? state_cache.read_am() : get_am_state(agent);
     if (interact_target_satisfied(task, final_state)) {
-      collect_step.result = create_command_success_result(collect_result);
+      collect_step.result =
+          create_command_success_result(collect_result, collect_command);
       return {status: 'success'};
     }
   }

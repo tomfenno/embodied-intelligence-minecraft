@@ -17,6 +17,15 @@ import {
 } from './config.js';
 import {format_action_as_command} from './failure_replanner.js';
 import {make_spl} from './log.js';
+import {
+  build_command_failure_message,
+  build_runner_exception_message,
+  build_search_already_attempted_message,
+  build_search_exhausted_message,
+  build_search_found_not_reached_message,
+} from './result_messages.js';
+// PR-A-D verification
+import {verify_log, verify_log_action_result} from './_pr_a_d_verify_log.js';
 import {check_search_complete, expand_search_item, run_search} from './search.js';
 import {task_key} from './tasks.js';
 import {create_action_result} from './trace.js';
@@ -126,9 +135,11 @@ function validate_search_replanner_output(output, available_actions) {
   }
 }
 
-async function run_action(action, agent, log, searched_targets) {
+async function run_action(
+    action, agent, log, searched_targets, searched_targets_outcomes) {
   if (action.name === '!search') {
-    return await run_search_action(action, agent, log, searched_targets);
+    return await run_search_action(
+        action, agent, log, searched_targets, searched_targets_outcomes);
   }
 
   const command = format_action_as_command(action);
@@ -154,56 +165,152 @@ async function run_action(action, agent, log, searched_targets) {
     const kind = success
         ? 'command_success'
         : (mode_interrupted ? 'mode_interrupted' : 'command_failure');
-    const result = create_action_result(
-        command, success, kind, env_result?.message ?? null);
+    // For plain command_failure, route the raw skill output through
+    // build_command_failure_message so the replanner sees a consistent
+    // headline shape. Skip the wrap when the message is already
+    // structured (verifier reclassification path; signalled by
+    // env_result.verifier_reason) — otherwise parse_skill_output runs
+    // on its own previous output and degrades to root_cause=unknown.
+    // command_success and mode_interrupted already arrive pre-built.
+    let message = env_result?.message ?? null;
+    if (kind === 'command_failure' &&
+        env_result?.verifier_reason == null &&
+        env_result?.bot_died !== true) {
+      message = build_command_failure_message({
+        command,
+        verifier_reason: null,
+        skill_output: message,
+        position: agent?.bot?.entity?.position ?? null,
+      });
+    } else if (kind === 'command_failure' &&
+        env_result?.verifier_reason != null) {
+      // PR-A-D verification
+      verify_log('double_wrap_skipped', {
+        command,
+        source: 'search_replanner_run_action',
+        reason: 'verifier_reason',
+      });
+    } else if (kind === 'command_failure' && env_result?.bot_died === true) {
+      // PR-A-D verification
+      verify_log('double_wrap_skipped', {
+        command,
+        source: 'search_replanner_run_action',
+        reason: 'bot_died',
+      });
+    }
+    const result = create_action_result(command, success, kind, message);
     if (mode_interrupted) {
       result.mode_interrupt_counts = env_result.mode_interrupt_counts;
+      if (env_result.mode_reasons != null) {
+        result.mode_reasons = env_result.mode_reasons;
+      }
       result.position_before = env_result.position_before;
       result.position_after = env_result.position_after;
     }
+    // PR-A-D verification
+    verify_log_action_result('search_replanner_run_action', result);
     return result;
   } catch (e) {
-    return create_action_result(command, false, 'runner_exception', String(e));
+    const exc_result = create_action_result(
+        command, false, 'runner_exception',
+        build_runner_exception_message({
+          command,
+          error: e,
+          position: agent?.bot?.entity?.position ?? null,
+          stack_top:
+              (e?.stack ?? '').split('\n').slice(0, 3).join(' / ') || null,
+        }));
+    // PR-A-D verification
+    verify_log_action_result('search_replanner_run_action', exc_result);
+    return exc_result;
   }
 }
 
-async function run_search_action(action, agent, log, searched_targets) {
+async function run_search_action(
+    action, agent, log, searched_targets, searched_targets_outcomes) {
   const command = format_action_as_command(action);
   const target = action.args?.[0];
 
   if (typeof target !== 'string' || target.length === 0) {
-    return create_action_result(
+    const invalid_result = create_action_result(
         command, false, 'invalid_command',
         '!search requires a non-empty string target');
+    // PR-A-D verification
+    verify_log_action_result(
+        'search_replanner_run_search_action', invalid_result);
+    return invalid_result;
   }
 
   // Per-plan dedup. A relocation between plans clears this set (the search
   // replanner resets `searched_targets` for each new attempt), so the LLM
   // can re-search the same target after the bot has moved.
   if (searched_targets.has(target)) {
-    return create_action_result(
+    const prior = searched_targets_outcomes?.get(target);
+    const dedup_result = create_action_result(
         command, false, 'search_already_attempted',
-        `Search for "${target}" already attempted in this plan`);
+        build_search_already_attempted_message({
+          target,
+          prior_kind: prior?.kind,
+          prior_detail: prior?.detail,
+        }));
+    // PR-A-D verification
+    verify_log_action_result(
+        'search_replanner_run_search_action', dedup_result);
+    return dedup_result;
   }
 
   try {
     const state = get_am_state(agent);
-    const {found, message} = await run_search(target, state, agent, log, 0);
+    const search_result = await run_search(target, state, agent, log, 0);
     await sleep(ACTION_DEBOUNCE_MS);
 
-    if (!found) {
-      searched_targets.add(target);
-      return create_action_result(command, false, 'search_exhausted', message);
+    // run_search now classifies the outcome itself (Step 2). Trust its
+    // post-check; no re-running of check_search_complete required.
+    if (search_result.found) {
+      const success_result = create_action_result(
+          command, true, 'search_success', search_result.message);
+      // PR-A-D verification
+      verify_log_action_result(
+          'search_replanner_run_search_action', success_result);
+      return success_result;
     }
-
-    const target_reached = check_search_complete(target, get_am_state(agent));
-    return target_reached ?
-        create_action_result(command, true, 'search_success', message) :
-        create_action_result(
-            command, false, 'search_found_not_reached', message);
+    const kind = search_result.outcome === 'found_not_reached'
+        ? 'search_found_not_reached'
+        : 'search_exhausted';
+    searched_targets.add(target);
+    searched_targets_outcomes?.set(target, {
+      kind,
+      detail: extract_prior_detail(search_result.message),
+    });
+    const fail_result =
+        create_action_result(command, false, kind, search_result.message);
+    // PR-A-D verification
+    verify_log_action_result(
+        'search_replanner_run_search_action', fail_result);
+    return fail_result;
   } catch (e) {
-    return create_action_result(command, false, 'runner_exception', String(e));
+    const exc_result = create_action_result(
+        command, false, 'runner_exception',
+        build_runner_exception_message({
+          command,
+          error: e,
+          position: agent?.bot?.entity?.position ?? null,
+          stack_top:
+              (e?.stack ?? '').split('\n').slice(0, 3).join(' / ') || null,
+        }));
+    // PR-A-D verification
+    verify_log_action_result(
+        'search_replanner_run_search_action', exc_result);
+    return exc_result;
   }
+}
+
+// Strip the `<kind>: ` prefix from a structured message so it composes
+// cleanly inside `prior_detail="…"` on a later search_already_attempted.
+function extract_prior_detail(message) {
+  if (typeof message !== 'string' || message.length === 0) return null;
+  const idx = message.indexOf(': ');
+  return idx === -1 ? message : message.slice(idx + 2);
 }
 
 // Returns true if ANY of the candidate targets is now visible in the bot's
@@ -273,7 +380,7 @@ function persist_search_trace(search_trace, rollout_dir) {
 /**
  * Main entry point. Called by `actions.js` when an in-task `!search` (or a
  * search_sweep task — see `handle_search_sweep`) has exhausted its full
- * 511-block radius without finding any of the candidate targets.
+ * full radius schedule (max 256 blocks) without finding any of the candidate targets.
  *
  * `targets` is a non-empty array of target names. Single-target callers
  * (the non-sweep `search_exhausted` branch in actions.js) pass an array
@@ -290,7 +397,8 @@ function persist_search_trace(search_trace, rollout_dir) {
  */
 export async function recover_failed_search(
     targets, agent, model, breadcrumb_tracker, log, task = null,
-    seed_failure_message = null) {
+    seed_failure_message = null, seed_sweep_outcomes = null,
+    seed_failure_kind = 'search_exhausted') {
   if (!Array.isArray(targets) || targets.length === 0) {
     spl.warn('recover_failed_search called with empty targets list — fail.');
     return 'fail';
@@ -303,26 +411,92 @@ export async function recover_failed_search(
   const attempts_log = [];
   const targets_display = targets.join(', ');
 
-  // Seed previous_summaries with the original !search that triggered
-  // recovery (attempt: 0) so the LLM has concrete evidence of why it was
-  // called — not just world state. Only added for single-target callers
-  // where there's a meaningful per-target message; the sweep caller
-  // passes null since per-source messages aren't captured.
-  if (seed_failure_message != null) {
+  // Seed previous_summaries with the original search activity that
+  // triggered recovery (attempt: 0) so the LLM has concrete evidence of
+  // why it was called — not just current world state.
+  //
+  // Two seeding shapes, mutually exclusive:
+  //   - Single-target: `seed_failure_message` carries the structured
+  //     message from run_search (Step 2). One result entry.
+  //   - Multi-target sweep: `seed_sweep_outcomes` is a map from source
+  //     name to {outcome, located_at?, located_distance?, blocker_kind?,
+  //     blocker_detail?, last_message?} as produced by
+  //     `run_breadth_first_sweep`. One result entry per source so the
+  //     LLM can see which were absent vs. located-but-unreachable.
+  if (seed_sweep_outcomes != null) {
     const seed_search_state =
         get_search_trace_state(agent, breadcrumb_tracker);
     previous_summaries.push({
       attempt: 0,
-      summary: `Original !search("${targets[0]}") exhausted across the ` +
-          `full radius schedule, triggering recovery.`,
+      summary: `Original sweep across [${targets_display}] exhausted at ` +
+          `all radii, triggering recovery.`,
+      actions: targets.map(t => ({name: '!search', args: [t]})),
+      results: targets.map(t => {
+        const o = seed_sweep_outcomes[t] ?? {outcome: 'exhausted'};
+        if (o.outcome === 'found_not_reached') {
+          return {
+            command: `!search("${t}")`,
+            success: false,
+            kind: 'search_found_not_reached',
+            message: build_search_found_not_reached_message({
+              target: t,
+              located_at: o.located_at,
+              located_distance: o.located_distance,
+              blocker_kind: o.blocker_kind,
+              blocker_detail: o.blocker_detail,
+            }),
+            located_at: o.located_at ?? null,
+            located_distance: o.located_distance ?? null,
+            blocker_kind: o.blocker_kind ?? null,
+          };
+        }
+        // 'exhausted' / 'soft_skipped' / 'not_attempted' all degrade to
+        // search_exhausted in the seed — none located the target.
+        return {
+          command: `!search("${t}")`,
+          success: false,
+          kind: 'search_exhausted',
+          message: build_search_exhausted_message({target: t}),
+        };
+      }),
+      end_state: pick_attempt_end_state(seed_search_state),
+    });
+    // PR-A-D verification
+    verify_log('sweep_seed', {
+      sources: targets,
+      outcomes: Object.fromEntries(
+          Object.entries(seed_sweep_outcomes).map(([k, v]) => [k, {
+            outcome: v.outcome ?? null,
+            has_located_at: v.located_at != null,
+            has_located_distance: v.located_distance != null,
+            blocker_kind: v.blocker_kind ?? null,
+          }])),
+    });
+  } else if (seed_failure_message != null) {
+    const seed_search_state =
+        get_search_trace_state(agent, breadcrumb_tracker);
+    previous_summaries.push({
+      attempt: 0,
+      summary: `Original !search("${targets[0]}") triggered recovery: ` +
+          `target absent or located-but-unreachable across the full ` +
+          `radius schedule.`,
       actions: [{name: '!search', args: [targets[0]]}],
       results: [{
         command: `!search("${targets[0]}")`,
         success: false,
-        kind: 'search_exhausted',
+        kind: seed_failure_kind,
         message: seed_failure_message,
       }],
       end_state: pick_attempt_end_state(seed_search_state),
+    });
+    // PR-A-D verification
+    verify_log('single_target_seed', {
+      target: targets[0],
+      kind: seed_failure_kind,
+      message_prefix:
+          typeof seed_failure_message === 'string'
+              ? seed_failure_message.slice(0, 120)
+              : null,
     });
   }
 
@@ -365,6 +539,11 @@ export async function recover_failed_search(
 
   for (let attempt = resume_attempt; attempt <= MAX_SEARCH_REPLANNER_ATTEMPTS;
        attempt++) {
+    if (agent.bot._ah_death_pending) {
+      spl.log(`Bot died — aborting recovery at attempt ${attempt}/${
+          MAX_SEARCH_REPLANNER_ATTEMPTS}.`);
+      return finalize('fail', 'bot_died');
+    }
     save_runtime_state({
       active_replanner: {
         kind: 'search',
@@ -409,6 +588,12 @@ export async function recover_failed_search(
 
     const action_results = [];
     const searched_targets = new Set();
+    // Parallel map of {kind, detail} for each searched target; consumed
+    // by the search_already_attempted short-circuit so the LLM sees the
+    // *outcome* of the prior search in the same plan, not just "already
+    // attempted". Per-plan scope: reset every plan along with
+    // searched_targets so a relocation between plans clears the dedup.
+    const searched_targets_outcomes = new Map();
     let attempt_outcome = null;
 
     for (let i = 0; i < replanner_output.actions.length; i++) {
@@ -442,10 +627,16 @@ export async function recover_failed_search(
           spl.log('Executing:', format_action_as_command(action));
         }
 
-        result = await run_action(action, agent, log, searched_targets);
+        result = await run_action(
+            action, agent, log, searched_targets, searched_targets_outcomes);
         spl.log('Result:', result);
         log?.search_recovery_action_result?.(attempt, i, result);
 
+        if (agent.bot._ah_death_pending) {
+          spl.log(`Bot died mid-plan — stopping action sequence in attempt ${
+              attempt}.`);
+          break;
+        }
         if (result.success) break;
         if (PLAN_TERMINATING_KINDS.has(result.kind)) break;
         // Pathfinding failures (mode_interrupted / runner_exception /

@@ -3,6 +3,10 @@ import * as world from "./world.js";
 import pf from 'mineflayer-pathfinder';
 import Vec3 from 'vec3';
 import settings from "../../../settings.js";
+// Start of AH code
+import {compute_collect_delta, VERIFIER_SETTLE_TICKS}
+    from '../../../achievement_hunter/src/pipeline/inventory_drops.js';
+// End of AH code
 
 const blockPlaceDelay = settings.block_place_delay == null ? 0 : settings.block_place_delay;
 const useDelay = blockPlaceDelay > 0;
@@ -497,6 +501,11 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
     // must always recover them, even if they end up adjacent to water/lava.
     const unsafeBlocks = ['obsidian', 'crafting_table', 'furnace'];
 
+    // Start of AH code — pre-collect inventory snapshot for accurate Collected headline
+    // (see achievement_hunter/docs/messages/collectblocks-count-and-item-mismatch.md).
+    const inv_before = world.getInventoryCounts(bot);
+    // End of AH code
+
     for (let i=0; i<num; i++) {
         // [Achievement Hunter] Check interrupt at the top of every iteration so
         // that a cancelTask()-induced catch+continue exits the loop immediately
@@ -596,10 +605,33 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
         }
         
         if (bot.interrupt_code)
-            break;  
+            break;
     }
-    log(bot, `Collected ${collected} ${blockType}.`);
+    // Start of AH code — emit headline from actual inventory delta so the message
+    // reports the drop item the bot actually received (e.g. "cobblestone" not "stone").
+    // Falls back to the legacy counter-based headline on any error or when the bot
+    // is dying, so a snapshot failure never swallows the success signal.
+    let headline = `Collected ${collected} ${blockType}.`;
+    try {
+        if (!bot._ah_death_pending) {
+            await bot.waitForTicks(VERIFIER_SETTLE_TICKS);
+        }
+        const inv_after = world.getInventoryCounts(bot);
+        const {primary_item, primary_count, extras} =
+            compute_collect_delta(blockType, inv_before, inv_after);
+        const extras_str = Object.entries(extras)
+            .sort((a, b) => b[1] - a[1])
+            .map(([k, v]) => `+${v} ${k}`).join(', ');
+        headline = extras_str
+            ? `Collected ${primary_count} ${primary_item} (also: ${extras_str}).`
+            : `Collected ${primary_count} ${primary_item}.`;
+    } catch (e) {
+        // Snapshot or settle-wait failed (typically: bot disconnected mid-loop).
+        // Keep the legacy headline computed above so the success signal survives.
+    }
+    log(bot, headline);
     return collected > 0;
+    // End of AH code
 }
 
 export async function pickupNearbyItems(bot) {

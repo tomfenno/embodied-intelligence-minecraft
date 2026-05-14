@@ -1,0 +1,3539 @@
+{
+  "objective": "Acquire diamonds. Have a diamond in the inventory.",
+  "status": "completed",
+  "started_at": "2026-05-14T20:32:22.903Z",
+  "stages": [
+    {
+      "timestamp": "2026-05-14T20:32:22.907Z",
+      "elapsed": "0s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "any_log",
+              "qty": 5,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 8,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "stone_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "iron_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "diamond"
+        ]
+      },
+      "state": {
+        "inventory": "Nothing"
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:23.043Z",
+      "elapsed": "0s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 5,
+          "item_type": "resource",
+          "source_hint": "any_log",
+          "source_kind": "block"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:32:23.139Z",
+      "elapsed": "0s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "any_log",
+        "action_type": "search_sweep",
+        "parameters": {
+          "targets": [
+            {
+              "target_item": "any_log",
+              "source": "any_log",
+              "kind": "block",
+              "qty": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:23.439Z",
+      "elapsed": "0s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!searchForBlock(\"oak_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:24.074Z",
+      "elapsed": "1s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"spruce_log\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:28.815Z",
+      "elapsed": "5s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 1,
+        "why": "S.inventory==Nothing",
+        "final": {
+          "vertices": [
+            {
+              "id": "any_log",
+              "qty": 5,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "any_plank",
+              "qty": 12,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 8,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_log",
+              "to": "any_plank",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "stone_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "iron_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        },
+        "s": [
+          "diamond"
+        ]
+      },
+      "state": {
+        "inventory": "Nothing"
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:28.914Z",
+      "elapsed": "6s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_log",
+          "qty": 5,
+          "item_type": "resource",
+          "source_hint": "any_log",
+          "source_kind": "block",
+          "grounded_nearby_source": "spruce_log"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:32:29.053Z",
+      "elapsed": "6s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "any_log",
+        "qty": 5,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "spruce_log",
+          "item_dependency": null,
+          "tool": null
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:29.264Z",
+      "elapsed": "6s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"spruce_log\", 5)",
+      "state": {
+        "inventory": {},
+        "craftable_items": [],
+        "nearby_blocks": [
+          "snow",
+          "grass_block",
+          "spruce_leaves",
+          "dirt",
+          "poppy",
+          "dandelion",
+          "short_grass",
+          "spruce_log",
+          "stone",
+          "coal_ore",
+          "gravel",
+          "granite",
+          "copper_ore",
+          "iron_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:51.397Z",
+      "elapsed": "28s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "any_plank",
+              "qty": 11,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 6,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "any_plank",
+              "to": "crafting_table",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "stick",
+              "type": "crafting_input",
+              "qty": 4,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "any_plank",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "stone_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "iron_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "spruce_log": 5
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:51.493Z",
+      "elapsed": "28s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "any_plank",
+          "qty": 11,
+          "item_type": "item",
+          "satisfied_inputs": [
+            {
+              "item": "any_log",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_kind": "block"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:32:51.588Z",
+      "elapsed": "28s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "spruce_planks",
+        "qty": 11,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_log",
+              "qty": 3
+            }
+          ],
+          "workstation": null
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:51.775Z",
+      "elapsed": "28s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"spruce_planks\", 3)",
+      "state": {
+        "inventory": {
+          "spruce_log": 5
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "spruce_wood"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "short_grass",
+          "grass_block",
+          "spruce_leaves",
+          "snow",
+          "dandelion",
+          "spruce_log",
+          "stone",
+          "poppy",
+          "coal_ore",
+          "gravel",
+          "granite",
+          "copper_ore",
+          "iron_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:54.044Z",
+      "elapsed": "31s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "crafting_table",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stick",
+              "qty": 6,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "wooden_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "stone_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "furnace",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "crafting_table",
+              "to": "iron_pickaxe",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "spruce_log": 2,
+          "spruce_planks": 12
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:54.146Z",
+      "elapsed": "31s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "crafting_table",
+          "qty": 1,
+          "item_type": "workstation",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_kind": "block"
+        },
+        {
+          "id": "stick",
+          "qty": 6,
+          "item_type": "item",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_kind": "block"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:32:54.265Z",
+      "elapsed": "31s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "crafting_table",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 4
+            }
+          ],
+          "workstation": null
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:54.478Z",
+      "elapsed": "31s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"crafting_table\", 1)",
+      "state": {
+        "inventory": {
+          "spruce_log": 2,
+          "spruce_planks": 12
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "crafting_table",
+          "spruce_button",
+          "spruce_pressure_plate",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "short_grass",
+          "grass_block",
+          "spruce_leaves",
+          "snow",
+          "dandelion",
+          "spruce_log",
+          "stone",
+          "poppy",
+          "coal_ore",
+          "gravel",
+          "granite",
+          "copper_ore",
+          "iron_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:56.770Z",
+      "elapsed": "33s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "stick",
+              "qty": 6,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "stick",
+              "to": "wooden_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "stick",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 2,
+              "consumed": true
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "spruce_log": 2,
+          "spruce_planks": 8,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:56.872Z",
+      "elapsed": "33s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "stick",
+          "qty": 6,
+          "item_type": "item",
+          "satisfied_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            }
+          ],
+          "source_kind": "block"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:32:56.978Z",
+      "elapsed": "34s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "stick",
+        "qty": 6,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "any_plank",
+              "qty": 3
+            }
+          ],
+          "workstation": null
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:57.228Z",
+      "elapsed": "34s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"stick\", 2)",
+      "state": {
+        "inventory": {
+          "spruce_log": 2,
+          "spruce_planks": 8,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "spruce_slab",
+          "chest",
+          "crafting_table",
+          "spruce_stairs",
+          "spruce_button",
+          "spruce_pressure_plate",
+          "spruce_door",
+          "spruce_trapdoor",
+          "spruce_boat",
+          "bowl",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "short_grass",
+          "grass_block",
+          "spruce_leaves",
+          "snow",
+          "dandelion",
+          "spruce_log",
+          "stone",
+          "poppy",
+          "coal_ore",
+          "gravel",
+          "granite",
+          "copper_ore",
+          "iron_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:58.333Z",
+      "elapsed": "35s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "wooden_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "wooden_pickaxe",
+              "to": "cobblestone",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "wooden_pickaxe",
+              "to": "coal",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "spruce_log": 2,
+          "spruce_planks": 4,
+          "crafting_table": 1,
+          "stick": 8
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:58.432Z",
+      "elapsed": "35s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "wooden_pickaxe",
+          "qty": 1,
+          "item_type": "tool",
+          "satisfied_inputs": [
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "any_plank",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_kind": "block"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:32:58.532Z",
+      "elapsed": "35s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "wooden_pickaxe",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "stick",
+              "qty": 2
+            },
+            {
+              "item": "any_plank",
+              "qty": 3
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:32:58.735Z",
+      "elapsed": "35s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"wooden_pickaxe\", 1)",
+      "state": {
+        "inventory": {
+          "spruce_log": 2,
+          "spruce_planks": 4,
+          "crafting_table": 1,
+          "stick": 8
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "spruce_slab",
+          "crafting_table",
+          "ladder",
+          "spruce_fence",
+          "spruce_button",
+          "spruce_pressure_plate",
+          "spruce_fence_gate",
+          "bowl",
+          "wooden_sword",
+          "wooden_shovel",
+          "wooden_pickaxe",
+          "wooden_axe",
+          "wooden_hoe",
+          "stick"
+        ],
+        "nearby_blocks": [
+          "dirt",
+          "short_grass",
+          "grass_block",
+          "spruce_leaves",
+          "snow",
+          "dandelion",
+          "spruce_log",
+          "stone",
+          "poppy",
+          "coal_ore",
+          "gravel",
+          "granite",
+          "copper_ore",
+          "iron_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:33:06.075Z",
+      "elapsed": "43s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "cobblestone",
+              "qty": 11,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "cobblestone",
+              "to": "stone_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "cobblestone",
+              "to": "furnace",
+              "type": "crafting_input",
+              "qty": 8,
+              "consumed": true
+            },
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "stick": 6,
+          "wooden_pickaxe": 1,
+          "spruce_planks": 1,
+          "spruce_log": 2,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:33:06.169Z",
+      "elapsed": "43s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "cobblestone",
+          "qty": 11,
+          "item_type": "resource",
+          "satisfied_inputs": [
+            {
+              "item": "wooden_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "stone",
+          "source_kind": "block",
+          "grounded_nearby_source": "stone"
+        },
+        {
+          "id": "coal",
+          "qty": 1,
+          "item_type": "resource",
+          "satisfied_inputs": [
+            {
+              "item": "wooden_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "coal_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": "coal_ore"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:33:06.267Z",
+      "elapsed": "43s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "cobblestone",
+        "qty": 11,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "stone",
+          "item_dependency": null,
+          "tool": "wooden_pickaxe"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:33:06.458Z",
+      "elapsed": "43s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"stone\", 11)",
+      "state": {
+        "inventory": {
+          "stick": 6,
+          "wooden_pickaxe": 1,
+          "spruce_planks": 1,
+          "spruce_log": 2,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "spruce_button",
+          "wooden_shovel"
+        ],
+        "nearby_blocks": [
+          "grass_block",
+          "dirt",
+          "snow",
+          "short_grass",
+          "spruce_leaves",
+          "dandelion",
+          "spruce_log",
+          "stone",
+          "poppy",
+          "coal_ore",
+          "gravel",
+          "granite",
+          "iron_ore",
+          "copper_ore"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:33:51.237Z",
+      "elapsed": "1m 28s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "stone_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "stone_pickaxe",
+              "to": "raw_iron",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "spruce_log": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "stick": 6,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "cobblestone": 17
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:33:51.288Z",
+      "elapsed": "1m 28s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "stone_pickaxe",
+          "qty": 1,
+          "item_type": "tool",
+          "satisfied_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_kind": "block"
+        },
+        {
+          "id": "coal",
+          "qty": 1,
+          "item_type": "resource",
+          "satisfied_inputs": [
+            {
+              "item": "wooden_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "coal_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": "coal_ore"
+        },
+        {
+          "id": "furnace",
+          "qty": 1,
+          "item_type": "workstation",
+          "satisfied_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 8,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_kind": "block"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:33:51.335Z",
+      "elapsed": "1m 28s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "stone_pickaxe",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 3
+            },
+            {
+              "item": "stick",
+              "qty": 2
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:33:51.451Z",
+      "elapsed": "1m 28s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"stone_pickaxe\", 1)",
+      "state": {
+        "inventory": {
+          "spruce_log": 2,
+          "crafting_table": 1,
+          "wooden_pickaxe": 1,
+          "stick": 6,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "cobblestone": 17
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "spruce_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "iron_ore",
+          "grass_block",
+          "coal_ore",
+          "granite",
+          "snow",
+          "copper_ore",
+          "short_grass",
+          "gravel",
+          "spruce_leaves",
+          "dandelion",
+          "poppy",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:33:59.019Z",
+      "elapsed": "1m 36s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "furnace",
+              "qty": 1,
+              "item_type": "workstation",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "furnace",
+              "to": "iron_ingot",
+              "type": "workstation_dependency",
+              "qty": 1,
+              "consumed": false
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "stone_pickaxe": 1,
+          "spruce_log": 2,
+          "stick": 4,
+          "wooden_pickaxe": 1,
+          "cobblestone": 14,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:33:59.083Z",
+      "elapsed": "1m 36s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "raw_iron",
+          "qty": 3,
+          "item_type": "resource",
+          "satisfied_inputs": [
+            {
+              "item": "stone_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "iron_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": "iron_ore"
+        },
+        {
+          "id": "coal",
+          "qty": 1,
+          "item_type": "resource",
+          "satisfied_inputs": [
+            {
+              "item": "wooden_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "coal_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": "coal_ore"
+        },
+        {
+          "id": "furnace",
+          "qty": 1,
+          "item_type": "workstation",
+          "satisfied_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 8,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_kind": "block"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:33:59.133Z",
+      "elapsed": "1m 36s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "furnace",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "cobblestone",
+              "qty": 8
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:33:59.241Z",
+      "elapsed": "1m 36s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"furnace\", 1)",
+      "state": {
+        "inventory": {
+          "stone_pickaxe": 1,
+          "spruce_log": 2,
+          "stick": 4,
+          "wooden_pickaxe": 1,
+          "cobblestone": 14,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "spruce_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "iron_ore",
+          "grass_block",
+          "coal_ore",
+          "granite",
+          "snow",
+          "copper_ore",
+          "short_grass",
+          "gravel",
+          "spruce_leaves",
+          "dandelion",
+          "poppy",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:34:06.410Z",
+      "elapsed": "1m 43s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "raw_iron",
+              "qty": 3,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "raw_iron",
+              "to": "iron_ingot",
+              "type": "smelting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "spruce_log": 2,
+          "stick": 4,
+          "wooden_pickaxe": 1,
+          "cobblestone": 6,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:34:06.476Z",
+      "elapsed": "1m 43s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "raw_iron",
+          "qty": 3,
+          "item_type": "resource",
+          "satisfied_inputs": [
+            {
+              "item": "stone_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "iron_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": "iron_ore"
+        },
+        {
+          "id": "coal",
+          "qty": 1,
+          "item_type": "resource",
+          "satisfied_inputs": [
+            {
+              "item": "wooden_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "coal_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": "coal_ore"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:34:06.529Z",
+      "elapsed": "1m 43s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "raw_iron",
+        "qty": 3,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "iron_ore",
+          "item_dependency": null,
+          "tool": "stone_pickaxe"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:34:06.625Z",
+      "elapsed": "1m 43s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"iron_ore\", 3)",
+      "state": {
+        "inventory": {
+          "stone_pickaxe": 1,
+          "furnace": 1,
+          "spruce_log": 2,
+          "stick": 4,
+          "wooden_pickaxe": 1,
+          "cobblestone": 6,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "cobblestone_slab",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "spruce_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "dirt",
+          "iron_ore",
+          "grass_block",
+          "coal_ore",
+          "granite",
+          "snow",
+          "copper_ore",
+          "short_grass",
+          "gravel",
+          "spruce_leaves",
+          "dandelion",
+          "poppy",
+          "spruce_log"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:34:23.234Z",
+      "elapsed": "2m 00s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "coal",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "coal",
+              "to": "iron_ingot",
+              "type": "fuel_input",
+              "qty": 1,
+              "consumed": true
+            },
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "furnace": 1,
+          "spruce_log": 2,
+          "stick": 4,
+          "wooden_pickaxe": 1,
+          "cobblestone": 19,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1,
+          "stone_pickaxe": 1,
+          "raw_iron": 3
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:34:23.280Z",
+      "elapsed": "2m 00s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "coal",
+          "qty": 1,
+          "item_type": "resource",
+          "satisfied_inputs": [
+            {
+              "item": "wooden_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "coal_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": "coal_ore"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:34:23.324Z",
+      "elapsed": "2m 00s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "coal",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "coal_ore",
+          "item_dependency": null,
+          "tool": "wooden_pickaxe"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:34:23.415Z",
+      "elapsed": "2m 00s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"coal_ore\", 1)",
+      "state": {
+        "inventory": {
+          "furnace": 1,
+          "spruce_log": 2,
+          "stick": 4,
+          "wooden_pickaxe": 1,
+          "cobblestone": 19,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1,
+          "stone_pickaxe": 1,
+          "raw_iron": 3
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "spruce_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "iron_ore",
+          "coal_ore",
+          "dirt",
+          "copper_ore",
+          "grass_block",
+          "snow",
+          "granite",
+          "short_grass",
+          "dandelion",
+          "gravel",
+          "poppy",
+          "andesite"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:34:28.753Z",
+      "elapsed": "2m 05s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "iron_ingot",
+              "qty": 3,
+              "item_type": "item",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_ingot",
+              "to": "iron_pickaxe",
+              "type": "crafting_input",
+              "qty": 3,
+              "consumed": true
+            },
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "coal": 1,
+          "furnace": 1,
+          "spruce_log": 2,
+          "stick": 4,
+          "wooden_pickaxe": 1,
+          "cobblestone": 23,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1,
+          "stone_pickaxe": 1,
+          "raw_iron": 3
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:34:28.794Z",
+      "elapsed": "2m 05s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "iron_ingot",
+          "qty": 3,
+          "item_type": "item",
+          "satisfied_inputs": [
+            {
+              "item": "raw_iron",
+              "qty": 3,
+              "type": "smelting_input",
+              "consumed": true
+            },
+            {
+              "item": "coal",
+              "qty": 1,
+              "type": "fuel_input",
+              "consumed": true
+            },
+            {
+              "item": "furnace",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_kind": "block"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:34:28.836Z",
+      "elapsed": "2m 05s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "iron_ingot",
+        "qty": 3,
+        "action_type": "smelt",
+        "parameters": {
+          "smelting_inputs": [
+            {
+              "item": "raw_iron",
+              "qty": 3
+            }
+          ],
+          "fuel_inputs": [
+            {
+              "item": "coal",
+              "qty": 1
+            }
+          ],
+          "workstation": "furnace"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:34:28.925Z",
+      "elapsed": "2m 06s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!smelt_item(\"raw_iron\", 3, \"coal\")",
+      "state": {
+        "inventory": {
+          "coal": 1,
+          "furnace": 1,
+          "spruce_log": 2,
+          "stick": 4,
+          "wooden_pickaxe": 1,
+          "cobblestone": 23,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1,
+          "stone_pickaxe": 1,
+          "raw_iron": 3
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "cobblestone_slab",
+          "torch",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "spruce_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "iron_ore",
+          "coal_ore",
+          "dirt",
+          "copper_ore",
+          "grass_block",
+          "snow",
+          "short_grass",
+          "granite",
+          "gravel",
+          "dandelion"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:35:04.998Z",
+      "elapsed": "2m 42s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "iron_pickaxe",
+              "qty": 1,
+              "item_type": "tool",
+              "acquisition_dependency": "none"
+            },
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": [
+            {
+              "from": "iron_pickaxe",
+              "to": "diamond",
+              "type": "tool_dependency",
+              "qty": 1,
+              "consumed": false
+            }
+          ]
+        }
+      },
+      "state": {
+        "inventory": {
+          "iron_ingot": 3,
+          "spruce_log": 2,
+          "furnace": 1,
+          "stick": 4,
+          "wooden_pickaxe": 1,
+          "cobblestone": 23,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1,
+          "stone_pickaxe": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:35:05.045Z",
+      "elapsed": "2m 42s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "iron_pickaxe",
+          "qty": 1,
+          "item_type": "tool",
+          "satisfied_inputs": [
+            {
+              "item": "iron_ingot",
+              "qty": 3,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "stick",
+              "qty": 2,
+              "type": "crafting_input",
+              "consumed": true
+            },
+            {
+              "item": "crafting_table",
+              "qty": 1,
+              "type": "workstation_dependency",
+              "consumed": false
+            }
+          ],
+          "source_kind": "block"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:35:05.089Z",
+      "elapsed": "2m 42s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "iron_pickaxe",
+        "qty": 1,
+        "action_type": "craft",
+        "parameters": {
+          "crafting_inputs": [
+            {
+              "item": "iron_ingot",
+              "qty": 3
+            },
+            {
+              "item": "stick",
+              "qty": 2
+            }
+          ],
+          "workstation": "crafting_table"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:35:05.201Z",
+      "elapsed": "2m 42s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!craftRecipe(\"iron_pickaxe\", 1)",
+      "state": {
+        "inventory": {
+          "iron_ingot": 3,
+          "spruce_log": 2,
+          "furnace": 1,
+          "stick": 4,
+          "wooden_pickaxe": 1,
+          "cobblestone": 23,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1,
+          "stone_pickaxe": 1
+        },
+        "craftable_items": [
+          "spruce_planks",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "lever",
+          "tripwire_hook",
+          "spruce_button",
+          "heavy_weighted_pressure_plate",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe",
+          "iron_sword",
+          "iron_shovel",
+          "iron_pickaxe",
+          "iron_axe",
+          "iron_hoe",
+          "bucket",
+          "shears",
+          "iron_nugget"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "iron_ore",
+          "coal_ore",
+          "dirt",
+          "copper_ore",
+          "grass_block",
+          "snow",
+          "short_grass",
+          "granite",
+          "gravel",
+          "dandelion"
+        ],
+        "nearby_entities": {
+          "mobs": [
+            "sheep",
+            "rabbit"
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:35:13.124Z",
+      "elapsed": "2m 50s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "iron_pickaxe": 1,
+          "spruce_log": 2,
+          "furnace": 1,
+          "stick": 2,
+          "wooden_pickaxe": 1,
+          "cobblestone": 23,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1,
+          "stone_pickaxe": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:35:13.187Z",
+      "elapsed": "2m 50s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "diamond",
+          "qty": 1,
+          "item_type": "resource",
+          "satisfied_inputs": [
+            {
+              "item": "iron_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "diamond_ore",
+          "source_kind": "block"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:35:13.239Z",
+      "elapsed": "2m 50s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "diamond",
+        "action_type": "search_sweep",
+        "parameters": {
+          "targets": [
+            {
+              "target_item": "diamond",
+              "source": "diamond_ore",
+              "kind": "block",
+              "qty": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:35:13.394Z",
+      "elapsed": "2m 50s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!searchForBlock(\"diamond_ore\", 32)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:35:13.989Z",
+      "elapsed": "2m 51s",
+      "stage": "AM",
+      "attempt": 2,
+      "raw": "!searchForBlock(\"diamond_ore\", 64)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:35:14.713Z",
+      "elapsed": "2m 51s",
+      "stage": "AM",
+      "attempt": 3,
+      "raw": "!searchForBlock(\"diamond_ore\", 128)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:35:29.327Z",
+      "elapsed": "3m 06s",
+      "stage": "AM",
+      "attempt": 4,
+      "raw": "!searchForBlock(\"diamond_ore\", 256)",
+      "meta": {
+        "source": "search"
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:36:13.879Z",
+      "elapsed": "3m 50s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 0,
+        "s": [
+          "diamond"
+        ],
+        "final": {
+          "objective": "Pick up a diamond from the ground.",
+          "sinks": [
+            "diamond"
+          ],
+          "vertices": [
+            {
+              "id": "diamond",
+              "qty": 1,
+              "item_type": "resource",
+              "acquisition_dependency": "none"
+            }
+          ],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "granite": 10,
+          "diorite": 4,
+          "spruce_log": 2,
+          "cobblestone": 84,
+          "furnace": 1,
+          "stick": 2,
+          "wooden_pickaxe": 1,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1,
+          "stone_pickaxe": 1,
+          "iron_pickaxe": 1
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:36:13.915Z",
+      "elapsed": "3m 51s",
+      "stage": "CANDIDATES",
+      "candidates": [
+        {
+          "id": "diamond",
+          "qty": 1,
+          "item_type": "resource",
+          "satisfied_inputs": [
+            {
+              "item": "iron_pickaxe",
+              "qty": 1,
+              "type": "tool_dependency",
+              "consumed": false
+            }
+          ],
+          "source_hint": "diamond_ore",
+          "source_kind": "block",
+          "grounded_nearby_source": "diamond_ore"
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-05-14T20:36:13.949Z",
+      "elapsed": "3m 51s",
+      "stage": "TASK",
+      "task": {
+        "target_item": "diamond",
+        "qty": 1,
+        "action_type": "collect",
+        "parameters": {
+          "source_block": "diamond_ore",
+          "item_dependency": null,
+          "tool": "iron_pickaxe"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:36:14.039Z",
+      "elapsed": "3m 51s",
+      "stage": "AM",
+      "attempt": 1,
+      "raw": "!collectBlocks(\"diamond_ore\", 1)",
+      "state": {
+        "inventory": {
+          "granite": 10,
+          "diorite": 4,
+          "spruce_log": 2,
+          "cobblestone": 84,
+          "furnace": 1,
+          "stick": 2,
+          "wooden_pickaxe": 1,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1,
+          "stone_pickaxe": 1,
+          "iron_pickaxe": 1
+        },
+        "craftable_items": [
+          "polished_granite",
+          "polished_diorite",
+          "andesite",
+          "spruce_planks",
+          "cobblestone_slab",
+          "furnace",
+          "cobblestone_stairs",
+          "cobblestone_wall",
+          "granite_wall",
+          "granite_stairs",
+          "granite_slab",
+          "diorite_slab",
+          "lever",
+          "spruce_button",
+          "wooden_shovel",
+          "stone_sword",
+          "stone_shovel",
+          "stone_pickaxe",
+          "stone_axe",
+          "stone_hoe"
+        ],
+        "nearby_blocks": [
+          "stone",
+          "granite",
+          "gold_ore",
+          "deepslate",
+          "andesite",
+          "copper_ore",
+          "diamond_ore",
+          "deepslate_diamond_ore",
+          "diorite",
+          "iron_ore",
+          "lapis_ore",
+          "deepslate_iron_ore",
+          "gravel",
+          "dirt",
+          "smooth_basalt",
+          "deepslate_gold_ore",
+          "calcite",
+          "deepslate_lapis_ore",
+          "amethyst_block",
+          "budding_amethyst",
+          "coal_ore"
+        ],
+        "nearby_entities": {
+          "mobs": []
+        }
+      }
+    },
+    {
+      "timestamp": "2026-05-14T20:36:21.819Z",
+      "elapsed": "3m 58s",
+      "stage": "SCSG",
+      "parsed": {
+        "r": 2,
+        "why": "all original sinks satisfied",
+        "final": {
+          "vertices": [],
+          "edges": []
+        }
+      },
+      "state": {
+        "inventory": {
+          "granite": 10,
+          "diorite": 4,
+          "spruce_log": 2,
+          "cobblestone": 92,
+          "diamond": 1,
+          "furnace": 1,
+          "stick": 2,
+          "wooden_pickaxe": 1,
+          "spruce_planks": 1,
+          "dirt": 5,
+          "crafting_table": 1,
+          "stone_pickaxe": 1,
+          "iron_pickaxe": 1
+        }
+      }
+    }
+  ],
+  "completed_at": "2026-05-14T20:36:21.821Z",
+  "total_elapsed": "3m 58s",
+  "completion_reason": "all sinks satisfied",
+  "summary": {
+    "outer_iterations": 16,
+    "tasks_attempted": 15,
+    "am_attempts": 19,
+    "recovery_attempts": 0,
+    "search_recovery_attempts": 0
+  }
+}

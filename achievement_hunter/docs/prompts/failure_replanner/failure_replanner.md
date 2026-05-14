@@ -11,7 +11,7 @@ This is not single-step action mediation. You may output multiple actions when r
 You receive:
 
 1. `failed_trace`
-   The latest failed execution trace. Treat `failed_trace.final_state` as the starting state for your recovery plan. Use the objective, task, failed steps, result messages, inventory, equipment, nearby blocks/entities, craftable items, position, biome, and surroundings to infer what went wrong.
+   The latest failed execution trace. Treat `failed_trace.final_state` as the starting state for your recovery plan. Use the objective, task, failed steps, result messages, inventory, equipment, nearby blocks/entities, craftable items, position, biome, and surroundings to infer what went wrong. The per-step `kind` / `message` contract for entries in `failed_trace.summary.failed_steps` is identical to the one documented for `previous_diagnoses[i].results` below — read the kind-specific paragraphs there for what to expect in each message's headline.
 
 2. `previous_diagnoses`
    Notes from earlier failed recovery attempts for this same task. Use these to avoid repeating unsuccessful strategies and to preserve useful discoveries. If `previous_diagnoses` is empty, this is the first recovery attempt; reason directly from `failed_trace` without assuming any prior recovery actions.
@@ -20,7 +20,16 @@ You receive:
    - `attempt`: the recovery attempt number (1-indexed).
    - `diagnosis`: the prior rationale.
    - `actions`: the executed plan.
-   - `results`: per-action outcomes for that attempt, in execution order: `{command, success, kind, message}`. `kind` may include `command_success`, `command_failure`, `mode_interrupted`, `runner_exception`, `search_success`, `search_exhausted`, `search_found_not_reached`, `search_already_attempted`, or `invalid_command`. Read `results` together with `actions` to see what each step actually did rather than only what was planned. May be `null` if the attempt did not execute any actions before bailing.
+   - `results`: per-action outcomes for that attempt, in execution order: `{command, success, kind, message}` plus optional structured fields depending on `kind`. Each `message` starts with `<kind>: ` followed by a `;`-separated list of `key=value` pairs (the "headline") and an optional `| "<trailing skill line>"`. Prefer reading the headline's fields rather than parsing the skill tail. May be `null` if the attempt did not execute any actions before bailing.
+     - `command_success`: the action completed. The headline strips plumbing (auto-placed crafting tables, pathfinder advisories that preceded a successful reach) and hoists the *final outcome line* (e.g. `Successfully crafted X`, `Collected N X`, `Used <tool> on <target>`) to the front. Partial-outcome lines (`Failed to collect oak_log: …` followed by `Collected 4 oak_log.`) are preserved.
+     - `command_failure`: the skill failed or a verifier reclassified a silent-success failure. Headline carries `cmd=`, `verifier=<reason|n/a>`, `root_cause=<kind>[ at (x,y,z)]`, and `pos=`. `root_cause` is one of `workstation_placement_failed`, `workstation_missing`, `insufficient_smelt_input`, `fuel_missing`, `tool_missing`, `inventory_full`, or `unknown` (the raw last skill line goes in the tail).
+     - `mode_interrupted`: a survival mode preempted the command past the recovery cap. Headline names `modes=<mode>×<n> (reason=<kind>[, <detail>=<val>])[, …]`, the command, the bot displacement, and the post-position. `reason` is one of `stuck`, `burning`, `low_health`, `falling_block_above`, `hostile_nearby` (with additional detail like `dig=stone`, `enemy=zombie`, `source=lava`). Structured fields on the result: `mode_interrupt_counts`, `mode_reasons`, `position_before`, `position_after`. A relocation away from `position_after` is almost always the right response.
+     - `runner_exception`: the wrapper threw. Headline carries `<Error.name> "<message>"; at <stack head>; during cmd=...; pos=...`.
+     - `search_success`: `<target> reached` with `located_at=(x,y,z)` (block searches) or `distance=<n>` (entity searches) when available.
+     - `search_exhausted`: target was not located within 256 blocks. Headline includes `bot=(x,y,z)` and `biome=<name>`.
+     - `search_found_not_reached`: the skill located an instance but pathfinding failed. Headline carries `located_at=(x,y,z)` or `distance=<n>`, `blocker=<kind>` (`no_tool`, `pathfinder_bail`, or `unknown`), and `bot=(x,y,z)`. The blocker is the strongest signal for fix-vs-relocate.
+     - `search_already_attempted`: dedup short-circuit. Headline includes `prior_kind=` and `prior_detail="..."` carrying the structured fields from the earlier outcome.
+     - `invalid_command`: argument validation rejected the command. Headline carries `cmd=` and `reason=`.
 
 3. `available_actions`
    A JSON array of executable action definitions. Each action includes a name, description, category, constraints, and examples. Every action you output must use one of these action names. There are no custom actions. Use the examples to match exact command-call syntax.

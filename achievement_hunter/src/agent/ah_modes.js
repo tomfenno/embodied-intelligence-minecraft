@@ -20,6 +20,8 @@ import * as skills from '../../../src/agent/library/skills.js';
 import * as world from '../../../src/agent/library/world.js';
 import settings from '../../../src/agent/settings.js';
 import * as mc from '../../../src/utils/mcdata.js';
+// PR-A-D verification
+import {verify_log} from '../pipeline/structured_loop/_pr_a_d_verify_log.js';
 
 /**
  * Returns true if the bot is in water by any of four signals: the physics
@@ -110,6 +112,8 @@ const modes_list = [
       } else if (
           this.fall_blocks.some(name => blockAbove.name.includes(name))) {
         bot.setControlState('sneak', false);
+        bot.modes.recordTrigger('self_preservation',
+            {reason: 'falling_block_above', block: blockAbove.name});
         execute(this, agent, async () => {
           await skills.moveAway(bot, 2);
         });
@@ -118,6 +122,12 @@ const modes_list = [
           blockAbove.name === 'lava' || blockAbove.name === 'fire') {
         say(agent, 'I\'m on fire!');
         bot.setControlState('sneak', false);
+        const burning_source = block.name === 'lava' ? 'lava'
+            : block.name === 'fire' ? 'fire'
+            : blockAbove.name === 'lava' ? 'lava_above'
+            : 'fire_above';
+        bot.modes.recordTrigger(
+            'self_preservation', {reason: 'burning', source: burning_source});
         // if you have a water bucket, use it
         let waterBucket =
             bot.inventory.items().find(item => item.name === 'water_bucket');
@@ -157,6 +167,11 @@ const modes_list = [
           (bot.health < 5 || bot.lastDamageTaken >= bot.health)) {
         say(agent, 'I\'m dying!');
         bot.setControlState('sneak', false);
+        bot.modes.recordTrigger('self_preservation', {
+          reason: 'low_health',
+          health: bot.health,
+          last_damage: bot.lastDamageTaken,
+        });
         execute(this, agent, async () => {
           await skills.moveAway(bot, 20);
         });
@@ -207,6 +222,11 @@ const modes_list = [
           this.max_stuck_time;
       if (this.stuck_time > max_stuck_time) {
         say(agent, 'I\'m stuck!');
+        bot.modes.recordTrigger('unstuck', {
+          reason: 'stuck',
+          dig: cur_dig_block?.name ?? null,
+          stuck_for_s: Math.round(this.stuck_time),
+        });
         this.stuck_time = 0;
         execute(this, agent, async () => {
           // try/finally ensures the kill timer clears even on PathStopped
@@ -259,6 +279,8 @@ const modes_list = [
           agent.bot, entity => mc.isHostile(entity), 8);
       if (enemy && await world.isClearPath(agent.bot, enemy)) {
         say(agent, `Fighting ${enemy.name}!`);
+        agent.bot.modes.recordTrigger(
+            'self_defense', {reason: 'hostile_nearby', enemy: enemy.name});
         execute(this, agent, async () => {
           await skills.defendSelf(agent.bot, 8);
         });
@@ -461,6 +483,41 @@ class ModeController {
   constructor(agent) {
     this._agent = agent;
     this.behavior_log = '';
+    // Per-mode trigger reason map, written by each mode right before it
+    // calls execute() and read by command_utils.js when building the
+    // `mode_interrupted` result message. Keyed by mode name; values are
+    // small plain objects like {reason: 'stuck', dig: 'stone'}.
+    // Survives only until the next time the same mode fires (overwrite
+    // semantics) — there's no per-firing history.
+    this._last_trigger = {};
+  }
+
+  /**
+   * Record why a mode is firing. Called from inside each mode's update
+   * function immediately before execute(). The recorded reason is then
+   * read by command_utils.js to enrich the `mode_interrupted` action
+   * result with `(reason=<kind>, <detail>=<value>)` per mode.
+   *
+   * Defensive: a buggy or unknown mode name is silently accepted; the
+   * map just grows by one entry. The reader treats missing entries as
+   * "no reason recorded".
+   */
+  recordTrigger(mode_name, reason_obj) {
+    if (typeof mode_name !== 'string' || mode_name.length === 0) return;
+    this._last_trigger[mode_name] =
+        reason_obj && typeof reason_obj === 'object' ? reason_obj : null;
+    // PR-A-D verification
+    verify_log('mode_trigger',
+        {mode: mode_name, reason: reason_obj ?? null});
+  }
+
+  /**
+   * Read the most recent trigger reason for a mode, or null when none
+   * has been recorded since process start. Pure read — does not clear
+   * the slot.
+   */
+  getLastTrigger(mode_name) {
+    return this._last_trigger?.[mode_name] ?? null;
   }
 
   exists(mode_name) {

@@ -563,61 +563,74 @@ const QUERY_TEMPLATES = [
 // --------------------------------------------------------------------------
 //
 // `command_verifier.js` (see `command_verifier_plan.md`) reclassifies
-// success-with-bad-postcondition results as `success: false` and
-// prepends `verifier_failed:<reason>` to the message. These templates
-// catch the reclassified messages and assign a semantic kind so the
-// experiment metrics (dependency_error_rate, etc.) reflect what really
-// went wrong instead of falling into a generic-failure bucket.
+// success-with-bad-postcondition results as `success: false` and the
+// `executeCommandWithModeRecovery` wrapper composes the result message
+// via `build_command_failure_message` (Step 4 of the action-result
+// message plan). The new headline format is:
+//   command_failure: cmd=<command>; verifier=<reason>; root_cause=...
+// These templates catch the verifier reason inside that headline and
+// assign a semantic kind so the experiment metrics
+// (dependency_error_rate, etc.) reflect what really went wrong instead
+// of falling into a generic-failure bucket.
 //
 // Each template is scoped via `actions` to its specific command — the
 // same verifier reason can mean different things for different commands
 // (e.g. `no_inventory_delta` from !collectBlocks vs !craftRecipe has
 // different root causes).
+//
+// Patterns use `\bverifier=<reason>\b` instead of the legacy
+// `^verifier_failed:<reason>` so the regex remains tight even though
+// the reason is no longer line-anchored.
 
 const VERIFIER_TEMPLATES = [
   // Inventory-delta verifiers.
   t('verifier.collect_no_delta',
-    /^verifier_failed:no_inventory_delta/m,
+    /\bverifier=no_inventory_delta\b/,
     KIND.DEPENDENCY_TARGET_UNREACHABLE, 'command_verifier.js',
     ['!collectBlocks']),
   t('verifier.craft_no_delta',
-    /^verifier_failed:no_inventory_delta/m,
+    /\bverifier=no_inventory_delta\b/,
     KIND.DEPENDENCY_RESOURCE, 'command_verifier.js', ['!craftRecipe']),
   t('verifier.smelt_no_delta',
-    /^verifier_failed:no_\w+_delta/m,
+    /\bverifier=no_\w+_delta\b/,
     KIND.DEPENDENCY_RESOURCE, 'command_verifier.js',
     ['!smelt_item', '!smeltItem']),
 
   // Inventory-decrease verifiers.
   t('verifier.place_blocked',
-    /^verifier_failed:item_still_in_inventory/m,
+    /\bverifier=item_still_in_inventory\b/,
     KIND.DEPENDENCY_ENVIRONMENT, 'command_verifier.js', ['!placeHere']),
   t('verifier.consume_failed',
-    /^verifier_failed:item_still_in_inventory/m,
+    /\bverifier=item_still_in_inventory\b/,
     KIND.AGENT_STATE, 'command_verifier.js', ['!consume']),
 
   // Position-based nav verifiers.
   t('verifier.goto_off_target',
-    /^verifier_failed:[\d.]+_blocks_off_target/m,
+    /\bverifier=[\d.]+_blocks_off_target\b/,
     KIND.DEPENDENCY_TARGET_UNREACHABLE, 'command_verifier.js',
     ['!goToCoordinates']),
   t('verifier.moveaway_stuck',
-    /^verifier_failed:no_movement/m,
+    /\bverifier=no_movement\b/,
     KIND.DEPENDENCY_TARGET_UNREACHABLE, 'command_verifier.js', ['!moveAway']),
   t('verifier.digdown_blocked',
-    /^verifier_failed:no_descent/m,
+    /\bverifier=no_descent\b/,
     KIND.DEPENDENCY_ENVIRONMENT, 'command_verifier.js', ['!digDown']),
   t('verifier.surface_obstructed',
-    /^verifier_failed:block_above_head:/m,
+    /\bverifier=block_above_head:/,
     KIND.DEPENDENCY_TARGET_UNREACHABLE, 'command_verifier.js',
     ['!goToSurface']),
 
   // Entity-state verifiers.
   t('verifier.attack_no_drop',
-    /^verifier_failed:no_drop_for_/m,
+    /\bverifier=no_drop_for_/,
     KIND.DEPENDENCY_ENTITY_NOT_FOUND, 'command_verifier.js', ['!attack']),
   t('verifier.equip_failed',
-    /^verifier_failed:held=/m,
+    // !equip's verifier reason is `still_holding=<item>` (failed
+    // unequip) or `<slot>=<wrong_item>` (failed equip). Both contain
+    // `=` followed by an item name within the verifier segment;
+    // match the `still_holding=` or any `<dest>=` form that signals
+    // an equipment-state mismatch.
+    /\bverifier=(?:still_holding=|hand=|head=|torso=|legs=|feet=|off-hand=)/,
     KIND.AGENT_STATE, 'command_verifier.js', ['!equip']),
 ];
 

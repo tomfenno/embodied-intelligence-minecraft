@@ -11,7 +11,14 @@ import {compute_scsg} from '../scsg.js';
 
 import {CRAFT_DEBOUNCE_MS, FAILURE_REPLANNER_MAX_ACTION_RETRIES as MAX_ACTION_RETRIES, MAX_RECOVERY_ATTEMPTS,} from './config.js';
 import {make_spl} from './log.js';
-import {check_search_complete, run_search} from './search.js';
+import {
+  build_command_failure_message,
+  build_runner_exception_message,
+  build_search_already_attempted_message,
+} from './result_messages.js';
+// PR-A-D verification
+import {verify_log, verify_log_action_result} from './_pr_a_d_verify_log.js';
+import {run_search} from './search.js';
 import {task_key} from './tasks.js';
 import {create_action_result, project_failed_steps} from './trace.js';
 
@@ -52,9 +59,11 @@ export function format_action_as_command(action) {
   return `${action.name}(${formatted_args.join(', ')})`;
 }
 
-async function run_action(action, agent, log, searched_targets) {
+async function run_action(
+    action, agent, log, searched_targets, searched_targets_outcomes) {
   if (action.name === '!search') {
-    return await run_search_action(action, agent, log, searched_targets);
+    return await run_search_action(
+        action, agent, log, searched_targets, searched_targets_outcomes);
   }
 
   const command = format_action_as_command(action);
@@ -74,53 +83,152 @@ async function run_action(action, agent, log, searched_targets) {
     const kind = success
         ? 'command_success'
         : (mode_interrupted ? 'mode_interrupted' : 'command_failure');
-    const result = create_action_result(
-        command, success, kind, env_result?.message ?? null);
+    // For plain command_failure, route the raw skill output through
+    // build_command_failure_message so the replanner sees a consistent
+    // headline shape. Skip the wrap when the message is already
+    // structured (verifier reclassification path; signalled by
+    // env_result.verifier_reason) — otherwise parse_skill_output runs
+    // on its own previous output and degrades to root_cause=unknown.
+    let message = env_result?.message ?? null;
+    if (kind === 'command_failure' &&
+        env_result?.verifier_reason == null &&
+        env_result?.bot_died !== true) {
+      message = build_command_failure_message({
+        command,
+        verifier_reason: null,
+        skill_output: message,
+        position: agent?.bot?.entity?.position ?? null,
+      });
+    } else if (kind === 'command_failure' &&
+        env_result?.verifier_reason != null) {
+      // PR-A-D verification
+      verify_log('double_wrap_skipped', {
+        command,
+        source: 'failure_replanner_run_action',
+        reason: 'verifier_reason',
+      });
+    } else if (kind === 'command_failure' && env_result?.bot_died === true) {
+      // PR-A-D verification
+      verify_log('double_wrap_skipped', {
+        command,
+        source: 'failure_replanner_run_action',
+        reason: 'bot_died',
+      });
+    }
+    const result = create_action_result(command, success, kind, message);
     if (mode_interrupted) {
       result.mode_interrupt_counts = env_result.mode_interrupt_counts;
+      if (env_result.mode_reasons != null) {
+        result.mode_reasons = env_result.mode_reasons;
+      }
       result.position_before = env_result.position_before;
       result.position_after = env_result.position_after;
     }
+    // PR-A-D verification
+    verify_log_action_result('failure_replanner_run_action', result);
     return result;
   } catch (e) {
-    return create_action_result(command, false, 'runner_exception', String(e));
+    const exc_result = create_action_result(
+        command, false, 'runner_exception',
+        build_runner_exception_message({
+          command,
+          error: e,
+          position: agent?.bot?.entity?.position ?? null,
+          stack_top:
+              (e?.stack ?? '').split('\n').slice(0, 3).join(' / ') || null,
+        }));
+    // PR-A-D verification
+    verify_log_action_result('failure_replanner_run_action', exc_result);
+    return exc_result;
   }
 }
 
-async function run_search_action(action, agent, log, searched_targets) {
+async function run_search_action(
+    action, agent, log, searched_targets, searched_targets_outcomes) {
   const command = format_action_as_command(action);
   const target = action.args?.[0];
 
   if (typeof target !== 'string' || target.length === 0) {
-    return create_action_result(
+    const invalid_result = create_action_result(
         command, false, 'invalid_command',
         '!search requires a non-empty string target');
+    // PR-A-D verification
+    verify_log_action_result(
+        'failure_replanner_run_search_action', invalid_result);
+    return invalid_result;
   }
 
   if (searched_targets.has(target)) {
-    return create_action_result(
+    const prior = searched_targets_outcomes?.get(target);
+    const dedup_result = create_action_result(
         command, false, 'search_already_attempted',
-        `Search for "${target}" already attempted in this recovery sequence`);
+        build_search_already_attempted_message({
+          target,
+          prior_kind: prior?.kind,
+          prior_detail: prior?.detail,
+        }));
+    // PR-A-D verification
+    verify_log_action_result(
+        'failure_replanner_run_search_action', dedup_result);
+    return dedup_result;
   }
 
   try {
     const state = get_am_state(agent);
-    const {found, message} = await run_search(target, state, agent, log, 0);
+    const search_result = await run_search(target, state, agent, log, 0);
     await sleep(CRAFT_DEBOUNCE_MS);
 
-    if (!found) {
-      searched_targets.add(target);
-      return create_action_result(command, false, 'search_exhausted', message);
+    // run_search now classifies the outcome itself (Step 2). Pass the
+    // structured message straight through without re-checking
+    // check_search_complete: run_search already verified post-state
+    // before returning.
+    if (search_result.found) {
+      const success_result = create_action_result(
+          command, true, 'search_success', search_result.message);
+      // PR-A-D verification
+      verify_log_action_result(
+          'failure_replanner_run_search_action', success_result);
+      return success_result;
     }
-
-    const target_reached = check_search_complete(target, get_am_state(agent));
-    return target_reached ?
-        create_action_result(command, true, 'search_success', message) :
-        create_action_result(
-            command, false, 'search_found_not_reached', message);
+    const kind = search_result.outcome === 'found_not_reached'
+        ? 'search_found_not_reached'
+        : 'search_exhausted';
+    searched_targets.add(target);
+    searched_targets_outcomes?.set(target, {
+      kind,
+      detail: extract_prior_detail(search_result.message),
+    });
+    const fail_result =
+        create_action_result(command, false, kind, search_result.message);
+    // PR-A-D verification
+    verify_log_action_result(
+        'failure_replanner_run_search_action', fail_result);
+    return fail_result;
   } catch (e) {
-    return create_action_result(command, false, 'runner_exception', String(e));
+    const exc_result = create_action_result(
+        command, false, 'runner_exception',
+        build_runner_exception_message({
+          command,
+          error: e,
+          position: agent?.bot?.entity?.position ?? null,
+          stack_top:
+              (e?.stack ?? '').split('\n').slice(0, 3).join(' / ') || null,
+        }));
+    // PR-A-D verification
+    verify_log_action_result(
+        'failure_replanner_run_search_action', exc_result);
+    return exc_result;
   }
+}
+
+// Compact textual summary of a search-step result, used to populate the
+// `prior_detail` field of a subsequent `search_already_attempted`
+// message. Strips the `<kind>: ` prefix from the structured message so
+// it composes cleanly inside `prior_detail="..."`.
+function extract_prior_detail(message) {
+  if (typeof message !== 'string' || message.length === 0) return null;
+  const idx = message.indexOf(': ');
+  return idx === -1 ? message : message.slice(idx + 2);
 }
 
 function result_indicates_hard_failure(result) {
@@ -243,6 +351,13 @@ export async function recover_failed_task(
   const task = failed_trace.task;
   const previous_diagnoses = [];
   const searched_targets = new Set();
+  // Parallel map of {kind, detail} for each searched target, used to
+  // produce a richer `search_already_attempted` message when a future
+  // !search in the same recovery session hits the dedup short-circuit.
+  // Per-recovery scope only (not checkpoint-persisted) — recovery
+  // attempts are short-lived enough that crash-resume rebuilds the
+  // dedup set from scratch.
+  const searched_targets_outcomes = new Map();
 
   // Restore the outer-attempt counter from a prior crash within this same
   // recovery, so the MAX_RECOVERY_ATTEMPTS budget is preserved across crashes
@@ -271,6 +386,12 @@ export async function recover_failed_task(
     for (let attempt = resume_attempt; attempt <= MAX_RECOVERY_ATTEMPTS;
          attempt++) {
       exit_attempt = attempt;
+      if (agent.bot._ah_death_pending) {
+        spl.log(`Bot died — aborting recovery at attempt ${attempt}/${
+            MAX_RECOVERY_ATTEMPTS}.`);
+        exit_status = 'bot_died';
+        break;
+      }
       save_runtime_state({
         active_replanner: {
           kind: 'failure',
@@ -367,11 +488,20 @@ export async function recover_failed_task(
           else
             spl.log('Executing:', action_command);
 
-          result = await run_action(action, agent, log, searched_targets);
+          result = await run_action(
+              action, agent, log, searched_targets, searched_targets_outcomes);
           spl.log('Result:', result);
 
           log?.recovery_action_result(attempt, action_index, result);
           latest_state = get_recovery_trace_state(agent, baseline_inventory);
+
+          if (agent.bot._ah_death_pending) {
+            spl.log(`Bot died mid-plan — stopping action sequence in attempt ${
+                attempt}.`);
+            hard_failed = true;
+            exit_detail = 'bot_died';
+            break;
+          }
 
           if (scsg_task_complete_check(task, graph, agent)) {
             spl.log('Task complete after recovery.');
@@ -383,6 +513,8 @@ export async function recover_failed_task(
         }
 
         action_results.push(result);
+
+        if (hard_failed) break;
 
         if (result_indicates_hard_failure(result)) {
           spl.warn('Hard failure, stopping action sequence:', result.kind);

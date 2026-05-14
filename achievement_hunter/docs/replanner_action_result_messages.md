@@ -295,9 +295,9 @@ Step 12  — token-budget guardrails; ships with or after Step 11.
 Recommended PR batching (4 PRs total):
 
 - **PR A: ✅ Landed.** Step 0 + Step 4.5 + Step 9. All independent correctness/wiring fixes; no helpers needed. (See "PR A landing notes" below.)
-- **PR B:** Step 1 + Step 11 (helper skeleton + snapshot test scaffolding).
-- **PR C:** Steps 2 + 3 + 8, paired with the matching Step 10 prompt edits (search-side message work, end-to-end).
-- **PR D:** Steps 4 + 5 + 6 + 7, paired with the matching Step 10 prompt edits (command-side message work).
+- **PR B: ✅ Landed.** Step 1 + Step 11 (helper skeleton + snapshot test scaffolding). (See "PR B landing notes" below.)
+- **PR C: ✅ Landed.** Steps 2 + 3 + 8, paired with the matching Step 10 prompt edits (search-side message work, end-to-end). (See "PR C landing notes" below.)
+- **PR D: ✅ Landed.** Steps 4 + 5 + 6 + 7, paired with the matching Step 10 prompt edits (command-side message work). (See "PR D landing notes" below.)
 - **Then:** Step 12 as a follow-up PR with token-budget measurements. (Step 13 removed — see below.)
 
 ### PR A landing notes
@@ -315,7 +315,81 @@ Validation:
 - `npm test -- achievement_hunter/src/pipeline/__tests__` → 192 / 192 tests pass.
 - No existing tests reference `previous_diagnoses`, `unstructured_failure_result`, or `mode_interrupted` in the changed code paths, so no test deletions or modifications were needed. Snapshot tests for the new shapes are deferred to PR B's Step 11.
 
-Intentional behavioural change (worth flagging in PR description):
+### PR B landing notes
+
+Files added (2):
+
+- `achievement_hunter/src/pipeline/structured_loop/result_messages.js` (406 lines) — `parse_skill_output` + 8 `build_*` helpers per Step 1. Pure functions, no agent I/O. Centralises every regex against upstream skill output so future upstream string changes patch in one place.
+- `achievement_hunter/src/pipeline/__tests__/result_messages.test.js` (438 lines) — 37 inline-fixture tests covering parser + each builder. Real skill blobs captured from `hot_stuff`, `pork_chop`, `acquire_hardware`, `moar_tools` eval runs.
+
+Validation:
+
+- `node --check` passes on the new module.
+- New test file: 37 / 37 tests pass.
+- Full suite: 272 / 272 tests pass (11 files) — no regressions in `command_verifier_useOn`, `checkpoint`, `self_refine`, `action_refs_sync`, or any agent-side test.
+- Dynamic import via `node -e "import(...)"` confirms all 9 named exports are reachable.
+
+Design notes for downstream PRs (C / D):
+
+- **`parse_skill_output` priority order** matches Step 4's table: `workstation_placement_failed` wins over `workstation_missing` when both patterns match the same blob; `no_tool` overrides an earlier `pathfinder_bail` since the more-specific blocker is preferable for the search_replanner's relocation/fix decision.
+- **`build_command_failure_message` always includes the skill tail** when present. The earlier suppress-when-known-kind heuristic was dropped during self-review — the tail carries useful secondary signal (e.g. for `workstation_placement_failed`, the trailing "There is no furnace nearby" tells the LLM the workstation is globally absent, not just unplaceable at one spot).
+- **`build_command_success_message` scans success-summary lines from the end** so the *final* outcome line wins when multiple candidates exist (e.g. for `!useOn`, "Used bucket on lava" beats the earlier "You have reached at" mid-step line).
+- **`build_mode_interrupted_message` accepts an optional `mode_reasons` map**, forward-compatible with Step 5's per-mode reason enrichment. PRs C/D can ignore this field until Step 5 lands.
+- **Token cap (200 chars on skill tail) is a guideline only.** Headlines are not capped. Per user direction, no strict assertion in tests.
+
+### PR C landing notes
+
+Files changed (5):
+
+- `achievement_hunter/src/pipeline/structured_loop/search.js` — `run_search` now classifies outcome (`'reached' | 'absent' | 'found_not_reached'`) and builds the result message via the helpers from PR B. `run_breadth_first_sweep`'s per-source outcomes upgrade from a plain string to a structured `{outcome, located_at?, located_distance?, blocker_kind?, blocker_detail?, last_message?}` object. Soft-skips unsupported abstracts in the single-target path (matches the sweep's behaviour). Imports `getBiomeName` / `getPosition` for bot-context snapshots.
+- `achievement_hunter/src/pipeline/structured_loop/actions.js` — `handle_search_action` emits both `search_exhausted` and `search_found_not_reached` (kind label depends on `run_search.outcome`). The SPL routing now invokes the search_replanner for *either* kind (previously only `search_exhausted`). New `searched_targets_outcomes` Map alongside the existing Set, written on dedup-add and read on dedup-hit to populate `prior_kind` / `prior_detail` via `build_search_already_attempted_message`. The Map is checkpoint-persisted via `persist_active_task` as an entries array (Map isn't JSON-serialisable). The stale `radius 511` literal in `sweep_exhausted` is replaced with `radii_tried=[${SEARCH_RADII.join(',')}]`.
+- `achievement_hunter/src/pipeline/structured_loop/search_replanner.js` — `recover_failed_search` gains optional `seed_sweep_outcomes` and `seed_failure_kind` parameters. New sweep-shaped seed branch builds one `attempt:0` result entry per source with synthesised structured messages so the LLM sees absent vs. located-but-unreachable per source. `run_search_action` simplified to trust `run_search`'s classification; removed the post-hoc `check_search_complete` reclassification dead code. Per-plan `searched_targets_outcomes` Map mirrors the actions.js wiring. The stale `511-block radius` docstring is corrected to `max 256 blocks`.
+- `achievement_hunter/src/pipeline/structured_loop/failure_replanner.js` — `run_search_action` mirrors the search_replanner: trusts `run_search`'s classification, populates the local `searched_targets_outcomes` Map, removes dead reclassification code. Map is per-recovery scope (not checkpoint-persisted).
+- `achievement_hunter/docs/prompts/search_replanner/search_replanner.md` — `previous_summaries[i].results` description now spells out the message contract per kind so the LLM knows it can rely on `located_at=`, `blocker=`, `pos=`, `bot=`, etc. as headline `key=value` pairs rather than parsing prose.
+
+Net diff: +464 / -147 lines across 5 files.
+
+Validation:
+
+- All five files pass `node --check`.
+- `npm test` → 272 / 272 tests pass (11 files). No regressions.
+- `git grep "radius 511"` → only the stale references that were intentionally fixed.
+
+Intentional behavioural changes (worth flagging in PR description):
+
+1. **`search_found_not_reached` now triggers the search_replanner.** Previously only `search_exhausted` routed through; the located-but-unreachable case fell through directly to the failure_replanner with less context. The search_replanner's `is_pathfinding_failure` short-circuit (D11) and its relocation-vs-fix-locally branching are both designed for this case. Routing both kinds matches the prompt's documented capabilities.
+2. **`searched_targets_outcomes` Map is added to the checkpoint schema** (`active_task.searched_targets_outcomes` as an entries array). Existing checkpoints from before PR C are forward-compatible because the read path uses `?? []`. If a checkpoint written by post-PR-C code is read by pre-PR-C code, the new field is silently ignored — also safe.
+3. **Sweep handler now passes per-source outcomes** to `recover_failed_search`. The search_replanner's `attempt:0` seed entry now has N result entries (one per source) instead of being empty for sweep callers. The previous behavior (empty seed) effectively hid which sources were absent vs. unreachable; the new shape exposes that distinction.
+
+### PR D landing notes
+
+Files changed (7):
+
+- `achievement_hunter/src/pipeline/command_utils.js` — verifier-reclassified failures now build their message through `build_command_failure_message` (carries `cmd=`, `verifier=`, `root_cause=` from `parse_skill_output`, `pos=`, and the trailing skill line). `build_mode_interrupted_result` now calls `build_mode_interrupted_message`, threads the command through, and reads per-mode trigger reasons from `bot.modes.getLastTrigger`. Both result objects now carry structured side-fields (`verifier_reason`, `mode_reasons`).
+- `achievement_hunter/src/agent/ah_modes.js` — `ModeController` gains a `_last_trigger` map plus `recordTrigger(name, reason)` and `getLastTrigger(name)` methods. Three modes record their trigger reasons right before the `execute()` call: `self_preservation` (3 sub-branches: falling block / burning / low health), `unstuck` (stuck + dig context), and `self_defense` (enemy entity type). ~52 LoC added, no upstream patch needed (the AH fork already wholly owns modes).
+- `achievement_hunter/src/pipeline/structured_loop/trace.js` — `create_command_success_result` now accepts an optional `command` arg and, when provided, routes the message through `build_command_success_message` (strips plumbing, hoists outcome line, preserves partial-outcome lines). `project_failed_steps` surfaces `mode_reasons` to the replanner alongside the existing `mode_interrupt_counts`.
+- `achievement_hunter/src/pipeline/structured_loop/actions.js` — all three `create_command_success_result` call sites pass `action.command`; the mode-interrupt-propagation block now also copies `mode_reasons` onto the trace step.
+- `achievement_hunter/src/pipeline/structured_loop/failure_replanner.js` + `search_replanner.js` — `run_action`/`run_search_action` `runner_exception` paths now build their message via `build_runner_exception_message` (carries Error name + message, stack head, command, bot position). Both also propagate `mode_reasons` onto the result object alongside the existing mode counts.
+- `achievement_hunter/src/pipeline/dependency_error_classifier.js` — `VERIFIER_TEMPLATES` regex patterns updated from `^verifier_failed:<reason>` to `\bverifier=<reason>\b` to match the new `command_failure: cmd=...; verifier=<reason>; ...` headline shape. The 11 template kinds are otherwise unchanged.
+- `achievement_hunter/docs/prompts/failure_replanner/failure_replanner.md` — `previous_diagnoses[i].results` and `failed_trace.summary.failed_steps` documented with the full per-kind message contract (mirrors PR C's search_replanner.md update).
+
+Net diff: total cumulative through PR D is +683 / -199 lines across 9 files (since baseline).
+
+Validation:
+
+- All seven modified JS files pass `node --check`.
+- `npm test` → 272 / 272 tests pass (11 files). No regressions.
+- The new `dependency_error_classifier.js` regex patterns are tested implicitly: the existing classifier kind taxonomy is unchanged, just the regex shape.
+- No test file references the legacy `verifier_failed:` literal; only PR B's `result_messages.test.js` references the new `verifier=` format.
+
+Intentional behavioural changes (worth flagging in PR description):
+
+1. **`command_failure` messages no longer start with `verifier_failed:<reason>`.** The new headline is `command_failure: cmd=<command>; verifier=<reason>; root_cause=<kind>[ at (x,y,z)]; pos=(x,y,z) | "<last skill line>"`. The replanner prompt's "read the headline `key=value` pairs" guidance now points at this format. Anyone parsing live `runner_stdout.log` for the legacy prefix will need to update — only `dependency_error_classifier.js` had such a dependency in-tree and is updated here.
+2. **`mode_interrupted` messages grow a per-mode `(reason=<kind>[, <detail>=<val>])` segment** when a recorded trigger reason is available. Modes that don't record a reason (cowardice, hunting, etc., or any mode pre-PR-D) degrade to the legacy `<mode>×<n>` form — no crash, just missing detail.
+3. **`command_success` messages are no longer the raw skill blob.** They're plumbing-stripped and outcome-hoisted via `build_command_success_message`. Partial-outcome lines (`Failed to collect X: …` followed by `Collected N X.`) are explicitly preserved. The legacy single-arg `create_command_success_result(result)` call still works (falls back to raw normalize-only), so any out-of-tree caller is forward-compatible.
+4. **`mode_reasons` is a new structured field** on action results (peer of `mode_interrupt_counts`). The replanner prompt names it; trace persistence surfaces it through `project_failed_steps`. Older traces (pre-PR-D) simply lack the field and the prompt's guidance degrades cleanly.
+
+### PR A — intentional behavioural change (worth flagging in PR description):
 
 Step 4.5 in `search_replanner.js` activates a dormant branch in
 `is_pathfinding_failure(result)` (line 49) that explicitly checks

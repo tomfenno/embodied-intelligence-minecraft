@@ -137,6 +137,10 @@ export function withPathRetry({ label, runFinal, getTarget, maxDepth = PATHFINDI
         let lastMessage = null;
 
         while (true) {
+            if (agent.bot._ah_death_pending) {
+                logAttempt({ label, phase: 'give_up', depth, reason: 'bot_died' });
+                return { success: false, message: '' };
+            }
             // --- Progress snapshot ---
             // Resolve target at iter start for the no-forward-progress
             // check at the bottom. Some consumers (searchForBlock)

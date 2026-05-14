@@ -1,33 +1,17 @@
 import {executeCommand} from '../../../src/agent/commands/index.js';
 import {extract_command_name, required_pre_state, snapshot_state, verify_command_outcome} from './command_verifier.js';
+import {SERVER_DRIVEN_SHARDS, VERIFIER_SETTLE_TICKS} from './inventory_drops.js';
+import {build_command_failure_message, build_mode_interrupted_message} from './structured_loop/result_messages.js';
+// PR-A-D verification
+import {verify_log} from './structured_loop/_pr_a_d_verify_log.js';
 
 const MAX_MODE_INTERRUPTS = 5;
 const MODE_IDLE_TIMEOUT_MS = 30_000;
 
-// Shards whose value depends on a packet the server sends back (rather
-// than local bot state). When the verifier needs any of these, the
-// post-snapshot must wait briefly after the skill returns so the
-// server's response has time to land — otherwise the verifier reads
-// stale state and false-fails commands that actually succeeded.
-//
-// Observed symptom: !useOn("bucket", "lava") completing fills server-
-// side, but the inventory update packet arrives after the skill's
-// activateItem promise resolves. The verifier post-snapshot fires
-// immediately, sees no lava_bucket delta, reclassifies as failure.
-// The SPL retries; by the time attempt 2's snapshots run, both
-// inventory updates have arrived and the bot ends up with two filled
-// buckets when only one was needed.
-//
-// `position` is intentionally excluded — bot.entity.position updates
-// locally as physics ticks, no server-roundtrip required.
-const SERVER_DRIVEN_SHARDS =
-    new Set(['inventory', 'equipment', 'nearby_blocks', 'nearby_entities']);
-
-// Ticks (50 ms each) to wait between a successful skill call and the
-// verifier's post-snapshot, when the verifier needs a server-driven
-// shard. 4 ticks ≈ 200 ms — covers typical inventory-update roundtrips
-// on local servers without meaningfully slowing down rollouts.
-const VERIFIER_SETTLE_TICKS = 4;
+// SERVER_DRIVEN_SHARDS and VERIFIER_SETTLE_TICKS now live in
+// ./inventory_drops.js so the upstream collectBlock skill and this
+// verifier path share the same settle-wait policy. See
+// docs/messages/collectblocks-count-and-item-mismatch.md.
 
 const log = (...args) => console.log('[SPL][cmd]', ...args);
 const warn = (...args) => console.warn('[SPL][cmd]', ...args);
@@ -115,11 +99,32 @@ export async function executeCommandWithModeRecovery(
         warn(
             `Verifier reclassified "${command}" as failure: ${
                 verdict.reason}`);
+        // build_command_failure_message centralizes the verifier-vs-
+        // skill-output reasoning: it calls parse_skill_output to
+        // derive a root_cause_kind (workstation_placement_failed,
+        // tool_missing, …) from the skill blob and composes a stable
+        // headline the replanner can grep without parsing prose.
+        const bot_pos = agent?.bot?.entity?.position ?? null;
+        const reclassified_message = build_command_failure_message({
+          command,
+          verifier_reason: verdict.reason,
+          skill_output: result.message,
+          position: bot_pos,
+        });
+        // PR-A-D verification
+        verify_log('verifier_reclassified', {
+          command,
+          verifier_reason: verdict.reason,
+          message_prefix: reclassified_message.slice(0, 160),
+        });
         return {
           ...result,
           success: false,
-          message: `verifier_failed:${verdict.reason} | ${
-              result.message ?? ''}`,
+          message: reclassified_message,
+          // Surface the verifier identifier on the result too so
+          // downstream code (failure trace, tests) can read it without
+          // parsing the message string.
+          verifier_reason: verdict.reason,
         };
       }
 
@@ -137,8 +142,8 @@ export async function executeCommandWithModeRecovery(
             `Command interrupted by mode ${interrupt_count} time(s), treating as failure:`,
             command);
         return build_mode_interrupted_result(
-            interrupt_counts_by_mode, position_before,
-            agent.bot.entity.position);
+            command, interrupt_counts_by_mode, position_before,
+            agent.bot.entity.position, agent.bot.modes);
       }
 
       interrupt_count++;
@@ -154,8 +159,9 @@ export async function executeCommandWithModeRecovery(
       if (!idled) {
         warn('Modes did not idle within timeout, treating as failure:', command);
         return build_mode_interrupted_result(
-            interrupt_counts_by_mode, position_before,
-            agent.bot.entity.position, 'modes did not idle within timeout');
+            command, interrupt_counts_by_mode, position_before,
+            agent.bot.entity.position, agent.bot.modes,
+            'modes did not idle within timeout');
       }
 
       log('Modes idle, retrying:', command);
@@ -175,24 +181,40 @@ function build_bot_died_result(command) {
 }
 
 function build_mode_interrupted_result(
-    counts_by_mode, position_before, position_after, extra_note = null) {
-  const counts_summary = Object.entries(counts_by_mode)
-                             .sort((a, b) => b[1] - a[1])
-                             .map(([name, n]) => `${name}×${n}`)
-                             .join(', ') ||
-      'unknown';
-  const dx = (position_after.x - position_before.x).toFixed(1);
-  const dy = (position_after.y - position_before.y).toFixed(1);
-  const dz = (position_after.z - position_before.z).toFixed(1);
-  const note = extra_note ? `; ${extra_note}` : '';
-  const message = `mode_interrupted: ${counts_summary}; bot Δ=(${dx},${dy},${
-      dz}) over retries; command never completed${note}`;
+    command, counts_by_mode, position_before, position_after, mode_controller,
+    extra_note = null) {
+  // Pull per-mode trigger reasons recorded by ah_modes.js (Step 5).
+  // mode_controller exposes getLastTrigger(mode_name); missing modes
+  // return null and the builder degrades gracefully (omits the
+  // parenthetical reason segment for that mode).
+  const mode_reasons = {};
+  if (mode_controller?.getLastTrigger) {
+    for (const name of Object.keys(counts_by_mode)) {
+      const trigger = mode_controller.getLastTrigger(name);
+      if (trigger != null) mode_reasons[name] = trigger;
+    }
+  }
+
+  let message = build_mode_interrupted_message({
+    command,
+    mode_counts: counts_by_mode,
+    position_before,
+    position_after,
+    mode_reasons,
+  });
+  if (extra_note) {
+    // Pre-existing semantic: `extra_note` only fires for the
+    // "modes did not idle within timeout" case. Append after the
+    // builder's headline so the standard prefix remains parseable.
+    message += `; ${extra_note}`;
+  }
 
   return {
     success: false,
     message,
     mode_interrupted: true,
     mode_interrupt_counts: {...counts_by_mode},
+    mode_reasons,
     position_before: {
       x: position_before.x,
       y: position_before.y,

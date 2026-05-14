@@ -1,7 +1,7 @@
 import {getFirstBlockAboveHead} from '../../../src/agent/library/world.js';
 
 import {get_am_state} from './agent_state.js';
-import {ABSTRACT_CLASS_MEMBERS} from './mc_sources.js';
+import {BLOCK_DROPS, expand_to_concretes, sum_inventory} from './inventory_drops.js';
 
 /**
  * Per-command post-condition verifier registry. Each entry maps a
@@ -18,8 +18,10 @@ import {ABSTRACT_CLASS_MEMBERS} from './mc_sources.js';
  *       // Post-condition predicate. Called only on the success path
  *       // (when the skill reported `success: true`). Returning
  *       // `{ok: false, reason}` causes `executeCommandWithModeRecovery`
- *       // to reclassify the result as `success: false` with the message
- *       // prefixed by `verifier_failed:<reason>`.
+ *       // to reclassify the result as `success: false`. The reason
+ *       // string is surfaced into the `command_failure` message
+ *       // headline as `verifier=<reason>` via build_command_failure_message
+ *       // (see pipeline/structured_loop/result_messages.js).
  *   }
  */
 export const command_verifiers = {
@@ -480,55 +482,11 @@ function read_equipment_slot(bot, dest) {
   return bot.inventory?.slots?.[idx]?.name ?? null;
 }
 
-// Block → dropped-item mapping. Lists ONLY blocks where the dropped
-// item name differs from the block name without silk touch. Blocks not
-// in this table default to dropping themselves (handled by the
-// `!collectBlocks` verifier's block-name check).
-//
-// The verifier checks BOTH the block name and the drop, so silk-touch
-// tooling (which makes the block drop itself) also classifies as
-// success. Net effect: collecting `stone` succeeds whether the bot
-// gets `cobblestone` (no silk) or `stone` (silk).
-//
-// Blocks that yield no item at all without silk touch (ice, glass)
-// are intentionally omitted — the verifier will correctly flag a
-// no-silk-touch attempt on those as `no_inventory_delta`.
-const BLOCK_DROPS = {
-  stone: 'cobblestone',
-  coal_ore: 'coal',
-  deepslate_coal_ore: 'coal',
-  iron_ore: 'raw_iron',
-  deepslate_iron_ore: 'raw_iron',
-  gold_ore: 'raw_gold',
-  deepslate_gold_ore: 'raw_gold',
-  copper_ore: 'raw_copper',
-  deepslate_copper_ore: 'raw_copper',
-  diamond_ore: 'diamond',
-  deepslate_diamond_ore: 'diamond',
-  emerald_ore: 'emerald',
-  deepslate_emerald_ore: 'emerald',
-  lapis_ore: 'lapis_lazuli',
-  deepslate_lapis_ore: 'lapis_lazuli',
-  redstone_ore: 'redstone',
-  deepslate_redstone_ore: 'redstone',
-  nether_quartz_ore: 'quartz',
-  nether_gold_ore: 'gold_nugget',
-  grass_block: 'dirt',
-  clay: 'clay_ball',
-  glowstone: 'glowstone_dust',
-  snow: 'snowball',
-  bookshelf: 'book',
-  melon: 'melon_slice',
-  sea_lantern: 'prismarine_crystals',
-  redstone_lamp: 'redstone',
-  gilded_blackstone: 'gold_nugget',
-  // Crops: block name (often plural) differs from item name (singular).
-  carrots: 'carrot',
-  potatoes: 'potato',
-  beetroots: 'beetroot',
-  cocoa: 'cocoa_beans',
-  sweet_berry_bush: 'sweet_berries',
-};
+// BLOCK_DROPS, expand_to_concretes, and sum_inventory now live in
+// ./inventory_drops.js so the upstream collectBlock skill and this
+// verifier share one definition of "what a mined block puts into
+// inventory". See docs/messages/collectblocks-count-and-item-mismatch.md
+// for rationale.
 
 // Mob → possible inventory drops. The verifier passes if ANY listed
 // drop's count increased post-kill. Mobs with all-rare-or-nothing drops
@@ -760,8 +718,8 @@ export function snapshot_state(agent, needs) {
  *
  *   {verified: true, ok: false, reason}
  *     — verifier failed. Caller should reclassify `success: true` to
- *       `success: false` and prepend `verifier_failed:<reason>` to the
- *       message.
+ *       `success: false` and embed `verifier=<reason>` into the
+ *       command_failure message headline via build_command_failure_message.
  *
  * Throws in the verifier are caught here — a buggy verifier should
  * never silently fail a command. We log and return `{verified: true,
@@ -817,32 +775,6 @@ export function extract_command_name(command) {
  *   "!goToSurface()"                               → []
  *   "!smelt_item(\"raw_iron\", 3, \"birch_planks\")" → ["raw_iron", 3, "birch_planks"]
  */
-/**
- * Expands an item name to its concrete members. For non-abstract names
- * (anything not starting with "any_"), returns `[item]` unchanged. For
- * registered abstracts (e.g. "any_log"), returns the concrete list from
- * `ABSTRACT_CLASS_MEMBERS`. For unknown abstracts, returns `[item]` —
- * defensive pass-through so a verifier never falsely flips a legitimate
- * success on an unrecognized abstract.
- *
- * Today the mediators resolve abstracts before issuing commands, so
- * abstract args rarely reach the verifier. This is belt-and-suspenders
- * (V8 in the verifier plan).
- */
-function expand_to_concretes(item) {
-  if (typeof item !== 'string') return [];
-  if (!item.startsWith('any_')) return [item];
-  const members = ABSTRACT_CLASS_MEMBERS?.[item];
-  return members?.length ? members : [item];
-}
-
-function sum_inventory(inventory, items) {
-  if (!inventory) return 0;
-  let total = 0;
-  for (const item of items) total += inventory[item] ?? 0;
-  return total;
-}
-
 export function extract_command_args(command) {
   if (typeof command !== 'string') return null;
   const open = command.indexOf('(');

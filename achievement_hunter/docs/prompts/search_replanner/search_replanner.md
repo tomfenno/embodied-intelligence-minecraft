@@ -50,7 +50,16 @@ You receive:
    Each entry contains:
    - `summary`: the prior rationale.
    - `actions`: the executed plan.
-   - `results`: per-action outcomes: `{command, success, kind, message}`. `kind` may include `command_success`, `command_failure`, `search_success`, `search_exhausted`, `search_found_not_reached`, `search_already_attempted`, `invalid_command`, `mode_interrupted`, or `runner_exception`.
+   - `results`: per-action outcomes: `{command, success, kind, message}` plus optional structured fields (`located_at`, `located_distance`, `blocker_kind`, `mode_interrupt_counts`, `position_before`, `position_after`) that may appear depending on `kind`. Each `message` starts with `<kind>: ` followed by a `;`-separated list of `key=value` pairs (the "headline") and an optional `| "<trailing skill line>"`. Prefer reading the headline's fields rather than parsing the skill tail.
+     - `command_success`: the action completed. Headline strips plumbing (auto-placed crafting tables, pathfinder advisories that preceded a successful reach); the *final outcome line* is hoisted first.
+     - `command_failure`: skill failed or a verifier reclassified a silent-success failure. Headline carries `cmd=`, `verifier=<reason|n/a>`, `root_cause=<kind>[ at (x,y,z)]`, and `pos=`. `root_cause` is one of `workstation_placement_failed`, `workstation_missing`, `insufficient_smelt_input`, `fuel_missing`, `tool_missing`, `inventory_full`, or `unknown` (with the raw last skill line in the tail).
+     - `search_success`: `<target> reached` with `located_at=(x,y,z)` (block searches) or `distance=<n>` (entity searches) when available.
+     - `search_exhausted`: target was not located within 256 blocks. Headline includes `bot=(x,y,z)` and `biome=<name>` so the LLM can decide where to relocate next.
+     - `search_found_not_reached`: the skill located an instance but pathfinding failed. Headline carries `located_at=(x,y,z)` or `distance=<n>`, `blocker=<kind>` (`no_tool`, `pathfinder_bail`, or `unknown`), and `bot=(x,y,z)`. The blocker is the strongest signal for fix-vs-relocate.
+     - `search_already_attempted`: dedup short-circuit. Headline includes `prior_kind=` and `prior_detail="..."` carrying the structured fields from the earlier outcome.
+     - `mode_interrupted`: a survival mode (typically `unstuck`) preempted the command past the recovery cap. Headline names `modes=<mode>×<n>[, ...]`, the command, the bot displacement, and the post-position. Structured fields on the result: `mode_interrupt_counts`, `position_before`, `position_after`. A relocation is almost always the right response.
+     - `runner_exception`: the wrapper threw. Headline carries `<Error.name> "<message>"; at <stack head>; during cmd=...; pos=...`.
+     - `invalid_command`: argument validation rejected the command. Headline carries `cmd=` and `reason=`.
    - `end_state`: `{position, inventory, craftable_items}` after the attempt. Inventory counts are absolute; `craftable_items` already accounts for nearby or carried crafting tables.
 
    Use this history to identify the failure cause, avoid repeating failed searches from the same or nearby position, build on accumulated inventory, and decide whether to search locally, fix-and-retry, or relocate.
