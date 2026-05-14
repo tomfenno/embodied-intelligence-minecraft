@@ -194,6 +194,18 @@ export async function runBenchmarkSuite({
       config.suite_name);
   ensureDirectory(suiteRoot);
 
+  // Clear any leftover Achievement Hunter checkpoint at the start of every
+  // experiment. The per-episode clears below should normally keep this
+  // file gone, but a prior run killed mid-episode can leave one behind
+  // and the agent-side stale-checkpoint guard would then have to fire on
+  // the first episode. Unconditional suite-level clear avoids that.
+  if (fs.existsSync(CHECKPOINT_PATH)) {
+    console.log(
+        `[suite] Clearing leftover Achievement Hunter checkpoint from prior run: ${
+            CHECKPOINT_PATH}`);
+    clearAchievementHunterCheckpoint();
+  }
+
   let manifests = loadExistingManifests(suiteRoot);
   for (const agentConfig of matrix.agents) {
     for (const seed of matrix.seeds) {

@@ -4,6 +4,7 @@ vi.mock('../commands.js', () => ({}));
 
 vi.mock('../../pipeline/checkpoint.js', () => ({
   loadCheckpoint: vi.fn(),
+  clearCheckpoint: vi.fn(() => Promise.resolve()),
 }));
 
 vi.mock('../../pipeline/llm_client.js', () => ({
@@ -43,7 +44,7 @@ vi.mock('../../../../src/agent/agent.js', () => ({
   },
 }));
 
-import {loadCheckpoint} from '../../pipeline/checkpoint.js';
+import {clearCheckpoint, loadCheckpoint} from '../../pipeline/checkpoint.js';
 import {structured_loop} from '../../pipeline/structured_loop/loop.js';
 import {AchievementAgent} from '../achievement_agent.js';
 
@@ -69,25 +70,66 @@ beforeEach(() => {
 });
 
 describe('AchievementAgent startup behavior', () => {
-  it('resumes a checkpoint before considering benchmark or manual modes', async () => {
+  it('resumes a checkpoint when its objective matches the current benchmark task', async () => {
+    const matching_goal =
+        'Smelt an Iron Ingot. Have an iron ingot in the inventory.';
     vi.mocked(loadCheckpoint).mockReturnValue({
-      objective: 'Resume from checkpoint',
+      objective: matching_goal,
       graph: {nodes: []},
       saved_at: '2026-04-27T00:00:00.000Z',
     });
     const agent = makeAgent({
       type: 'inventory',
-      goal: 'Smelt an Iron Ingot. Have an iron ingot in the inventory.',
+      goal: matching_goal,
     });
 
     await agent._setupEventHandlers(null, null);
 
     expect(agent._waiting_for_objective).toBe(false);
-    expect(agent._launch_spl)
-        .toHaveBeenCalledWith('Resume from checkpoint', {nodes: []});
+    expect(agent._launch_spl).toHaveBeenCalledWith(matching_goal, {nodes: []});
     expect(agent.openChat)
-        .toHaveBeenCalledWith('Resuming previous task: "Resume from checkpoint"');
+        .toHaveBeenCalledWith(`Resuming previous task: "${matching_goal}"`);
+    expect(clearCheckpoint).not.toHaveBeenCalled();
   });
+
+  it('discards a stale checkpoint whose objective does not match the current benchmark task',
+     async () => {
+       vi.mocked(loadCheckpoint).mockReturnValue({
+         objective: 'Fill a Bucket with lava. Have a lava bucket in the inventory.',
+         graph: {nodes: []},
+         saved_at: '2026-04-27T00:00:00.000Z',
+       });
+       const current_goal =
+           'Smelt an Iron Ingot. Have an iron ingot in the inventory.';
+       const agent = makeAgent({type: 'inventory', goal: current_goal});
+
+       await agent._setupEventHandlers(null, null);
+
+       // Stale checkpoint should be discarded, and the agent should
+       // launch the current benchmark goal instead of the stale one.
+       expect(clearCheckpoint).toHaveBeenCalledOnce();
+       expect(agent._launch_spl).toHaveBeenCalledWith(current_goal);
+       expect(agent.openChat).not.toHaveBeenCalledWith(
+           expect.stringContaining('Resuming previous task'));
+     });
+
+  it('resumes a checkpoint in non-benchmark (manual) mode without objective check',
+     async () => {
+       vi.mocked(loadCheckpoint).mockReturnValue({
+         objective: 'Some manually-set objective',
+         graph: {nodes: []},
+         saved_at: '2026-04-27T00:00:00.000Z',
+       });
+       // No task data → non-benchmark mode. Resume regardless of objective.
+       const agent = makeAgent(null);
+
+       await agent._setupEventHandlers(null, null);
+
+       expect(agent._waiting_for_objective).toBe(false);
+       expect(agent._launch_spl)
+           .toHaveBeenCalledWith('Some manually-set objective', {nodes: []});
+       expect(clearCheckpoint).not.toHaveBeenCalled();
+     });
 
   it('auto-starts SPL from the attached benchmark inventory goal', async () => {
     vi.mocked(loadCheckpoint).mockReturnValue(null);

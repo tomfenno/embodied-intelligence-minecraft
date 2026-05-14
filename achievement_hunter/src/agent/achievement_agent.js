@@ -7,7 +7,7 @@
 import './commands.js';
 
 import {Agent} from '../../../src/agent/agent.js';
-import {loadCheckpoint} from '../pipeline/checkpoint.js';
+import {clearCheckpoint, loadCheckpoint} from '../pipeline/checkpoint.js';
 import {LlmClient} from '../pipeline/llm_client.js';
 import {structured_loop} from '../pipeline/structured_loop/loop.js';
 import {recordEpisodeCompleted} from '../../evaluation_harness/episode_runtime.js';
@@ -36,7 +36,29 @@ export class AchievementAgent extends Agent {
     this._benchmark_shutdown_requested = false;
     this._task_completion_recorded = false;
 
-    const saved_checkpoint = loadCheckpoint();
+    let saved_checkpoint = loadCheckpoint();
+
+    // In benchmark mode, a checkpoint whose objective doesn't match the
+    // current task's goal is stale — leftover from a previous episode
+    // whose cleanup didn't run (harness killed mid-episode, or the agent
+    // was launched outside the harness). Discard it and fall through to
+    // the normal benchmark-task launch path. Without this guard the
+    // agent silently runs the wrong objective for the entire episode.
+    if (saved_checkpoint && this._benchmark_task_mode) {
+      const current_goal =
+          typeof benchmarkTask?.goal === 'string' ? benchmarkTask.goal.trim() :
+                                                    null;
+      if (current_goal && saved_checkpoint.objective?.trim() !== current_goal) {
+        console.warn(
+            '[SPL] Stale checkpoint discarded: saved objective',
+            JSON.stringify(saved_checkpoint.objective),
+            'does not match current benchmark task',
+            JSON.stringify(current_goal) + '.');
+        await clearCheckpoint();
+        saved_checkpoint = null;
+      }
+    }
+
     if (saved_checkpoint) {
       this._waiting_for_objective = false;
       console.log(
