@@ -69,6 +69,27 @@ export const ACTION_DEBOUNCE_MS = 750;
 // against every still-active source before incrementing.
 export const SEARCH_RADII = [32, 64, 128, 256];
 
+// --- Pathfinding retry wrappers (achievement_hunter/src/agent/pathfinding_wrappers.js) ---
+//
+// Used by the wrapper module, which lives outside structured_loop but is
+// configured here so all tunable knobs sit in one file.
+
+// Maximum consecutive non-progressing retries withPathRetry will accept
+// before giving up. Successful midpoint hops reset the counter.
+export const PATHFINDING_WRAPPER_MAX_DEPTH = 4;
+
+// XZ closeness passed to skills.goToXZPosition when pathfinding to a
+// midpoint hop between the bot and the final target.
+export const PATHFINDING_WRAPPER_MIDPOINT_CLOSENESS = 2;
+
+// Max characters of the action's accumulated message preserved in each
+// log line's `tail=` field. Keeps log lines readable.
+export const PATHFINDING_WRAPPER_LOG_TAIL_MAX_CHARS = 200;
+
+// Directory (relative to repo root) where per-day wrapper logs are
+// appended. Created on demand.
+export const PATHFINDING_WRAPPER_LOG_DIR = 'achievement_hunter/logs/pathfinding_wrappers';
+
 // --- Observability (rollout_logger.js) ---
 
 // When true, writes per-run rollout artifacts under
@@ -76,7 +97,7 @@ export const SEARCH_RADII = [32, 64, 128, 256];
 // task_traces/, search_traces/). Disable to remove all rollout-directory
 // sync I/O from the agent's hot path; the agent itself does not read these
 // files at runtime, so behavior is unchanged.
-export const ENABLE_ROLLOUT_LOGGING = false;
+export const ENABLE_ROLLOUT_LOGGING = true;
 
 // When true, writes the live dashboard markdown files under `rollout_live/`
 // and runs the per-stage markdown rendering. Disable to remove all

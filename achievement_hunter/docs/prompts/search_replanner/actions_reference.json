@@ -15,7 +15,10 @@
       "horizontal_distance_from_current_position": {
         "max": 250,
         "metric": "euclidean",
-        "applies_to": ["x", "z"],
+        "applies_to": [
+          "x",
+          "z"
+        ],
         "description": "The target x/z coordinate must be within 250 horizontal blocks of the agent's current x/z position."
       },
       "max_uses_per_recovery_plan": 1
@@ -24,6 +27,32 @@
       "!goToCoordinates(x, y, z, closeness)",
       "!goToCoordinates(100, 64, -200, 1)",
       "!goToCoordinates(0, 70, 0, 3)"
+    ]
+  },
+  {
+    "name": "!goToXZ",
+    "description": "Go to the given x, z column within the given closeness value. The bot chooses the cheapest y. Prefer this over !goToCoordinates when the y coordinate does not matter — it is faster, more likely to succeed, and more likely to stay on the overworld in a safe location.",
+    "category": "movement",
+    "constraints": {
+      "closeness": {
+        "min": 0,
+        "recommended use": "Use as large of a closeness value to maximize the chance of success. Closeness values near 1 are much more likely to fail than larger closeness values."
+      },
+      "horizontal_distance_from_current_position": {
+        "max": 250,
+        "metric": "euclidean",
+        "applies_to": [
+          "x",
+          "z"
+        ],
+        "description": "The target x/z coordinate must be within 250 horizontal blocks of the agent's current x/z position."
+      },
+      "max_uses_per_recovery_plan": 1
+    },
+    "examples": [
+      "!goToXZ(x, z, closeness)",
+      "!goToXZ(100, -200, 3)",
+      "!goToXZ(0, 0, 5)"
     ]
   },
   {
@@ -37,7 +66,10 @@
       "no_repeat_in_sequence": "A second !search for the same target inside one recovery action sequence will short-circuit to 'search_already_attempted'.",
       "requires_relocation_after_exhaustion": true
     },
-    "examples": ["!search(\"chicken\")", "!search(\"diamond_ore\")"]
+    "examples": [
+      "!search(\"chicken\")",
+      "!search(\"diamond_ore\")"
+    ]
   },
   {
     "name": "!collectBlocks",
@@ -87,7 +119,10 @@
       "fuel_must_be_available": true,
       "furnace_must_be_in_inventory": true
     },
-    "examples": ["!smeltItem(\"raw_iron\", 8)", "!smeltItem(\"raw_gold\", 4)"]
+    "examples": [
+      "!smeltItem(\"raw_iron\", 8)",
+      "!smeltItem(\"raw_gold\", 4)"
+    ]
   },
   {
     "name": "!digDown",
@@ -104,7 +139,10 @@
       "stops_at_drop_gte_4": true,
       "do_not_use_for_navigation": "Do not use to reach distant targets or escape failed surface searches."
     },
-    "examples": ["!digDown(5)", "!digDown(20)"]
+    "examples": [
+      "!digDown(5)",
+      "!digDown(20)"
+    ]
   },
   {
     "name": "!goToSurface",
@@ -113,6 +151,8 @@
     "constraints": {
       "only_use_when_below_surface_or_obstructed": true
     },
-    "examples": ["!goToSurface()"]
+    "examples": [
+      "!goToSurface()"
+    ]
   }
 ]

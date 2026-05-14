@@ -1,15 +1,15 @@
 [
   {
     "name": "!stop",
+    "include_in": ["failure_replanner"],
     "description": "Force stop all actions and commands that are currently executing.",
     "category": "control",
     "constraints": {},
-    "examples": [
-      "!stop()"
-    ]
+    "examples": ["!stop()"]
   },
   {
     "name": "!goToCoordinates",
+    "include_in": ["failure_replanner", "search_replanner"],
     "description": "Go to the given x, y, z location within the given closeness value.",
     "category": "movement",
     "constraints": {
@@ -24,10 +24,7 @@
       "horizontal_distance_from_current_position": {
         "max": 250,
         "metric": "euclidean",
-        "applies_to": [
-          "x",
-          "z"
-        ],
+        "applies_to": ["x", "z"],
         "description": "The target x/z coordinate must be within 250 horizontal blocks of the agent's current x/z position."
       },
       "max_uses_per_recovery_plan": 1
@@ -40,6 +37,7 @@
   },
   {
     "name": "!goToXZ",
+    "include_in": ["failure_replanner", "search_replanner"],
     "description": "Go to the given x, z column within the given closeness value. The bot chooses the cheapest y. Prefer this over !goToCoordinates when the y coordinate does not matter — it is faster, more likely to succeed, and more likely to stay on the overworld in a safe location.",
     "category": "movement",
     "constraints": {
@@ -50,10 +48,7 @@
       "horizontal_distance_from_current_position": {
         "max": 250,
         "metric": "euclidean",
-        "applies_to": [
-          "x",
-          "z"
-        ],
+        "applies_to": ["x", "z"],
         "description": "The target x/z coordinate must be within 250 horizontal blocks of the agent's current x/z position."
       },
       "max_uses_per_recovery_plan": 1
@@ -66,6 +61,7 @@
   },
   {
     "name": "!search",
+    "include_in": ["failure_replanner", "search_replanner"],
     "description": "Search for the nearest block or entity of a given type by sweeping radii 32, 64, 128, 256 from the bot's current position. Equivalent to running a maximum-radius search; there is no broader scan available.",
     "category": "movement",
     "constraints": {
@@ -75,13 +71,11 @@
       "no_repeat_in_sequence": "A second !search for the same target inside one recovery action sequence will short-circuit to 'search_already_attempted'.",
       "requires_relocation_after_exhaustion": true
     },
-    "examples": [
-      "!search(\"chicken\")",
-      "!search(\"diamond_ore\")"
-    ]
+    "examples": ["!search(\"chicken\")", "!search(\"diamond_ore\")"]
   },
   {
     "name": "!moveAway",
+    "include_in": ["failure_replanner"],
     "description": "Move a short distance away for unsticking or repositioning only. Direction is unpredictable — the bot goes wherever terrain is easiest and cannot be steered. Never use for: going up/down, reaching a specific place, finding blocks/entities, or relocating after a failed search.",
     "category": "movement",
     "constraints": {
@@ -93,39 +87,33 @@
       },
       "not_for_search_relocation": "Do not use !moveAway as the main relocation strategy after search_exhausted. Use !goToCoordinates with a bounded target instead."
     },
-    "examples": [
-      "!moveAway(10)",
-      "!moveAway(25)"
-    ]
+    "examples": ["!moveAway(10)", "!moveAway(25)"]
   },
   {
     "name": "!consume",
+    "include_in": ["failure_replanner"],
     "description": "Eat/drink the given item.",
     "category": "inventory",
     "constraints": {
       "item_must_be_consumable": true,
       "item_must_be_in_inventory": true
     },
-    "examples": [
-      "!consume(\"bread\")",
-      "!consume(\"potion\")"
-    ]
+    "examples": ["!consume(\"bread\")", "!consume(\"potion\")"]
   },
   {
     "name": "!equip",
+    "include_in": ["failure_replanner"],
     "description": "Equip the given item.",
     "category": "inventory",
     "constraints": {
       "item_must_be_in_inventory": true,
       "item_must_be_equippable": true
     },
-    "examples": [
-      "!equip(\"diamond_sword\")",
-      "!equip(\"iron_pickaxe\")"
-    ]
+    "examples": ["!equip(\"diamond_sword\")", "!equip(\"iron_pickaxe\")"]
   },
   {
     "name": "!collectBlocks",
+    "include_in": ["failure_replanner", "search_replanner"],
     "description": "Collect the nearest blocks of a given type. Only works if the block is currently present in the state.",
     "category": "collection",
     "constraints": {
@@ -144,6 +132,7 @@
   },
   {
     "name": "!craftRecipe",
+    "include_in": ["failure_replanner", "search_replanner"],
     "description": "Craft the given recipe a given number of times.",
     "category": "crafting",
     "constraints": {
@@ -161,6 +150,7 @@
   },
   {
     "name": "!smeltItem",
+    "include_in": ["failure_replanner", "search_replanner"],
     "description": "Smelt the given item the given number of times.",
     "category": "crafting",
     "constraints": {
@@ -172,37 +162,32 @@
       "fuel_must_be_available": true,
       "furnace_must_be_in_inventory": true
     },
-    "examples": [
-      "!smeltItem(\"raw_iron\", 8)",
-      "!smeltItem(\"raw_gold\", 4)"
-    ]
+    "examples": ["!smeltItem(\"raw_iron\", 8)", "!smeltItem(\"raw_gold\", 4)"]
   },
   {
     "name": "!clearFurnace",
+    "include_in": ["failure_replanner"],
     "description": "Take all items out of the nearest furnace.",
     "category": "crafting",
     "constraints": {
       "furnace_must_be_nearby": true
     },
-    "examples": [
-      "!clearFurnace()"
-    ]
+    "examples": ["!clearFurnace()"]
   },
   {
     "name": "!placeHere",
+    "include_in": ["failure_replanner"],
     "description": "Place a given block in the current location. Do NOT use to build structures, only use for single blocks/torches.",
     "category": "collection",
     "constraints": {
       "single_block_only": true,
       "item_must_be_in_inventory": true
     },
-    "examples": [
-      "!placeHere(\"torch\")",
-      "!placeHere(\"crafting_table\")"
-    ]
+    "examples": ["!placeHere(\"torch\")", "!placeHere(\"crafting_table\")"]
   },
   {
     "name": "!attack",
+    "include_in": ["failure_replanner"],
     "description": "Attack and kill the nearest entity of a given type. Only works if the target entity is currently present in the state.",
     "category": "control",
     "constraints": {
@@ -210,25 +195,22 @@
       "recommended_use": "Use only after !search succeeds for the same entity type, or when the entity is already visible in nearby.entityTypes.",
       "do_not_use_after_failed_search": "If !search for this entity returned search_exhausted from the current position, !attack will not help."
     },
-    "examples": [
-      "!attack(\"zombie\")",
-      "!attack(\"cow\")"
-    ]
+    "examples": ["!attack(\"zombie\")", "!attack(\"cow\")"]
   },
   {
     "name": "!goToBed",
+    "include_in": ["failure_replanner"],
     "description": "Go to the nearest bed and sleep. Only works if a bed is within the state. If the bed is in the inventory it should be put down first.",
     "category": "movement",
     "constraints": {
       "bed_must_be_nearby": true,
       "must_be_night_or_thunderstorm": true
     },
-    "examples": [
-      "!goToBed()"
-    ]
+    "examples": ["!goToBed()"]
   },
   {
     "name": "!stay",
+    "include_in": ["failure_replanner"],
     "description": "Stay in the current location no matter what. Pauses all modes.",
     "category": "control",
     "constraints": {
@@ -238,13 +220,11 @@
         "note": "-1 means forever; use only when intentionally stopping the agent indefinitely."
       }
     },
-    "examples": [
-      "!stay(30)",
-      "!stay(-1)"
-    ]
+    "examples": ["!stay(30)", "!stay(-1)"]
   },
   {
     "name": "!digDown",
+    "include_in": ["failure_replanner", "search_replanner"],
     "description": "Digs down a specified distance. Stops if it reaches lava, water, or a fall >=4 blocks below the bot.",
     "category": "collection",
     "constraints": {
@@ -258,33 +238,26 @@
       "stops_at_drop_gte_4": true,
       "do_not_use_for_navigation": "Do not use to reach distant targets or escape failed surface searches."
     },
-    "examples": [
-      "!digDown(5)",
-      "!digDown(20)"
-    ]
+    "examples": ["!digDown(5)", "!digDown(20)"]
   },
   {
     "name": "!goToSurface",
+    "include_in": ["failure_replanner", "search_replanner"],
     "description": "Moves the bot to the highest block above it, usually the surface.",
     "category": "movement",
     "constraints": {
       "only_use_when_below_surface_or_obstructed": true
     },
-    "examples": [
-      "!goToSurface()"
-    ]
+    "examples": ["!goToSurface()"]
   },
   {
     "name": "!useOn",
+    "include_in": ["failure_replanner"],
     "description": "Use, right click, the given tool on the nearest target of the given type.",
     "category": "custom",
     "constraints": {
       "target": {
-        "allowed_values": [
-          "entity type",
-          "block type",
-          "nothing"
-        ]
+        "allowed_values": ["entity type", "block type", "nothing"]
       },
       "tool_name": {
         "note": "Use \"hand\" for no tool"

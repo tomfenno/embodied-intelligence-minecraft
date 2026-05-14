@@ -1274,6 +1274,52 @@ export async function goToPosition(bot, x, y, z, min_distance=2) {
     }
 }
 
+// Start of AH code
+export async function goToXZPosition(bot, x, z, min_distance=2) {
+    if (x == null || z == null) {
+        log(bot, `Missing coordinates, given x:${x} z:${z}`);
+        return false;
+    }
+    if (bot.modes.isOn('cheat')) {
+        const y = Math.floor(bot.entity.position.y);
+        bot.chat('/tp @s ' + x + ' ' + y + ' ' + z);
+        log(bot, `Teleported to ${x}, ${y}, ${z}.`);
+        return true;
+    }
+
+    const checkDigProgress = () => {
+        if (bot.targetDigBlock) {
+            const targetBlock = bot.targetDigBlock;
+            const itemId = bot.heldItem ? bot.heldItem.type : null;
+            if (!targetBlock.canHarvest(itemId)) {
+                log(bot, `Pathfinding stopped: Cannot break ${targetBlock.name} with current tools.`);
+                bot.pathfinder.stop();
+                bot.stopDigging();
+            }
+        }
+    };
+    const progressInterval = setInterval(checkDigProgress, 1000);
+
+    try {
+        await goToGoal(bot, new pf.goals.GoalNearXZ(x, z, min_distance));
+        clearInterval(progressInterval);
+        const pos = bot.entity.position;
+        const xz_distance = Math.sqrt((pos.x - x) ** 2 + (pos.z - z) ** 2);
+        if (xz_distance <= min_distance + 1) {
+            log(bot, `You have reached column ${x}, ${z}.`);
+            return true;
+        } else {
+            log(bot, `Unable to reach column ${x}, ${z}, you are ${Math.round(xz_distance)} blocks away.`);
+            return false;
+        }
+    } catch (err) {
+        log(bot, `Pathfinding stopped: ${err.message}.`);
+        clearInterval(progressInterval);
+        return false;
+    }
+}
+// End of AH code
+
 export async function goToNearestBlock(bot, blockType,  min_distance=2, range=64) {
     /**
      * Navigate to the nearest block of the given type.

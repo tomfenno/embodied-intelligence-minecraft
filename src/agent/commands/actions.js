@@ -1,6 +1,10 @@
 import * as skills from '../library/skills.js';
 import settings from '../settings.js';
 import convoManager from '../conversation.js';
+// Start of AH code
+import * as world from '../library/world.js';
+import { withPathRetry } from '../../../achievement_hunter/src/agent/pathfinding_wrappers.js';
+// End of AH code
 
 
 function runAsAction (actionFn, resume = false, timeout = -1) {
@@ -96,9 +100,26 @@ export const actionsList = [
             'player_name': {type: 'string', description: 'The name of the player to go to.'},
             'closeness': {type: 'float', description: 'How close to get to the player.', domain: [0, Infinity]}
         },
-        perform: runAsAction(async (agent, player_name, closeness) => {
-            await skills.goToPlayer(agent.bot, player_name, closeness);
+        // Start of AH code
+        perform: withPathRetry({
+            label: 'goToPlayer',
+            runFinal: async (agent, player_name, closeness) => {
+                if (agent.bot.username !== player_name && !agent.bot.players[player_name]?.entity) {
+                    skills.log(agent.bot, `Could not find ${player_name}.`);
+                    return;
+                }
+                try {
+                    await skills.goToPlayer(agent.bot, player_name, closeness);
+                } catch (err) {
+                    skills.log(agent.bot, `Pathfinding stopped: ${err.message}.`);
+                }
+            },
+            getTarget: (agent, [player_name, _closeness], _lastMessage) => {
+                const pos = agent.bot.players[player_name]?.entity?.position;
+                return pos ? { x: pos.x, y: pos.y, z: pos.z } : null;
+            },
         })
+        // End of AH code
     },
     {
         name: '!followPlayer',
@@ -120,10 +141,34 @@ export const actionsList = [
             'z': {type: 'float', description: 'The z coordinate.', domain: [-Infinity, Infinity]},
             'closeness': {type: 'float', description: 'How close to get to the location.', domain: [0, Infinity]}
         },
-        perform: runAsAction(async (agent, x, y, z, closeness) => {
-            await skills.goToPosition(agent.bot, x, y, z, closeness);
+        // Start of AH code
+        perform: withPathRetry({
+            label: 'goToCoordinates',
+            runFinal: async (agent, x, y, z, closeness) => {
+                await skills.goToPosition(agent.bot, x, y, z, closeness);
+            },
+            getTarget: (agent, [x, y, z, _closeness], _lastMessage) => ({ x, y, z }),
+        })
+        // End of AH code
+    },
+    // Start of AH code
+    {
+        name: '!goToXZ',
+        description: 'Go to the given x, z column. The bot will choose the cheapest y. Use when y does not matter.',
+        params: {
+            'x': {type: 'float', description: 'The x coordinate.', domain: [-Infinity, Infinity]},
+            'z': {type: 'float', description: 'The z coordinate.', domain: [-Infinity, Infinity]},
+            'closeness': {type: 'float', description: 'How close (in xz) to get to the column.', domain: [0, Infinity]}
+        },
+        perform: withPathRetry({
+            label: 'goToXZ',
+            runFinal: async (agent, x, z, closeness) => {
+                await skills.goToXZPosition(agent.bot, x, z, closeness);
+            },
+            getTarget: (agent, [x, z, _closeness], _lastMessage) => ({ x, z }),
         })
     },
+    // End of AH code
     {
         name: '!searchForBlock',
         description: 'Find and go to the nearest block of a given type in a given range.',
@@ -131,13 +176,24 @@ export const actionsList = [
             'type': { type: 'BlockName', description: 'The block type to go to.' },
             'search_range': { type: 'float', description: 'The range to search for the block. Minimum 32.', domain: [10, 512] }
         },
-        perform: runAsAction(async (agent, block_type, range) => {
-            if (range < 32) {
-                log(agent.bot, `Minimum search range is 32.`);
-                range = 32;
-            }
-            await skills.goToNearestBlock(agent.bot, block_type, 4, range);
+        // Start of AH code
+        perform: withPathRetry({
+            label: 'searchForBlock',
+            runFinal: async (agent, block_type, range) => {
+                if (range < 32) {
+                    skills.log(agent.bot, `Minimum search range is 32.`);
+                    range = 32;
+                }
+                await skills.goToNearestBlock(agent.bot, block_type, 4, range);
+            },
+            getTarget: (agent, [_block_type, _range], lastMessage) => {
+                if (!lastMessage) return null;
+                const m = lastMessage.match(/Found .+? at \((-?\d+(?:\.\d+)?), (-?\d+(?:\.\d+)?), (-?\d+(?:\.\d+)?)\)\. Navigating\.\.\./);
+                if (!m) return null;
+                return { x: parseFloat(m[1]), y: parseFloat(m[2]), z: parseFloat(m[3]) };
+            },
         })
+        // End of AH code
     },
     {
         name: '!searchForEntity',
@@ -146,9 +202,19 @@ export const actionsList = [
             'type': { type: 'string', description: 'The type of entity to go to.' },
             'search_range': { type: 'float', description: 'The range to search for the entity.', domain: [32, 512] }
         },
-        perform: runAsAction(async (agent, entity_type, range) => {
-            await skills.goToNearestEntity(agent.bot, entity_type, 4, range);
+        // Start of AH code
+        perform: withPathRetry({
+            label: 'searchForEntity',
+            runFinal: async (agent, entity_type, range) => {
+                await skills.goToNearestEntity(agent.bot, entity_type, 4, range);
+            },
+            getTarget: (agent, [entity_type, range], _lastMessage) => {
+                const entity = world.getNearestEntityWhere(agent.bot, e => e.name === entity_type, range);
+                if (!entity) return null;
+                return { x: entity.position.x, y: entity.position.y, z: entity.position.z };
+            },
         })
+        // End of AH code
     },
     {
         name: '!moveAway',
@@ -172,14 +238,23 @@ export const actionsList = [
         name: '!goToRememberedPlace',
         description: 'Go to a saved location.',
         params: {'name': { type: 'string', description: 'The name of the location to go to.' }},
-        perform: runAsAction(async (agent, name) => {
-            const pos = agent.memory_bank.recallPlace(name);
-            if (!pos) {
-            skills.log(agent.bot, `No location named "${name}" saved.`);
-            return;
-            }
-            await skills.goToPosition(agent.bot, pos[0], pos[1], pos[2], 1);
+        // Start of AH code
+        perform: withPathRetry({
+            label: 'goToRememberedPlace',
+            runFinal: async (agent, name) => {
+                const pos = agent.memory_bank.recallPlace(name);
+                if (!pos) {
+                    skills.log(agent.bot, `No location named "${name}" saved.`);
+                    return;
+                }
+                await skills.goToPosition(agent.bot, pos[0], pos[1], pos[2], 1);
+            },
+            getTarget: (agent, [name], _lastMessage) => {
+                const pos = agent.memory_bank.recallPlace(name);
+                return pos ? { x: pos[0], y: pos[1], z: pos[2] } : null;
+            },
         })
+        // End of AH code
     },
     {
         name: '!givePlayer',
@@ -332,9 +407,24 @@ export const actionsList = [
     {
         name: '!goToBed',
         description: 'Go to the nearest bed and sleep.',
-        perform: runAsAction(async (agent) => {
-            await skills.goToBed(agent.bot);
+        // Start of AH code
+        perform: withPathRetry({
+            label: 'goToBed',
+            runFinal: async (agent) => {
+                await skills.goToBed(agent.bot);
+            },
+            getTarget: (agent, _args, _lastMessage) => {
+                const beds = agent.bot.findBlocks({
+                    matching: (block) => block.name.includes('bed'),
+                    maxDistance: 32,
+                    count: 1,
+                });
+                if (beds.length === 0) return null;
+                const loc = beds[0];
+                return { x: loc.x, y: loc.y, z: loc.z };
+            },
         })
+        // End of AH code
     },
     {
         name: '!stay',
@@ -485,9 +575,15 @@ export const actionsList = [
         name: '!goToSurface',
         description: 'Moves the bot to the highest block above it (usually the surface).',
         params: {},
-        perform: runAsAction(async (agent) => {
-            await skills.goToSurface(agent.bot);
+        // Start of AH code
+        perform: withPathRetry({
+            label: 'goToSurface',
+            runFinal: async (agent) => {
+                await skills.goToSurface(agent.bot);
+            },
+            // No getTarget: target column equals bot column, midpoints would be no-ops.
         })
+        // End of AH code
     },
     {
         name: '!useOn',

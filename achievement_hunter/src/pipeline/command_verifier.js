@@ -13,7 +13,7 @@ import {ABSTRACT_CLASS_MEMBERS} from './mc_sources.js';
  *       // and after the command runs. Supported shards (added as
  *       // verifiers need them): 'inventory', 'position',
  *       // 'nearby_blocks', 'nearby_entities', 'craftable_items',
- *       // 'held_item'.
+ *       // 'equipment'.
  *     verify: ({args, pre, post, agent}) => {ok: boolean, reason: string},
  *       // Post-condition predicate. Called only on the success path
  *       // (when the skill reported `success: true`). Returning
@@ -86,6 +86,31 @@ export const command_verifiers = {
     },
   },
 
+  '!goToXZ': {
+    needs: new Set(['position']),
+    verify: ({args, post}) => {
+      const [x, z, closeness] = args ?? [];
+      if (typeof x !== 'number' || typeof z !== 'number') {
+        return {ok: true, reason: 'missing_coords'};
+      }
+      if (!post?.position) {
+        return {ok: true, reason: 'unknown_position'};
+      }
+      const dx = post.position.x - x;
+      const dz = post.position.z - z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      // XZ-only — y is intentionally chosen by the pathfinder, so a
+      // successful column hop that lands at a different y must not be
+      // penalised. Threshold matches goToXZPosition's "You have reached
+      // column" check: xz_distance <= min_distance + 1. closeness
+      // defaults to 2 (matches the skill's min_distance default).
+      const threshold = (typeof closeness === 'number' ? closeness : 2) + 1;
+      return dist <= threshold ?
+          {ok: true, reason: `within_${dist.toFixed(1)}_of_column`} :
+          {ok: false, reason: `${dist.toFixed(1)}_blocks_off_column`};
+    },
+  },
+
   '!moveAway': {
     needs: new Set(['position']),
     verify: ({pre, post}) => {
@@ -124,7 +149,9 @@ export const command_verifiers = {
 
   '!goToSurface': {
     // Doesn't need pre/post snapshots — checks the agent's current
-    // surroundings directly via getFirstBlockAboveHead.
+    // surroundings directly via getFirstBlockAboveHead. The skill returns
+    // the *string* 'none' (not null) when no block was found within the
+    // scan distance; treat that as open sky.
     needs: new Set(),
     verify: ({agent}) => {
       let first_above;
@@ -133,11 +160,89 @@ export const command_verifiers = {
       } catch (e) {
         return {ok: true, reason: `getFirstBlockAboveHead_threw:${e.message}`};
       }
-      return first_above == null ?
-          {ok: true, reason: 'open_sky_above'} :
-          {ok: false, reason: `block_above_head:${first_above}`};
+      const has_block_above =
+          first_above != null && first_above !== 'none';
+      return has_block_above ?
+          {ok: false, reason: `block_above_head:${first_above}`} :
+          {ok: true, reason: 'open_sky_above'};
     },
   },
+
+  '!goToPlayer': {
+    needs: new Set(['position']),
+    verify: ({args, post, agent}) => {
+      const [player_name, closeness] = args ?? [];
+      if (typeof player_name !== 'string' || player_name.length === 0) {
+        return {ok: true, reason: 'no_player_arg'};
+      }
+      // "Go to self" carve-out matches the skill's special case.
+      if (agent?.bot?.username === player_name) {
+        return {ok: true, reason: 'self_target'};
+      }
+      if (!post?.position) {
+        return {ok: true, reason: 'unknown_position'};
+      }
+      // Player position is a live re-query — the player is moving and
+      // a snapshot would be stale. If the player went offline between
+      // skill completion and verification, pass-through rather than
+      // false-fail.
+      const player_pos = agent?.bot?.players?.[player_name]?.entity?.position;
+      if (!player_pos) {
+        return {ok: true, reason: 'player_not_present'};
+      }
+      const dx = post.position.x - player_pos.x;
+      const dy = post.position.y - player_pos.y;
+      const dz = post.position.z - player_pos.z;
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      // Skill defaults `distance` to 3. Threshold matches other
+      // navigation verifiers: closeness + 1.
+      const threshold = (typeof closeness === 'number' ? closeness : 3) + 1;
+      return dist <= threshold ?
+          {ok: true, reason: `within_${dist.toFixed(1)}_of_player`} :
+          {ok: false, reason: `${dist.toFixed(1)}_blocks_from_player`};
+    },
+  },
+
+  '!goToRememberedPlace': {
+    needs: new Set(['position']),
+    verify: ({args, post, agent}) => {
+      const [name] = args ?? [];
+      if (typeof name !== 'string' || name.length === 0) {
+        return {ok: true, reason: 'no_name_arg'};
+      }
+      // Re-lookup the saved place. If unsaved, the wrapper already
+      // classified the result non_retryable / success:false and the
+      // verifier won't run — pass-through defensively if it does.
+      const pos = agent?.memory_bank?.recallPlace(name);
+      if (!pos) {
+        return {ok: true, reason: 'place_not_saved'};
+      }
+      if (!post?.position) {
+        return {ok: true, reason: 'unknown_position'};
+      }
+      const [px, py, pz] = pos;
+      const dx = post.position.x - px;
+      const dy = post.position.y - py;
+      const dz = post.position.z - pz;
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      // Skill calls goToPosition(... 1), so the "you have reached at"
+      // threshold inside the skill is 1 + 1 = 2.
+      return dist <= 2 ?
+          {ok: true, reason: `within_${dist.toFixed(1)}_of_place`} :
+          {ok: false, reason: `${dist.toFixed(1)}_blocks_off_place`};
+    },
+  },
+
+  // !goToBed: no verifier registered.
+  //
+  // The skill (skills.js:goToBed) blocks until the bot has gone to sleep
+  // AND woken back up. By the time the skill returns success, isSleeping
+  // is already false, so any post-condition check on `isSleeping` would
+  // false-fail every successful sleep. Sleep failures (daytime / mob
+  // interruption) throw from bot.sleep() and surface as
+  // `!!Code threw exception!!` → non_retryable in the wrapper, so the
+  // skill's success signal is already reliable. Add a `time_of_day`
+  // pre/post shard if a real verifier is needed later.
 
   // ── Phase 3+4: crafting and smelting ─────────────────────────────────
   // Loose inventory-delta on the recipe output. Partial crafts (e.g.
@@ -259,21 +364,60 @@ export const command_verifiers = {
   },
 
   '!equip': {
-    needs: new Set(['held_item']),
+    needs: new Set(['equipment']),
     verify: ({args, post, agent}) => {
       const item = args?.[0];
       if (typeof item !== 'string' || item.length === 0) {
         return {ok: true, reason: 'no_item_arg'};
       }
-      // post.held_item is captured by snapshot_state; fall back to
-      // agent.bot.heldItem if for some reason it's missing.
-      const held = post?.held_item ?? agent?.bot?.heldItem?.name ?? null;
-      return held === item ?
-          {ok: true, reason: 'item_equipped'} :
-          {ok: false, reason: `held=${held ?? 'nothing'}`};
+      // Special case mirroring the skill: equip("hand") unequips the hand.
+      if (item === 'hand') {
+        const held = post?.equipment?.hand ?? read_equipment_slot(agent?.bot, 'hand');
+        return held == null ?
+            {ok: true, reason: 'hand_unequipped'} :
+            {ok: false, reason: `still_holding=${held}`};
+      }
+      // Armor / shield / hand items all land in different slots. The
+      // skill's bot.equip(item, slot) dispatch is mirrored here so the
+      // verifier reads the same slot the skill wrote.
+      const dest = equip_destination_slot(item);
+      const equipped = post?.equipment?.[dest] ?? read_equipment_slot(agent?.bot, dest);
+      return equipped === item ?
+          {ok: true, reason: `equipped_to_${dest}`} :
+          {ok: false, reason: `${dest}=${equipped ?? 'nothing'}`};
     },
   },
 };
+
+// Maps an item name to the equipment slot it lands in. Mirrors the
+// dispatch in skills.js:equip — keep in sync with that function.
+function equip_destination_slot(item_name) {
+  if (typeof item_name !== 'string') return 'hand';
+  if (item_name.includes('leggings')) return 'legs';
+  if (item_name.includes('boots')) return 'feet';
+  if (item_name.includes('helmet')) return 'head';
+  if (item_name.includes('chestplate') || item_name.includes('elytra')) return 'torso';
+  if (item_name.includes('shield')) return 'off-hand';
+  return 'hand';
+}
+
+// Mineflayer's standard inventory slot indices for non-hotbar equipment.
+// The 'hand' slot reads bot.heldItem directly (selected hotbar slot).
+const EQUIP_SLOT_INDEX = {
+  head: 5,
+  torso: 6,
+  legs: 7,
+  feet: 8,
+  'off-hand': 45,
+};
+
+function read_equipment_slot(bot, dest) {
+  if (!bot) return null;
+  if (dest === 'hand') return bot.heldItem?.name ?? null;
+  const idx = EQUIP_SLOT_INDEX[dest];
+  if (idx == null) return null;
+  return bot.inventory?.slots?.[idx]?.name ?? null;
+}
 
 // Block → dropped-item mapping. Lists ONLY blocks where the dropped
 // item name differs from the block name without silk touch. Blocks not
@@ -317,6 +461,12 @@ const BLOCK_DROPS = {
   sea_lantern: 'prismarine_crystals',
   redstone_lamp: 'redstone',
   gilded_blackstone: 'gold_nugget',
+  // Crops: block name (often plural) differs from item name (singular).
+  carrots: 'carrot',
+  potatoes: 'potato',
+  beetroots: 'beetroot',
+  cocoa: 'cocoa_beans',
+  sweet_berry_bush: 'sweet_berries',
 };
 
 // Mob → possible inventory drops. The verifier passes if ANY listed
@@ -502,8 +652,16 @@ export function snapshot_state(agent, needs) {
       state.position = {x: pos.x, y: pos.y, z: pos.z};
     }
   }
-  if (needs.has('held_item')) {
-    state.held_item = agent?.bot?.heldItem?.name ?? null;
+  if (needs.has('equipment')) {
+    const bot = agent?.bot;
+    state.equipment = {
+      hand: read_equipment_slot(bot, 'hand'),
+      head: read_equipment_slot(bot, 'head'),
+      torso: read_equipment_slot(bot, 'torso'),
+      legs: read_equipment_slot(bot, 'legs'),
+      feet: read_equipment_slot(bot, 'feet'),
+      'off-hand': read_equipment_slot(bot, 'off-hand'),
+    };
   }
 
   return state;

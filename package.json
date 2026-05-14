@@ -40,7 +40,9 @@
         "postinstall": "patch-package",
         "start": "node main.js",
         "test": "vitest run",
-        "test:watch": "vitest"
+        "test:watch": "vitest",
+        "build:action-refs": "node achievement_hunter/scripts/build_action_refs.mjs",
+        "check:action-refs": "node achievement_hunter/scripts/build_action_refs.mjs --check"
     },
     "devDependencies": {
         "@eslint/js": "^9.13.0",
