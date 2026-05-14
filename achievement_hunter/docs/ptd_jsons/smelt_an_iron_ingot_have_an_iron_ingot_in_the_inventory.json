@@ -23,15 +23,15 @@
             "acquisition_dependency": "none"
         },
         {
-            "id": "cobblestone",
-            "qty": 11,
-            "item_type": "resource",
-            "acquisition_dependency": "none"
-        },
-        {
             "id": "stone_pickaxe",
             "qty": 1,
             "item_type": "tool",
+            "acquisition_dependency": "none"
+        },
+        {
+            "id": "cobblestone",
+            "qty": 11,
+            "item_type": "resource",
             "acquisition_dependency": "none"
         },
         {
@@ -88,6 +88,13 @@
             "consumed": false
         },
         {
+            "from": "stone_pickaxe",
+            "to": "raw_iron",
+            "type": "tool_dependency",
+            "qty": 1,
+            "consumed": false
+        },
+        {
             "from": "cobblestone",
             "to": "furnace",
             "type": "crafting_input",
@@ -102,20 +109,6 @@
             "consumed": false
         },
         {
-            "from": "stone_pickaxe",
-            "to": "raw_iron",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "wooden_pickaxe",
-            "to": "cobblestone",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
             "from": "cobblestone",
             "to": "stone_pickaxe",
             "type": "crafting_input",
@@ -137,6 +130,20 @@
             "consumed": false
         },
         {
+            "from": "wooden_pickaxe",
+            "to": "cobblestone",
+            "type": "tool_dependency",
+            "qty": 1,
+            "consumed": false
+        },
+        {
+            "from": "any_plank",
+            "to": "stick",
+            "type": "crafting_input",
+            "qty": 2,
+            "consumed": true
+        },
+        {
             "from": "any_plank",
             "to": "wooden_pickaxe",
             "type": "crafting_input",
@@ -159,9 +166,9 @@
         },
         {
             "from": "any_plank",
-            "to": "stick",
+            "to": "crafting_table",
             "type": "crafting_input",
-            "qty": 2,
+            "qty": 4,
             "consumed": true
         },
         {
@@ -169,13 +176,6 @@
             "to": "any_plank",
             "type": "crafting_input",
             "qty": 3,
-            "consumed": true
-        },
-        {
-            "from": "any_plank",
-            "to": "crafting_table",
-            "type": "crafting_input",
-            "qty": 4,
             "consumed": true
         }
     ]

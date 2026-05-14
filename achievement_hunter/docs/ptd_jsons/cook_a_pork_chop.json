@@ -41,12 +41,6 @@
             "acquisition_dependency": "none"
         },
         {
-            "id": "crafting_table",
-            "qty": 1,
-            "item_type": "workstation",
-            "acquisition_dependency": "none"
-        },
-        {
             "id": "any_plank",
             "qty": 12,
             "item_type": "item",
@@ -56,6 +50,12 @@
             "id": "any_log",
             "qty": 3,
             "item_type": "resource",
+            "acquisition_dependency": "none"
+        },
+        {
+            "id": "crafting_table",
+            "qty": 1,
+            "item_type": "workstation",
             "acquisition_dependency": "none"
         }
     ],
@@ -68,10 +68,10 @@
             "consumed": true
         },
         {
-            "from": "any_plank",
+            "from": "stick",
             "to": "cooked_porkchop",
             "type": "fuel_input",
-            "qty": 1,
+            "qty": 2,
             "consumed": true
         },
         {
@@ -96,24 +96,17 @@
             "consumed": false
         },
         {
-            "from": "wooden_pickaxe",
-            "to": "cobblestone",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "stick",
-            "to": "wooden_pickaxe",
+            "from": "any_plank",
+            "to": "crafting_table",
             "type": "crafting_input",
-            "qty": 2,
+            "qty": 4,
             "consumed": true
         },
         {
             "from": "any_plank",
-            "to": "wooden_pickaxe",
+            "to": "stick",
             "type": "crafting_input",
-            "qty": 3,
+            "qty": 2,
             "consumed": true
         },
         {
@@ -125,17 +118,24 @@
         },
         {
             "from": "any_plank",
-            "to": "stick",
+            "to": "wooden_pickaxe",
+            "type": "crafting_input",
+            "qty": 3,
+            "consumed": true
+        },
+        {
+            "from": "stick",
+            "to": "wooden_pickaxe",
             "type": "crafting_input",
             "qty": 2,
             "consumed": true
         },
         {
-            "from": "any_plank",
-            "to": "crafting_table",
-            "type": "crafting_input",
-            "qty": 4,
-            "consumed": true
+            "from": "wooden_pickaxe",
+            "to": "cobblestone",
+            "type": "tool_dependency",
+            "qty": 1,
+            "consumed": false
         },
         {
             "from": "any_log",

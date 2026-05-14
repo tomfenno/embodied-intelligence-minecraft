@@ -101,6 +101,22 @@ export async function craftRecipe(bot, itemName, num=1) {
                     recipes = bot.recipesFor(mc.getItemId(itemName), null, 1, craftingTable);
                     placedTable = true;
                 }
+                // Start of AH code
+                // placeBlock can silently fail (returns false, logs the
+                // specific cause to bot.output, but doesn't throw). If we
+                // fall through to bot.craft(recipe, n, null) below,
+                // mineflayer throws "Recipe requires craftingTable, but
+                // one was not supplied" — misleading because the agent
+                // does have a crafting_table in inventory; placement is
+                // what failed. placeBlock has already logged the actual
+                // cause to bot.output, so the downstream replanner sees
+                // the real message ("Failed to place crafting_table at
+                // (x, y, z).", "Cannot place crafting_table at Y: ...",
+                // etc.) when we return false here.
+                else {
+                    return false;
+                }
+                // End of AH code
             }
             else {
                 log(bot, `Crafting ${itemName} requires a crafting table.`)
@@ -1612,7 +1628,21 @@ export async function moveAway(bot, distance) {
         }
     }
 
-    await goToGoal(bot, inverted_goal);
+    // Start of AH code
+    // Catch PathStopped (and other pathfinder throws) so a moveAway
+    // interrupted mid-path doesn't surface as "!!Code threw exception!!"
+    // through callers like modes (e.g. self_preservation calling moveAway
+    // and getting cut off by another interrupt). Mirrors goToPosition's
+    // pattern. The bot may have made partial progress before the throw;
+    // we still report success so the caller treats the relocation as
+    // best-effort done.
+    try {
+        await goToGoal(bot, inverted_goal);
+    } catch (err) {
+        log(bot, `Pathfinding stopped: ${err.message}.`);
+        return false;
+    }
+    // End of AH code
     let new_pos = bot.entity.position;
     log(bot, `Moved away from ${pos.floored()} to ${new_pos.floored()}.`);
     return true;

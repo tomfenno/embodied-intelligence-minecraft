@@ -187,8 +187,14 @@ export async function execute_task_action(
         searched_targets.add(search_target);  // Only block re-search when not found.
         break;
       }
-      // On search_success or search_found_not_reached (PathStopped): allow
-      // reattempt — bot may be closer now or path obstruction may have changed.
+      // On search_success: don't consume an attempt slot. A successful
+      // !search is preparation, not task progress — the next iteration's
+      // AM will pick the actual task action once it sees the target in
+      // nearby state. Decrement to compensate for the for-loop's
+      // increment, so the next iteration runs at the same attempt_index.
+      if (current_step.result.kind === 'search_success') {
+        attempt_index--;
+      }
       continue;
     }
 

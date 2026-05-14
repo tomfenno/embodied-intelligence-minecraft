@@ -62,7 +62,7 @@
   {
     "name": "!search",
     "include_in": ["failure_replanner", "search_replanner"],
-    "description": "Search for the nearest block or entity of a given type by sweeping radii 32, 64, 128, 256 from the bot's current position. Equivalent to running a maximum-radius search; there is no broader scan available.",
+    "description": "Search for the nearest block or entity of a given type by sweeping radii 32, 64, 128, 256 from the bot's current position, if found the agent attempts to move to the nearest target.",
     "category": "movement",
     "constraints": {
       "target_must_be_concrete": "Pass concrete block or entity names, e.g. \"chicken\", \"diamond_ore\" or abstract category names, e.g. \"any_log\" when appropriate.",
@@ -144,7 +144,8 @@
       },
       "recipe_must_be_known": true,
       "required_inputs_must_be_in_inventory": true,
-      "crafting_table_required_for_some_recipes": true
+      "crafting_table_required_for_some_recipes": true,
+      "crafting_table_placement_requires_free_space": "If no crafting_table is already placed nearby, one is auto-placed from inventory. Placement requires open space next to a buildable surface; it will fail in tight or confined spots (cramped caves, surrounded by unmineable blocks, etc.). If a craft fails with 'Failed to place crafting_table at (x, y, z)', relocate to a more open area before retrying."
     },
     "examples": [
       "!craftRecipe(\"stick\", 4)",

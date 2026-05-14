@@ -79,41 +79,6 @@
             "consumed": true
         },
         {
-            "from": "crafting_table",
-            "to": "wooden_pickaxe",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "crafting_table",
-            "to": "wooden_shovel",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "crafting_table",
-            "to": "wooden_axe",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "crafting_table",
-            "to": "wooden_hoe",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "stick",
-            "to": "wooden_pickaxe",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
-        },
-        {
             "from": "any_plank",
             "to": "wooden_pickaxe",
             "type": "crafting_input",
@@ -122,10 +87,17 @@
         },
         {
             "from": "stick",
-            "to": "wooden_shovel",
+            "to": "wooden_pickaxe",
             "type": "crafting_input",
             "qty": 2,
             "consumed": true
+        },
+        {
+            "from": "crafting_table",
+            "to": "wooden_pickaxe",
+            "type": "workstation_dependency",
+            "qty": 1,
+            "consumed": false
         },
         {
             "from": "any_plank",
@@ -136,10 +108,17 @@
         },
         {
             "from": "stick",
-            "to": "wooden_axe",
+            "to": "wooden_shovel",
             "type": "crafting_input",
             "qty": 2,
             "consumed": true
+        },
+        {
+            "from": "crafting_table",
+            "to": "wooden_shovel",
+            "type": "workstation_dependency",
+            "qty": 1,
+            "consumed": false
         },
         {
             "from": "any_plank",
@@ -150,10 +129,17 @@
         },
         {
             "from": "stick",
-            "to": "wooden_hoe",
+            "to": "wooden_axe",
             "type": "crafting_input",
             "qty": 2,
             "consumed": true
+        },
+        {
+            "from": "crafting_table",
+            "to": "wooden_axe",
+            "type": "workstation_dependency",
+            "qty": 1,
+            "consumed": false
         },
         {
             "from": "any_plank",
@@ -161,6 +147,20 @@
             "type": "crafting_input",
             "qty": 2,
             "consumed": true
+        },
+        {
+            "from": "stick",
+            "to": "wooden_hoe",
+            "type": "crafting_input",
+            "qty": 2,
+            "consumed": true
+        },
+        {
+            "from": "crafting_table",
+            "to": "wooden_hoe",
+            "type": "workstation_dependency",
+            "qty": 1,
+            "consumed": false
         }
     ]
 }

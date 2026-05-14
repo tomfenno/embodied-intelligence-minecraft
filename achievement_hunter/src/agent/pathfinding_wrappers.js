@@ -60,6 +60,15 @@ const RETRYABLE_PATTERNS = [
 // outcome.
 const MIN_FORWARD_PROGRESS_BLOCKS = 1.0;
 
+// If the next midpoint is already within this many XZ blocks of the
+// final target, skip the midpoint hop and give up the loop. A midpoint
+// that close means the bot would barely move; if the final goal is
+// still unreachable from there, the failure isn't a distance problem
+// (more likely terrain, y-axis depth, or unmineable blocks) and
+// repeated short hops won't help. Saves the multi-minute pathfinder
+// timeout per iteration when stuck near a target.
+const MIDPOINT_GIVEUP_DISTANCE = 14;
+
 export function classifyOutcome(message) {
     if (!message) return 'retryable';
     for (const p of NON_RETRYABLE_PATTERNS) if (p.test(message)) return 'non_retryable';
@@ -186,6 +195,22 @@ export function withPathRetry({ label, runFinal, getTarget, maxDepth = PATHFINDI
             } else {
                 const mid = midpoint(agent.bot.entity.position, target);
 
+                // If the midpoint is already close to the final target,
+                // hopping there wouldn't meaningfully shorten the final
+                // attempt. The final has been failing; doing another
+                // midpoint hop would just produce another failed final
+                // for the same non-distance reason. Bail directly.
+                const midToTargetXZ = distanceXZ(mid, target);
+                if (midToTargetXZ != null &&
+                    midToTargetXZ < MIDPOINT_GIVEUP_DISTANCE) {
+                    logAttempt({
+                        label, phase: 'give_up', depth, mid, target,
+                        pos: agent.bot.entity.position,
+                        reason: `midpoint_too_close_to_target: mid_to_target_xz=${midToTargetXZ.toFixed(1)} < ${MIDPOINT_GIVEUP_DISTANCE}`,
+                    });
+                    return { success: false, message: lastMessage };
+                }
+
                 attempt++;
                 const midStartPos = agent.bot.entity.position.clone();
                 logAttempt({ label, attempt, phase: 'start_midpoint', depth, mid, target, pos: midStartPos });
@@ -204,15 +229,19 @@ export function withPathRetry({ label, runFinal, getTarget, maxDepth = PATHFINDI
                 const midOutcome = classifyOutcome(midReturn.message);
                 logAttempt({ label, attempt, phase: 'midpoint', depth, outcome: midOutcome, elapsedMs: midElapsed, moved: midMoved, message: midReturn.message, mid, target });
 
-                if (midOutcome === 'success') {
-                    depth = 0;
-                } else if (midOutcome === 'non_retryable') {
+                if (midOutcome === 'non_retryable') {
                     // The midpoint hit a permanent obstacle (e.g. needs tools we don't have).
                     // The final goal won't fare better — surface the original failure.
                     return { success: false, message: lastMessage };
-                } else {
-                    depth++;
                 }
+                // depth always increments per iteration (regardless of
+                // midpoint success). A midpoint reaching its column does
+                // not by itself indicate progress toward the final goal —
+                // the bot can reach the same midpoint repeatedly from the
+                // same stale position. Real productivity is verified by
+                // the no-forward-progress check below; depth is a hard
+                // bound on total iterations.
+                depth++;
             }
 
             // --- Progress check ---
