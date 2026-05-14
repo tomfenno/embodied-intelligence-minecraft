@@ -45,7 +45,7 @@
     "self_defense": true,
     "lava_sneak": true,
     "hunting": false,
-    "item_collecting": true,
+    "item_collecting": false,
     "torch_placing": false,
     "elbow_room": true,
     "idle_staring": false,
