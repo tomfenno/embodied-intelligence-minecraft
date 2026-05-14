@@ -7,6 +7,7 @@ import {
   summarizeDependencyErrors,
   TEMPLATES_BY_ID,
 } from '../../src/pipeline/dependency_error_classifier.js';
+import {collectTrustedDependencyMetrics} from './trusted_dependency_classifier.js';
 import {readJson, walkFiles, writeJson} from './utils.js';
 
 export function collectDependencyMetrics(
@@ -29,11 +30,28 @@ export function collectDependencyMetrics(
   }
 
   const classifierSummary = summarizeDependencyErrors(records);
-  const summary = {
+  const legacySummary = {
     source,
     parseable_command_records: records.length,
     unparseable_command_records: unparseableCommandRecords,
     ...classifierSummary,
+  };
+  const trustedSummary = collectTrustedDependencyMetrics(resultDir);
+  const summary = {
+    ...legacySummary,
+    trusted_dependency_available: trustedSummary.available,
+    trusted_dependency_failures:
+        trustedSummary.available ? trustedSummary.dependencyFailures : null,
+    trusted_dependency_total_commands:
+        trustedSummary.available ? trustedSummary.totalCommands : null,
+    trusted_dependency_error_rate:
+        trustedSummary.available ? trustedSummary.dependencyErrorRate : null,
+    trusted_dependency_incidents:
+        trustedSummary.available ? trustedSummary.dependencyIncidents : null,
+    trusted_dependency_ambiguous_events:
+        trustedSummary.available ? trustedSummary.ambiguousEvents : null,
+    legacy: legacySummary,
+    trusted: trustedSummary,
   };
 
   writeJson(path.join(resultDir, 'dependency_summary.json'), summary);

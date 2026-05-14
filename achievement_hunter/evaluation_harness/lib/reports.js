@@ -74,6 +74,14 @@ export function writeSummaryReports(suiteRoot, manifests) {
     const dependencyFailures = manifest.dependency_failures ?? 0;
     const totalCommands = manifest.dependency_total_commands ?? 0;
     const unparseable = manifest.dependency_unparseable_command_records ?? 0;
+    const trustedAvailable = manifest.trusted_dependency_available === true;
+    const trustedDependencyFailures =
+        manifest.trusted_dependency_failures ?? 0;
+    const trustedTotalCommands =
+        manifest.trusted_dependency_total_commands ?? 0;
+    const trustedIncidents = manifest.trusted_dependency_incidents ?? 0;
+    const trustedAmbiguousEvents =
+        manifest.trusted_dependency_ambiguous_events ?? 0;
     const target = serializeMetadataValue(manifest.target);
     const targetAnyOf = serializeMetadataValue(manifest.target_any_of);
 
@@ -101,6 +109,11 @@ export function writeSummaryReports(suiteRoot, manifests) {
         total_dependency_failures: 0,
         total_commands: 0,
         total_unparseable_command_records: 0,
+        trusted_dependency_available_runs: 0,
+        trusted_dependency_failures: 0,
+        trusted_dependency_total_commands: 0,
+        trusted_dependency_incidents: 0,
+        trusted_dependency_ambiguous_events: 0,
       });
     }
     const perTaskRow = perTaskRows.get(perTaskKey);
@@ -110,6 +123,11 @@ export function writeSummaryReports(suiteRoot, manifests) {
     perTaskRow.total_dependency_failures += dependencyFailures;
     perTaskRow.total_commands += totalCommands;
     perTaskRow.total_unparseable_command_records += unparseable;
+    perTaskRow.trusted_dependency_available_runs += trustedAvailable ? 1 : 0;
+    perTaskRow.trusted_dependency_failures += trustedDependencyFailures;
+    perTaskRow.trusted_dependency_total_commands += trustedTotalCommands;
+    perTaskRow.trusted_dependency_incidents += trustedIncidents;
+    perTaskRow.trusted_dependency_ambiguous_events += trustedAmbiguousEvents;
 
     const summaryKey =
         [manifest.agent_label, manifest.agent_name, manifest.mode].join('::');
@@ -124,6 +142,11 @@ export function writeSummaryReports(suiteRoot, manifests) {
         total_dependency_failures: 0,
         total_commands: 0,
         total_unparseable_command_records: 0,
+        trusted_dependency_available_runs: 0,
+        trusted_dependency_failures: 0,
+        trusted_dependency_total_commands: 0,
+        trusted_dependency_incidents: 0,
+        trusted_dependency_ambiguous_events: 0,
       });
     }
     const summaryRow = summaryRows.get(summaryKey);
@@ -133,6 +156,11 @@ export function writeSummaryReports(suiteRoot, manifests) {
     summaryRow.total_dependency_failures += dependencyFailures;
     summaryRow.total_commands += totalCommands;
     summaryRow.total_unparseable_command_records += unparseable;
+    summaryRow.trusted_dependency_available_runs += trustedAvailable ? 1 : 0;
+    summaryRow.trusted_dependency_failures += trustedDependencyFailures;
+    summaryRow.trusted_dependency_total_commands += trustedTotalCommands;
+    summaryRow.trusted_dependency_incidents += trustedIncidents;
+    summaryRow.trusted_dependency_ambiguous_events += trustedAmbiguousEvents;
   }
 
   writeCsv(path.join(suiteRoot, 'per_task.csv'), [
@@ -151,6 +179,13 @@ export function writeSummaryReports(suiteRoot, manifests) {
     'total_commands',
     'dependency_error_rate',
     'total_unparseable_command_records',
+    'trusted_dependency_available',
+    'trusted_dependency_available_runs',
+    'trusted_dependency_failures',
+    'trusted_dependency_total_commands',
+    'trusted_dependency_error_rate',
+    'trusted_dependency_incidents',
+    'trusted_dependency_ambiguous_events',
   ], [...perTaskRows.values()].sort((a, b) => {
     return compareTuple(
         [a.agent_label, a.task_id],
@@ -169,6 +204,13 @@ export function writeSummaryReports(suiteRoot, manifests) {
     'total_commands',
     'dependency_error_rate',
     'total_unparseable_command_records',
+    'trusted_dependency_available',
+    'trusted_dependency_available_runs',
+    'trusted_dependency_failures',
+    'trusted_dependency_total_commands',
+    'trusted_dependency_error_rate',
+    'trusted_dependency_incidents',
+    'trusted_dependency_ambiguous_events',
   ], [...summaryRows.values()].sort((a, b) => {
     return compareTuple(
         [a.agent_label, a.agent_name],
@@ -185,6 +227,7 @@ export function serializeMetadataValue(value) {
 function formatSummaryRow(row) {
   const runs = row.runs || 0;
   const totalCommands = row.total_commands || 0;
+  const trustedTotalCommands = row.trusted_dependency_total_commands || 0;
   return {
     ...row,
     success_rate: runs === 0 ? 0 : row.successful_runs / runs,
@@ -192,6 +235,11 @@ function formatSummaryRow(row) {
         runs === 0 ? 0 : row.total_episode_duration_seconds / runs,
     dependency_error_rate:
         totalCommands === 0 ? 0 : row.total_dependency_failures / totalCommands,
+    trusted_dependency_available:
+        runs > 0 && row.trusted_dependency_available_runs === runs ? 1 : 0,
+    trusted_dependency_error_rate: trustedTotalCommands === 0 ?
+        0 :
+        row.trusted_dependency_failures / trustedTotalCommands,
   };
 }
 

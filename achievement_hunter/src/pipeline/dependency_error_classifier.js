@@ -194,30 +194,30 @@ const SKILL_TEMPLATES = [
   // Smelting
   t('smelt.bad_input',
     /^Cannot smelt .+\. Hint: make sure you are smelting the 'raw' item\.$/m,
-    KIND.DEPENDENCY_RECIPE, 'skills.js', ['!smeltItem']),
+    KIND.DEPENDENCY_RECIPE, 'skills.js', ['!smelt_item', '!smeltItem']),
   t('smelt.no_furnace',
     /^There is no furnace nearby and you have no furnace\.$/m,
-    KIND.DEPENDENCY_ENVIRONMENT, 'skills.js', ['!smeltItem']),
+    KIND.DEPENDENCY_ENVIRONMENT, 'skills.js', ['!smelt_item', '!smeltItem']),
   t('smelt.busy', /^The furnace is currently smelting .+\.$/m, KIND.AGENT_STATE,
-    'skills.js', ['!smeltItem']),
+    'skills.js', ['!smelt_item', '!smeltItem']),
   t('smelt.not_enough_input', /^You do not have enough .+ to smelt\.$/m,
-    KIND.DEPENDENCY_RESOURCE, 'skills.js', ['!smeltItem']),
+    KIND.DEPENDENCY_RESOURCE, 'skills.js', ['!smelt_item', '!smeltItem']),
   t('smelt.no_fuel',
     /^You have no fuel to smelt .+, you need coal, charcoal, or wood\.$/m,
-    KIND.DEPENDENCY_RESOURCE, 'skills.js', ['!smeltItem']),
+    KIND.DEPENDENCY_RESOURCE, 'skills.js', ['!smelt_item', '!smeltItem']),
   t('smelt.using_fuel', /^Using .+ as fuel\.$/m, KIND.INFO, 'skills.js',
-    ['!smeltItem']),
+    ['!smelt_item', '!smeltItem']),
   t('smelt.not_enough_fuel',
     /^You don't have enough .+ to smelt \d+ .+; you need \d+\.$/m,
-    KIND.DEPENDENCY_RESOURCE, 'skills.js', ['!smeltItem']),
+    KIND.DEPENDENCY_RESOURCE, 'skills.js', ['!smelt_item', '!smeltItem']),
   t('smelt.added_fuel', /^Added \d+ .+ to furnace fuel\.$/m, KIND.INFO,
-    'skills.js', ['!smeltItem']),
+    'skills.js', ['!smelt_item', '!smeltItem']),
   t('smelt.failed', /^Failed to smelt .+\.$/m, KIND.AGENT_EXCEPTION,
-    'skills.js', ['!smeltItem']),
+    'skills.js', ['!smelt_item', '!smeltItem']),
   t('smelt.partial', /^Only smelted \d+ .+\.$/m, KIND.PARTIAL_SUCCESS,
-    'skills.js', ['!smeltItem']),
+    'skills.js', ['!smelt_item', '!smeltItem']),
   t('smelt.ok', /^Successfully smelted .+, got \d+ .+\.$/m, KIND.SUCCESS,
-    'skills.js', ['!smeltItem']),
+    'skills.js', ['!smelt_item', '!smeltItem']),
 
   // Furnace
   t('clearFurnace.no_furnace', /^No furnace nearby to clear\.$/m,
@@ -646,6 +646,21 @@ export const TEMPLATES_BY_KIND = TEMPLATES.reduce((acc, template) => {
 export const DEPENDENCY_TEMPLATES =
     TEMPLATES.filter((template) => template.isDependencyFailure);
 
+const TRUSTED_DEPENDENCY_CANDIDATE_PATTERNS = [
+  {
+    id: 'trusted_candidate.recipe_requires_crafting_table',
+    pattern: /Recipe requires craftingTable/m,
+  },
+  {
+    id: 'trusted_candidate.failed_to_place_crafting_table',
+    pattern: /Failed to place crafting_table at /m,
+  },
+  {
+    id: 'trusted_candidate.failed_to_place_furnace',
+    pattern: /Failed to place furnace at /m,
+  },
+];
+
 // --------------------------------------------------------------------------
 // Matching helpers
 // --------------------------------------------------------------------------
@@ -768,6 +783,33 @@ export function classifyMessage(actionName, result) {
     isInterrupted: success === false && rawMessage === '',
     isException: kinds.has(KIND.AGENT_EXCEPTION),
     isParseError: kinds.has(KIND.PARSE_ERROR),
+  };
+}
+
+export function detectDependencyCandidate({
+  actionName,
+  command = null,
+  result,
+} = {}) {
+  const classification = classifyMessage(actionName, result);
+  const candidateTemplateIds =
+      classification.dependencyMatches.map((template) => template.id);
+  const extraCandidateIds = TRUSTED_DEPENDENCY_CANDIDATE_PATTERNS
+      .filter(({pattern}) => pattern.test(classification.rawMessage))
+      .map(({id}) => id);
+
+  return {
+    command,
+    actionName,
+    success: classification.success,
+    rawMessage: classification.rawMessage,
+    matchedTemplateIds:
+        classification.matches.map((match) => match.template.id),
+    candidateTemplateIds,
+    extraCandidateIds,
+    isCandidate:
+        candidateTemplateIds.length > 0 || extraCandidateIds.length > 0,
+    classification,
   };
 }
 

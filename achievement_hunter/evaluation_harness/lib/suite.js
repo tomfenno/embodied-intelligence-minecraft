@@ -439,6 +439,18 @@ async function runSingleBenchmarkEpisode({
       dependency_unparseable_command_records:
           dependencySummary.unparseable_command_records,
       dependency_source: dependencySummary.source,
+      trusted_dependency_available:
+          dependencySummary.trusted_dependency_available,
+      trusted_dependency_failures:
+          dependencySummary.trusted_dependency_failures,
+      trusted_dependency_total_commands:
+          dependencySummary.trusted_dependency_total_commands,
+      trusted_dependency_error_rate:
+          dependencySummary.trusted_dependency_error_rate,
+      trusted_dependency_incidents:
+          dependencySummary.trusted_dependency_incidents,
+      trusted_dependency_ambiguous_events:
+          dependencySummary.trusted_dependency_ambiguous_events,
       world_provider: provider,
       world_host: serverRuntime.host,
       world_port: serverRuntime.port,

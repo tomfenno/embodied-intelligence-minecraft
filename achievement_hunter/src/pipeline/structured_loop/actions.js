@@ -17,6 +17,7 @@ import {recover_failed_task} from './failure_replanner.js';
 import {make_spl} from './log.js';
 import {check_search_complete, parse_search_command, run_breadth_first_sweep, run_search} from './search.js';
 import {recover_failed_search} from './search_replanner.js';
+import {build_dependency_context} from './dependency_context.js';
 import {task_key} from './tasks.js';
 import {create_command_success_result, create_step_result, normalize_result_message, project_failed_steps} from './trace.js';
 
@@ -121,7 +122,7 @@ export async function execute_task_action(
 
     const current_step = create_trace_step(
         attempt_number, serialize_am_output(action),
-        state_cache.read_recovery(baseline_inventory));
+        state_cache.read_recovery(baseline_inventory), task, state, agent);
     task_trace.steps.push(current_step);
 
     log_am_action(log, attempt_number, action, state);
@@ -382,6 +383,7 @@ async function handle_search_sweep(
   const sweep_step = {
     i: 1,
     state: get_recovery_trace_state(agent, baseline_inventory),
+    dependency_context: null,
     action: `search_sweep([${targets_display}])`,
     result: null,
   };
@@ -691,10 +693,18 @@ function create_task_trace(task, log) {
   };
 }
 
-function create_trace_step(step_index, action_output, recovery_state) {
+function create_trace_step(
+    step_index, action_output, recovery_state, task = null, am_state = null,
+    agent = null) {
   return {
     i: step_index,
     state: recovery_state,
+    dependency_context:
+        task && am_state ?
+        build_dependency_context(task, am_state, {
+          equipped_item: agent?.bot?.heldItem?.name ?? null,
+        }) :
+        null,
     action: action_output,
     result: null,
   };
@@ -782,6 +792,18 @@ async function handle_interact_success(
     i: `${attempt_number}a`,
     state: state_cache ? state_cache.read_recovery(baseline_inventory) :
                          get_recovery_trace_state(agent, baseline_inventory),
+    dependency_context: build_dependency_context(
+        {
+          target_item: task.target_item,
+          qty: task.qty,
+          action_type: 'collect',
+          parameters: {
+            source_block: task.target_item,
+            item_dependency: null,
+            tool: null,
+          },
+        },
+        post_command_state, {equipped_item: agent?.bot?.heldItem?.name ?? null}),
     action: collect_command,
     result: null,
   };
