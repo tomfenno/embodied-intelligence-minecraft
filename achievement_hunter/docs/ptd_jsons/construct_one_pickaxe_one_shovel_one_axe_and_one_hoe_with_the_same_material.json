@@ -8,6 +8,30 @@
     ],
     "vertices": [
         {
+            "id": "any_log",
+            "qty": 5,
+            "item_type": "resource",
+            "acquisition_dependency": "none"
+        },
+        {
+            "id": "any_plank",
+            "qty": 20,
+            "item_type": "item",
+            "acquisition_dependency": "none"
+        },
+        {
+            "id": "stick",
+            "qty": 8,
+            "item_type": "item",
+            "acquisition_dependency": "none"
+        },
+        {
+            "id": "crafting_table",
+            "qty": 1,
+            "item_type": "workstation",
+            "acquisition_dependency": "none"
+        },
+        {
             "id": "wooden_pickaxe",
             "qty": 1,
             "item_type": "tool",
@@ -29,30 +53,6 @@
             "id": "wooden_hoe",
             "qty": 1,
             "item_type": "tool",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "crafting_table",
-            "qty": 1,
-            "item_type": "workstation",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "stick",
-            "qty": 8,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "any_plank",
-            "qty": 20,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "any_log",
-            "qty": 5,
-            "item_type": "resource",
             "acquisition_dependency": "none"
         }
     ],

@@ -246,9 +246,17 @@ export async function recover_failed_task(
         MAX_RECOVERY_ATTEMPTS} (prior crash, plan discarded).`);
   }
 
+  // Tracks how the attempt loop exited so the post-loop log can be honest
+  // about it. `null` means the loop ran to MAX_RECOVERY_ATTEMPTS without
+  // success; any non-null value is set at the corresponding `break`.
+  let exit_status = null;
+  let exit_attempt = resume_attempt - 1;
+  let exit_detail = null;
+
   try {
     for (let attempt = resume_attempt; attempt <= MAX_RECOVERY_ATTEMPTS;
          attempt++) {
+      exit_attempt = attempt;
       save_runtime_state({
         active_replanner: {
           kind: 'failure',
@@ -270,6 +278,8 @@ export async function recover_failed_task(
         replanner_output = extract_json(raw);
       } catch (e) {
         spl.error('LLM call failed:', e.message);
+        exit_status = 'llm_error';
+        exit_detail = e.message;
         break;
       }
 
@@ -282,6 +292,8 @@ export async function recover_failed_task(
         validate_replanner_output(replanner_output, available_actions);
       } catch (e) {
         spl.warn('Validation failed:', e.message);
+        exit_status = 'validation_failed';
+        exit_detail = e.message;
         break;
       }
 
@@ -354,6 +366,7 @@ export async function recover_failed_task(
         if (result_indicates_hard_failure(result)) {
           spl.warn('Hard failure, stopping action sequence:', result.kind);
           hard_failed = true;
+          exit_detail = result.kind;
           break;
         }
       }
@@ -362,13 +375,23 @@ export async function recover_failed_task(
         latest_state = get_recovery_trace_state(agent, baseline_inventory);
       }
 
-      if (hard_failed) break;
+      if (hard_failed) {
+        exit_status = 'hard_failure';
+        break;
+      }
 
       failed_trace = build_failed_trace_from_attempt(
           failed_trace, action_results, latest_state);
     }
 
-    spl.warn(`Recovery exhausted after ${MAX_RECOVERY_ATTEMPTS} attempts.`);
+    if (exit_status === null) {
+      spl.warn(
+          `Recovery exhausted: ran all ${MAX_RECOVERY_ATTEMPTS} attempts without success.`);
+    } else {
+      spl.warn(`Recovery aborted at attempt ${exit_attempt}/${
+          MAX_RECOVERY_ATTEMPTS} (${exit_status}${
+          exit_detail ? `: ${exit_detail}` : ''}).`);
+    }
     log?.recovery_end('fail');
     return 'fail';
 

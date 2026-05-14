@@ -16,13 +16,19 @@ export function parse_search_command(action) {
   return match?.[1] ?? null;
 }
 
-// Detects the skill's "located target but couldn't reach it" log line. When
-// this fires, bigger radii won't help — the target's position is already
+// Detects the skill's "located target but couldn't reach it" log line.
+// Bigger radii won't help in that case — the target's position is already
 // known and the failure is navigation/tooling, not absence. Defer to the
-// search_replanner instead of burning the next three radii on the same
-// blocker.
-const FOUND_BUT_NOT_REACHED_PATTERN =
-    /Found .+? at \([^)]+\)\. Navigating\.\.\./;
+// search_replanner.
+//
+// We require BOTH the "Found X at … Navigating" prefix AND the absence of
+// "You have reached at": if the bot did navigate successfully but the
+// search still failed (because state filters reject the target type — e.g.
+// flowing lava instead of source lava), escalating to a larger radius can
+// genuinely help find a different instance further out. Only short-circuit
+// when navigation itself failed.
+const FOUND_PATTERN = /Found .+? at \([^)]+\)\. Navigating\.\.\./;
+const REACHED_PATTERN = /You have reached at /;
 
 export async function run_search(target, state, agent, log, start_attempt) {
   const concrete_items = expand_search_item(target);
@@ -57,7 +63,8 @@ export async function run_search(target, state, agent, log, start_attempt) {
         return {found: false, message: last_message, bot_died: true};
       }
       if (found) return {found: true, message};
-      if (message && FOUND_BUT_NOT_REACHED_PATTERN.test(message)) {
+      if (message && FOUND_PATTERN.test(message) &&
+          !REACHED_PATTERN.test(message)) {
         spl.log(
             `Search: "${item}" located at radius ${radius} but not reached — skipping larger radii for this item (defer to search_replanner).`);
         found_but_not_reached.add(item);

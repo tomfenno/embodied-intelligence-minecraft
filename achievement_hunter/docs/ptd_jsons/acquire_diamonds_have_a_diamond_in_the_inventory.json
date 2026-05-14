@@ -1,19 +1,19 @@
 {
-    "objective": "Fill a Bucket with lava. Have a lava bucket in the inventory.",
+    "objective": "Acquire diamonds. Have a diamond in the inventory.",
     "sinks": [
-        "lava_bucket"
+        "diamond"
     ],
     "vertices": [
         {
-            "id": "lava_bucket",
+            "id": "diamond",
             "qty": 1,
-            "item_type": "item",
-            "acquisition_dependency": "lava_source"
+            "item_type": "resource",
+            "acquisition_dependency": "none"
         },
         {
-            "id": "bucket",
+            "id": "iron_pickaxe",
             "qty": 1,
-            "item_type": "item",
+            "item_type": "tool",
             "acquisition_dependency": "none"
         },
         {
@@ -35,42 +35,6 @@
             "acquisition_dependency": "none"
         },
         {
-            "id": "coal",
-            "qty": 1,
-            "item_type": "resource",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "crafting_table",
-            "qty": 1,
-            "item_type": "workstation",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "any_plank",
-            "qty": 12,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "any_log",
-            "qty": 3,
-            "item_type": "resource",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "stick",
-            "qty": 4,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-        },
-        {
-            "id": "wooden_pickaxe",
-            "qty": 1,
-            "item_type": "tool",
-            "acquisition_dependency": "none"
-        },
-        {
             "id": "stone_pickaxe",
             "qty": 1,
             "item_type": "tool",
@@ -81,26 +45,63 @@
             "qty": 11,
             "item_type": "resource",
             "acquisition_dependency": "none"
+        },
+        {
+            "id": "wooden_pickaxe",
+            "qty": 1,
+            "item_type": "tool",
+            "acquisition_dependency": "none"
+        },
+        {
+            "id": "stick",
+            "qty": 8,
+            "item_type": "item",
+            "acquisition_dependency": "none"
+        },
+        {
+            "id": "any_plank",
+            "qty": 12,
+            "item_type": "item",
+            "acquisition_dependency": "none"
+        },
+        {
+            "id": "crafting_table",
+            "qty": 1,
+            "item_type": "workstation",
+            "acquisition_dependency": "none"
+        },
+        {
+            "id": "any_log",
+            "qty": 5,
+            "item_type": "resource",
+            "acquisition_dependency": "none"
         }
     ],
     "edges": [
         {
-            "from": "bucket",
-            "to": "lava_bucket",
-            "type": "crafting_input",
+            "from": "iron_pickaxe",
+            "to": "diamond",
+            "type": "tool_dependency",
             "qty": 1,
-            "consumed": true
+            "consumed": false
         },
         {
             "from": "iron_ingot",
-            "to": "bucket",
+            "to": "iron_pickaxe",
             "type": "crafting_input",
             "qty": 3,
             "consumed": true
         },
         {
+            "from": "stick",
+            "to": "iron_pickaxe",
+            "type": "crafting_input",
+            "qty": 2,
+            "consumed": true
+        },
+        {
             "from": "crafting_table",
-            "to": "bucket",
+            "to": "iron_pickaxe",
             "type": "workstation_dependency",
             "qty": 1,
             "consumed": false
@@ -113,10 +114,10 @@
             "consumed": true
         },
         {
-            "from": "coal",
+            "from": "any_log",
             "to": "iron_ingot",
             "type": "fuel_input",
-            "qty": 1,
+            "qty": 2,
             "consumed": true
         },
         {
@@ -169,11 +170,11 @@
             "consumed": false
         },
         {
-            "from": "any_plank",
-            "to": "stick",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
+            "from": "wooden_pickaxe",
+            "to": "cobblestone",
+            "type": "tool_dependency",
+            "qty": 1,
+            "consumed": false
         },
         {
             "from": "any_plank",
@@ -197,10 +198,10 @@
             "consumed": false
         },
         {
-            "from": "any_log",
-            "to": "any_plank",
+            "from": "any_plank",
+            "to": "stick",
             "type": "crafting_input",
-            "qty": 3,
+            "qty": 4,
             "consumed": true
         },
         {
@@ -211,18 +212,11 @@
             "consumed": true
         },
         {
-            "from": "wooden_pickaxe",
-            "to": "cobblestone",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
-            "from": "wooden_pickaxe",
-            "to": "coal",
-            "type": "tool_dependency",
-            "qty": 1,
-            "consumed": false
+            "from": "any_log",
+            "to": "any_plank",
+            "type": "crafting_input",
+            "qty": 3,
+            "consumed": true
         }
     ]
 }
