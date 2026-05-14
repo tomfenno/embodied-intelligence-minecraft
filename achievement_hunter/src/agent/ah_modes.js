@@ -22,6 +22,22 @@ import settings from '../../../src/agent/settings.js';
 import * as mc from '../../../src/utils/mcdata.js';
 
 /**
+ * Returns true if the bot is in water by any of four signals: the physics
+ * engine's bounding-box test, or water blocks at feet / head / one-below.
+ * Mirrors the check in skills.goToNearestLand and the !goToNearestLand
+ * verifier so all three agree on what "in water" means. The fallbacks
+ * catch the chunk-not-loaded case where blockAt defaults to null and
+ * the physics test may not register.
+ */
+function is_in_water(bot) {
+  const pos = bot.entity.position;
+  return !!bot.entity.isInWater
+      || bot.blockAt(pos)?.name === 'water'
+      || bot.blockAt(pos.offset(0, 1, 0))?.name === 'water'
+      || bot.blockAt(pos.offset(0, -1, 0))?.name === 'water';
+}
+
+/**
  * Returns true if lava is within one block of the bot in any direction that
  * poses a fall-in risk: horizontally adjacent, diagonally adjacent (same Y),
  * or one block below an adjacent edge.
@@ -84,7 +100,9 @@ const modes_list = [
       if (!block)
         block = {name: 'air'};  // hacky fix when blocks are not loaded
       if (!blockAbove) blockAbove = {name: 'air'};
-      if (blockAbove.name === 'water') {
+      const drowning = blockAbove.name === 'water'
+          || (is_in_water(bot) && bot.oxygenLevel != null && bot.oxygenLevel < 20);
+      if (drowning) {
         // does not call execute so does not interrupt other actions
         if (!bot.pathfinder.goal) {
           bot.setControlState('jump', true);

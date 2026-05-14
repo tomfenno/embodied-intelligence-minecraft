@@ -69,7 +69,8 @@ export const ACTION_DEBOUNCE_MS = 750;
 // against every still-active source before incrementing.
 export const SEARCH_RADII = [32, 64, 128, 256];
 
-// --- Pathfinding retry wrappers (achievement_hunter/src/agent/pathfinding_wrappers.js) ---
+// --- Pathfinding retry wrappers
+// (achievement_hunter/src/agent/pathfinding_wrappers.js) ---
 //
 // Used by the wrapper module, which lives outside structured_loop but is
 // configured here so all tunable knobs sit in one file.
@@ -88,7 +89,8 @@ export const PATHFINDING_WRAPPER_LOG_TAIL_MAX_CHARS = 200;
 
 // Directory (relative to repo root) where per-day wrapper logs are
 // appended. Created on demand.
-export const PATHFINDING_WRAPPER_LOG_DIR = 'achievement_hunter/logs/pathfinding_wrappers';
+export const PATHFINDING_WRAPPER_LOG_DIR =
+    'achievement_hunter/logs/pathfinding_wrappers';
 
 // --- Observability (rollout_logger.js) ---
 
@@ -97,7 +99,7 @@ export const PATHFINDING_WRAPPER_LOG_DIR = 'achievement_hunter/logs/pathfinding_
 // task_traces/, search_traces/). Disable to remove all rollout-directory
 // sync I/O from the agent's hot path; the agent itself does not read these
 // files at runtime, so behavior is unchanged.
-export const ENABLE_ROLLOUT_LOGGING = true;
+export const ENABLE_ROLLOUT_LOGGING = false;
 
 // When true, writes the live dashboard markdown files under `rollout_live/`
 // and runs the per-stage markdown rendering. Disable to remove all

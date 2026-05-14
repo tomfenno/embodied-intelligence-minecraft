@@ -585,6 +585,23 @@ export const actionsList = [
         })
         // End of AH code
     },
+    // Start of AH code
+    {
+        name: '!goToNearestLand',
+        description: 'If the bot is in water, navigate to the nearest standable land within 500 blocks. No-op success if already on land.',
+        params: {},
+        perform: withPathRetry({
+            label: 'goToNearestLand',
+            runFinal: async (agent) => {
+                await skills.goToNearestLand(agent.bot);
+            },
+            getTarget: (agent, _args, _lastMessage) => {
+                const pos = skills.findNearestLand(agent.bot);
+                return pos ? { x: pos.x, y: pos.y + 1, z: pos.z } : null;
+            },
+        })
+    },
+    // End of AH code
     {
         name: '!useOn',
         description: 'Use (right click) the given tool on the nearest target of the given type.',

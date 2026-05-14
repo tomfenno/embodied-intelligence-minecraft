@@ -19,7 +19,7 @@
       },
       "closeness": {
         "min": 0,
-        "recommended use": "Use as large of a closeness value to maximize the chance of success. Closeness values near 1 are much more likely to fail than larger closeness values."
+        "recommended_use": "Use as large of a closeness value to maximize the chance of success. Closeness values near 1 are much more likely to fail than larger closeness values."
       },
       "horizontal_distance_from_current_position": {
         "max": 250,
@@ -45,7 +45,7 @@
     "constraints": {
       "closeness": {
         "min": 0,
-        "recommended use": "Use as large of a closeness value to maximize the chance of success. Closeness values near 1 are much more likely to fail than larger closeness values."
+        "recommended_use": "Use as large of a closeness value to maximize the chance of success. Closeness values near 1 are much more likely to fail than larger closeness values."
       },
       "horizontal_distance_from_current_position": {
         "max": 250,
@@ -128,12 +128,12 @@
     "name": "!collectBlocks",
     "description": "Collect the nearest blocks of a given type. Only works if the block is currently present in the state.",
     "category": "collection",
+    "recommended_use": "Use only after !search succeeds for the same block type, or when the block is already visible in nearby.blocks.",
     "constraints": {
       "num": {
         "min": 1
       },
       "target_must_be_in_state": true,
-      "recommended_use": "Use only after !search succeeds for the same block type, or when the block is already visible in nearby.blocks.",
       "do_not_use_after_failed_search": "If !search for this block returned search_exhausted from the current position, !collectBlocks will not help.",
       "timeout_minutes": 10
     },
@@ -147,6 +147,9 @@
     "description": "Craft the given recipe a given number of times.",
     "category": "crafting",
     "constraints": {
+      "recipe_name": {
+        "note": "The OUTPUT item to craft (e.g. 'oak_planks' to craft planks), not the inputs."
+      },
       "num": {
         "min": 1
       },
@@ -164,6 +167,9 @@
     "description": "Smelt the given item the given number of times.",
     "category": "crafting",
     "constraints": {
+      "item_name": {
+        "note": "The INPUT item to smelt (e.g. 'raw_iron' produces iron_ingot), not the output."
+      },
       "num": {
         "min": 1
       },
@@ -205,9 +211,9 @@
     "name": "!attack",
     "description": "Attack and kill the nearest entity of a given type. Only works if the target entity is currently present in the state.",
     "category": "control",
+    "recommended_use": "Use only after !search succeeds for the same entity type, or when the entity is already visible in nearby.entityTypes.",
     "constraints": {
       "target_must_be_in_state": true,
-      "recommended_use": "Use only after !search succeeds for the same entity type, or when the entity is already visible in nearby.entityTypes.",
       "do_not_use_after_failed_search": "If !search for this entity returned search_exhausted from the current position, !attack will not help."
     },
     "examples": [
@@ -272,6 +278,20 @@
     },
     "examples": [
       "!goToSurface()"
+    ]
+  },
+  {
+    "name": "!goToNearestLand",
+    "description": "If the bot is in water, navigate to the nearest standable land within 500 blocks. No-op success if already on land. Use to relocate after wandering into water.",
+    "category": "movement",
+    "constraints": {
+      "max_search_radius": 500,
+      "no_op_when_already_on_land": true,
+      "max_uses_per_recovery_plan": 1
+    },
+    "recommended_use": "Call when in water or after a call to !goToCoordinates or !goToXZ to ensure the agent is on land.",
+    "examples": [
+      "!goToNearestLand()"
     ]
   },
   {

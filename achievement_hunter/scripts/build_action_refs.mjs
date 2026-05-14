@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Run with npm run build:action-refs
+// Run with `npm run build:action-refs`
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';

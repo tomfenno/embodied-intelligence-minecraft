@@ -27,12 +27,14 @@ const NON_RETRYABLE_PATTERNS = [
     /Could not find a bed to sleep in\./,
     /Missing coordinates,/,
     /No location named ".+" saved\./,
+    /No land found within \d+ blocks\./,
     /!!Code threw exception!!/,
 ];
 
 const SUCCESS_PATTERNS = [
     /You have reached at /,
     /You have reached column /,
+    /Already on land\./,
     /You have reached [^ ]+\./,
 ];
 

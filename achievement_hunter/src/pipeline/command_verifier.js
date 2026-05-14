@@ -168,6 +168,28 @@ export const command_verifiers = {
     },
   },
 
+  '!goToNearestLand': {
+    // No pre/post snapshot — checks the bot's current water state directly.
+    // Mirrors the skill's multi-signal check (truthy isInWater + block-name
+    // fallbacks at feet / head / one-below) so the verifier and skill agree
+    // on what "in water" means. Truthy (not strict `=== true`) so a non-
+    // boolean isInWater would still degrade safely to the block-name path.
+    needs: new Set(),
+    verify: ({agent}) => {
+      const bot = agent?.bot;
+      if (!bot?.entity?.position) return {ok: true, reason: 'no_position'};
+      const pos = bot.entity.position;
+      const in_water =
+          !!bot.entity.isInWater ||
+          bot.blockAt(pos)?.name === 'water' ||
+          bot.blockAt(pos.offset(0, 1, 0))?.name === 'water' ||
+          bot.blockAt(pos.offset(0, -1, 0))?.name === 'water';
+      return in_water ?
+          {ok: false, reason: 'still_in_water'} :
+          {ok: true, reason: 'on_land'};
+    },
+  },
+
   '!goToPlayer': {
     needs: new Set(['position']),
     verify: ({args, post, agent}) => {

@@ -1318,6 +1318,81 @@ export async function goToXZPosition(bot, x, z, min_distance=2) {
         return false;
     }
 }
+
+export function findNearestLand(bot, range=500) {
+    /**
+     * Find the nearest standable land position within `range` (Chebyshev distance, xz only).
+     * For each (x, z) column visited, scans a small y window around the bot for a solid
+     * non-fluid block whose neighbour above is air. Spirals outward and returns on first hit.
+     * @returns {Vec3 | null} position of the land block; stand on it via y+1. Null if none found.
+     **/
+    const start = bot.entity.position;
+    const startX = Math.floor(start.x);
+    const startY = Math.floor(start.y);
+    const startZ = Math.floor(start.z);
+
+    const checkColumn = (cx, cz) => {
+        for (let dy = 5; dy >= -3; dy--) {
+            const y = startY + dy;
+            const block = bot.blockAt(new Vec3(cx, y, cz));
+            if (!block) continue;
+            if (block.name === 'air' || block.name === 'cave_air' || block.name === 'water' || block.name === 'lava') continue;
+            if (!block.boundingBox || block.boundingBox === 'empty') continue;
+            const above = bot.blockAt(new Vec3(cx, y + 1, cz));
+            if (above && (above.name === 'air' || above.name === 'cave_air')) {
+                return new Vec3(cx, y, cz);
+            }
+        }
+        return null;
+    };
+
+    // Bot's own column first (covers the "already on land but head submerged" edge case).
+    let result = checkColumn(startX, startZ);
+    if (result) return result;
+
+    // Chebyshev rings, perimeter only.
+    for (let r = 1; r <= range; r++) {
+        for (let dx = -r; dx <= r; dx++) {
+            result = checkColumn(startX + dx, startZ - r);
+            if (result) return result;
+            result = checkColumn(startX + dx, startZ + r);
+            if (result) return result;
+        }
+        for (let dz = -r + 1; dz <= r - 1; dz++) {
+            result = checkColumn(startX - r, startZ + dz);
+            if (result) return result;
+            result = checkColumn(startX + r, startZ + dz);
+            if (result) return result;
+        }
+    }
+    return null;
+}
+
+export async function goToNearestLand(bot, range=500) {
+    /**
+     * If the bot is in water, navigate to the nearest standable land. No-op if already on land.
+     * @returns {Promise<boolean>} true on success; false if no land was found.
+     **/
+    const pos = bot.entity.position;
+    const inWater = bot.entity.isInWater
+        || bot.blockAt(pos)?.name === 'water'
+        || bot.blockAt(pos.offset(0, 1, 0))?.name === 'water'
+        || bot.blockAt(pos.offset(0, -1, 0))?.name === 'water';
+    if (!inWater) {
+        log(bot, `Already on land.`);
+        return true;
+    }
+
+    const target = findNearestLand(bot, range);
+    if (!target) {
+        log(bot, `No land found within ${range} blocks.`);
+        return false;
+    }
+
+    log(bot, `Found land at ${target}. Navigating...`);
+    await goToPosition(bot, target.x, target.y + 1, target.z, 0);
+    return true;
+}
 // End of AH code
 
 export async function goToNearestBlock(bot, blockType,  min_distance=2, range=64) {
