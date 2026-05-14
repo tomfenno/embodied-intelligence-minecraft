@@ -385,6 +385,45 @@ export const command_verifiers = {
     },
   },
 
+  // ── Phase 7: bucket fill / use-on verifier ───────────────────────────
+  // `useToolOnBlock` (skills.js) calls `bot.activateItem()` and logs
+  // "Used <tool> on <block>" + returns true regardless of whether the
+  // server actually filled the bucket. Three independent failure modes
+  // (goToPosition stopped 3 blocks short; bot on top of source with
+  // bounding-box clipping the top face; look-update race with use_item
+  // packet) all collapse into silent success. The verifier reclassifies
+  // by checking that the expected filled-bucket item appears in
+  // inventory.
+  //
+  // Scope is intentionally narrow: only bucket-like tools targeting a
+  // mapped fluid/entity are verified. Non-bucket tools (shears, dye,
+  // flint_and_steel, etc.) and unmapped targets pass through — adding
+  // them here would require post-condition contracts the skill doesn't
+  // currently guarantee.
+
+  '!useOn': {
+    needs: new Set(['inventory']),
+    verify: ({args, pre, post}) => {
+      const tool = args?.[0];
+      const target = args?.[1];
+      if (typeof tool !== 'string' || typeof target !== 'string') {
+        return {ok: true, reason: 'unparseable_args'};
+      }
+      if (!BUCKET_TOOLS.has(tool)) {
+        return {ok: true, reason: 'non_bucket_tool'};
+      }
+      const filled = USEON_FILLED_BUCKET[target.toLowerCase()];
+      if (!filled) {
+        return {ok: true, reason: `unknown_useOn_target:${target}`};
+      }
+      const before = pre?.inventory?.[filled] ?? 0;
+      const after = post?.inventory?.[filled] ?? 0;
+      return after > before ?
+          {ok: true, reason: `${filled}_delta=${after - before}`} :
+          {ok: false, reason: 'bucket_unfilled'};
+    },
+  },
+
   '!equip': {
     needs: new Set(['equipment']),
     verify: ({args, post, agent}) => {
@@ -622,6 +661,26 @@ function verify_smelt(args, pre, post) {
       {ok: true, reason: `${output}_delta=${after - before}`} :
       {ok: false, reason: `no_${output}_delta`};
 }
+
+// Tools whose !useOn outcome is verified by a filled-bucket inventory
+// delta. Any other tool name (shears, dye, flint_and_steel, etc.) is
+// pass-through.
+const BUCKET_TOOLS = new Set([
+  'bucket', 'water_bucket', 'lava_bucket', 'milk_bucket',
+]);
+
+// Maps the !useOn target → the filled-bucket item the verifier expects
+// to appear in inventory. Targets not in this table are pass-through.
+// `cow`/`mooshroom` use bot.useOn(entity) rather than activateItem, so
+// they're verified for completeness — if a milking false-negative ever
+// surfaces, drop those entries (the silent-success problem is
+// specifically the block-target path).
+const USEON_FILLED_BUCKET = {
+  lava: 'lava_bucket',
+  water: 'water_bucket',
+  cow: 'milk_bucket',
+  mooshroom: 'milk_bucket',
+};
 
 const EMPTY_NEEDS = new Set();
 

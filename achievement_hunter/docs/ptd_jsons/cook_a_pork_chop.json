@@ -68,18 +68,18 @@
             "consumed": true
         },
         {
-            "from": "furnace",
-            "to": "cooked_porkchop",
-            "type": "workstation_dependency",
-            "qty": 1,
-            "consumed": false
-        },
-        {
             "from": "any_plank",
             "to": "cooked_porkchop",
             "type": "fuel_input",
             "qty": 1,
             "consumed": true
+        },
+        {
+            "from": "furnace",
+            "to": "cooked_porkchop",
+            "type": "workstation_dependency",
+            "qty": 1,
+            "consumed": false
         },
         {
             "from": "cobblestone",

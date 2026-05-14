@@ -42,7 +42,17 @@ export function get_am_state(agent) {
   const craftable_items = getCraftableItems(bot);
 
   const block_set = new Set();
-  for (const block of getNearestBlocks(bot)) {
+  // distance=16 (not default 8) to work around mineflayer's chunk-
+  // section iterator boundary: `findBlocks` only visits sections within
+  // L1 distance `ceil((distance + 8) / 16)` of the bot's section. At
+  // distance=8 the iterator radius is 1, which misses blocks just 3-4
+  // away when the bot is in one section and the target block is in a
+  // section that's 2 L1-steps away — common when the bot is at y=N and
+  // the target is at y=N-1 across a chunk-section boundary. distance=16
+  // pushes the iterator radius to 2 and reliably covers every section
+  // adjacent to the bot, so source lava etc. no longer disappear from
+  // state based on where the bot is standing relative to chunk borders.
+  for (const block of getNearestBlocks(bot, null, 16)) {
     if (COLLECTIBLE_LIQUIDS.has(block.name) && block.metadata !== 0) continue;
     block_set.add(block.name);
   }
@@ -69,7 +79,17 @@ export function get_nts_state(agent) {
   const craftable_items = getCraftableItems(bot);
 
   const block_set = new Set();
-  for (const block of getNearestBlocks(bot)) {
+  // distance=16 (not default 8) to work around mineflayer's chunk-
+  // section iterator boundary: `findBlocks` only visits sections within
+  // L1 distance `ceil((distance + 8) / 16)` of the bot's section. At
+  // distance=8 the iterator radius is 1, which misses blocks just 3-4
+  // away when the bot is in one section and the target block is in a
+  // section that's 2 L1-steps away — common when the bot is at y=N and
+  // the target is at y=N-1 across a chunk-section boundary. distance=16
+  // pushes the iterator radius to 2 and reliably covers every section
+  // adjacent to the bot, so source lava etc. no longer disappear from
+  // state based on where the bot is standing relative to chunk borders.
+  for (const block of getNearestBlocks(bot, null, 16)) {
     if (COLLECTIBLE_LIQUIDS.has(block.name) && block.metadata !== 0) continue;
     block_set.add(block.name);
   }

@@ -66,6 +66,13 @@
         },
         {
             "from": "any_plank",
+            "to": "stick",
+            "type": "crafting_input",
+            "qty": 4,
+            "consumed": true
+        },
+        {
+            "from": "any_plank",
             "to": "crafting_table",
             "type": "crafting_input",
             "qty": 4,
@@ -100,36 +107,8 @@
             "consumed": false
         },
         {
-            "from": "any_plank",
-            "to": "stick",
-            "type": "crafting_input",
-            "qty": 4,
-            "consumed": true
-        },
-        {
             "from": "stick",
             "to": "wooden_pickaxe",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
-        },
-        {
-            "from": "stick",
-            "to": "wooden_shovel",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
-        },
-        {
-            "from": "stick",
-            "to": "wooden_axe",
-            "type": "crafting_input",
-            "qty": 2,
-            "consumed": true
-        },
-        {
-            "from": "stick",
-            "to": "wooden_hoe",
             "type": "crafting_input",
             "qty": 2,
             "consumed": true
@@ -139,6 +118,13 @@
             "to": "wooden_pickaxe",
             "type": "crafting_input",
             "qty": 3,
+            "consumed": true
+        },
+        {
+            "from": "stick",
+            "to": "wooden_shovel",
+            "type": "crafting_input",
+            "qty": 2,
             "consumed": true
         },
         {
@@ -149,10 +135,24 @@
             "consumed": true
         },
         {
+            "from": "stick",
+            "to": "wooden_axe",
+            "type": "crafting_input",
+            "qty": 2,
+            "consumed": true
+        },
+        {
             "from": "any_plank",
             "to": "wooden_axe",
             "type": "crafting_input",
             "qty": 3,
+            "consumed": true
+        },
+        {
+            "from": "stick",
+            "to": "wooden_hoe",
+            "type": "crafting_input",
+            "qty": 2,
             "consumed": true
         },
         {

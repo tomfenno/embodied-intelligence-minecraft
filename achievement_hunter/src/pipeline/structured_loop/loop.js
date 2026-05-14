@@ -22,19 +22,19 @@ export async function structured_loop(models, agent, task_name, graph = null) {
   const bot = agent.bot;
 
   // This hard coded option to load a graph is intended. Do not remove.
-  const load_graph = false;
+  const load_graph = true;
   const graph_file_path =
       //    './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_diamond.json'
       //  './achievement_hunter/docs/ptd_jsons/bake_a_cake.json';
-      // `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
-      // `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
-      // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
-      //  './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
-      // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
-      // './achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
-      graph = load_graph ? await load_graph_from_file(graph_file_path) :
-                           await generate_primary_task_dag_self_refined(
-                               models, task_name, graph, log);
+      `./achievement_hunter/docs/ptd_jsons/get_a_lava_bucket.json`;
+  // `./achievement_hunter/docs/ptd_jsons/create_an_iron_golem.json`;
+  // './achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json';
+  //  './achievement_hunter/docs/ptd_jsons/smelt_an_iron_ingot.json';
+  // './achievement_hunter/docs/ptd_jsons/cook_a_porkchop.json';
+  // './achievement_hunter/docs/ptd_jsons/pick_up_a_diamond_from_the_ground.json'
+  graph = load_graph ? await load_graph_from_file(graph_file_path) :
+                       await generate_primary_task_dag_self_refined(
+                           models, task_name, graph, log);
   if (!graph) return;
 
   // Track death within this SPL run. When the bot dies the server cancels all

@@ -78,7 +78,16 @@ export async function craftRecipe(bot, itemName, num=1) {
                 // message so recovery can plan a larger relocation.
                 if (!pos) {
                     log(bot, `No free space within 6 blocks to place crafting_table; moving away to retry.`);
-                    await moveAway(bot, 5);
+                    try {
+                        await moveAway(bot, 5);
+                    } catch (err) {
+                        // Pathfinder failure during the recovery hop (e.g.
+                        // "Took to long to decide path"). Bot may have made
+                        // partial progress before the throw, so re-search
+                        // anyway rather than turning this into a
+                        // runner_exception the replanner can't act on.
+                        log(bot, `moveAway during craft recovery failed: ${err.message}. Retrying space search anyway.`);
+                    }
                     pos = world.getNearestFreeSpace(bot, 1, 6);
                     if (!pos) {
                         log(bot, `Crafting ${itemName} requires placing a crafting_table, but no free space was found within 6 blocks even after moving. Move to a more open area first.`);
@@ -2234,7 +2243,15 @@ export async function useToolOn(bot, toolName, targetName) {
 
     const distance = toolName === 'water_bucket' && block.name !== 'lava' ? 1.5 : 2;
     await goToPosition(bot, block.position.x, block.position.y, block.position.z, distance);
-    await bot.lookAt(block.position.offset(0.5, 0.5, 0.5));
+    // Start of AH code
+    // Sync lookAt (B1): force=true flushes the look packet immediately and
+    // waitForTicks(1) lets the server apply it before subsequent
+    // blockAtCursor reads / use_item packets. Without this, bot.lookAt can
+    // resolve before the look update propagates and downstream raycasts use
+    // stale pitch/yaw.
+    await bot.lookAt(block.position.offset(0.5, 0.5, 0.5), true);
+    await bot.waitForTicks(1);
+    // End of AH code
 
     // Proceed only if view is clear or bot is directly above the target.
     // If a wall blocks the view, dig through it rather than hunting for a lucky angle.
@@ -2256,12 +2273,60 @@ export async function useToolOn(bot, toolName, targetName) {
         }
         log(bot, `Breaking ${blockingBlock.name} to reach ${block.name}...`);
         await bot.dig(blockingBlock);
-        await bot.lookAt(block.position.offset(0.5, 0.5, 0.5));
+        await bot.lookAt(block.position.offset(0.5, 0.5, 0.5), true);
+        await bot.waitForTicks(1);
         if (viewBlocked() && !isAbove()) {
             const stillBlocking = bot.blockAtCursor(5);
             log(bot, `Block ${stillBlocking?.name ?? 'unknown'} is still in the way, not using ${toolName}.`);
             return false;
         }
+    }
+    // End of AH code
+
+    // Start of AH code
+    // B2: drift-conditional reposition + final lookAt re-sync for
+    // bucket-on-fluid. bot.activateItem() sends a use_item packet whose
+    // server-side raycast determines which block (if any) is targeted.
+    // The server's raycast handles fluid sources for bucket fills — we
+    // cannot pre-check client-side because mineflayer's raycast skips
+    // empty-shape blocks (lava/water boundingBox: 'empty', no shapes).
+    //
+    // What we can do:
+    //   1. If the bot has drifted from where goToPosition left it
+    //      (e.g. fell off, got pushed by a mob between goToPosition and
+    //      now), reposition once. Drift gate prevents a no-op reposition
+    //      when the bot is still in place.
+    //   2. Re-sync lookAt immediately before activate to minimize the
+    //      pitch/yaw drift window between the look update and the
+    //      use_item packet.
+    //
+    // Out-of-reach calls are intentionally NOT gated here — Layer A's
+    // verifier reclassifies silent failures as `bucket_unfilled`. A
+    // client-side reach check would risk false-positives on servers with
+    // extended interact distance (modded / paper / 1.20.5+ player
+    // attributes), and per the plan's earlier analysis is redundant
+    // with Layer A.
+    if (toolName.includes('bucket') &&
+        (block.name === 'lava' || block.name === 'water')) {
+        const target_pos = block.position.offset(0.5, 0.5, 0.5);
+        // Drift threshold = goToPosition's tolerance + small slack. If
+        // the bot is farther than this from the block, it has moved
+        // since goToPosition succeeded (or goToPosition gave up early;
+        // either way, repositioning is the right action).
+        const REPOS_DRIFT_THRESHOLD = distance + 0.5;
+        const drift = bot.entity.position.distanceTo(block.position);
+        if (drift > REPOS_DRIFT_THRESHOLD) {
+            log(bot, `Bot drifted (dist=${drift.toFixed(1)}, threshold ` +
+                `${REPOS_DRIFT_THRESHOLD}) from ${block.name} at ` +
+                `${block.position}; repositioning.`);
+            await goToPosition(
+                bot, block.position.x, block.position.y,
+                block.position.z, distance);
+        }
+        // Re-sync lookAt right before activate to minimize the window for
+        // pitch/yaw drift between look and use_item packet on the server.
+        await bot.lookAt(target_pos, true);
+        await bot.waitForTicks(2);
     }
     // End of AH code
 

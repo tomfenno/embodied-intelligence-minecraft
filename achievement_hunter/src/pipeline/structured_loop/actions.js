@@ -735,15 +735,15 @@ async function handle_search_action(
       await run_search(search_target, state, agent, log, attempt_number);
 
   if (found) {
-    const post_search_state = get_am_state(agent);
-    const target_reached =
-        check_search_complete(search_target, post_search_state);
-
+    // Trust run_search's `found` directly. We used to re-run
+    // check_search_complete here, but that was redundant with the
+    // identical check already performed inside run_search →
+    // execute_search_command; the two reads were back-to-back against
+    // the same state and only ever differed when the bot moved a tiny
+    // amount between them — a case the next AM iteration handles
+    // anyway.
     spl.log(`Search found "${search_target}", re-running AM with fresh state.`);
-
-    return target_reached ?
-        create_step_result(true, 'search_success', search_message) :
-        create_step_result(false, 'search_found_not_reached', search_message);
+    return create_step_result(true, 'search_success', search_message);
   }
 
   spl.warn(`Search exhausted all radii for "${search_target}", re-evaluating.`);

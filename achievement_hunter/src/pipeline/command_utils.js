@@ -4,6 +4,31 @@ import {extract_command_name, required_pre_state, snapshot_state, verify_command
 const MAX_MODE_INTERRUPTS = 5;
 const MODE_IDLE_TIMEOUT_MS = 30_000;
 
+// Shards whose value depends on a packet the server sends back (rather
+// than local bot state). When the verifier needs any of these, the
+// post-snapshot must wait briefly after the skill returns so the
+// server's response has time to land — otherwise the verifier reads
+// stale state and false-fails commands that actually succeeded.
+//
+// Observed symptom: !useOn("bucket", "lava") completing fills server-
+// side, but the inventory update packet arrives after the skill's
+// activateItem promise resolves. The verifier post-snapshot fires
+// immediately, sees no lava_bucket delta, reclassifies as failure.
+// The SPL retries; by the time attempt 2's snapshots run, both
+// inventory updates have arrived and the bot ends up with two filled
+// buckets when only one was needed.
+//
+// `position` is intentionally excluded — bot.entity.position updates
+// locally as physics ticks, no server-roundtrip required.
+const SERVER_DRIVEN_SHARDS =
+    new Set(['inventory', 'equipment', 'nearby_blocks', 'nearby_entities']);
+
+// Ticks (50 ms each) to wait between a successful skill call and the
+// verifier's post-snapshot, when the verifier needs a server-driven
+// shard. 4 ticks ≈ 200 ms — covers typical inventory-update roundtrips
+// on local servers without meaningfully slowing down rollouts.
+const VERIFIER_SETTLE_TICKS = 4;
+
 const log = (...args) => console.log('[SPL][cmd]', ...args);
 const warn = (...args) => console.warn('[SPL][cmd]', ...args);
 
@@ -71,6 +96,18 @@ export async function executeCommandWithModeRecovery(
       // verifiers with `needs: new Set()` (e.g. !goToSurface, which
       // reads surroundings directly off `agent`) are still consulted —
       // we don't gate on `verifier_needs.size > 0`.
+      //
+      // Settle wait: if the verifier reads a server-driven shard,
+      // wait a few ticks before snapshotting so server response
+      // packets (inventory updates after !useOn / !attack /
+      // !collectBlocks, equipment changes after !equip, etc.) have
+      // time to land. Without this, the verifier races the network
+      // and false-fails commands that actually succeeded.
+      const needs_settle = [...verifier_needs].some(
+          shard => SERVER_DRIVEN_SHARDS.has(shard));
+      if (needs_settle) {
+        await agent.bot.waitForTicks(VERIFIER_SETTLE_TICKS);
+      }
       const verifier_post_state = snapshot_state(agent, verifier_needs);
       const verdict = verify_command_outcome(
           command, verifier_pre_state, verifier_post_state, agent);
