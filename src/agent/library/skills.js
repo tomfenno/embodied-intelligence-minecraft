@@ -65,6 +65,27 @@ export async function craftRecipe(bot, itemName, num=1) {
             let hasTable = world.getInventoryCounts(bot)['crafting_table'] > 0;
             if (hasTable) {
                 let pos = world.getNearestFreeSpace(bot, 1, 6);
+                // Start of AH code
+                // getNearestFreeSpace returns undefined when no 1x1 free
+                // space exists within range (cramped caves, surrounded by
+                // non-air on all sides). Without this guard the next line
+                // throws "Cannot read properties of undefined (reading 'x')"
+                // — a runner_exception that the replanner can't act on.
+                // Try a small moveAway-and-retry to escape wedge cases
+                // automatically; moveAway uses the pathfinder which can
+                // navigate where the strict block-criteria check can't see
+                // past. If still no space after the move, surface a real
+                // message so recovery can plan a larger relocation.
+                if (!pos) {
+                    log(bot, `No free space within 6 blocks to place crafting_table; moving away to retry.`);
+                    await moveAway(bot, 5);
+                    pos = world.getNearestFreeSpace(bot, 1, 6);
+                    if (!pos) {
+                        log(bot, `Crafting ${itemName} requires placing a crafting_table, but no free space was found within 6 blocks even after moving. Move to a more open area first.`);
+                        return false;
+                    }
+                }
+                // End of AH code
                 await placeBlock(bot, 'crafting_table', pos.x, pos.y, pos.z);
                 craftingTable = world.getNearestBlock(bot, 'crafting_table', craftingTableRange);
                 if (craftingTable) {
