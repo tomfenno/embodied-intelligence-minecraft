@@ -142,9 +142,26 @@ async function run_action(action, agent, log, searched_targets) {
     const env_result = await executeCommandWithModeRecovery(agent, command);
     await sleep(ACTION_DEBOUNCE_MS);
     const success = env_result?.success === true;
-    return create_action_result(
-        command, success, success ? 'command_success' : 'command_failure',
-        env_result?.message ?? null);
+    // Preserve mode-interrupt classification: when the wrapper hit the
+    // mode-recovery cap, env_result.mode_interrupted is true and carries
+    // per-mode tallies + bot displacement. Surface those as kind
+    // 'mode_interrupted' with the structured fields so the replanner's
+    // mode-aware reasoning branch fires for recovery actions too — the
+    // SPL outer loop in actions.js already does this; without this
+    // mirror the same env_result shape collapses to plain
+    // 'command_failure' inside recovery plans.
+    const mode_interrupted = env_result?.mode_interrupted === true;
+    const kind = success
+        ? 'command_success'
+        : (mode_interrupted ? 'mode_interrupted' : 'command_failure');
+    const result = create_action_result(
+        command, success, kind, env_result?.message ?? null);
+    if (mode_interrupted) {
+      result.mode_interrupt_counts = env_result.mode_interrupt_counts;
+      result.position_before = env_result.position_before;
+      result.position_after = env_result.position_after;
+    }
+    return result;
   } catch (e) {
     return create_action_result(command, false, 'runner_exception', String(e));
   }

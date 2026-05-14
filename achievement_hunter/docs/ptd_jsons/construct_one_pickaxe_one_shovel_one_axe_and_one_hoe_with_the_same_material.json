@@ -20,15 +20,15 @@
             "acquisition_dependency": "none"
         },
         {
-            "id": "stick",
-            "qty": 8,
-            "item_type": "item",
-            "acquisition_dependency": "none"
-        },
-        {
             "id": "crafting_table",
             "qty": 1,
             "item_type": "workstation",
+            "acquisition_dependency": "none"
+        },
+        {
+            "id": "stick",
+            "qty": 8,
+            "item_type": "item",
             "acquisition_dependency": "none"
         },
         {
@@ -66,14 +66,14 @@
         },
         {
             "from": "any_plank",
-            "to": "stick",
+            "to": "crafting_table",
             "type": "crafting_input",
             "qty": 4,
             "consumed": true
         },
         {
             "from": "any_plank",
-            "to": "crafting_table",
+            "to": "stick",
             "type": "crafting_input",
             "qty": 4,
             "consumed": true

@@ -16,6 +16,12 @@ You receive:
 2. `previous_diagnoses`
    Notes from earlier failed recovery attempts for this same task. Use these to avoid repeating unsuccessful strategies and to preserve useful discoveries. If `previous_diagnoses` is empty, this is the first recovery attempt; reason directly from `failed_trace` without assuming any prior recovery actions.
 
+   Each entry contains:
+   - `attempt`: the recovery attempt number (1-indexed).
+   - `diagnosis`: the prior rationale.
+   - `actions`: the executed plan.
+   - `results`: per-action outcomes for that attempt, in execution order: `{command, success, kind, message}`. `kind` may include `command_success`, `command_failure`, `mode_interrupted`, `runner_exception`, `search_success`, `search_exhausted`, `search_found_not_reached`, `search_already_attempted`, or `invalid_command`. Read `results` together with `actions` to see what each step actually did rather than only what was planned. May be `null` if the attempt did not execute any actions before bailing.
+
 3. `available_actions`
    A JSON array of executable action definitions. Each action includes a name, description, category, constraints, and examples. Every action you output must use one of these action names. There are no custom actions. Use the examples to match exact command-call syntax.
 
