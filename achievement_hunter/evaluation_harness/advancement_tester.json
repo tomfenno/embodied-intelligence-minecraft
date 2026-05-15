@@ -4,7 +4,7 @@
     "goal": "Smelt an Iron Ingot. Have an iron ingot in the inventory.",
     "target": "iron_ingot",
     "agent_count": 1,
-    "timeout": 1200
+    "timeout": 900
   },
   "hot_stuff": {
     "type": "inventory",
@@ -38,12 +38,19 @@
       }
     ],
     "agent_count": 1,
-    "timeout": 1200
+    "timeout": 600
   },
   "pork_chop": {
     "type": "inventory",
     "goal": "Cook a pork chop.",
     "target": "cooked_porkchop",
+    "agent_count": 1,
+    "timeout": 900
+  },
+  "shiny": {
+    "type": "inventory",
+    "goal": "Acquire a diamond chestplate. Have a diamond chestplate in the inventory.",
+    "target": "diamond_chestplate",
     "agent_count": 1,
     "timeout": 1200
   }
