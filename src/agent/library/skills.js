@@ -629,7 +629,16 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
         }
         catch (err) {
             if (err.name === 'NoChests') {
-                log(bot, `Failed to collect ${blockType}: Inventory full, no place to deposit.`);
+                // Start of AH code — reworded from "Failed to collect ...: Inventory full"
+                // so the line doesn't contradict the trailing "Collected N X" headline
+                // when the loop has already collected at least one block before the
+                // inventory filled. The "Inventory full" substring is preserved so
+                // achievement_hunter/src/pipeline/structured_loop/result_messages.js
+                // INVENTORY_FULL_RE (case-insensitive substring match) and the
+                // dependency_error_classifier `collect.inv_full` template (updated
+                // in lockstep) continue to fire.
+                log(bot, `Stopped collecting ${blockType}: Inventory full, no place to deposit.`);
+                // End of AH code
                 break;
             }
             else if (err.name === 'NoChest' || err.name === 'NoItem') {
@@ -641,7 +650,15 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
                 return false;
             }
             else {
-                log(bot, `Failed to collect ${blockType}: ${err}.`);
+                // Start of AH code — reworded from "Failed to collect ...: ${err}"
+                // so the per-iteration message (which precedes `continue`) doesn't
+                // contradict the trailing "Collected N X" headline when other
+                // iterations succeed. "Could not reach" is accurate in both partial-
+                // success (some reachable, this one wasn't) and total-failure (none
+                // reachable across N attempts) cases. dependency_error_classifier's
+                // `collect.failed_err` template is updated in lockstep.
+                log(bot, `Could not reach ${blockType}: ${err}.`);
+                // End of AH code
                 continue;
             }
         }
