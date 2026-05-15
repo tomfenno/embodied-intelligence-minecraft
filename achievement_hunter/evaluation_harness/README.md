@@ -95,3 +95,24 @@ node achievement_hunter/evaluation_harness/merge_results.js \
   --input path/to/results_a.jsonl \
   --input path/to/results_b.jsonl
 ```
+
+Recommended workflow:
+
+1. Run disjoint seed shards on each machine into separate suite directories.
+2. Share either the shard `results.jsonl` files or the full shard directories.
+3. Merge those shard outputs on one machine with `merge_results.js`.
+4. Use the merged `per_task.csv` and `summary.csv` for Excel/figure generation.
+
+Artifact roles:
+
+- `results.jsonl` is the canonical compact per-episode dataset used for merging.
+- `per_task.csv` is a derived task-level summary with only:
+  `agent_label, task_id, runs, successful_runs, success_rate, avg_episode_duration_seconds, total_commands`
+- `summary.csv` is a derived per-agent summary with only:
+  `agent_label, runs, successful_runs, success_rate, avg_episode_duration_seconds, total_commands`
+- Per-episode directories still keep `episode_manifest.json` and raw logs for
+  debugging, but you do not need per-directory CSVs.
+
+The merge command rejects duplicate `agent_label x seed x task_id` episodes
+across different inputs so overlapping shards do not silently overwrite each
+other.

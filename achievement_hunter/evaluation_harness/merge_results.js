@@ -6,6 +6,7 @@ import {hideBin} from 'yargs/helpers';
 
 import {
   appendOrReplaceManifest,
+  buildEpisodeKey,
   loadJsonl,
   writeResultsJsonl,
   writeSummaryReports,
@@ -34,8 +35,19 @@ const argv = await yargs(hideBin(process.argv))
 
 try {
   const manifests = [];
-  for (const inputValue of argv.input) {
-    for (const manifest of loadInputManifests(resolveProjectPath(inputValue))) {
+  const seenInputByKey = new Map();
+  for (const [inputIndex, inputValue] of argv.input.entries()) {
+    const inputPath = resolveProjectPath(inputValue);
+    const inputSource = `input[${inputIndex + 1}] ${inputPath}`;
+    for (const manifest of dedupeInputManifests(loadInputManifests(inputPath))) {
+      const episodeKey = buildEpisodeKey(manifest);
+      const priorInput = seenInputByKey.get(episodeKey);
+      if (priorInput) {
+        throw new Error(
+            `Duplicate benchmark episode across merge inputs for ${episodeKey}: ` +
+            `${priorInput} and ${inputSource}`);
+      }
+      seenInputByKey.set(episodeKey, inputSource);
       const next = appendOrReplaceManifest(manifests, manifest);
       manifests.splice(0, manifests.length, ...next);
     }
@@ -71,4 +83,12 @@ function loadInputManifests(inputPath) {
     manifests.push(JSON.parse(fs.readFileSync(filePath, 'utf8')));
   }
   return manifests;
+}
+
+function dedupeInputManifests(manifests) {
+  let deduped = [];
+  for (const manifest of manifests) {
+    deduped = appendOrReplaceManifest(deduped, manifest);
+  }
+  return deduped;
 }

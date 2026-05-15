@@ -3,19 +3,38 @@ import path from 'path';
 
 import {readJson, walkFiles} from './utils.js';
 
-export function appendOrReplaceManifest(manifests, newManifest) {
-  const key = [
-    newManifest.agent_label,
-    newManifest.seed,
-    newManifest.task_id,
+const PER_TASK_HEADERS = [
+  'agent_label',
+  'task_id',
+  'runs',
+  'successful_runs',
+  'success_rate',
+  'avg_episode_duration_seconds',
+  'total_commands',
+];
+
+const SUMMARY_HEADERS = [
+  'agent_label',
+  'runs',
+  'successful_runs',
+  'success_rate',
+  'avg_episode_duration_seconds',
+  'total_commands',
+];
+
+export function buildEpisodeKey(record) {
+  return [
+    record.agent_label,
+    record.seed,
+    record.task_id,
   ].join('::');
+}
+
+export function appendOrReplaceManifest(manifests, newManifest) {
+  const key = buildEpisodeKey(newManifest);
 
   const filtered = manifests.filter((manifest) => {
-    return [
-      manifest.agent_label,
-      manifest.seed,
-      manifest.task_id,
-    ].join('::') !== key;
+    return buildEpisodeKey(manifest) !== key;
   });
   filtered.push(newManifest);
   filtered.sort((a, b) => {
@@ -57,9 +76,23 @@ export function loadJsonl(filePath) {
       .map((line) => JSON.parse(line));
 }
 
+export function normalizeEpisodeRecord(record) {
+  return {
+    agent_label: record.agent_label,
+    seed: record.seed,
+    task_id: record.task_id,
+    success: normalizeSuccess(record),
+    episode_duration_seconds:
+        normalizeNumber(record.episode_duration_seconds),
+    total_commands:
+        normalizeNumber(record.total_commands ??
+            record.dependency_total_commands),
+  };
+}
+
 export function writeResultsJsonl(resultsPath, manifests) {
   const content = manifests
-      .map((manifest) => JSON.stringify(manifest))
+      .map((manifest) => JSON.stringify(normalizeEpisodeRecord(manifest)))
       .join('\n');
   fs.writeFileSync(resultsPath, `${content}${content ? '\n' : ''}`, 'utf8');
 }
@@ -68,178 +101,65 @@ export function writeSummaryReports(suiteRoot, manifests) {
   const perTaskRows = new Map();
   const summaryRows = new Map();
 
-  for (const manifest of manifests) {
-    const success = Number((manifest.score ?? 0) >= 1);
-    const durationSeconds = manifest.episode_duration_seconds ?? 0;
-    const dependencyFailures = manifest.dependency_failures ?? 0;
-    const totalCommands = manifest.dependency_total_commands ?? 0;
-    const unparseable = manifest.dependency_unparseable_command_records ?? 0;
-    const trustedAvailable = manifest.trusted_dependency_available === true;
-    const trustedDependencyFailures =
-        manifest.trusted_dependency_failures ?? 0;
-    const trustedTotalCommands =
-        manifest.trusted_dependency_total_commands ?? 0;
-    const trustedIncidents = manifest.trusted_dependency_incidents ?? 0;
-    const trustedAmbiguousEvents =
-        manifest.trusted_dependency_ambiguous_events ?? 0;
-    const target = serializeMetadataValue(manifest.target);
-    const targetAnyOf = serializeMetadataValue(manifest.target_any_of);
-
-    const perTaskKey = [
-      manifest.agent_label,
-      manifest.agent_name,
-      manifest.mode,
-      manifest.task_id,
-      manifest.task_type,
-      target,
-      targetAnyOf,
-    ].join('::');
+  for (const manifest of manifests.map(normalizeEpisodeRecord)) {
+    const perTaskKey = [manifest.agent_label, manifest.task_id].join('::');
     if (!perTaskRows.has(perTaskKey)) {
       perTaskRows.set(perTaskKey, {
         agent_label: manifest.agent_label,
-        agent_name: manifest.agent_name,
-        mode: manifest.mode,
         task_id: manifest.task_id,
-        task_type: manifest.task_type,
-        target,
-        target_any_of: targetAnyOf,
         runs: 0,
         successful_runs: 0,
         total_episode_duration_seconds: 0,
-        total_dependency_failures: 0,
         total_commands: 0,
-        total_unparseable_command_records: 0,
-        trusted_dependency_available_runs: 0,
-        trusted_dependency_failures: 0,
-        trusted_dependency_total_commands: 0,
-        trusted_dependency_incidents: 0,
-        trusted_dependency_ambiguous_events: 0,
       });
     }
     const perTaskRow = perTaskRows.get(perTaskKey);
     perTaskRow.runs += 1;
-    perTaskRow.successful_runs += success;
-    perTaskRow.total_episode_duration_seconds += durationSeconds;
-    perTaskRow.total_dependency_failures += dependencyFailures;
-    perTaskRow.total_commands += totalCommands;
-    perTaskRow.total_unparseable_command_records += unparseable;
-    perTaskRow.trusted_dependency_available_runs += trustedAvailable ? 1 : 0;
-    perTaskRow.trusted_dependency_failures += trustedDependencyFailures;
-    perTaskRow.trusted_dependency_total_commands += trustedTotalCommands;
-    perTaskRow.trusted_dependency_incidents += trustedIncidents;
-    perTaskRow.trusted_dependency_ambiguous_events += trustedAmbiguousEvents;
+    perTaskRow.successful_runs += manifest.success;
+    perTaskRow.total_episode_duration_seconds +=
+        manifest.episode_duration_seconds;
+    perTaskRow.total_commands += manifest.total_commands;
 
-    const summaryKey =
-        [manifest.agent_label, manifest.agent_name, manifest.mode].join('::');
+    const summaryKey = manifest.agent_label;
     if (!summaryRows.has(summaryKey)) {
       summaryRows.set(summaryKey, {
         agent_label: manifest.agent_label,
-        agent_name: manifest.agent_name,
-        mode: manifest.mode,
         runs: 0,
         successful_runs: 0,
         total_episode_duration_seconds: 0,
-        total_dependency_failures: 0,
         total_commands: 0,
-        total_unparseable_command_records: 0,
-        trusted_dependency_available_runs: 0,
-        trusted_dependency_failures: 0,
-        trusted_dependency_total_commands: 0,
-        trusted_dependency_incidents: 0,
-        trusted_dependency_ambiguous_events: 0,
       });
     }
     const summaryRow = summaryRows.get(summaryKey);
     summaryRow.runs += 1;
-    summaryRow.successful_runs += success;
-    summaryRow.total_episode_duration_seconds += durationSeconds;
-    summaryRow.total_dependency_failures += dependencyFailures;
-    summaryRow.total_commands += totalCommands;
-    summaryRow.total_unparseable_command_records += unparseable;
-    summaryRow.trusted_dependency_available_runs += trustedAvailable ? 1 : 0;
-    summaryRow.trusted_dependency_failures += trustedDependencyFailures;
-    summaryRow.trusted_dependency_total_commands += trustedTotalCommands;
-    summaryRow.trusted_dependency_incidents += trustedIncidents;
-    summaryRow.trusted_dependency_ambiguous_events += trustedAmbiguousEvents;
+    summaryRow.successful_runs += manifest.success;
+    summaryRow.total_episode_duration_seconds +=
+        manifest.episode_duration_seconds;
+    summaryRow.total_commands += manifest.total_commands;
   }
 
-  writeCsv(path.join(suiteRoot, 'per_task.csv'), [
-    'agent_label',
-    'agent_name',
-    'mode',
-    'task_id',
-    'task_type',
-    'target',
-    'target_any_of',
-    'runs',
-    'successful_runs',
-    'success_rate',
-    'avg_episode_duration_seconds',
-    'total_dependency_failures',
-    'total_commands',
-    'dependency_error_rate',
-    'total_unparseable_command_records',
-    'trusted_dependency_available',
-    'trusted_dependency_available_runs',
-    'trusted_dependency_failures',
-    'trusted_dependency_total_commands',
-    'trusted_dependency_error_rate',
-    'trusted_dependency_incidents',
-    'trusted_dependency_ambiguous_events',
-  ], [...perTaskRows.values()].sort((a, b) => {
-    return compareTuple(
-        [a.agent_label, a.task_id],
-        [b.agent_label, b.task_id]);
-  }).map((row) => formatSummaryRow(row)));
+  writeCsv(path.join(suiteRoot, 'per_task.csv'), PER_TASK_HEADERS,
+      [...perTaskRows.values()].sort((a, b) => {
+        return compareTuple(
+            [a.agent_label, a.task_id],
+            [b.agent_label, b.task_id]);
+      }).map((row) => formatAggregateRow(row)));
 
-  writeCsv(path.join(suiteRoot, 'summary.csv'), [
-    'agent_label',
-    'agent_name',
-    'mode',
-    'runs',
-    'successful_runs',
-    'success_rate',
-    'avg_episode_duration_seconds',
-    'total_dependency_failures',
-    'total_commands',
-    'dependency_error_rate',
-    'total_unparseable_command_records',
-    'trusted_dependency_available',
-    'trusted_dependency_available_runs',
-    'trusted_dependency_failures',
-    'trusted_dependency_total_commands',
-    'trusted_dependency_error_rate',
-    'trusted_dependency_incidents',
-    'trusted_dependency_ambiguous_events',
-  ], [...summaryRows.values()].sort((a, b) => {
-    return compareTuple(
-        [a.agent_label, a.agent_name],
-        [b.agent_label, b.agent_name]);
-  }).map((row) => formatSummaryRow(row)));
+  writeCsv(path.join(suiteRoot, 'summary.csv'), SUMMARY_HEADERS,
+      [...summaryRows.values()].sort((a, b) => {
+        return compareTuple(
+            [a.agent_label],
+            [b.agent_label]);
+      }).map((row) => formatAggregateRow(row)));
 }
 
-export function serializeMetadataValue(value) {
-  if (value == null) return '';
-  if (typeof value === 'object') return JSON.stringify(value);
-  return String(value);
-}
-
-function formatSummaryRow(row) {
+function formatAggregateRow(row) {
   const runs = row.runs || 0;
-  const totalCommands = row.total_commands || 0;
-  const trustedTotalCommands = row.trusted_dependency_total_commands || 0;
   return {
     ...row,
     success_rate: runs === 0 ? 0 : row.successful_runs / runs,
     avg_episode_duration_seconds:
         runs === 0 ? 0 : row.total_episode_duration_seconds / runs,
-    dependency_error_rate:
-        totalCommands === 0 ? 0 : row.total_dependency_failures / totalCommands,
-    trusted_dependency_available:
-        runs > 0 && row.trusted_dependency_available_runs === runs ? 1 : 0,
-    trusted_dependency_error_rate: trustedTotalCommands === 0 ?
-        0 :
-        row.trusted_dependency_failures / trustedTotalCommands,
   };
 }
 
@@ -268,4 +188,23 @@ function compareTuple(aTuple, bTuple) {
     if (aValue > bValue) return 1;
   }
   return 0;
+}
+
+function normalizeSuccess(record) {
+  if (record.success != null) {
+    const value = String(record.success).trim().toLowerCase();
+    if (value === '1' || value === 'true') return 1;
+    if (value === '0' || value === 'false') return 0;
+    const numeric = Number(record.success);
+    if (Number.isFinite(numeric)) {
+      return numeric >= 1 ? 1 : 0;
+    }
+  }
+
+  return Number((record.score ?? 0) >= 1);
+}
+
+function normalizeNumber(value) {
+  const numeric = Number(value ?? 0);
+  return Number.isFinite(numeric) ? numeric : 0;
 }
