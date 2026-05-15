@@ -4,7 +4,7 @@ import pf from 'mineflayer-pathfinder';
 import Vec3 from 'vec3';
 import settings from "../../../settings.js";
 // Start of AH code
-import {compute_collect_delta, VERIFIER_SETTLE_TICKS}
+import {compute_collect_delta, inventory_delta_positive, VERIFIER_SETTLE_TICKS}
     from '../../../achievement_hunter/src/pipeline/inventory_drops.js';
 // End of AH code
 
@@ -445,6 +445,9 @@ export async function attackEntity(bot, entity, kill=true) {
         await bot.attack(entity);
     }
     else {
+        // Start of AH code
+        const inv_before = world.getInventoryCounts(bot);
+        // End of AH code
         bot.pvp.attack(entity);
         while (world.getNearbyEntities(bot, 24).includes(entity)) {
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -454,7 +457,21 @@ export async function attackEntity(bot, entity, kill=true) {
             }
         }
         log(bot, `Successfully killed ${entity.name}.`);
-        await pickupNearbyItems(bot);
+        // Start of AH code
+        // Capture pickups via inventory delta — vanilla auto-pickup during combat
+        // can claim drops before pickupNearbyItems even runs, so its iteration
+        // counter is unreliable. Snapshot was taken before bot.pvp.attack above.
+        await pickupNearbyItems(bot, {suppress_log: true});
+        try {
+            await bot.waitForTicks(VERIFIER_SETTLE_TICKS);
+        } catch (e) { /* bot may have disconnected; fall through */ }
+        const inv_after = world.getInventoryCounts(bot);
+        const gained = inventory_delta_positive(inv_after, inv_before);
+        const parts = Object.entries(gained)
+            .sort((a, b) => b[1] - a[1])
+            .map(([k, v]) => `${v} ${k}`);
+        log(bot, parts.length ? `Picked up ${parts.join(', ')}.` : `Picked up 0 items.`);
+        // End of AH code
         return true;
     }
 }
@@ -546,6 +563,12 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
     // Start of AH code — pre-collect inventory snapshot for accurate Collected headline
     // (see achievement_hunter/docs/messages/collectblocks-count-and-item-mismatch.md).
     const inv_before = world.getInventoryCounts(bot);
+    // Buffer per-iteration "Could not reach" messages instead of logging directly.
+    // When the loop ends with collected >= num, the request was fully satisfied
+    // and transient pathfinding retries are noise the agent doesn't need. When
+    // collected < num, flush the dedupped buffer so the agent can see why the
+    // request fell short.
+    const unreachable_msgs = [];
     // End of AH code
 
     for (let i=0; i<num; i++) {
@@ -611,7 +634,13 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
         try {
             let success = false;
             if (isLiquid) {
-                success = await useToolOnBlock(bot, 'bucket', block);
+                // Start of AH code — {quiet:true} suppresses useToolOnBlock's own
+                // "Collected N <fluid>_bucket." / "Could not fill ..." outcome line
+                // because the end-of-loop compute_collect_delta headline below
+                // already reports the actual inventory delta. Without quiet the
+                // success case logs the same headline twice.
+                success = await useToolOnBlock(bot, 'bucket', block, {quiet: true});
+                // End of AH code
             }
             else if (mc.mustCollectManually(blockType)) {
                 await goToPosition(bot, block.position.x, block.position.y, block.position.z, 2);
@@ -657,7 +686,9 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
                 // success (some reachable, this one wasn't) and total-failure (none
                 // reachable across N attempts) cases. dependency_error_classifier's
                 // `collect.failed_err` template is updated in lockstep.
-                log(bot, `Could not reach ${blockType}: ${err}.`);
+                // Buffer rather than log directly: the message is only flushed at
+                // the end of the loop when collected < num (see flush block below).
+                unreachable_msgs.push(`Could not reach ${blockType}: ${err}.`);
                 // End of AH code
                 continue;
             }
@@ -670,7 +701,16 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
     // reports the drop item the bot actually received (e.g. "cobblestone" not "stone").
     // Falls back to the legacy counter-based headline on any error or when the bot
     // is dying, so a snapshot failure never swallows the success signal.
+    //
+    // The flush decision for unreachable_msgs (below) uses the inventory delta
+    // primary_count rather than the local `collected` counter. Reason:
+    // bot.collectBlock.collect() can pick up more blocks than the iteration count
+    // (cluster digs / auto-pickup of nearby drops), so `collected` can undercount
+    // the actual outcome. Using the inventory delta makes "request satisfied?"
+    // match reality, so we don't flush noise lines when the agent did get
+    // everything it asked for.
     let headline = `Collected ${collected} ${blockType}.`;
+    let satisfied_count = collected;
     try {
         if (!bot._ah_death_pending) {
             await bot.waitForTicks(VERIFIER_SETTLE_TICKS);
@@ -678,6 +718,7 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
         const inv_after = world.getInventoryCounts(bot);
         const {primary_item, primary_count, extras} =
             compute_collect_delta(blockType, inv_before, inv_after);
+        satisfied_count = primary_count;
         const extras_str = Object.entries(extras)
             .sort((a, b) => b[1] - a[1])
             .map(([k, v]) => `+${v} ${k}`).join(', ');
@@ -688,15 +729,27 @@ export async function collectBlock(bot, blockType, num=1, exclude=null) {
         // Snapshot or settle-wait failed (typically: bot disconnected mid-loop).
         // Keep the legacy headline computed above so the success signal survives.
     }
+    // Flush buffered "Could not reach" messages only when the request was not
+    // fully satisfied (per the actual inventory delta — see comment above).
+    // Dedup so repeated identical pathfinder timeouts collapse to a single line.
+    if (satisfied_count < num && unreachable_msgs.length > 0) {
+        const seen = new Set();
+        for (const msg of unreachable_msgs) {
+            if (seen.has(msg)) continue;
+            seen.add(msg);
+            log(bot, msg);
+        }
+    }
     log(bot, headline);
     return collected > 0;
     // End of AH code
 }
 
-export async function pickupNearbyItems(bot) {
+export async function pickupNearbyItems(bot, options = {}) {
     /**
      * Pick up all nearby items.
      * @param {MinecraftBot} bot, reference to the minecraft bot.
+     * @param {{suppress_log?: boolean}} [options] - if suppress_log, skip the trailing "Picked up N items." log so the caller can emit a delta-based message instead.
      * @returns {Promise<boolean>} true if the items were picked up, false otherwise.
      * @example
      * await skills.pickupNearbyItems(bot);
@@ -718,7 +771,11 @@ export async function pickupNearbyItems(bot) {
         }
         pickedUp++;
     }
-    log(bot, `Picked up ${pickedUp} items.`);
+    // Start of AH code
+    if (!options.suppress_log) {
+        log(bot, `Picked up ${pickedUp} items.`);
+    }
+    // End of AH code
     return true;
 }
 
@@ -948,16 +1005,27 @@ export async function placeBlock(bot, blockType, x, y, z, placeOn='bottom', dont
             return true;
         }
     } catch (err) {
+        // Start of AH code
+        // bot.placeBlock can throw even when the block was actually placed (see comment above).
+        // Re-check the world state before reporting failure to avoid false "Failed to place" messages.
+        const placed = bot.blockAt(target_dest);
+        if (placed && placed.name === blockType) {
+            log(bot, `Placed ${blockType} at ${target_dest}.`);
+            await new Promise(resolve => setTimeout(resolve, 200));
+            return true;
+        }
+        // End of AH code
         log(bot, `Failed to place ${blockType} at ${target_dest}.`);
         return false;
     }
 }
 
-export async function equip(bot, itemName) {
+export async function equip(bot, itemName, options = {}) {
     /**
      * Equip the given item to the proper body part, like tools or armor.
      * @param {MinecraftBot} bot, reference to the minecraft bot.
      * @param {string} itemName, the item or block name to equip.
+     * @param {{quiet?: boolean}} [options] - if quiet, skip the trailing "Equipped X." log (internal callers like useToolOnBlock pass this).
      * @returns {Promise<boolean>} true if the item was equipped, false otherwise.
      * @example
      * await skills.equip(bot, "iron_pickaxe");
@@ -996,7 +1064,11 @@ export async function equip(bot, itemName) {
     else {
         await bot.equip(item, 'hand');
     }
-    log(bot, `Equipped ${itemName}.`);
+    // Start of AH code
+    if (!options.quiet) {
+        log(bot, `Equipped ${itemName}.`);
+    }
+    // End of AH code
     return true;
 }
 
@@ -1261,16 +1333,23 @@ export async function goToGoal(bot, goal) {
     // through.
     const pathfind_timeout = 15000;
     // End of AH code
+    // Start of AH code — defer the path-status log until the navigation outcome
+    // is known. On success the log is pure progress chatter (the agent only
+    // cares that it arrived) and just consumes prompt tokens. On failure the
+    // log is informative context (no-path vs slow-path) so we flush it before
+    // rethrowing.
+    let deferred_path_log = null;
     if (await bot.pathfinder.getPathTo(nonDestructiveMovements, goal, pathfind_timeout).status === 'success') {
         final_movements = nonDestructiveMovements;
-        log(bot, `Found non-destructive path.`);
+        deferred_path_log = `Found non-destructive path.`;
     }
     else if (await bot.pathfinder.getPathTo(destructiveMovements, goal, pathfind_timeout).status === 'success') {
-        log(bot, `Found destructive path.`);
+        deferred_path_log = `Found destructive path.`;
     }
     else {
-        log(bot, `Path not found, but attempting to navigate anyway using destructive movements.`);
+        deferred_path_log = `Path not found, but attempting to navigate anyway using destructive movements.`;
     }
+    // End of AH code
 
     const doorCheckInterval = startDoorInterval(bot);
 
@@ -1281,6 +1360,10 @@ export async function goToGoal(bot, goal) {
         return true;
     } catch (err) {
         clearInterval(doorCheckInterval);
+        // Start of AH code — flush the deferred path-status log on failure so
+        // diagnostic context survives the rethrow.
+        if (deferred_path_log) log(bot, deferred_path_log);
+        // End of AH code
         // we need to catch so we can clean up the door check interval, then rethrow the error
         throw err;
     }
@@ -1352,7 +1435,7 @@ function startDoorInterval(bot) {
     return doorCheckInterval;
 }
 
-export async function goToPosition(bot, x, y, z, min_distance=2) {
+export async function goToPosition(bot, x, y, z, min_distance=2, options = {}) {
     /**
      * Navigate to the given position.
      * @param {MinecraftBot} bot, reference to the minecraft bot.
@@ -1360,6 +1443,7 @@ export async function goToPosition(bot, x, y, z, min_distance=2) {
      * @param {number} y, the y coordinate to navigate to. If null, the bot's current y coordinate will be used.
      * @param {number} z, the z coordinate to navigate to. If null, the bot's current z coordinate will be used.
      * @param {number} distance, the distance to keep from the position. Defaults to 2.
+     * @param {{quiet?: boolean}} [options] - if quiet, skip the trailing "You have reached at..." log (internal repositioning callers pass this). Failure logs are always emitted.
      * @returns {Promise<boolean>} true if the position was reached, false otherwise.
      * @example
      * let position = world.world.getNearestBlock(bot, "oak_log", 64).position;
@@ -1397,7 +1481,11 @@ export async function goToPosition(bot, x, y, z, min_distance=2) {
         clearInterval(progressInterval);
         const distance = bot.entity.position.distanceTo(new Vec3(x, y, z));
         if (distance <= min_distance+1) {
-            log(bot, `You have reached at ${x}, ${y}, ${z}.`);
+            // Start of AH code
+            if (!options.quiet) {
+                log(bot, `You have reached at ${x}, ${y}, ${z}.`);
+            }
+            // End of AH code
             return true;
         }
         else {
@@ -2353,17 +2441,30 @@ export async function useToolOn(bot, toolName, targetName) {
     return true;
  }
 
- export async function useToolOnBlock(bot, toolName, block) {
+ export async function useToolOnBlock(bot, toolName, block, options = {}) {
     /**
      * Use a tool on a specific block.
      * @param {MinecraftBot} bot
      * @param {string} toolName - item name of the tool to equip, or "hand" for no tool.
      * @param {Block} block - the block reference to use the tool on.
+     * @param {{quiet?: boolean}} [options] - if quiet, suppress the trailing outcome log (the caller is expected to emit its own outcome line). Failure logs along the way still emit.
      * @returns {Promise<boolean>} true if action succeeded
      */
 
     const distance = toolName === 'water_bucket' && block.name !== 'lava' ? 1.5 : 2;
-    await goToPosition(bot, block.position.x, block.position.y, block.position.z, distance);
+    // Start of AH code — buffer intermediate diagnostic lines ("Breaking X to
+    // reach Y...", "Bot drifted ... repositioning.") and suppress the initial-
+    // arrival "You have reached at" log. The outcome line is what matters for
+    // the LLM; the intermediates are diagnostic chatter that's only useful when
+    // the outcome was a failure. On success we drop the buffer; on each failure
+    // path we flush it first so the LLM sees the full context.
+    const intermediate_msgs = [];
+    const flushIntermediate = () => {
+        for (const m of intermediate_msgs) log(bot, m);
+        intermediate_msgs.length = 0;
+    };
+    await goToPosition(bot, block.position.x, block.position.y, block.position.z, distance, {quiet: true});
+    // End of AH code
     // Start of AH code
     // Sync lookAt (B1): force=true flushes the look packet immediately and
     // waitForTicks(1) lets the server apply it before subsequent
@@ -2389,15 +2490,17 @@ export async function useToolOn(bot, toolName, targetName) {
     if (viewBlocked() && !isAbove()) {
         const blockingBlock = bot.blockAtCursor(5);
         if (!blockingBlock || !bot.canDigBlock(blockingBlock)) {
+            // Failure before any intermediate was buffered — nothing to flush.
             log(bot, `Block ${blockingBlock?.name ?? 'unknown'} is in the way and cannot be broken, not using ${toolName}.`);
             return false;
         }
-        log(bot, `Breaking ${blockingBlock.name} to reach ${block.name}...`);
+        intermediate_msgs.push(`Breaking ${blockingBlock.name} to reach ${block.name}...`);
         await bot.dig(blockingBlock);
         await bot.lookAt(block.position.offset(0.5, 0.5, 0.5), true);
         await bot.waitForTicks(1);
         if (viewBlocked() && !isAbove()) {
             const stillBlocking = bot.blockAtCursor(5);
+            flushIntermediate();
             log(bot, `Block ${stillBlocking?.name ?? 'unknown'} is still in the way, not using ${toolName}.`);
             return false;
         }
@@ -2437,12 +2540,15 @@ export async function useToolOn(bot, toolName, targetName) {
         const REPOS_DRIFT_THRESHOLD = distance + 0.5;
         const drift = bot.entity.position.distanceTo(block.position);
         if (drift > REPOS_DRIFT_THRESHOLD) {
-            log(bot, `Bot drifted (dist=${drift.toFixed(1)}, threshold ` +
+            intermediate_msgs.push(`Bot drifted (dist=${drift.toFixed(1)}, threshold ` +
                 `${REPOS_DRIFT_THRESHOLD}) from ${block.name} at ` +
                 `${block.position}; repositioning.`);
+            // {quiet:true} also suppresses the reposition's "You have reached
+            // at..." log — only the outcome line at the end of this function
+            // should reach the LLM on success.
             await goToPosition(
                 bot, block.position.x, block.position.y,
-                block.position.z, distance);
+                block.position.z, distance, {quiet: true});
         }
         // Re-sync lookAt right before activate to minimize the window for
         // pitch/yaw drift between look and use_item packet on the server.
@@ -2451,18 +2557,53 @@ export async function useToolOn(bot, toolName, targetName) {
     }
     // End of AH code
 
-    const equipped = await equip(bot, toolName);
+    // Start of AH code — {quiet:true} suppresses the noisy "Equipped X." log;
+    // the eventual "Collected ..." / "Used ..." line captures the outcome.
+    const equipped = await equip(bot, toolName, {quiet: true});
+    // End of AH code
 
     if (!equipped) {
+        flushIntermediate();
         log(bot, `Could not equip ${toolName}.`);
         return false;
     }
+    // Start of AH code — bucket-on-fluid: snapshot inventory before activate so
+    // the outcome line can be derived from the actual delta. bot.activateItem
+    // is fire-and-forget; the server's raycast determines whether the fluid is
+    // collected. Without a delta check the function would log a misleading
+    // "Used bucket on lava." even when no fluid was picked up.
+    const is_bucket_fill = toolName === 'bucket' &&
+        (block.name === 'lava' || block.name === 'water');
+    const inv_before_use = is_bucket_fill ? world.getInventoryCounts(bot) : null;
+    // End of AH code
     if (toolName.includes('bucket')) {
         await bot.activateItem();
     }
     else {
         await bot.activateBlock(block);
     }
-    log(bot, `Used ${toolName} on ${block.name}.`);
+    // Start of AH code
+    if (is_bucket_fill) {
+        try {
+            await bot.waitForTicks(VERIFIER_SETTLE_TICKS);
+        } catch (e) { /* bot disconnected; fall through */ }
+        const inv_after_use = world.getInventoryCounts(bot);
+        const filled_name = `${block.name}_bucket`;
+        const got = (inv_after_use[filled_name] ?? 0) -
+                    (inv_before_use[filled_name] ?? 0);
+        if (got > 0) {
+            // Success — drop intermediate diagnostic chatter.
+            // {quiet:true} on the caller side skips this outcome line so callers
+            // (e.g. collectBlock) that emit their own "Collected N X" headline
+            // avoid duplication.
+            if (!options.quiet) log(bot, `Collected ${got} ${filled_name}.`);
+            return true;
+        }
+        flushIntermediate();
+        if (!options.quiet) log(bot, `Could not fill bucket with ${block.name}.`);
+        return false;
+    }
+    // End of AH code
+    if (!options.quiet) log(bot, `Used ${toolName} on ${block.name}.`);
     return true;
  }
