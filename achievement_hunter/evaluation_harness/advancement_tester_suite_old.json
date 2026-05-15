@@ -23,7 +23,7 @@
     "provider": "managed_local",
     "minecraft_version": "1.21.6",
     "server_template_path": "achievement_hunter/evaluation_harness/server_templates/minecraft_1_21_6_clean",
-    "seeds": [12345, 24680, 97531],
+    "seeds": [-4141044970847841270, -2642246322311662149, -8365199587770310186],
     "difficulty": "peaceful",
     "gamemode": "survival",
     "generate_structures": true,
