@@ -1,0 +1,33 @@
+{
+  "suite_name": "achievement_hunter_eval_v2_full",
+  "task_path": "achievement_hunter/evaluation_harness/advancement_tester_old.json",
+  "agents": [
+    {
+      "label": "baseline_andy",
+      "profile": "./andy.json",
+      "settings_override": {
+        "achievement_hunter": false,
+        "auto_open_ui": false
+      }
+    },
+    {
+      "label": "our_agent",
+      "profile": "./achievement_hunter/src/profile.json",
+      "settings_override": {
+        "achievement_hunter": true,
+        "auto_open_ui": false
+      }
+    }
+  ],
+  "world": {
+    "provider": "managed_local",
+    "minecraft_version": "1.21.6",
+    "server_template_path": "achievement_hunter/evaluation_harness/server_templates/minecraft_1_21_6_clean",
+    "seeds": [12345, 24680, 97531],
+    "difficulty": "peaceful",
+    "gamemode": "survival",
+    "generate_structures": true,
+    "allow_cheats": false,
+    "level_name": "world"
+  }
+}
