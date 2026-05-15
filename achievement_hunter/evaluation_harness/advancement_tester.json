@@ -47,11 +47,25 @@
     "agent_count": 1,
     "timeout": 900
   },
-  "shiny": {
+  "cover_me_in_diamonds": {
     "type": "inventory",
     "goal": "Acquire a diamond chestplate. Have a diamond chestplate in the inventory.",
     "target": "diamond_chestplate",
     "agent_count": 1,
     "timeout": 1200
-  }
+  },
+  "ice_bucket_challenge": {
+    "type": "inventory",
+    "goal": "Obtain a block of Obsidian. Have a block of obsidian in the inventory.",
+    "target": "obsidian",
+    "agent_count": 1,
+    "timeout": 1200
+  },
+  "the_lie": {
+  "type": "inventory",
+  "goal": "Bake a cake. Have a cake in the inventory.",
+  "target": "cake",
+  "agent_count": 1,
+  "timeout": 1500
+}
 }
