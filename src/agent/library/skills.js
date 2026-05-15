@@ -2452,7 +2452,19 @@ export async function useToolOn(bot, toolName, targetName) {
      */
 
     const distance = toolName === 'water_bucket' && block.name !== 'lava' ? 1.5 : 2;
-    await goToPosition(bot, block.position.x, block.position.y, block.position.z, distance);
+    // Start of AH code — buffer intermediate diagnostic lines ("Breaking X to
+    // reach Y...", "Bot drifted ... repositioning.") and suppress the initial-
+    // arrival "You have reached at" log. The outcome line is what matters for
+    // the LLM; the intermediates are diagnostic chatter that's only useful when
+    // the outcome was a failure. On success we drop the buffer; on each failure
+    // path we flush it first so the LLM sees the full context.
+    const intermediate_msgs = [];
+    const flushIntermediate = () => {
+        for (const m of intermediate_msgs) log(bot, m);
+        intermediate_msgs.length = 0;
+    };
+    await goToPosition(bot, block.position.x, block.position.y, block.position.z, distance, {quiet: true});
+    // End of AH code
     // Start of AH code
     // Sync lookAt (B1): force=true flushes the look packet immediately and
     // waitForTicks(1) lets the server apply it before subsequent
@@ -2478,15 +2490,17 @@ export async function useToolOn(bot, toolName, targetName) {
     if (viewBlocked() && !isAbove()) {
         const blockingBlock = bot.blockAtCursor(5);
         if (!blockingBlock || !bot.canDigBlock(blockingBlock)) {
+            // Failure before any intermediate was buffered — nothing to flush.
             log(bot, `Block ${blockingBlock?.name ?? 'unknown'} is in the way and cannot be broken, not using ${toolName}.`);
             return false;
         }
-        log(bot, `Breaking ${blockingBlock.name} to reach ${block.name}...`);
+        intermediate_msgs.push(`Breaking ${blockingBlock.name} to reach ${block.name}...`);
         await bot.dig(blockingBlock);
         await bot.lookAt(block.position.offset(0.5, 0.5, 0.5), true);
         await bot.waitForTicks(1);
         if (viewBlocked() && !isAbove()) {
             const stillBlocking = bot.blockAtCursor(5);
+            flushIntermediate();
             log(bot, `Block ${stillBlocking?.name ?? 'unknown'} is still in the way, not using ${toolName}.`);
             return false;
         }
@@ -2526,13 +2540,12 @@ export async function useToolOn(bot, toolName, targetName) {
         const REPOS_DRIFT_THRESHOLD = distance + 0.5;
         const drift = bot.entity.position.distanceTo(block.position);
         if (drift > REPOS_DRIFT_THRESHOLD) {
-            log(bot, `Bot drifted (dist=${drift.toFixed(1)}, threshold ` +
+            intermediate_msgs.push(`Bot drifted (dist=${drift.toFixed(1)}, threshold ` +
                 `${REPOS_DRIFT_THRESHOLD}) from ${block.name} at ` +
                 `${block.position}; repositioning.`);
-            // {quiet:true} suppresses the duplicate "You have reached at..."
-            // success line — the initial goToPosition at the top of this
-            // function already logged it; this internal reposition is a
-            // small correction and shouldn't double-log.
+            // {quiet:true} also suppresses the reposition's "You have reached
+            // at..." log — only the outcome line at the end of this function
+            // should reach the LLM on success.
             await goToPosition(
                 bot, block.position.x, block.position.y,
                 block.position.z, distance, {quiet: true});
@@ -2550,6 +2563,7 @@ export async function useToolOn(bot, toolName, targetName) {
     // End of AH code
 
     if (!equipped) {
+        flushIntermediate();
         log(bot, `Could not equip ${toolName}.`);
         return false;
     }
@@ -2578,11 +2592,14 @@ export async function useToolOn(bot, toolName, targetName) {
         const got = (inv_after_use[filled_name] ?? 0) -
                     (inv_before_use[filled_name] ?? 0);
         if (got > 0) {
-            // {quiet:true} skips this outcome line so callers (e.g. collectBlock)
-            // that emit their own "Collected N X" headline avoid duplication.
+            // Success — drop intermediate diagnostic chatter.
+            // {quiet:true} on the caller side skips this outcome line so callers
+            // (e.g. collectBlock) that emit their own "Collected N X" headline
+            // avoid duplication.
             if (!options.quiet) log(bot, `Collected ${got} ${filled_name}.`);
             return true;
         }
+        flushIntermediate();
         if (!options.quiet) log(bot, `Could not fill bucket with ${block.name}.`);
         return false;
     }
