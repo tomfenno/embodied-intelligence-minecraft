@@ -253,8 +253,8 @@ const SKILL_TEMPLATES = [
     'skills.js', ['!collectBlocks']),
   t('collect.ok', /^Collected \d+ .+\.$/m, KIND.SUCCESS, 'skills.js',
     ['!collectBlocks']),
-  t('pickup.ok', /^Picked up \d+ items\.$/m, KIND.INFO, 'skills.js',
-    ['(pickup loop)']),
+  t('pickup.ok', /^Picked up (?:\d+ items|\d+ \S+(?:, \d+ \S+)*)\.$/m, KIND.INFO, 'skills.js',
+    ['(pickup loop)', '(attackEntity delta)']),
 
   // Break / place
   t('break.setblock',
