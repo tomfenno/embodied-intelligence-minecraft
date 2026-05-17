@@ -67,5 +67,12 @@
   "target": "cake",
   "agent_count": 1,
   "timeout": 1800
-}
+  },
+  "oh_shiny": {
+  "type": "inventory",
+  "goal": "Craft a golden apple. Have a golden apple in the inventory.",
+  "target": "golden_apple",
+  "agent_count": 1,
+  "timeout": 1800
+  }
 }
