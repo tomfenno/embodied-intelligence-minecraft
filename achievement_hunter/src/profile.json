@@ -3,6 +3,11 @@
 
   "model": "gpt-5",
 
+  "skin": {
+    "model": "classic",
+    "path": "https://www.minecraftskins.com/uploads/skins/2026/02/16/computer-23869410.png?v950"
+  },
+
   "//": [
     "Per-stage model overrides. Omit any field to fall back to 'model' above.",
     "Available OpenAI models used here (relative rankings are approximate):",

@@ -16,7 +16,7 @@ export const MAX_OUTER_RETRIES = 10;
 // LLM-driven self-refine generator. Hard-fails if the resolved file is
 // missing. Flip on for eval runs that need deterministic, no-LLM PTDs.
 // Checkpoint-resumed graphs still take precedence.
-export const LOAD_PTD_FROM_DISK = false;
+export const LOAD_PTD_FROM_DISK = true;
 
 // Directory (repo-root-relative) holding pre-generated PTD JSONs. Matches
 // self_refine.js's DEFAULT_OPTIONS.output_dir so saved PTDs are reloadable
@@ -132,4 +132,4 @@ export const ENABLE_ROLLOUT_LOGGING = false;
 // When true, writes the live dashboard markdown files under `rollout_live/`
 // and runs the per-stage markdown rendering. Disable to remove all
 // live-viewer sync I/O and rendering work from the agent's hot path.
-export const ENABLE_LIVE_VIEWER = false;
+export const ENABLE_LIVE_VIEWER = true;
