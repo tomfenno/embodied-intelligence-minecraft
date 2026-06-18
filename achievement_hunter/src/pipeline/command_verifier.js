@@ -404,17 +404,43 @@ export const command_verifiers = {
   // currently guarantee.
 
   '!useOn': {
-    needs: new Set(['inventory']),
+    needs: new Set(['inventory', 'nearby_blocks']),
     verify: ({args, pre, post}) => {
       const tool = args?.[0];
       const target = args?.[1];
       if (typeof tool !== 'string' || typeof target !== 'string') {
         return {ok: true, reason: 'unparseable_args'};
       }
+      const target_key = target.toLowerCase();
+
+      // Block-creation case (checked BEFORE the bucket-fill case): some
+      // !useOn combos transform the world rather than fill a bucket.
+      // water_bucket on lava forms an obsidian block (source lava). The
+      // bucket empties whether or not obsidian actually formed — the water
+      // is placed either way — so an inventory delta is the wrong signal.
+      // The authoritative post-condition is the created block appearing in
+      // nearby world state, the same way !useOn shears on a pumpkin is
+      // verified by its product rather than a bucket delta. Presence-based
+      // (not a pre→post delta) so building several obsidian in a row
+      // (e.g. a nether-portal frame) doesn't false-negative once the first
+      // one is already nearby.
+      const created = USEON_CREATES_BLOCK[`${tool}:${target_key}`];
+      if (created) {
+        const present = post?.nearby_blocks?.includes(created) ?? false;
+        return present ?
+            {ok: true, reason: `${created}_present`} :
+            {ok: false, reason: `no_${created}`};
+      }
+
+      // Bucket-fill case: only an empty `bucket` can be filled. Already-
+      // full bucket tools (water_bucket / lava_bucket / milk_bucket) used
+      // on a target are placements/transforms, not fills — checking them
+      // against USEON_FILLED_BUCKET is what made water_bucket-on-lava
+      // false-fail as bucket_unfilled.
       if (!BUCKET_TOOLS.has(tool)) {
         return {ok: true, reason: 'non_bucket_tool'};
       }
-      const filled = USEON_FILLED_BUCKET[target.toLowerCase()];
+      const filled = USEON_FILLED_BUCKET[target_key];
       if (!filled) {
         return {ok: true, reason: `unknown_useOn_target:${target}`};
       }
@@ -620,12 +646,29 @@ function verify_smelt(args, pre, post) {
       {ok: false, reason: `no_${output}_delta`};
 }
 
-// Tools whose !useOn outcome is verified by a filled-bucket inventory
-// delta. Any other tool name (shears, dye, flint_and_steel, etc.) is
-// pass-through.
-const BUCKET_TOOLS = new Set([
-  'bucket', 'water_bucket', 'lava_bucket', 'milk_bucket',
-]);
+// Only an empty `bucket` is fill-verified via a filled-bucket inventory
+// delta — it's the one bucket tool that can actually be filled. Already-
+// full bucket tools (water_bucket / lava_bucket / milk_bucket) used via
+// !useOn are placements/transforms, not fills: verifying them against
+// USEON_FILLED_BUCKET is what made water_bucket-on-lava (obsidian) false-
+// fail as bucket_unfilled. They (and every other tool — shears, dye,
+// flint_and_steel, …) pass through as non_bucket_tool unless covered by
+// USEON_CREATES_BLOCK below.
+const BUCKET_TOOLS = new Set(['bucket']);
+
+// Maps a `<tool>:<target>` !useOn combo to the block it creates in the
+// world. Verified by that block appearing in nearby_blocks (presence) —
+// the tool's inventory side effect (e.g. the emptied bucket) happens
+// regardless of whether the block formed, so an inventory delta would be
+// the wrong signal. Presence (not a pre→post delta) so making several of
+// the block in a row (e.g. a nether-portal frame) doesn't false-negative
+// once the first is already nearby.
+const USEON_CREATES_BLOCK = {
+  // Water poured onto a lava *source* turns it to obsidian. (Source-only:
+  // get_am_state filters flowing lava out of nearby_blocks, so target
+  // 'lava' here means a source block was present.)
+  'water_bucket:lava': 'obsidian',
+};
 
 // Maps the !useOn target → the filled-bucket item the verifier expects
 // to appear in inventory. Targets not in this table are pass-through.

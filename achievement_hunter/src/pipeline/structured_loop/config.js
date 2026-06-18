@@ -36,7 +36,10 @@ export const PTD_JSON_DIR = 'achievement_hunter/docs/ptd_jsons';
 //   'achievement_hunter/docs/ptd_jsons/bake_a_cake.json'
 //   'achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_diamond.json'
 //   'achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json'
-export const PTD_JSON_OVERRIDE_PATH = null;
+// export const PTD_JSON_OVERRIDE_PATH = null;
+export const PTD_JSON_OVERRIDE_PATH =
+    'achievement_hunter/docs/ptd_jsons/craft_a_golden_apple_have_a_golden_apple_in_the_inventory.json';
+//'achievement_hunter/docs/ptd_jsons/obtain_one_obsidian.json';
 
 // --- Breadcrumb tracker (breadcrumbs.js, constructed in loop.js) ---
 
