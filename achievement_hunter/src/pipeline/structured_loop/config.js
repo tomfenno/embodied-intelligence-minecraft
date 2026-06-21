@@ -38,7 +38,7 @@ export const PTD_JSON_DIR = 'achievement_hunter/docs/ptd_jsons';
 //   'achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json'
 export const PTD_JSON_OVERRIDE_PATH = null;
 // export const PTD_JSON_OVERRIDE_PATH =
-'achievement_hunter/docs/ptd_jsons/craft_a_golden_apple_have_a_golden_apple_in_the_inventory.json';
+// 'achievement_hunter/docs/ptd_jsons/craft_a_golden_apple_have_a_golden_apple_in_the_inventory.json';
 //'achievement_hunter/docs/ptd_jsons/obtain_one_obsidian.json';
 
 // --- Breadcrumb tracker (breadcrumbs.js, constructed in loop.js) ---
@@ -131,6 +131,19 @@ export const PATHFINDING_WRAPPER_LOG_DIR =
 // sync I/O from the agent's hot path; the agent itself does not read these
 // files at runtime, so behavior is unchanged.
 export const ENABLE_ROLLOUT_LOGGING = false;
+
+function env_truthy(name) {
+  const value = process.env[name];
+  if (typeof value !== 'string') return false;
+  return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
+}
+
+export function is_rollout_logging_enabled() {
+  return ENABLE_ROLLOUT_LOGGING || env_truthy('AH_ENABLE_ROLLOUT_LOGGING') ||
+      env_truthy('BENCHMARK_EPISODE_MODE') ||
+      typeof process.env.BENCHMARK_EPISODE_DIR === 'string' &&
+          process.env.BENCHMARK_EPISODE_DIR.length > 0;
+}
 
 // When true, writes the live dashboard markdown files under `rollout_live/`
 // and runs the per-stage markdown rendering. Disable to remove all

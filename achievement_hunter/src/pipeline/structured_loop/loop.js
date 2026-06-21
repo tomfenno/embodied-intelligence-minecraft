@@ -33,6 +33,11 @@ export async function structured_loop(models, agent, task_name, graph = null) {
         `${PTD_JSON_DIR}/${to_snake_case(task_name)}.json`;
     spl.log(`LOAD_PTD_FROM_DISK=true — loading PTD from ${file_path}`);
     graph = await load_graph_from_file(file_path);
+    log.ptd('[loaded from disk]', graph, {
+      source: 'disk',
+      status: 'loaded',
+      file_path,
+    });
   } else {
     graph = await generate_primary_task_dag_self_refined(
         models, task_name, graph, log);

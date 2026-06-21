@@ -2,11 +2,12 @@ import {existsSync, mkdirSync, unlinkSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
+import {buildArchitectureMetricsFromRollout} from './architecture_metrics.js';
 import {graph_to_mermaid} from './graph_utils.js';
 import {ioQueue} from './io_queue.js';
 import {
   ENABLE_LIVE_VIEWER,
-  ENABLE_ROLLOUT_LOGGING,
+  is_rollout_logging_enabled,
 } from './structured_loop/config.js';
 
 // ── Paths + constants
@@ -223,7 +224,7 @@ function compact_candidate(candidate) {
 
 // Builds a one-shot rollout-level summary so offline consumers don't need
 // to re-scan all stages to compute basic counts.
-function build_rollout_summary(rollout) {
+export function build_rollout_summary(rollout) {
   const summary = {
     outer_iterations: 0,
     tasks_attempted: 0,
@@ -243,6 +244,7 @@ function build_rollout_summary(rollout) {
       summary.search_recovery_attempts += 1;
     }
   }
+  summary.architecture_metrics = buildArchitectureMetricsFromRollout(rollout);
   return summary;
 }
 
@@ -655,6 +657,7 @@ const live_writer = {
  * Creates a new rollout log file for a single structured loop run.
  */
 export function createRolloutLogger(objective) {
+  const rollout_logging_enabled = is_rollout_logging_enabled();
   if (ENABLE_LIVE_VIEWER) mkdirSync(LIVE_DIR, {recursive: true});
 
   const started_at = iso_now();
@@ -663,7 +666,7 @@ export function createRolloutLogger(objective) {
   const safe_objective = objective.replace(/[^a-z0-9]/gi, '_').slice(0, 40);
   const rollout_dir = path.join(ROLLOUTS_DIR, `${timestamp}_${safe_objective}`);
   const rollout_path = path.join(rollout_dir, 'rollout_trace.json');
-  if (ENABLE_ROLLOUT_LOGGING) mkdirSync(rollout_dir, {recursive: true});
+  if (rollout_logging_enabled) mkdirSync(rollout_dir, {recursive: true});
 
   const rollout = {
     objective,
@@ -702,7 +705,7 @@ export function createRolloutLogger(objective) {
   // ───────────────────────────────────────────────────────────
 
   function flush_rollout() {
-    if (!ENABLE_ROLLOUT_LOGGING) return;
+    if (!rollout_logging_enabled) return;
     // Thunk form: coalesced calls skip the stringify of all but the latest
     // `rollout` state. The closure captures the mutable object by reference,
     // so the deferred read picks up every stage pushed before the write
@@ -711,7 +714,7 @@ export function createRolloutLogger(objective) {
   }
 
   function record_stage(entry) {
-    if (!ENABLE_ROLLOUT_LOGGING) return;
+    if (!rollout_logging_enabled) return;
     rollout.stages.push({
       timestamp: iso_now(),
       elapsed: format_elapsed(started_ms),
@@ -794,7 +797,7 @@ export function createRolloutLogger(objective) {
   // ───────────────────────────────────────────────────────────
 
   return {
-    rollout_dir: ENABLE_ROLLOUT_LOGGING ? rollout_dir : null,
+    rollout_dir: rollout_logging_enabled ? rollout_dir : null,
     objective,
 
     ptd(raw, parsed, meta = {}) {
@@ -912,7 +915,8 @@ export function createRolloutLogger(objective) {
       render_live();
     },
 
-    recovery_attempt(attempt, task, diagnosis, planned_actions) {
+    recovery_attempt(
+        attempt, task, diagnosis, planned_actions, invocation_id = null) {
       if (!live_state.recovery) {
         live_state.recovery = {task, attempts: []};
       }
@@ -921,12 +925,21 @@ export function createRolloutLogger(objective) {
       record_stage({
         stage: STAGE.RECOVERY,
         type: 'attempt_start',
+        invocation_id,
         attempt,
         task,
         diagnosis,
         planned_actions,
       });
       render_live();
+    },
+
+    recovery_invocation_start(details) {
+      record_stage({
+        stage: STAGE.RECOVERY,
+        type: 'invocation_start',
+        ...details,
+      });
     },
 
     recovery_action_result(attempt_num, action_index, result) {
@@ -936,11 +949,20 @@ export function createRolloutLogger(objective) {
       record_stage({
         stage: STAGE.RECOVERY,
         type: 'action_result',
+        invocation_id: result?.invocation_id ?? null,
         attempt: attempt_num,
         action_index,
         result,
       });
       render_live();
+    },
+
+    recovery_invocation_end(details) {
+      record_stage({
+        stage: STAGE.RECOVERY,
+        type: 'invocation_end',
+        ...details,
+      });
     },
 
     recovery_end(final_status) {
@@ -1009,7 +1031,7 @@ export function createRolloutLogger(objective) {
     // a continuously-overwritten view, not an event. Persists JSON to the
     // rollout directory and refreshes the live markdown view.
     breadcrumbs(breadcrumbs_list) {
-      if (ENABLE_ROLLOUT_LOGGING) {
+      if (rollout_logging_enabled) {
         ioQueue.write(
             path.join(rollout_dir, 'breadcrumbs.json'),
             () => JSON.stringify(breadcrumbs_list ?? [], null, 2));
@@ -1048,7 +1070,7 @@ export function createRolloutLogger(objective) {
       // runs (e.g. tests) can race the queue and observe stale files.
       await ioQueue.drain();
 
-      if (ENABLE_ROLLOUT_LOGGING) {
+      if (rollout_logging_enabled) {
         console.log('[SPL] Rollout saved to', rollout_path);
       }
     },

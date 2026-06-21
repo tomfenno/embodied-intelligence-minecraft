@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Run with `npm run build:action-refs`
 import fs from 'node:fs';
 import path from 'node:path';
@@ -97,6 +96,8 @@ function main() {
   if (drift) process.exit(1);
 }
 
-if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+const invokedPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
+
+if (invokedPath && fileURLToPath(import.meta.url) === invokedPath) {
   main();
 }

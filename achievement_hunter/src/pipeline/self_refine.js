@@ -347,7 +347,7 @@ async function run_stage({
   safe_log_ptd(log, call.response ?? '', parsed, {
     latency_ms: call.latency_ms,
     error,
-    source: 'llm',
+    source: 'self_refine',
     stage,
     round,
   });

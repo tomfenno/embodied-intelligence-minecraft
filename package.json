@@ -42,7 +42,8 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "build:action-refs": "node achievement_hunter/scripts/build_action_refs.mjs",
-        "check:action-refs": "node achievement_hunter/scripts/build_action_refs.mjs --check"
+        "check:action-refs": "node achievement_hunter/scripts/build_action_refs.mjs --check",
+        "summarize:architecture-metrics": "node achievement_hunter/evaluation_harness/summarize_architecture_metrics.js"
     },
     "devDependencies": {
         "@eslint/js": "^9.13.0",

@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import {BENCHMARK_TASK_TYPES} from '../task_validators.js';
+import {augmentManifestWithArchitectureMetrics} from './architecture_metrics.js';
 import {collectDependencyMetrics} from './dependency_metrics.js';
 import {
   appendOrReplaceManifest,
@@ -414,7 +415,7 @@ async function runSingleBenchmarkEpisode({
       episodeRuntime,
     });
 
-    const manifest = {
+    const manifest = augmentManifestWithArchitectureMetrics({
       agent_label: agentLabel,
       agent_name: agentName,
       mode,
@@ -463,7 +464,7 @@ async function runSingleBenchmarkEpisode({
       minecraft_version: worldConfig.minecraft_version || '1.21.6',
       initial_spawn: initialSpawn,
       result_dir: resultDir,
-    };
+    }, resultDir);
     writeJson(path.join(resultDir, 'episode_manifest.json'), manifest);
 
     if (serverRuntime.serverRoot) {

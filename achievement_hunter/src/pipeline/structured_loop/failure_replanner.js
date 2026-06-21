@@ -44,6 +44,18 @@ function load_available_actions() {
   return _available_actions;
 }
 
+function make_invocation_id(taskKey) {
+  return `${taskKey}:${Date.now().toString(36)}:${
+      Math.random().toString(36).slice(2, 8)}`;
+}
+
+function get_failed_step_kinds(failedTrace) {
+  return [...new Set(
+      (failedTrace?.summary?.failed_steps ?? [])
+          .map(step => step?.kind)
+          .filter(kind => typeof kind === 'string' && kind.length > 0))];
+}
+
 // Converts {name, args} into a bot command string e.g.
 // !search("pumpkin")
 // Exported so search_replanner.js can reuse the same serialization.
@@ -333,9 +345,34 @@ export async function recover_failed_task(
                           prior_replanner.task_key === current_task_key) ?
       Math.max(1, prior_replanner.outer_attempt ?? 1) :
       1;
+  const resumed_from_prior_crash = resume_attempt > 1;
+  const invocation_id =
+      (prior_replanner?.kind === 'failure' &&
+       prior_replanner.task_key === current_task_key &&
+       typeof prior_replanner.invocation_id === 'string' &&
+       prior_replanner.invocation_id.length > 0) ?
+      prior_replanner.invocation_id :
+      make_invocation_id(current_task_key);
+  const should_log_invocation_start =
+      !(resumed_from_prior_crash &&
+        typeof prior_replanner?.invocation_id === 'string' &&
+        prior_replanner.invocation_id.length > 0);
   if (resume_attempt > 1) {
     spl.log(`Resuming failure recovery at attempt ${resume_attempt}/${
         MAX_RECOVERY_ATTEMPTS} (prior crash, plan discarded).`);
+  }
+  const trigger_terminal_reason = failed_trace?.terminal_reason ?? null;
+  const failed_step_kinds = get_failed_step_kinds(failed_trace);
+  if (should_log_invocation_start) {
+    log?.recovery_invocation_start({
+      invocation_id,
+      task_key: current_task_key,
+      action_type: task?.action_type ?? null,
+      target_item: task?.target_item ?? null,
+      trigger_terminal_reason,
+      failed_step_kinds,
+      resumed_from_prior_crash,
+    });
   }
 
   // Tracks how the attempt loop exited so the post-loop log can be honest
@@ -344,6 +381,7 @@ export async function recover_failed_task(
   let exit_status = null;
   let exit_attempt = resume_attempt - 1;
   let exit_detail = null;
+  let actions_executed = 0;
 
   try {
     for (let attempt = resume_attempt; attempt <= MAX_RECOVERY_ATTEMPTS;
@@ -358,6 +396,7 @@ export async function recover_failed_task(
       save_runtime_state({
         active_replanner: {
           kind: 'failure',
+          invocation_id,
           task_key: current_task_key,
           outer_attempt: attempt,
           action_index: 0,
@@ -411,7 +450,8 @@ export async function recover_failed_task(
       };
 
       log?.recovery_attempt(
-          attempt, task, replanner_output.diagnosis, replanner_output.actions);
+          attempt, task, replanner_output.diagnosis, replanner_output.actions,
+          invocation_id);
 
       const action_results = [];
       let latest_state = null;
@@ -422,6 +462,7 @@ export async function recover_failed_task(
         save_runtime_state({
           active_replanner: {
             kind: 'failure',
+            invocation_id,
             task_key: current_task_key,
             outer_attempt: attempt,
             action_index,
@@ -437,6 +478,7 @@ export async function recover_failed_task(
           save_runtime_state({
             active_replanner: {
               kind: 'failure',
+              invocation_id,
               task_key: current_task_key,
               outer_attempt: attempt,
               action_index,
@@ -454,8 +496,11 @@ export async function recover_failed_task(
           result = await run_action(
               action, agent, log, searched_targets, searched_targets_outcomes);
           spl.log('Result:', result);
-
-          log?.recovery_action_result(attempt, action_index, result);
+          actions_executed += 1;
+          log?.recovery_action_result(attempt, action_index, {
+            ...result,
+            invocation_id,
+          });
           latest_state = get_recovery_trace_state(agent, baseline_inventory);
 
           if (agent.bot._ah_death_pending) {
@@ -468,6 +513,19 @@ export async function recover_failed_task(
 
           if (scsg_task_complete_check(task, graph, agent)) {
             spl.log('Task complete after recovery.');
+            log?.recovery_invocation_end({
+              invocation_id,
+              task_key: current_task_key,
+              action_type: task?.action_type ?? null,
+              target_item: task?.target_item ?? null,
+              trigger_terminal_reason,
+              failed_step_kinds,
+              status: 'success',
+              exit_status: 'success',
+              attempts_used: Math.max(0, attempt - resume_attempt + 1),
+              actions_executed,
+              resumed_from_prior_crash,
+            });
             log?.recovery_end('success');
             return 'success';
           }
@@ -516,6 +574,19 @@ export async function recover_failed_task(
           MAX_RECOVERY_ATTEMPTS} (${exit_status}${
           exit_detail ? `: ${exit_detail}` : ''}).`);
     }
+    log?.recovery_invocation_end({
+      invocation_id,
+      task_key: current_task_key,
+      action_type: task?.action_type ?? null,
+      target_item: task?.target_item ?? null,
+      trigger_terminal_reason,
+      failed_step_kinds,
+      status: 'fail',
+      exit_status: exit_status ?? 'exhausted',
+      attempts_used: Math.max(0, exit_attempt - resume_attempt + 1),
+      actions_executed,
+      resumed_from_prior_crash,
+    });
     log?.recovery_end('fail');
     return 'fail';
 
