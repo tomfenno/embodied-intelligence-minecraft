@@ -2,8 +2,8 @@
 
 This harness runs the five single-agent tasks in
 `achievement_hunter/evaluation_harness/advancement_tester.json` for
-`baseline_andy` and `our_agent` (`AH_Bot`) using benchmark-generated temp
-profiles pinned to `gpt-5`.
+`baseline_andy`, `baseline_andy_simple`, and `our_agent` (`AH_Bot`) using
+benchmark-generated temp profiles pinned to `gpt-5`.
 
 ## Default behavior
 
@@ -56,6 +56,15 @@ Single agent / single seed verification:
 node achievement_hunter/evaluation_harness/cli.js \
   --config achievement_hunter/evaluation_harness/advancement_tester_smoke.json \
   --agent baseline_andy \
+  --seed 12345
+```
+
+Simple baseline verification:
+
+```bash
+node achievement_hunter/evaluation_harness/cli.js \
+  --config achievement_hunter/evaluation_harness/advancement_tester_smoke.json \
+  --agent baseline_andy_simple \
   --seed 12345
 ```
 

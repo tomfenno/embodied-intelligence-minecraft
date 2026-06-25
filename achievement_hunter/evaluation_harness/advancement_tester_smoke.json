@@ -4,7 +4,15 @@
   "agents": [
     {
       "label": "baseline_andy",
-      "profile": "./andy.json",
+      "profile": "./achievement_hunter/evaluation_harness/profiles/baseline_andy_reasoning.json",
+      "settings_override": {
+        "achievement_hunter": false,
+        "auto_open_ui": false
+      }
+    },
+    {
+      "label": "baseline_andy_simple",
+      "profile": "./achievement_hunter/evaluation_harness/profiles/baseline_andy_simple.json",
       "settings_override": {
         "achievement_hunter": false,
         "auto_open_ui": false
