@@ -61,13 +61,6 @@
     "agent_count": 1,
     "timeout": 1800
   },
-  "the_lie": {
-  "type": "inventory",
-  "goal": "Bake a cake. Have a cake in the inventory.",
-  "target": "cake",
-  "agent_count": 1,
-  "timeout": 1800
-  },
   "oh_shiny": {
   "type": "inventory",
   "goal": "Craft a golden apple. Have a golden apple in the inventory.",
