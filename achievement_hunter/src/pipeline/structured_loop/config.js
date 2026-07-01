@@ -16,7 +16,7 @@ export const MAX_OUTER_RETRIES = 10;
 // LLM-driven self-refine generator. Hard-fails if the resolved file is
 // missing. Flip on for eval runs that need deterministic, no-LLM PTDs.
 // Checkpoint-resumed graphs still take precedence.
-export const LOAD_PTD_FROM_DISK = true;
+export const LOAD_PTD_FROM_DISK = false;
 
 // Directory (repo-root-relative) holding pre-generated PTD JSONs. Matches
 // self_refine.js's DEFAULT_OPTIONS.output_dir so saved PTDs are reloadable
