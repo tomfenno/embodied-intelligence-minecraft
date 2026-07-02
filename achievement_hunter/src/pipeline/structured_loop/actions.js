@@ -234,7 +234,7 @@ export async function execute_task_action(
       return 'death';
     }
 
-    if (task.action_type === 'interact' &&
+    if (command_produces_collectable(task, action.command) &&
         is_successful_command_result(command_result)) {
       const interact_result = await handle_interact_success(
           task, agent, log, task_trace, attempt_number, command_result,
@@ -658,6 +658,32 @@ function interact_target_satisfied(task, state) {
 function interact_target_collectable(task, state) {
   const nearby_blocks = state.nearby_blocks ?? [];
   return nearby_blocks.includes(task.target_item);
+}
+
+// True when a *successful* command is expected to have produced a block in
+// the world that still has to be collected into inventory as part of THIS
+// task — so the collect must run within the current attempt rather than
+// across outer-loop iterations. Letting it span iterations regenerates the
+// SCSG mid-chain: after `!useOn("water_bucket","lava")` consumes the
+// water_bucket but before the obsidian is collected, compute_scsg sees the
+// obsidian still unsatisfied and its (consumed:false) water_bucket
+// prerequisite missing, so it re-schedules a water_bucket refill before the
+// obsidian collect. Keeping useOn→collect atomic avoids that.
+//
+// Two shapes qualify:
+//   - interact tasks (e.g. shears on a pumpkin), which always finish with a
+//     collectable target; and
+//   - collect tasks whose environmental source made mediate_collect emit a
+//     !useOn (e.g. water_bucket on lava -> obsidian).
+// A plain collect task emits !collectBlocks directly and is already
+// complete on success, so it must NOT be routed here — hence the !useOn
+// command check. Bucket-fill collect tasks (e.g. !useOn("bucket","water")
+// -> water_bucket) are safe: handle_interact_success short-circuits via
+// interact_target_satisfied because the filled bucket lands in inventory.
+export function command_produces_collectable(task, command) {
+  if (task?.action_type === 'interact') return true;
+  return task?.action_type === 'collect' &&
+      typeof command === 'string' && command.startsWith('!useOn(');
 }
 
 export function resolve_smelt_fuel_name(task, state) {

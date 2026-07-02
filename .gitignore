@@ -46,3 +46,4 @@ logs/
 achievement_hunter/rollouts/
 achievement_hunter/rollout_live/
 timing_experiments/
+achievement_hunter/evaluation_harness/exp*

@@ -16,7 +16,7 @@ export const MAX_OUTER_RETRIES = 10;
 // LLM-driven self-refine generator. Hard-fails if the resolved file is
 // missing. Flip on for eval runs that need deterministic, no-LLM PTDs.
 // Checkpoint-resumed graphs still take precedence.
-export const LOAD_PTD_FROM_DISK = true;
+export const LOAD_PTD_FROM_DISK = false;
 
 // Directory (repo-root-relative) holding pre-generated PTD JSONs. Matches
 // self_refine.js's DEFAULT_OPTIONS.output_dir so saved PTDs are reloadable
@@ -37,6 +37,9 @@ export const PTD_JSON_DIR = 'achievement_hunter/docs/ptd_jsons';
 //   'achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_diamond.json'
 //   'achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json'
 export const PTD_JSON_OVERRIDE_PATH = null;
+// export const PTD_JSON_OVERRIDE_PATH =
+'achievement_hunter/docs/ptd_jsons/craft_a_golden_apple_have_a_golden_apple_in_the_inventory.json';
+//'achievement_hunter/docs/ptd_jsons/obtain_one_obsidian.json';
 
 // --- Breadcrumb tracker (breadcrumbs.js, constructed in loop.js) ---
 
@@ -132,4 +135,4 @@ export const ENABLE_ROLLOUT_LOGGING = false;
 // When true, writes the live dashboard markdown files under `rollout_live/`
 // and runs the per-stage markdown rendering. Disable to remove all
 // live-viewer sync I/O and rendering work from the agent's hot path.
-export const ENABLE_LIVE_VIEWER = true;
+export const ENABLE_LIVE_VIEWER = false;

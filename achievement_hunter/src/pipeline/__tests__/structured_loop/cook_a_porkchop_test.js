@@ -61,7 +61,7 @@ import {get_item_batch_size} from '../../recipe_utils.js';
 import {get_canonical_block_source, get_canonical_mob_source, is_environmental_use_target, resolve_fallback_block_source, resolve_nearby_block_source, resolve_nearby_mob_source,} from '../../mc_sources.js';
 import {build_incoming_edge_map, edge_in_subgraph, edge_key, get_satisfied_inputs_by_type, get_single_satisfied_input_item, resolve_concrete_craft_target,} from '../../structured_loop/graph.js';
 import {check_search_complete, expand_search_item, is_entity_target, make_search_command, parse_search_command,} from '../../structured_loop/search.js';
-import {get_command_failure_signature, is_craft_command, is_successful_command_result, mediate_collect, mediate_craft, mediate_kill, mediate_smelt, resolve_smelt_fuel_name, should_abort_repeated_failure,} from '../../structured_loop/actions.js';
+import {command_produces_collectable, get_command_failure_signature, is_craft_command, is_successful_command_result, mediate_collect, mediate_craft, mediate_kill, mediate_smelt, resolve_smelt_fuel_name, should_abort_repeated_failure,} from '../../structured_loop/actions.js';
 import {make_fallback_acquisition_task, select_next_task, try_make_craft_task, try_make_immediate_acquisition_task, try_make_smelt_task,} from '../../structured_loop/tasks.js';
 
 // ── Rollout-derived fixtures
@@ -1554,6 +1554,76 @@ describe('mediate_collect', () => {
        const action = mediate_collect(TASK_COLLECT_COBBLESTONE, STATE_STAGE_6);
        expect(action.command).toBe('!collectBlocks("stone", 8)');
      });
+});
+
+// ── command_produces_collectable (useOn→collect chaining guard)
+// ──────────────────────────────────────────────────────────────
+
+describe('command_produces_collectable', () => {
+  it('returns true for interact tasks (always finish with a collectable target)',
+     () => {
+       const task = {
+         target_item: 'carved_pumpkin',
+         action_type: 'interact',
+         parameters: {tool: 'shears', target: 'pumpkin'},
+       };
+       expect(command_produces_collectable(task, '!useOn("shears", "pumpkin")'))
+           .toBe(true);
+     });
+
+  it('returns true for a collect task whose action is a !useOn (water_bucket on lava -> obsidian)',
+     () => {
+       const task = {
+         target_item: 'obsidian',
+         action_type: 'collect',
+         parameters:
+             {source_block: 'lava', item_dependency: 'water_bucket', tool: null},
+       };
+       expect(
+           command_produces_collectable(task, '!useOn("water_bucket", "lava")'))
+           .toBe(true);
+     });
+
+  it('returns true for a bucket-fill collect task (safe: handler short-circuits on the filled item)',
+     () => {
+       // This is the safety case: the broadened guard catches it, but
+       // handle_interact_success returns success via interact_target_satisfied
+       // because the filled bucket lands directly in inventory — no stray
+       // collectBlocks is issued.
+       const task = {
+         target_item: 'water_bucket',
+         action_type: 'collect',
+         parameters: {source_block: 'water', item_dependency: 'bucket', tool: null},
+       };
+       expect(command_produces_collectable(task, '!useOn("bucket", "water")'))
+           .toBe(true);
+     });
+
+  it('returns false for a plain collectBlocks collect task (already complete on success)',
+     () => {
+       const task = {
+         target_item: 'cobblestone',
+         action_type: 'collect',
+         parameters: {source_block: 'stone', item_dependency: null, tool: null},
+       };
+       expect(command_produces_collectable(task, '!collectBlocks("stone", 8)'))
+           .toBe(false);
+     });
+
+  it('returns false for non-interact/collect tasks (craft, smelt, kill)', () => {
+    expect(command_produces_collectable(
+               {action_type: 'craft'}, '!craftRecipe("stick", 1)'))
+        .toBe(false);
+    expect(command_produces_collectable(
+               {action_type: 'kill'}, '!attack("pig")'))
+        .toBe(false);
+  });
+
+  it('is defensive against null task / non-string command', () => {
+    expect(command_produces_collectable(null, '!useOn("a", "b")')).toBe(false);
+    expect(command_produces_collectable({action_type: 'collect'}, null))
+        .toBe(false);
+  });
 });
 
 // ── mediate_kill

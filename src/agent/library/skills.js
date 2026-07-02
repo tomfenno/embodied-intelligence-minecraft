@@ -2495,6 +2495,16 @@ export async function useToolOn(bot, toolName, targetName) {
             return false;
         }
         intermediate_msgs.push(`Breaking ${blockingBlock.name} to reach ${block.name}...`);
+        // Equip the best available tool before mining the obstruction, mirroring
+        // breakBlockAt (skills.js:815). bot.dig() does not auto-equip, so without
+        // this the wall is broken with whatever happens to be in hand (often the
+        // useOn target tool or bare hand) — the cause of the "doesn't equip its
+        // pickaxe" behavior. No options are passed: with neither requireHarvest
+        // nor getFromChest, equipForBlock cannot reach its NoItem/NoChest throw
+        // paths (Tool.js:122-148), so no try/catch is needed. It equips the
+        // fastest tool, or leaves the hand empty if none exists — preserving the
+        // canDigBlock() guard's intent to dig through any diggable block.
+        await bot.tool.equipForBlock(blockingBlock);
         await bot.dig(blockingBlock);
         await bot.lookAt(block.position.offset(0.5, 0.5, 0.5), true);
         await bot.waitForTicks(1);
