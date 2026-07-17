@@ -518,34 +518,49 @@ def run_script(task_path,
     make_script_file_and_run(script_content, script_file, session_name=session_name, run_in_tmux=run_in_tmux)
 
 
-def make_ops(agent_names, session_name):
-    """Make the agents operators in the Minecraft world."""
+def make_ops(agent_names, session_name, max_wait_seconds=90, poll_interval=5):
+    """Make the agents operators in the Minecraft world.
+
+    Launches the debug task once, then polls `/op @a` + ops.json until every
+    agent is opped or max_wait_seconds elapses. Resending the launch command
+    on retry (the previous behavior) typed garbage into the still-running
+    debug process instead of starting a fresh attempt, so retries could never
+    actually succeed once the first poll window was missed.
+    """
     print('Making agents operators...')
 
     cmd = f"node main.js --task_path tasks/example_tasks.json --task_id debug_{len(agent_names)}_agent_timeout"
-
     subprocess.run(["tmux", "send-keys", "-t", session_name, cmd, "C-m"])
 
-    time.sleep(30)
+    ops_file = f"./tasks/server_data_{session_name}/ops.json"
+    deadline = time.time() + max_wait_seconds
+    while time.time() < deadline:
+        time.sleep(poll_interval)
+        subprocess.run(["tmux", "send-keys", "-t", "server_" + session_name, f"/op @a", "C-m"])
 
-    subprocess.run(["tmux", "send-keys", "-t", "server_" + session_name, f"/op @a", "C-m"])
+        if check_agent_ops(agent_names, ops_file=ops_file):
+            print("Agents are operators! You are good to go :D")
+            return
 
-    agents_op = check_agent_ops(agent_names, ops_file=f"./tasks/server_data_{session_name}/ops.json")
-    if agents_op:
-        print("Agents are operators! You are good to go :D")
-    else: 
-        print("Agents are not operators! We will need to try making them operators again!")
-        make_ops(agent_names, session_name)
+        print(f"Agents are not operators yet, retrying... ({int(deadline - time.time())}s left)")
+
+    raise RuntimeError(
+        f"Failed to make agents {agent_names} operators within {max_wait_seconds}s. "
+        f"Check that both bots actually connected: tmux attach -t {session_name}"
+    )
 
 def check_agent_ops(agent_names, ops_file="ops.json"):
+    if not os.path.exists(ops_file):
+        return False
+
     with open(ops_file, "r") as f:
         ops_data = json.load(f)
-    
+
     ops_names = [op["name"] for op in ops_data]
-    
+
     for agent in agent_names:
         if agent not in ops_names:
-            return False 
+            return False
     return True
 
 def make_script_file_and_run(script_content, 
