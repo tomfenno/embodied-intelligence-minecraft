@@ -15,6 +15,8 @@ import socket
 
 import boto3
 
+from parse_episode_score import parse_episode_score
+
 BLOCKED_ACTIONS_COOKING = [
     '!activate', '!attackPlayer', '!checkBlueprint', '!checkBlueprintLevel',
     '!clearChat', '!clearFurnace', '!consume', '!craftable', '!discard',
@@ -47,35 +49,11 @@ def analyze_json_file(file_path):
         file_path (str): Path to the JSON file.
 
     Returns:
-        str or None: The task outcome string if found, otherwise None.
+        int, float, or None: The task outcome if found, otherwise None.
     """
-    try:
-        with open(file_path, 'r') as f:
-            data = json.load(f)
-            if "turns" in data:
-                for turn in data["turns"]:
-                    if turn.get("role") == "system" and "content" in turn:
-                        if isinstance(turn["content"], str) and "Task ended with score : " in turn["content"]:
-                            if "Task ended with score : 1" in turn["content"]:
-                                return 1
-                            elif "Task ended with score : 0" in turn["content"]:
-                                return 0
-                            else:
-                                score = float(turn["content"].split(":")[-1].strip())
-                                return score
-                            
-                            
-        return None
-    except FileNotFoundError:
-        print(f"Error: File not found: {file_path}")
-        return None
-    except json.JSONDecodeError:
-        print(f"Error: Invalid JSON format in: {file_path}")
-        return None
-    except Exception as e:
-        print(f"An unexpected error occurred while processing {file_path}: {e}")
-        return None
-    
+    return parse_episode_score(file_path)
+
+
 def extract_result(folder_path):
     folder_name = os.path.basename(folder_path)
     json_files = glob.glob(os.path.join(folder_path, "*.json"))
@@ -241,29 +219,32 @@ def set_environment_variable_tmux_session(session_name, key, value):
     """Set an environment variable for the current process."""
     subprocess.run(["tmux", "send-keys", "-t", session_name, f"export {key}={value}", "C-m"])
 
-def launch_parallel_experiments(task_path, 
-                                num_exp, 
-                                exp_name, 
-                                num_agents=2, 
+def launch_parallel_experiments(task_path,
+                                num_exp,
+                                exp_name,
+                                num_agents=2,
                                 model="gpt-4o-mini",
                                 api="openai",
                                 num_parallel=1,
-                                s3=False, 
-                                bucket_name="mindcraft-experiments", 
-                                template_profile="profiles/tasks/collab_profile.json", 
-                                insecure_coding=False, 
-                                url="http://127.0.0.1:8000/v1", 
+                                s3=False,
+                                bucket_name="mindcraft-experiments",
+                                template_profile="profiles/tasks/collab_profile.json",
+                                insecure_coding=False,
+                                url="http://127.0.0.1:8000/v1",
                                 max_messages=15,
-                                num_examples=2, 
+                                num_examples=2,
                                 no_pruning=False,
-                                block_conversation=False, 
-                                run_in_tmux=True):
-    
+                                block_conversation=False,
+                                run_in_tmux=True,
+                                team_condition="baseline",
+                                reasoning_effort=None):
+
     with open(task_path, 'r', encoding='utf-8') as file:
         content = file.read()
     json_data = json.loads(content)
 
     task_ids = json_data.keys()
+    task_timeouts = {tid: json_data[tid].get("timeout", 300) for tid in task_ids}
 
     task_type = json_data[list(task_ids)[0]]["type"]
     # split the task_ids into num_parallel groups
@@ -296,27 +277,30 @@ def launch_parallel_experiments(task_path,
     # start wandb
     os.makedirs(experiments_folder, exist_ok=True)
     for i, server in enumerate(servers):
-        launch_server_experiment(task_path, 
-                                 task_ids_split[i], 
-                                 num_exp, 
-                                 server, 
-                                 experiments_folder, 
-                                 exp_name, 
-                                 s3=s3, 
-                                 bucket_name=bucket_name, 
-                                 template_profile=template_profile, 
-                                 model=model, 
-                                 api=api, 
+        launch_server_experiment(task_path,
+                                 task_ids_split[i],
+                                 num_exp,
+                                 server,
+                                 experiments_folder,
+                                 exp_name,
+                                 s3=s3,
+                                 bucket_name=bucket_name,
+                                 template_profile=template_profile,
+                                 model=model,
+                                 api=api,
                                  insecure_coding=insecure_coding,
-                                 num_agents=num_agents, 
-                                 url=url, 
-                                 task_type=task_type, 
-                                 s3_path=s3_path, 
+                                 num_agents=num_agents,
+                                 url=url,
+                                 task_type=task_type,
+                                 s3_path=s3_path,
                                  max_messages=max_messages,
-                                 num_examples=num_examples, 
+                                 num_examples=num_examples,
                                  no_pruning=no_pruning,
-                                 block_conversation=block_conversation, 
-                                 run_in_tmux=run_in_tmux)
+                                 block_conversation=block_conversation,
+                                 run_in_tmux=run_in_tmux,
+                                 team_condition=team_condition,
+                                 reasoning_effort=reasoning_effort,
+                                 task_timeouts=task_timeouts)
         time.sleep(5)
     
     total_num_tasks = len(task_ids)
@@ -338,34 +322,43 @@ def launch_parallel_experiments(task_path,
         results["num_examples"] = num_examples
         with open(f"{experiments_folder}/results.txt", "w") as file:
             file.write(str(results))
-        if s3: 
+        if s3:
             cmd = f"aws s3 cp {experiments_folder}/results.txt s3://{s3_path}/results.txt"
             print(cmd)
             subprocess.run(cmd.split())
-        
+
         time.sleep(60)
 
-def launch_server_experiment(task_path, 
-                             task_ids, 
-                             num_exp, 
-                             server, 
+    subprocess.run([
+        "node", "achievement_hunter/evaluation_harness/merge_results.js",
+        "--input", experiments_folder,
+        "--output", os.path.join(experiments_folder, "aggregate"),
+    ])
+
+def launch_server_experiment(task_path,
+                             task_ids,
+                             num_exp,
+                             server,
                              experiments_folder,
-                             exp_name="exp", 
-                             num_agents=2, 
+                             exp_name="exp",
+                             num_agents=2,
                              model="gpt-4o",
-                             api="openai", 
-                             s3=False, 
-                             bucket_name="mindcraft-experiments", 
-                             template_profile="profiles/tasks/collab_profile.json", 
-                             insecure_coding=False, 
-                             url="http://127.0.0.1:8000/v1", 
-                             task_type="techtree", 
-                             s3_path="", 
-                             max_messages=15, 
-                             num_examples=2, 
+                             api="openai",
+                             s3=False,
+                             bucket_name="mindcraft-experiments",
+                             template_profile="profiles/tasks/collab_profile.json",
+                             insecure_coding=False,
+                             url="http://127.0.0.1:8000/v1",
+                             task_type="techtree",
+                             s3_path="",
+                             max_messages=15,
+                             num_examples=2,
                              no_pruning=False,
-                             block_conversation=False, 
-                             run_in_tmux=True):
+                             block_conversation=False,
+                             run_in_tmux=True,
+                             team_condition="baseline",
+                             reasoning_effort=None,
+                             task_timeouts=None):
     
     """
     Launch a Minecraft server and run experiments on it.
@@ -404,7 +397,7 @@ def launch_server_experiment(task_path,
         models = [model] * num_agents
         apis = [api] * num_agents
         
-    make_profiles(agent_names, models, apis, template_profile=template_profile, url=url)
+    make_profiles(agent_names, models, apis, template_profile=template_profile, url=url, reasoning_effort=reasoning_effort)
 
     agent_profiles = [f"./{agent}.json" for agent in agent_names]
 
@@ -445,27 +438,36 @@ def launch_server_experiment(task_path,
         os.environ["NUM_EXAMPLES"] = str(num_examples)
         os.environ["LOG_ALL"] = "true"
     
-    run_script(task_path, 
-               task_ids, 
-               num_exp, 
-               experiments_folder, 
-               agent_names, 
-               server_path, 
-               s3=s3, 
-               s3_path=s3_path, 
-               session_name=session_name, 
-               run_in_tmux=run_in_tmux)
-
-def run_script(task_path, 
-               task_ids, 
+    run_script(task_path,
+               task_ids,
                num_exp,
-               experiments_folder, 
+               experiments_folder,
+               agent_names,
+               server_path,
+               s3=s3,
+               s3_path=s3_path,
+               session_name=session_name,
+               run_in_tmux=run_in_tmux,
+               team_condition=team_condition,
+               team_size=num_agents,
+               task_type=task_type,
+               task_timeouts=task_timeouts)
+
+def run_script(task_path,
+               task_ids,
+               num_exp,
+               experiments_folder,
                agent_names,
                server_path,
                s3=False,
                s3_path="mindcraft-experiments",
                session_name="0",
-               run_in_tmux=True,):
+               run_in_tmux=True,
+               team_condition="baseline",
+               team_size=None,
+               task_type=None,
+               task_timeouts=None):
+    task_timeouts = task_timeouts or {}
     script_content = ""
     for task_id in task_ids:
         # Create a separate folder for each task_id
@@ -473,14 +475,18 @@ def run_script(task_path,
         os.makedirs(task_folder, exist_ok=True)
         assert os.path.exists(task_folder), f"Directory {task_folder} was not created"
         print(f"Created directory: {task_folder}")
-        
+
         cmd = f"node main.js --task_path \'{task_path}\' --task_id {task_id}"
         cp_cmd = f"cp {agent_names[0]}.json {server_path}bots/{agent_names[0]}/profile.json"
         for _ in range(num_exp):
-            script_content += f"{cmd}\n"
+            episode_dir = os.path.join(task_folder, f"episode_{_}")
+            script_content += f"mkdir -p {episode_dir}\n"
+            script_content += f"BENCHMARK_EPISODE_DIR={episode_dir} {cmd}\n"
             script_content += "sleep 2\n"
+            agent_file_paths = []
             for agent in agent_names:
                 agent_file_path = os.path.join(task_folder, f"{agent}_{_}.json")
+                agent_file_paths.append(agent_file_path)
                 script_content += f"echo 'Saving to {agent_file_path}'\n"
                 cp_cmd = f"cp bots/{agent}/memory.json {agent_file_path}"
                 script_content += f"echo '{cp_cmd}'\n"
@@ -492,6 +498,16 @@ def run_script(task_path,
                     script_content += f"echo '{s3_cmd}'\n"
                     script_content += f"{s3_cmd}\n"
                     script_content += "sleep 1\n"
+
+            manifest_cmd = (
+                f"node achievement_hunter/evaluation_harness/episode_manifest.js "
+                f"--episode_dir {episode_dir} --task_id {task_id} --seed {_} "
+                f"--team_condition {team_condition} --team_size {team_size} --domain {task_type} "
+                f"--agent_files {' '.join(agent_file_paths)}"
+            )
+            if task_timeouts.get(task_id) is not None:
+                manifest_cmd += f" --task_timeout_seconds {task_timeouts[task_id]}"
+            script_content += f"{manifest_cmd}\n"
         script_content += f"sleep 10\n"
         if s3:
             for agent in agent_names:
@@ -554,12 +570,12 @@ def make_script_file_and_run(script_content,
     else:
         subprocess.run(script_file_run.split())
 
-def make_profiles(agent_names, models, apis, template_profile="profiles/collab_profile.json", url="http://127.0.0.1:8000/v1"):
+def make_profiles(agent_names, models, apis, template_profile="profiles/collab_profile.json", url="http://127.0.0.1:8000/v1", reasoning_effort=None):
     assert len(agent_names) == len(models)
 
     with open(template_profile, 'r') as f:
         content = f.read()
-    
+
     profile = json.loads(content)
 
     for index in range(len(agent_names)):
@@ -567,7 +583,7 @@ def make_profiles(agent_names, models, apis, template_profile="profiles/collab_p
         if apis[index] == "vllm":
             profile["model"] = {
                 "api": "vllm",
-                "model": models[index], 
+                "model": models[index],
                 "url": url
             }
         elif apis[index] == "ollama":
@@ -576,7 +592,12 @@ def make_profiles(agent_names, models, apis, template_profile="profiles/collab_p
                 "model": models[index],
                 "embedding": "ollama"
             }
-        else: 
+        elif apis[index] == "openai" and reasoning_effort:
+            profile["model"] = {
+                "model": models[index],
+                "params": {"reasoning": {"effort": reasoning_effort}}
+            }
+        else:
             profile["model"] = models[index]
 
         with open(f"{agent_names[index]}.json", 'w') as f:
@@ -751,6 +772,8 @@ def main():
     parser.add_argument('--block_conversation', action='store_true', help='Block conversation actions')
     parser.add_argument('--check', metavar='FOLDER_PATH', help='Check and evaluate results in the specified folder without running experiments')
     parser.add_argument('--usernames', default="", help='Comma-separated list of usernames for the agents')
+    parser.add_argument('--team_condition', default="baseline", help='Label written into episode_manifest.json for pairing/grouping results (e.g. gpt5_5_baseline)')
+    parser.add_argument('--reasoning_effort', default=None, help='Reasoning effort (e.g. low/medium/high) folded into the OpenAI profile params; omit to leave the model default')
 
     args = parser.parse_args()
     print(args)
@@ -790,23 +813,25 @@ def main():
         with open(args.task_path, 'w') as f:
             json.dump(task, f, indent=4)
     
-    launch_parallel_experiments(args.task_path, 
-                                num_exp=args.num_exp, 
-                                exp_name=args.exp_name, 
-                                num_parallel=args.num_parallel, 
-                                s3=args.s3, 
-                                bucket_name=args.bucket_name, 
-                                template_profile=args.template_profile, 
-                                model=args.model, 
-                                api=args.api, 
+    launch_parallel_experiments(args.task_path,
+                                num_exp=args.num_exp,
+                                exp_name=args.exp_name,
+                                num_parallel=args.num_parallel,
+                                s3=args.s3,
+                                bucket_name=args.bucket_name,
+                                template_profile=args.template_profile,
+                                model=args.model,
+                                api=args.api,
                                 insecure_coding=args.insecure_coding,
-                                num_agents=args.num_agents, 
-                                url=args.url, 
+                                num_agents=args.num_agents,
+                                url=args.url,
                                 max_messages=args.max_messages,
-                                num_examples=args.num_examples, 
-                                no_pruning=args.no_pruning, 
+                                num_examples=args.num_examples,
+                                no_pruning=args.no_pruning,
                                 block_conversation=args.block_conversation,
-                                run_in_tmux=not args.no_launch_world)
+                                run_in_tmux=not args.no_launch_world,
+                                team_condition=args.team_condition,
+                                reasoning_effort=args.reasoning_effort)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,8 @@
+{
+  "_comment": "USD per 1M tokens. Verify at https://developers.openai.com/api/docs/pricing before a real run — prices confirmed live July 2026.",
+  "gpt-5.5": {
+    "input_per_million": 5.00,
+    "cached_input_per_million": 0.50,
+    "output_per_million": 30.00
+  }
+}

@@ -190,7 +190,7 @@ function readTurnsFromArtifact(filePath) {
   return [];
 }
 
-function extractActionName(commandText) {
+export function extractActionName(commandText) {
   const match = String(commandText).match(/!\w+/);
   return match ? match[0] : null;
 }

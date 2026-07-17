@@ -85,6 +85,15 @@ describe('merge_results.js', () => {
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
+    const optionalNullFields = {
+      team_size: null,
+      domain: null,
+      task_score: null,
+      timeout_used_pct: null,
+      total_cost_usd: null,
+      total_tokens: null,
+      total_llm_requests: null,
+    };
     expect(loadJsonl(path.join(outputDir, 'results.jsonl'))).toEqual([
       {
         agent_label: 'agent_a',
@@ -93,6 +102,7 @@ describe('merge_results.js', () => {
         success: 1,
         episode_duration_seconds: 10,
         total_commands: 5,
+        ...optionalNullFields,
       },
       {
         agent_label: 'agent_a',
@@ -101,6 +111,7 @@ describe('merge_results.js', () => {
         success: 0,
         episode_duration_seconds: 30,
         total_commands: 9,
+        ...optionalNullFields,
       },
     ]);
 

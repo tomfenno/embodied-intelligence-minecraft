@@ -1,6 +1,7 @@
 import OpenAIApi from 'openai';
 import { getKey, hasKey } from '../utils/keys.js';
 import { strictFormat } from '../utils/text.js';
+import { recordLLMUsage } from '../../achievement_hunter/evaluation_harness/llm_usage.js';
 
 export class GPT {
     static prefix = 'openai';
@@ -21,7 +22,7 @@ export class GPT {
         this.openai = new OpenAIApi(config);
     }
 
-    async sendRequest(turns, systemMessage, stop_seq='***') {
+    async sendRequest(turns, systemMessage, stop_seq='***', callerName='unknown') {
         let messages = strictFormat(turns);
         messages = messages.map(message => {
             message.content += stop_seq;
@@ -49,10 +50,18 @@ export class GPT {
                 }
                 let completion = await this.openai.chat.completions.create(pack);
                 if (completion.choices[0].finish_reason == 'length')
-                    throw new Error('Context length exceeded'); 
+                    throw new Error('Context length exceeded');
                 console.log('Received.');
                 res = completion.choices[0].message.content;
-            } 
+                if (completion.usage) {
+                    recordLLMUsage(callerName, {
+                        model,
+                        inputTokens: completion.usage.prompt_tokens ?? 0,
+                        outputTokens: completion.usage.completion_tokens ?? 0,
+                        cachedInputTokens: completion.usage.prompt_tokens_details?.cached_tokens ?? 0,
+                    });
+                }
+            }
             // otherwise, use responses
             else {
                 let messages = strictFormat(turns);
@@ -70,12 +79,20 @@ export class GPT {
                 res = response.output_text;
                 let stop_seq_index = res.indexOf(stop_seq);
                 res = stop_seq_index !== -1 ? res.slice(0, stop_seq_index) : res;
+                if (response.usage) {
+                    recordLLMUsage(callerName, {
+                        model,
+                        inputTokens: response.usage.input_tokens ?? 0,
+                        outputTokens: response.usage.output_tokens ?? 0,
+                        cachedInputTokens: response.usage.input_tokens_details?.cached_tokens ?? 0,
+                    });
+                }
             }
         }
         catch (err) {
             if ((err.message == 'Context length exceeded' || err.code == 'context_length_exceeded') && turns.length > 1) {
                 console.log('Context length exceeded, trying again with shorter context.');
-                return await this.sendRequest(turns.slice(1), systemMessage, stop_seq);
+                return await this.sendRequest(turns.slice(1), systemMessage, stop_seq, callerName);
             } else if (err.message.includes('image_url')) {
                 console.log(err);
                 res = 'Vision is only supported by certain models.';

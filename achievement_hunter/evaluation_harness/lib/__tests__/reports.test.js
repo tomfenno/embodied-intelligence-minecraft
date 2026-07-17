@@ -37,7 +37,7 @@ function readCsv(filePath) {
 }
 
 describe('writeResultsJsonl', () => {
-  it('writes only the compact per-episode fields', () => {
+  it('writes the compact per-episode fields plus null-defaulted optional baseline metrics', () => {
     const suiteRoot = makeSuiteRoot('compact-results');
     const resultsPath = path.join(suiteRoot, 'results.jsonl');
 
@@ -60,6 +60,13 @@ describe('writeResultsJsonl', () => {
       success: 1,
       episode_duration_seconds: 12.5,
       total_commands: 17,
+      team_size: null,
+      domain: null,
+      task_score: null,
+      timeout_used_pct: null,
+      total_cost_usd: null,
+      total_tokens: null,
+      total_llm_requests: null,
     }]);
   });
 });

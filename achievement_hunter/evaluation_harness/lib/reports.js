@@ -87,6 +87,16 @@ export function normalizeEpisodeRecord(record) {
     total_commands:
         normalizeNumber(record.total_commands ??
             record.dependency_total_commands),
+    // Optional fields populated by the GPT-5.5 baseline pipeline
+    // (episode_manifest.js); left as null when absent so older
+    // single-agent manifests continue to round-trip unchanged.
+    team_size: record.team_size ?? null,
+    domain: record.domain ?? null,
+    task_score: record.task_score ?? null,
+    timeout_used_pct: record.timeout_used_pct ?? null,
+    total_cost_usd: record.total_cost_usd ?? null,
+    total_tokens: record.total_tokens ?? null,
+    total_llm_requests: record.total_llm_requests ?? null,
   };
 }
 
