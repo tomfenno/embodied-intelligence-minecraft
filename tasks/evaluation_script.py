@@ -418,6 +418,7 @@ def launch_server_experiment(task_path,
         subprocess.run(['tmux', 'new-session', '-d', '-s', session_name], check=True) 
     # set environment variables
     if run_in_tmux:
+        set_environment_variable_tmux_session(session_name, "MINECRAFT_HOST", "127.0.0.1")
         set_environment_variable_tmux_session(session_name, "MINECRAFT_PORT", server_port)
         set_environment_variable_tmux_session(session_name, "MINDSERVER_PORT", mindserver_port)
         set_environment_variable_tmux_session(session_name, "PROFILES", agent_profiles_str)
@@ -433,6 +434,7 @@ def launch_server_experiment(task_path,
             agent_profiles_str += f"\"{agent}\", " 
         agent_profiles_str += f"\"{agent_profiles[-1]}\"]"
         # print(agent_profiles_str)
+        os.environ["MINECRAFT_HOST"] = "127.0.0.1"
         os.environ["PROFILES"] = agent_profiles_str
         os.environ["MAX_MESSAGES"] = str(max_messages)
         os.environ["NUM_EXAMPLES"] = str(num_examples)
