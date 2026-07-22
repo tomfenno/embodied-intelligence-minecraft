@@ -81,6 +81,13 @@ const settings = {
       true,  // when true, agent waits for a player command on spawn
              // and runs the structured prompting loop with it as the objective
 
+  // Start of AH code
+  'colab_agent':
+      false,  // when true, count_id 0 runs the Disclosure Loop (Phase 1); every
+              // other agent is the exact stock path, untouched. See
+              // colab_agent/docs/08-phase-1-world-state-document.md
+  // End of AH code
+
 }
 
 if (process.env.SETTINGS_JSON) {

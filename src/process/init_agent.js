@@ -1,6 +1,10 @@
 import { Agent } from '../agent/agent.js';
 import { serverProxy } from '../agent/mindserver_proxy.js';
 import yargs from 'yargs';
+// Start of AH code
+import settings from '../agent/settings.js';
+import { ColabCoordinatorAgent } from '../../colab_agent/src/agent/coordinator_agent.js';
+// End of AH code
 
 const args = process.argv.slice(2);
 if (args.length < 1) {
@@ -42,7 +46,16 @@ const argv = yargs(args)
         console.log('Connecting to MindServer');
         await serverProxy.connect(argv.name, argv.port);
         console.log('Starting agent');
-        const agent = new Agent();
+        // Start of AH code
+        const isColabCoordinator = settings.colab_agent && argv.count_id === 0;
+        if (settings.colab_agent) {
+            console.log(`[Disclosure Loop] colab_agent mode: count_id ${argv.count_id} is ` +
+                `${isColabCoordinator ? 'the coordinator (ColabCoordinatorAgent)' : 'a responder (stock Agent)'}`);
+        }
+        const agent = isColabCoordinator
+            ? new ColabCoordinatorAgent()
+            : new Agent();
+        // End of AH code
         serverProxy.setAgent(agent);
         await agent.start(argv.load_memory, argv.init_message, argv.count_id);
     } catch (error) {

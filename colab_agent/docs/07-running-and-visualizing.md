@@ -12,7 +12,7 @@ This uses the **stock Mindcraft multi-agent path** (`achievement_hunter: false`)
 cd /Users/Matthew/Desktop/AH-Hunter/embodied-intelligence-minecraft
 
 SETTINGS_JSON='{"host":"127.0.0.1","achievement_hunter":false}' \
-PROFILES='["./achievement_hunter/colab_agent/profiles/andy.json","./achievement_hunter/colab_agent/profiles/jill.json"]' \
+PROFILES='["./colab_agent/profiles/andy.json","./colab_agent/profiles/jill.json"]' \
 node main.js \
   --task_path tasks/crafting_tasks/test_tasks/2_agent.json \
   --task_id multiagent_crafting_pink_wool_full_plan__depth_0
@@ -28,7 +28,7 @@ node main.js \
 |---|---|---|
 | Node.js | ✅ v20 | `node -v` |
 | `OPENAI_API_KEY` in `keys.json` | ✅ set | The colab profiles use `gpt-4o-mini`. |
-| Colab agent profiles | ✅ created | `achievement_hunter/colab_agent/profiles/{andy,jill}.json` |
+| Colab agent profiles | ✅ created | `colab_agent/profiles/{andy,jill}.json` |
 | Minecraft **1.21.6** client | ⬜ you provide | Used both to **host** the world and to **watch**. |
 | `tmux` / conda | not needed | Only the Python batch driver needs those. |
 
@@ -60,7 +60,7 @@ In a terminal at the repo root:
 
 ```bash
 SETTINGS_JSON='{"host":"127.0.0.1","achievement_hunter":false}' \
-PROFILES='["./achievement_hunter/colab_agent/profiles/andy.json","./achievement_hunter/colab_agent/profiles/jill.json"]' \
+PROFILES='["./colab_agent/profiles/andy.json","./colab_agent/profiles/jill.json"]' \
 node main.js \
   --task_path tasks/crafting_tasks/test_tasks/2_agent.json \
   --task_id multiagent_crafting_pink_wool_full_plan__depth_0
@@ -167,7 +167,7 @@ To watch a Python-driven run, Direct-Connect your client to `localhost:55916` on
 
 ## Files this guide added
 
-- `achievement_hunter/colab_agent/profiles/andy.json` — agent 0 (name `andy`), crafting prompt, `gpt-4o-mini`.
-- `achievement_hunter/colab_agent/profiles/jill.json` — agent 1 (name `jill`), same prompt.
+- `colab_agent/profiles/andy.json` — agent 0 (name `andy`), crafting prompt, `gpt-4o-mini`.
+- `colab_agent/profiles/jill.json` — agent 1 (name `jill`), same prompt.
 
 Both are plain Mindcraft profiles; edit `model`/`name`/`modes` freely. See [doc 02 §2](./02-initial-agent-state.md) for what each profile field controls.

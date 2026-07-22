@@ -45,4 +45,5 @@ logs/
 .ipynb_checkpoints/
 achievement_hunter/rollouts/
 achievement_hunter/rollout_live/
+colab_agent/rollouts/
 timing_experiments/

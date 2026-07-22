@@ -8,7 +8,7 @@
 
 This repo is a fork of **Mindcraft** (LLM agents that play Minecraft via [Mineflayer](https://github.com/PrismarineJS/mineflayer)) with an **Achievement Hunter (AH)** layer on top. All AH work lives under `achievement_hunter/`.
 
-The **colab_agent** sub-project (this directory, `achievement_hunter/colab_agent/`) is a *new, not-yet-built* effort. The goal: build a **structured prompting loop for multi-agent collaboration** that can complete the collaborative tasks in `tasks/` (crafting, cooking, construction). The existing AH agent is the closest reference, but it is **single-agent only** — the multi-agent coordination layer is the new work.
+The **colab_agent** sub-project (this directory, `colab_agent/`, at the repo root — **not** under `achievement_hunter/`) is a *new, not-yet-built* effort. The goal: build a **structured prompting loop for multi-agent collaboration** that can complete the collaborative tasks in `tasks/` (crafting, cooking, construction). The existing AH agent is the closest reference, but it is **single-agent only** — the multi-agent coordination layer is the new work.
 
 **Current phase: investigation + documentation only.** No new agent has been built. No task behavior has been changed.
 
@@ -16,7 +16,7 @@ The **colab_agent** sub-project (this directory, `achievement_hunter/colab_agent
 
 ## 2. What exists right now (created in prior sessions)
 
-Everything is under `achievement_hunter/colab_agent/`:
+Everything is under `colab_agent/` (repo root):
 
 ```
 colab_agent/
@@ -91,7 +91,7 @@ Hosting the world from the user's own client with **Open-to-LAN + Allow Cheats O
 ```bash
 cd /Users/Matthew/Desktop/AH-Hunter/embodied-intelligence-minecraft
 SETTINGS_JSON='{"host":"127.0.0.1","achievement_hunter":false}' \
-PROFILES='["./achievement_hunter/colab_agent/profiles/andy.json","./achievement_hunter/colab_agent/profiles/jill.json"]' \
+PROFILES='["./colab_agent/profiles/andy.json","./colab_agent/profiles/jill.json"]' \
 node main.js \
   --task_path tasks/crafting_tasks/test_tasks/2_agent.json \
   --task_id multiagent_crafting_pink_wool_full_plan__depth_0

@@ -62,13 +62,13 @@ The task system is mostly *agnostic* to how an agent thinks, but it assumes the 
 **Mirror the AH pattern, but keep (rather than silence) the collaboration paths.**
 
 1. **Add a `settings.colab_agent` flag** + a `main.js` branch calling a new `create_colab_agent(settings)`. Keep everything else in `main.js` untouched (it already loads the task and spawns per profile).
-2. **Subclass `Agent`** in `achievement_hunter/colab_agent/src/agent/`, copying the AH process/init trio. Override `update()`/`handleMessage()` with your loop — but **do not** call `_silence_chat_listeners()`; you want inter-agent messages.
+2. **Subclass `Agent`** in `colab_agent/src/agent/`, copying the AH process/init trio. Override `update()`/`handleMessage()` with your loop — but **do not** call `_silence_chat_listeners()`; you want inter-agent messages.
 3. **Reuse the `Task` lifecycle as-is** for non-benchmark, collaborative task types (`techtree`, `cooking`, `construction`): let `initBotTask()` grant inventory/teleport/seed-conversation and let `isDone()` score. The collaboration goal injection in `setAgentGoal()` (`tasks.js:166-176`) already names teammates — keep it, since `isBenchmarkTaskType` is false for these types so the AH early-return at `tasks.js:163` won't fire.
 4. **Build the coordination layer on top of the socket relay** (doc 03): receive teammate messages via `convoManager`/`handleMessage`, decide actions with your loop, send via `routeResponse`/`sendToBot`. Privileged-info exchange (recipes in Hell's Kitchen, inventory sharing) is *application logic in your loop*, not infrastructure.
 5. **Reuse AH planning utilities** where single-agent reasoning applies: `agent_state.js`, `scsg.js`, `command_verifier.js`/`command_utils.js`, `rollout_logger.js`, `checkpoint.js`. The **new** work is the multi-agent layer: teammate state modeling, task division, message protocol, and when to ask vs. act.
 6. **Emit `Task ended with score : N`** through `checkTaskDone()` so results land in `memory.json` and the Python analyzer (`evaluation_script.py:42`).
 
-> **Per the repo CLAUDE.md:** all new code lives under `achievement_hunter/colab_agent/`; any edit *outside* that dir (e.g. the `main.js` branch, a `settings.js` flag, a `tasks.js` hook) must be wrapped in `// Start of AH code` / `// End of AH code` markers and checked against `patches/` first.
+> **Per the repo CLAUDE.md:** AH code lives under `achievement_hunter/`; `colab_agent/` is its own sub-project at the repo **root**, outside that dir. Any edit to a file that predates `colab_agent/` (e.g. the `main.js` branch, a `settings.js` flag, a `tasks.js` hook) must still be wrapped in `// Start of AH code` / `// End of AH code` markers and checked against `patches/` first — that rule is about touching pre-existing repo files, not about where `colab_agent/`'s own new files live.
 
 ---
 
@@ -76,8 +76,8 @@ The task system is mostly *agnostic* to how an agent thinks, but it assumes the 
 
 - [ ] `settings.js`: add `colab_agent` flag + default profile path (AH-marked edit).
 - [ ] `main.js`: add `if (settings.colab_agent) create_colab_agent(settings)` branch (AH-marked edit).
-- [ ] `achievement_hunter/colab_agent/src/agent/{create,process,init}.js`: copy/adapt AH trio.
-- [ ] `achievement_hunter/colab_agent/src/agent/colab_agent.js`: `extends Agent`, custom `update()`/`handleMessage()`, **keep chat listeners**.
+- [ ] `colab_agent/src/agent/{create,process,init}.js`: copy/adapt AH trio.
+- [ ] `colab_agent/src/agent/colab_agent.js`: `extends Agent`, custom `update()`/`handleMessage()`, **keep chat listeners**.
 - [ ] Decide: reuse `ConversationManager` turn-taking, or custom `chat-message` protocol.
 - [ ] Decide: reuse `prompter.js` templates, or AH-style JSON prompts via `llm_client.js`.
 - [ ] Verify `task.isDone()` scoring path is intact for your target task types.

@@ -15,6 +15,7 @@ This directory documents how the Mindcraft/MineCollab **task system** (`tasks/` 
 | [`05-interface-points-for-new-agent.md`](./05-interface-points-for-new-agent.md) | Where a new agent hooks in, the contract `tasks/` assumes, recommendations, and open questions | "Interface points for a new agent" |
 | [`06-task-demands-and-coordination.md`](./06-task-demands-and-coordination.md) | What each task category actually demands of agents, and the coordination/role structures those demands imply | designing an agent organizational structure |
 | [`07-running-and-visualizing.md`](./07-running-and-visualizing.md) | Copy-pasteable guide to run a 2-agent collaborative task and watch it in Minecraft 1.21.6 (no tmux/Python, no settings.js edits) | running & visualizing a task |
+| [`08-phase-1-world-state-document.md`](./08-phase-1-world-state-document.md) | Implementation plan for Phase 1 only: the "Disclosure Loop" — Agent 0 as coordinator interviews its teammate to build a world state document, before any planning/execution exists | building & running a Phase 1 rollout |
 
 ## One-paragraph summary
 
