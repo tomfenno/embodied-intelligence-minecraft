@@ -418,6 +418,14 @@ def launch_server_experiment(task_path,
         subprocess.run(['tmux', 'new-session', '-d', '-s', session_name], check=True) 
     # set environment variables
     if run_in_tmux:
+        # settings.js defaults achievement_hunter=true, which routes agents through
+        # AchievementAgent (the SPL path) instead of the plain baseline Agent class.
+        # AchievementAgent doesn't understand MineCollab task types (cooking/construction/
+        # techtree) at all, so the baseline eval needs this forced off via the existing
+        # SETTINGS_JSON override mechanism (same one achievement_hunter/evaluation_harness
+        # /lib/suite.js:320-325 already uses), not by touching the shared settings.js default.
+        settings_json_value = "'" + json.dumps({"achievement_hunter": False}) + "'"
+        set_environment_variable_tmux_session(session_name, "SETTINGS_JSON", settings_json_value)
         set_environment_variable_tmux_session(session_name, "MINECRAFT_HOST", "127.0.0.1")
         set_environment_variable_tmux_session(session_name, "MINECRAFT_PORT", server_port)
         set_environment_variable_tmux_session(session_name, "MINDSERVER_PORT", mindserver_port)
@@ -434,6 +442,7 @@ def launch_server_experiment(task_path,
             agent_profiles_str += f"\"{agent}\", " 
         agent_profiles_str += f"\"{agent_profiles[-1]}\"]"
         # print(agent_profiles_str)
+        os.environ["SETTINGS_JSON"] = json.dumps({"achievement_hunter": False})
         os.environ["MINECRAFT_HOST"] = "127.0.0.1"
         os.environ["PROFILES"] = agent_profiles_str
         os.environ["MAX_MESSAGES"] = str(max_messages)
