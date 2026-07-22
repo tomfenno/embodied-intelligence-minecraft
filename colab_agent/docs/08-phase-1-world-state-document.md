@@ -64,22 +64,29 @@ The only thing that differs anywhere in the system because `colab_agent` is on i
 
 ```
 colab_agent/
-├── docs/08-phase-1-world-state-document.md   ← this file
+├── docs/
+│   ├── 08-phase-1-world-state-document.md    ← this file
+│   └── prompts/disclosure_loop_prompts/
+│       └── assessment_prompt.md              the assessment prompt template, editable directly
 ├── profiles/{andy,jill}.json                 ← REUSED, unchanged
 ├── rollouts/                                 ← NEW, gitignored output
 │   └── <task_id>/<run_id>/
 │       ├── world_state.json                  final document
-│       └── iterations.jsonl                  per-question trace
+│       ├── iterations.jsonl                  per-question trace
+│       └── memory.json                       narrative memory, separate from world_state.json (§9)
 └── src/
     ├── agent/
     │   └── coordinator_agent.js              ColabCoordinatorAgent — the only agent-side file
     ├── comms/
     │   └── teammate_channel.js                askTeammate() — the swappable query abstraction
     └── pipeline/
-        └── world_state.js                     the Disclosure Loop: schema, prompt, termination
+        ├── world_state.js                     the Disclosure Loop: schema, loop, termination
+        └── prompt_utils.js                     loads/fills assessment_prompt.md
 ```
 
-Five new files total. `colab_agent/src/pipeline/world_state.js` imports `LlmClient` from `achievement_hunter/src/pipeline/llm_client.js` and `get_sgsg_state` from `achievement_hunter/src/pipeline/agent_state.js` directly (not copied) — generic, agent-agnostic utilities that would just drift if duplicated. This is the one intentional cross-directory dependency colab_agent takes on.
+Seven new files total. `colab_agent/src/pipeline/world_state.js` imports `LlmClient` from `achievement_hunter/src/pipeline/llm_client.js` and `get_sgsg_state` from `achievement_hunter/src/pipeline/agent_state.js` directly (not copied) — generic, agent-agnostic utilities that would just drift if duplicated. This is the one intentional cross-directory dependency colab_agent takes on.
+
+**Prompt templates live as `.md` files under `docs/prompts/`, not inline template literals** — mirroring `achievement_hunter/docs/prompts/`'s convention exactly: `{{KEY}}` placeholders filled by a small `prompt_utils.js` (`_read_template`/`_fill`, same shape as AH's, duplicated rather than imported since AH doesn't export those two helpers). Editing the actual wording of the assessment prompt is now a plain-text edit to `assessment_prompt.md`, not a code change to `world_state.js`.
 
 ---
 
@@ -178,6 +185,20 @@ export class TeammateChannel {
       }
     });
   }
+
+  // The real !endConversation command handler only clears local state — it
+  // never notifies the other side (src/agent/commands/actions.js:514-526).
+  // The "other side" mechanism is that sendToBot flags a message end:true
+  // whenever its text contains the substring "!endConversation", which the
+  // receiver's _handleFullInMessage acts on. So closing cleanly on both ends
+  // requires both steps. Order matters: endConversation() sets
+  // ignore_until_start, and sendToBot drops the message if that's already
+  // set — the farewell must go out first.
+  endConversation(name, farewellMessage) {
+    if (!convoManager.inConversation(name)) return;
+    convoManager.sendToBot(name, `${farewellMessage} !endConversation("${name}")`);
+    convoManager.endConversation(name);
+  }
 }
 ```
 
@@ -274,30 +295,34 @@ An earlier version of this plan had the LLM regenerate the *entire* document eve
 
 ```js
 // colab_agent/src/pipeline/world_state.js (as implemented)
-const DEFAULT_MODEL = 'gpt-4o-mini';
+const FALLBACK_MODEL = 'gpt-4o-mini'; // used only if the coordinator's own profile omits "model"
 const MAX_ITERATIONS = 5;
 const INTRO = "Hi, I'm coordinating this task. Before anyone starts, I'm gathering " +
     "what everyone has and needs. Please hold off on taking any actions until I " +
     "share the plan. ";
 
 export async function runDisclosureLoop(agent, teammateChannel) {
-  const llm = new LlmClient(DEFAULT_MODEL);
+  const llm = new LlmClient(agent.prompter.profile.model || FALLBACK_MODEL);
   const runDir = makeRunDir(agent.task.data.task_id);
   console.log(`[Disclosure Loop] starting for ${agent.name}, logging to ${runDir}`);
 
   const teammates = await waitForTeammates(agent);
   console.log(`[Disclosure Loop] teammates found: ${teammates.join(', ')}`);
 
+  await waitForInventory(agent);
   const doc = seedDocument(agent);
   writeDocument(runDir, doc);
 
+  let lastSummary = null;
   for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     const round = { iteration };
     let decision;
     try {
-      const raw = await llm.send_prompt(buildAssessmentPrompt(doc, teammates));
+      const raw = await llm.send_prompt(fill_assessment_prompt(doc, teammates));
       decision = parseDecision(raw, teammates);
       round.status = decision.status;
+      round.summary = decision.summary;
+      lastSummary = decision.summary;
     } catch (err) {
       console.error(`[Disclosure Loop] iteration ${iteration} assessment failed:`, err.message);
       round.error = err.message;
@@ -335,7 +360,21 @@ export async function runDisclosureLoop(agent, teammateChannel) {
   }
 
   doc.status = doc.status ?? 'incomplete';
+  for (const name of Object.keys(doc.teammates)) {
+    teammateChannel.endConversation(name, "Thanks, that's everything I need for now — standing by.");
+  }
   writeDocument(runDir, doc);
+
+  agent.memoryLog = agent.memoryLog || [];
+  const memoryEntry = {
+    phase: 'phase_1',
+    status: doc.status,
+    summary: lastSummary ?? `Phase 1 ended in ${doc.status} before any assessment completed.`,
+  };
+  agent.memoryLog.push(memoryEntry);
+  writeFileSync(path.join(runDir, 'memory.json'), JSON.stringify(agent.memoryLog, null, 2));
+  console.log(`[Disclosure Loop] memory recorded: ${memoryEntry.summary}`);
+
   const totalQuestions = Object.values(doc.teammates).reduce((n, t) => n + t.qna.length, 0);
   console.log(`[Disclosure Loop] finished (${doc.status}) after ${totalQuestions} question(s). ` +
       `Document at ${path.join(runDir, 'world_state.json')}`);
@@ -357,6 +396,29 @@ async function waitForTeammates(agent, timeoutMs = TEAMMATE_WAIT_TIMEOUT_MS) {
   throw new Error(`Timed out waiting for teammates (expected ${expected})`);
 }
 
+// /give is fire-and-forget — there's no confirmation that the server has
+// processed it and mineflayer's bot.inventory reflects it. Waits for the
+// specific quantities initial_inventory promised (not a generic "non-empty"
+// check, which would hang forever for an agent whose slice is legitimately
+// empty); returns immediately when nothing was promised.
+async function waitForInventory(agent, timeoutMs = INVENTORY_WAIT_TIMEOUT_MS) {
+  const expected = agent.task.data.initial_inventory?.[String(agent.count_id)] || {};
+  const expectedEntries = Object.entries(expected);
+  if (expectedEntries.length === 0) return;
+
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const inventory = get_sgsg_state(agent).inventory;
+    const counts = inventory === 'Nothing' ? {} : inventory;
+    if (expectedEntries.every(([item, count]) => (counts[item] || 0) >= count)) {
+      console.log('[Disclosure Loop] initial inventory confirmed');
+      return;
+    }
+    await new Promise(resolve => setTimeout(resolve, 250));
+  }
+  console.warn(`[Disclosure Loop] initial_inventory grant not confirmed within ${timeoutMs}ms; seeding self-state anyway`);
+}
+
 function seedDocument(agent) {
   const goal = agent.task.data.goal;
   return {
@@ -371,7 +433,17 @@ function seedDocument(agent) {
 
 The `INTRO` prepend on the first question only is deliberate: it's the one piece of framing that actually matters for responder behavior (§7), so it's guaranteed verbatim by code rather than left to the model to remember to phrase correctly every time.
 
-(`buildAssessmentPrompt`/`parseDecision`/`makeRunDir`/`appendRound`/`writeDocument` are straightforward and omitted here — see the actual file. The prompt asks for `{status: "complete"}` or `{status: "need_info", next_query: {target_agent, question}}` as JSON, instructed to ask about only genuinely missing information.)
+(`parseDecision`/`makeRunDir`/`appendRound`/`writeDocument` are straightforward and omitted here — see the actual file. `fill_assessment_prompt` lives in `prompt_utils.js` and loads `docs/prompts/disclosure_loop_prompts/assessment_prompt.md` — see §4. The prompt asks for `{status: "complete", summary}` or `{status: "need_info", summary, next_query: {target_agent, question}}` as JSON, instructed to ask about only genuinely missing information.)
+
+### Narrative memory — separate from the document, on purpose
+
+`world_state.json`/`self`/`teammates.qna` are precise structured facts — the whole point of §9's "division of labor" is that nothing in there gets rewritten or summarized by the LLM. But that leaves no room for something genuinely useful across phases: a short narrative of *what the coordinator concluded and why*, for Phase 2/3 (once built) to orient against without re-parsing the full structured document. That's a different concern, so it gets a different artifact.
+
+`assessment_prompt.md`'s schema requires a `summary` field on **every** response, not only on `"complete"` — one or two sentences of the model's current understanding, distinct from a restatement of the raw data it was just given. The loop tracks `lastSummary` across iterations and, whichever iteration turns out to be the last one (`complete`, or `MAX_ITERATIONS` exhausted while still `need_info`), that's what gets recorded — no separate handling needed per exit path. Only a genuine `error` (the assessment call itself never parsed) has no summary to use, and gets a one-line deterministic note instead.
+
+This is the same trick `achievement_hunter`'s `failure_replanner.js` already uses for its own `previous_diagnoses` list: the `diagnosis` field there isn't produced by a dedicated "please summarize" call — it's just part of the structured output a call is already producing for its primary purpose (deciding what to try next). Applying that here means **zero new LLM calls** for memory. The entry (`{phase: 'phase_1', status, summary}`) is pushed onto `agent.memoryLog` — an array living on the coordinator instance, so it's readable in-process by whatever Phase 2 code eventually runs there — and persisted to `memory.json` in the same run directory, genuinely separate from `world_state.json`/`iterations.jsonl` on disk, not just a differently-named field inside them.
+
+One gap knowingly left open: `agent.memoryLog` only survives in-process. If the coordinator's process crash-restarts (`AgentProcess`'s restart path spins up a brand-new instance), the in-memory array is gone, though `memory.json` on disk isn't — a future phase that needs restart-resilience would reload it from disk on startup, mirroring `achievement_hunter/src/pipeline/checkpoint.js`'s already-proven pattern for exactly this problem. Not built now since nothing consumes it yet.
 
 ### Observability
 
@@ -380,7 +452,17 @@ Two gaps surfaced only once this was actually implemented, both fixed before con
 1. **Nothing was logged to the console during the loop, only to the trace file** — meaning watching the terminal live (the whole point of doc 07's setup) would show nothing between "starting" and "finished" unless something crashed. Fixed by having `TeammateChannel` itself log every `->`/`<-` message (§6) and `runDisclosureLoop` log teammate discovery and each iteration's decision — so the terminal now shows the entire negotiation as it happens, not just the outcome.
 2. **The document was only written once, at the very end** — a crash mid-loop would lose every answer gathered so far, leaving nothing to inspect. Fixed by writing `world_state.json` after every iteration (`writeDocument(runDir, doc)` inside the loop, not just after it), and by logging each full round (decision + the actual question sent, with the `INTRO` prepend included + the answer or error) to `iterations.jsonl`, not just the bare status/next_query as originally sketched.
 
+### First live rollout — findings
+
+The observability work above paid off immediately: the first real run against the compass task (host client + gpt-4o-mini) completed with `status: "complete"` after exactly one question, and reading `iterations.jsonl` back showed jill's real inventory (`iron_ingot`, `redstone`, `crafting_table`) had actually been captured — the core loop worked as designed. But the persisted `world_state.json` also showed `"self": {"inventory": "Nothing"}` for andy, despite the log confirming `Gave andy 2 iron_ingot` had fired. Root cause: `/give` is a fire-and-forget chat command (`initBotTask()` does `await this.agent.bot.chat(...)`, but `bot.chat()` doesn't return a promise that resolves on server confirmation) — `seedDocument()` was reading `get_sgsg_state(agent)` before the grant's server round trip had landed in `bot.inventory`. Fixed with `waitForInventory()` (above): polls for the *specific* quantities `initial_inventory[count_id]` promised, rather than a generic delay or a "non-empty" check (which would hang for any agent whose slice is legitimately empty) — same structural pattern as `waitForTeammates`, applied to the second place the same class of async-effects-aren't-confirmed problem showed up.
+
+A second issue from the same run: the coordinator never explicitly ended the conversation after capturing an answer, which left jill's side thinking she was still awaiting a reply — the stock 30s/60s "hasn't responded" monitor fired and drove her self-prompter to act on its own (checking `!entities`, then asking the human player for help). Root cause traced to `src/agent/commands/actions.js:514-526`: the real `!endConversation` command only clears local state and never notifies the other side — the actual "tell the other party" mechanism is that `sendToBot` flags a message `end: true` whenever its text contains the substring `!endConversation`, which the receiver's `_handleFullInMessage` acts on. Fixed with `TeammateChannel.endConversation()` (§6), called once per teammate at the end of `runDisclosureLoop` (§9) regardless of outcome — sends a farewell containing that substring, then clears local state (in that order, since clearing first would cause the farewell to be silently dropped).
+
+An alternative was considered and rejected: having the *responder* end the conversation herself (e.g. instructed to say `!endConversation` once she's answered). Two problems ruled it out. First, she has no visibility into whether the coordinator wants a follow-up, so she can't know the actual right moment to end it — that decision belongs to whoever runs the adequacy check. Second, and more concretely: if her reply bundles the answer and `!endConversation` in one message (a likely combination), `_handleFullInMessage` rewrites the message's `source` to `'system'` before it reaches `ColabCoordinatorAgent.handleMessage`, whose first line (`if (source === 'system') return true;`) discards it — silently losing the answer entirely, a strictly worse failure than the one being fixed.
+
 Net effect: `init_agent.js` logs which class it picked for each `count_id` at startup (§5), `TeammateChannel` logs every message in real time, and `world_state.json`/`iterations.jsonl` are both readable at any point during the run, not just after it finishes successfully.
+
+A second live run (with the Bug 1/Bug 2 fixes above applied) surfaced a third gap, this time in the assessment prompt itself: `world_state.json` recorded jill's inventory but nothing about her `blocked_actions` or whether her goal differed from andy's — the loop declared `"complete"` after asking only about inventory. The schema wasn't at fault (`teammates.<name>.qna` is a plain transcript; nothing stops a `blocked_actions` question from landing there same as inventory did) — the assessment prompt's own bar for "done" was too vague ("your team's combined inventory and constraints") to reliably make gpt-4o-mini think to ask about the other two canonical categories doc 02/06 already established (inventory, blocked actions, goal asymmetry). The tempting wrong fix — read jill's `blocked_actions`/goal directly off the shared task JSON, which every process technically has loaded — was explicitly rejected: that's exactly the "shared blackboard" doc 05 warned against, and would make the Disclosure Loop's reason for existing (having to *ask*) meaningless. Fixed instead by adding a short "Context" paragraph to `assessment_prompt.md` naming all three categories explicitly and reframing the completion bar around them ("a complete picture of your team's inventories, blocked actions, and goals") — a pure prompt-wording change, no schema or code changes. Verified against the real model in three scenarios: fresh start (now asks about inventory *and* blocked actions in one question), inventory-only-known (the exact point the original run stopped early — now correctly identifies the gap and asks about blocked actions), and all-three-covered (correctly reports `"complete"` rather than looping unnecessarily).
 
 ### Termination
 
@@ -388,7 +470,7 @@ Net effect: `init_agent.js` logs which class it picked for each `count_id` at st
 - **Runaway guard:** `MAX_ITERATIONS = 5` — generous for a task that realistically needs 2-3 exchanges, small enough to fail loudly rather than loop indefinitely. On exhaustion, the document is written with `status: "incomplete"` rather than looping forever.
 - **After completion:** write the file, log it, and stop. No `killAll()`, no `task.isDone()` — Phase 1 isn't scored and Phase 2/3 don't exist yet. This is a placeholder ending to revisit once Phase 2 exists.
 
-`DEFAULT_MODEL` is a plain constant rather than a separate config file — there's exactly one model choice to make in Phase 1, so a `colab_agent/src/profile.json`-style config (as `achievement_hunter` has, for its many pipeline stages) would be pure ceremony right now. Worth promoting into a real config file once Phase 2 adds a second model choice.
+**The coordinator's model is chosen via its own Mindcraft profile** (`colab_agent/profiles/andy.json`'s `"model"` field), not a separate `colab_agent/src/profile.json`-style config. This wasn't the original plan — `DEFAULT_MODEL` was initially a hardcoded constant, on the reasoning that a dedicated config file would be pure ceremony for one model choice. But the coordinator already has a per-agent profile file, and it already has a `"model"` field (it's simply not read by the coordinator's own reasoning, since that bypasses the stock `Prompter` entirely) — so reusing it costs nothing new and gets the actual thing wanted for free: editing `andy.json`'s `"model"` to something more capable (e.g. `gpt-5`) now controls only the coordinator's reasoning, completely independent of `jill.json`'s `"model"`, which already independently controlled her stock reactive path. `FALLBACK_MODEL` only matters if a profile ever omits `"model"` entirely.
 
 ---
 
@@ -407,7 +489,8 @@ Net effect: `init_agent.js` logs which class it picked for each `count_id` at st
 - [ ] `src/process/init_agent.js`: add the flag-guarded class selection + import (AH-marked). No other stock file changes — `main.js` is untouched.
 - [ ] `colab_agent/src/agent/coordinator_agent.js`: `ColabCoordinatorAgent`.
 - [ ] `colab_agent/src/comms/teammate_channel.js`: `TeammateChannel`.
-- [ ] `colab_agent/src/pipeline/world_state.js`: `runDisclosureLoop` + schema + prompt.
+- [ ] `colab_agent/src/pipeline/world_state.js`: `runDisclosureLoop` + schema.
+- [ ] `colab_agent/src/pipeline/prompt_utils.js` + `colab_agent/docs/prompts/disclosure_loop_prompts/assessment_prompt.md`: the assessment prompt template + loader.
 - [ ] `colab_agent/rollouts/` created (gitignored).
 - [ ] Run against `multiagent_crafting_compass_partial_plan_requires_ctable__depth_0` per doc 07's launch pattern, with the new flag. Note `achievement_hunter` still defaults to `true` in `settings.js` and `main.js`'s branch checks it first (untouched, per §5) — `colab_agent:true` alone does nothing unless `achievement_hunter:false` is also set:
   ```bash
@@ -418,3 +501,4 @@ Net effect: `init_agent.js` logs which class it picked for each `count_id` at st
     --task_id multiagent_crafting_compass_partial_plan_requires_ctable__depth_0
   ```
 - [ ] Inspect `colab_agent/rollouts/.../world_state.json` and `iterations.jsonl` to confirm the document actually captured jill's inventory/constraints, not just the shared goal text.
+- [ ] Inspect `colab_agent/rollouts/.../memory.json` to confirm it holds a genuine narrative summary (not a restatement of `world_state.json`'s raw fields), separate from the structured document.

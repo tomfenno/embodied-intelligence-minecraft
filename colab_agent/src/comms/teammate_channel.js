@@ -44,4 +44,19 @@ export class TeammateChannel {
       }
     });
   }
+
+  // The real !endConversation command handler only clears local state — it
+  // never notifies the other side (src/agent/commands/actions.js:514-526).
+  // The "other side" mechanism is that ConversationManager.sendToBot flags a
+  // message end:true whenever its text contains the substring
+  // "!endConversation", which the receiver's _handleFullInMessage acts on.
+  // So closing a conversation cleanly on both ends requires both: sending a
+  // message carrying that substring, and clearing local state ourselves. Order
+  // matters — endConversation() sets ignore_until_start, and sendToBot drops
+  // the message if that's already set, so the farewell must go out first.
+  endConversation(name, farewellMessage) {
+    if (!convoManager.inConversation(name)) return;
+    convoManager.sendToBot(name, `${farewellMessage} !endConversation("${name}")`);
+    convoManager.endConversation(name);
+  }
 }
