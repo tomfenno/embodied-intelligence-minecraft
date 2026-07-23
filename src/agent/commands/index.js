@@ -4,6 +4,7 @@ import { queryList } from './queries.js';
 // Start of AH code
 import { log_action_result } from '../../../achievement_hunter/src/agent/_action_message_log.js';
 // End of AH code
+import { recordCommandIssued } from '../../../achievement_hunter/evaluation_harness/command_stats.js';
 
 let suppressNoDomainWarning = true;
 
@@ -227,6 +228,7 @@ export async function executeCommand(agent, message) {
         // Start of AH code
         log_action_result(message, _parseErrResult);
         // End of AH code
+        recordCommandIssued(agent.name, containsCommand(message) ?? 'unknown');
         return _parseErrResult;
     }
     else {
@@ -241,6 +243,7 @@ export async function executeCommand(agent, message) {
             // Start of AH code
             log_action_result(message, _argErrResult);
             // End of AH code
+            recordCommandIssued(agent.name, parsed.commandName);
             return _argErrResult;
         }
         else {
@@ -249,6 +252,7 @@ export async function executeCommand(agent, message) {
             // Start of AH code
             log_action_result(message, result);
             // End of AH code
+            recordCommandIssued(agent.name, parsed.commandName);
             return result;
         }
     }

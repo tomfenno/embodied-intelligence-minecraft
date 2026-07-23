@@ -68,8 +68,20 @@ function main() {
   const episodeDir = path.resolve(argv.episode_dir);
   const runtime = readJsonIfExists(path.join(episodeDir, 'episode_runtime.json')) ?? {};
   const llmUsage = readJsonIfExists(path.join(episodeDir, 'episode_llm_usage.json')) ?? {};
+  const liveCommandStats =
+      readJsonIfExists(path.join(episodeDir, 'episode_command_stats.json'));
 
-  const {totalCommands, commandsByAgent, commandsByName} =
+  // Prefer the live command log (recorded at dispatch time in
+  // src/agent/commands/index.js:executeCommand, covers every command type
+  // including parse/arg errors) over the post-hoc turns-parsing fallback,
+  // which can undercount commands trimmed by context-window pruning before
+  // the final memory.json snapshot.
+  const {totalCommands, commandsByAgent, commandsByName} = liveCommandStats ?
+      {
+        totalCommands: liveCommandStats.total_commands ?? 0,
+        commandsByAgent: liveCommandStats.commands_by_agent ?? {},
+        commandsByName: liveCommandStats.commands_by_name ?? {},
+      } :
       collectCommandCounts(argv.agent_files);
 
   const taskScore = parseEpisodeScore(argv.agent_files);

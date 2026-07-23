@@ -257,11 +257,21 @@ export class Task {
     await this.teleportBots();
 
     if (this.data.agent_count && this.data.agent_count > 1) {
-      await new Promise((resolve) => setTimeout(resolve, 10000));
+      // Poll instead of a single fixed wait: available_agents is populated by a
+      // live socket registration signal from MindServer, so a one-shot 10s wait
+      // was a false-positive "agent missing" trap under realistic cold-start
+      // variance between independently-booting, LLM-backed sibling processes.
+      const maxWaitMs = 60000;
+      const pollIntervalMs = 2000;
+      const deadline = Date.now() + maxWaitMs;
+      while (this.available_agents.length < this.data.agent_count &&
+             Date.now() < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+      }
       if (this.available_agents.length < this.data.agent_count) {
         console.log(
             `Missing ${
-                this.data.agent_count - this.available_agents.length} bot(s).`);
+                this.data.agent_count - this.available_agents.length} bot(s) after ${maxWaitMs}ms.`);
         this.agent.killAll();
       }
     }
@@ -323,11 +333,21 @@ export class Task {
     }
 
     if (this.data.agent_count && this.data.agent_count > 1) {
-      await new Promise((resolve) => setTimeout(resolve, 10000));
+      // Poll instead of a single fixed wait: available_agents is populated by a
+      // live socket registration signal from MindServer, so a one-shot 10s wait
+      // was a false-positive "agent missing" trap under realistic cold-start
+      // variance between independently-booting, LLM-backed sibling processes.
+      const maxWaitMs = 60000;
+      const pollIntervalMs = 2000;
+      const deadline = Date.now() + maxWaitMs;
+      while (this.available_agents.length < this.data.agent_count &&
+             Date.now() < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+      }
       if (this.available_agents.length < this.data.agent_count) {
         console.log(
             `Missing ${
-                this.data.agent_count - this.available_agents.length} bot(s).`);
+                this.data.agent_count - this.available_agents.length} bot(s) after ${maxWaitMs}ms.`);
         this.agent.killAll();
       }
     }
