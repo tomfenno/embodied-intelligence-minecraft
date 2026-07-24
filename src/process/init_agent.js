@@ -2,6 +2,7 @@ import { Agent } from '../agent/agent.js';
 import { serverProxy } from '../agent/mindserver_proxy.js';
 import yargs from 'yargs';
 // Start of AH code
+import { readFileSync } from 'fs';
 import settings from '../agent/settings.js';
 import { ColabCoordinatorAgent } from '../../colab_agent/src/agent/coordinator_agent.js';
 // End of AH code
@@ -51,6 +52,30 @@ const argv = yargs(args)
         if (settings.colab_agent) {
             console.log(`[Disclosure Loop] colab_agent mode: count_id ${argv.count_id} is ` +
                 `${isColabCoordinator ? 'the coordinator (ColabCoordinatorAgent)' : 'a responder (stock Agent)'}`);
+        }
+        // Leader framing as persistent goal text, not just a one-time chat
+        // message — goal text re-injects on every self-prompt cycle, so it
+        // survives history compression on long episodes. Motivated by
+        // repeated evidence of non-coordinator agents acting autonomously
+        // before receiving direction. See
+        // colab_agent/docs/10-phase-3-execution.md §9.
+        if (settings.colab_agent && !isColabCoordinator && settings.task?.goal != null) {
+            try {
+                const leaderProfile = JSON.parse(readFileSync(settings.profiles[0], 'utf8'));
+                const leaderName = leaderProfile.name;
+                if (leaderName) {
+                    const note = `\n${leaderName} is the leader for this task. Wait for ` +
+                        `${leaderName} to tell you what to do before acting, and follow ` +
+                        `their direction throughout.`;
+                    const agentId = String(argv.count_id);
+                    const baseGoal = typeof settings.task.goal === 'string'
+                        ? settings.task.goal
+                        : (settings.task.goal[agentId] || '');
+                    settings.task.goal = { [agentId]: baseGoal + note };
+                }
+            } catch (err) {
+                console.warn('[Disclosure Loop] could not resolve leader name for goal framing:', err.message);
+            }
         }
         const agent = isColabCoordinator
             ? new ColabCoordinatorAgent()

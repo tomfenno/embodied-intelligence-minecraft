@@ -1,10 +1,35 @@
 import settings from './settings.js';
 import { containsCommand } from './commands/index.js';
 import { sendBotChatToServer } from './mindserver_proxy.js';
+// Start of AH code
+import { appendFileSync } from 'fs';
+import path from 'path';
+// End of AH code
 
 let agent;
 let agent_names = [];
 let agents_in_game = [];
+
+// Start of AH code
+// Writes every bot-to-bot message this process sends or receives into
+// colab_agent's rollout dir, if one has been set on the agent (only true
+// for the colab_agent coordinator — see colab_agent/src/pipeline/world_state.js).
+// A no-op for every other agent (e.g. the stock responder), so this adds
+// zero new behavior/config for them. Because the coordinator's own process
+// sees both its own outgoing sends (sendToBot) and the other agent's
+// replies as it receives them (_handleFullInMessage), one process's file
+// already captures the full two-way conversation — the other agent never
+// needs to write anything itself.
+function _logConversationTurn(from, to, message) {
+    if (!agent?.runDir) return;
+    try {
+        const line = `[${new Date().toISOString()}] ${from} -> ${to}: ${message}\n`;
+        appendFileSync(path.join(agent.runDir, 'conversation.log'), line);
+    } catch (err) {
+        console.warn('Failed to write conversation transcript:', err.message);
+    }
+}
+// End of AH code
 
 class Conversation {
     constructor(name) {
@@ -162,6 +187,9 @@ class ConversationManager {
         };
 
         this.awaiting_response = true;
+        // Start of AH code
+        _logConversationTurn(agent.name, send_to, message);
+        // End of AH code
         sendBotChatToServer(send_to, json);
     }
 
@@ -227,7 +255,16 @@ class ConversationManager {
     endConversation(sender) {
         if (this.convos[sender]) {
             this.convos[sender].end();
-            if (this.activeConversation.name === sender) {
+            // Start of AH code
+            // activeConversation is only non-null while a conversation with
+            // this exact sender is the one being monitored — it's already
+            // null if endConversation(sender) was already called once (e.g.
+            // once from an inbound end:true message, then again from this
+            // agent's own !stfu -> shutUp() -> endAllConversations()).
+            // Without this guard, the second call throws reading .name off
+            // null.
+            if (this.activeConversation && this.activeConversation.name === sender) {
+            // End of AH code
                 this._stopMonitor();
                 this.activeConversation = null;
                 if (agent.self_prompter.isPaused() && !this.inConversation()) {
@@ -324,7 +361,10 @@ function _compileInMessages(convo) {
 
 function _handleFullInMessage(sender, received) {
     console.log(`${agent.name} responding to "${received.message}" from ${sender}`);
-    
+    // Start of AH code
+    _logConversationTurn(sender, agent.name, received.message);
+    // End of AH code
+
     const convo = convoManager._getConvo(sender);
     convo.active = true;
 

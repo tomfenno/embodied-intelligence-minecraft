@@ -20,6 +20,20 @@ export function fill_assessment_prompt(doc, teammates) {
   });
 }
 
+/**
+ * Fills the ptd_prompt template with the finished Phase 1 world state
+ * document and the team's available command vocabulary. Returns the filled
+ * prompt string, ready to send to an LLM.
+ */
+export function fill_ptd_prompt(worldStateDoc, commandDocs) {
+  const template = _read_template('../../docs/prompts/ptd_prompts/ptd_prompt.md');
+  return _fill(template, {
+    OBJECTIVE: worldStateDoc.shared_goal,
+    WORLD_STATE: worldStateDoc,
+    COMMAND_DOCS: commandDocs,
+  });
+}
+
 /* Helper functions ------------------------------------------------------ */
 
 const _template_cache = new Map();

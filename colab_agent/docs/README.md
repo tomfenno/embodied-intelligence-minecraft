@@ -16,6 +16,8 @@ This directory documents how the Mindcraft/MineCollab **task system** (`tasks/` 
 | [`06-task-demands-and-coordination.md`](./06-task-demands-and-coordination.md) | What each task category actually demands of agents, and the coordination/role structures those demands imply | designing an agent organizational structure |
 | [`07-running-and-visualizing.md`](./07-running-and-visualizing.md) | Copy-pasteable guide to run a 2-agent collaborative task and watch it in Minecraft 1.21.6 (no tmux/Python, no settings.js edits) | running & visualizing a task |
 | [`08-phase-1-world-state-document.md`](./08-phase-1-world-state-document.md) | Implementation plan for Phase 1 only: the "Disclosure Loop" — Agent 0 as coordinator interviews its teammate to build a world state document, before any planning/execution exists | building & running a Phase 1 rollout |
+| [`10-phase-3-execution.md`](./10-phase-3-execution.md) | Implementation plan for Phase 3: the "Execution Loop" — andy's PTD is rendered into a goal string and handed to the stock `self_prompter`, no bespoke decision loop, jill needs zero new code | how the team should act on the PTD |
+| [`11-test-commands.md`](./11-test-commands.md) | Copy-pasteable terminal commands for exercising Phases 1-3 end to end, three tests of increasing difficulty (compass regression, pink_wool smoke test, cooking division-of-labor) plus troubleshooting | running the built pipeline |
 
 ## One-paragraph summary
 

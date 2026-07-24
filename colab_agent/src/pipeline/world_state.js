@@ -4,6 +4,7 @@ import { mkdirSync, writeFileSync, appendFileSync } from 'fs';
 
 import { LlmClient } from '../../../achievement_hunter/src/pipeline/llm_client.js';
 import { get_sgsg_state } from '../../../achievement_hunter/src/pipeline/agent_state.js';
+import { extract_json } from '../../../achievement_hunter/src/pipeline/json_utils.js';
 import convoManager from '../../../src/agent/conversation.js';
 import { fill_assessment_prompt } from './prompt_utils.js';
 
@@ -26,6 +27,12 @@ export async function runDisclosureLoop(agent, teammateChannel) {
   // the coordinator's own reasoning just wasn't reading it until now.
   const llm = new LlmClient(agent.prompter.profile.model || FALLBACK_MODEL);
   const runDir = makeRunDir(agent.task.data.task_id);
+  // Stashed on the agent (not just a local var) so the stock
+  // ConversationManager can find it and write conversation.log into this
+  // same rollout dir for the rest of the episode — see the AH-marked hook
+  // in src/agent/conversation.js. Set as early as possible so no Phase 1
+  // exchange is missed.
+  agent.runDir = runDir;
   console.log(`[Disclosure Loop] starting for ${agent.name}, logging to ${runDir}`);
 
   const teammates = await waitForTeammates(agent);
@@ -106,7 +113,7 @@ export async function runDisclosureLoop(agent, teammateChannel) {
   const totalQuestions = Object.values(doc.teammates).reduce((n, t) => n + t.qna.length, 0);
   console.log(`[Disclosure Loop] finished (${doc.status}) after ${totalQuestions} question(s). ` +
       `Document at ${path.join(runDir, 'world_state.json')}`);
-  return doc;
+  return { doc, runDir };
 }
 
 function appendRound(runDir, round) {
@@ -173,13 +180,9 @@ function seedDocument(agent) {
 
 function parseDecision(raw, teammates) {
   if (!raw) throw new Error('LLM returned no response');
-  const jsonText = raw.trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
-
-  let parsed;
-  try {
-    parsed = JSON.parse(jsonText);
-  } catch (err) {
-    throw new Error(`Could not parse LLM response as JSON: ${err.message}`);
+  const parsed = extract_json(raw);
+  if (!parsed) {
+    throw new Error('Could not extract a JSON object from the LLM response');
   }
 
   if (parsed.status !== 'complete' && parsed.status !== 'need_info') {
