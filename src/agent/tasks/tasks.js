@@ -76,7 +76,13 @@ export class Task {
   }
 
   updateAvailableAgents(agents) {
-    this.available_agents = agents;
+    // mindserver.js's agentsStatusUpdate() broadcasts status objects
+    // ({name, in_game, viewerPort, socket_connected}), not name strings —
+    // every consumer in this file (filter/some/join/template-literal
+    // interpolation against this.name or a player name) expects strings, so
+    // normalize here once rather than at each call site.
+    this.available_agents =
+        agents.map((agent) => (typeof agent === 'string' ? agent : agent.name));
   }
 
   resetHellsKitchenProgress() {

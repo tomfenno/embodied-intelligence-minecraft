@@ -129,13 +129,16 @@ export class Agent {
               
                 if (!load_mem) {
                     if (settings.task) {
-                        this.task.initBotTask();
-                        this.task.setAgentGoal();
+                        // awaited so a rejection here is caught by this function's
+                        // own try/catch below instead of becoming an unhandled
+                        // promise rejection that silently drops the agent's goal
+                        await this.task.initBotTask();
+                        await this.task.setAgentGoal();
                     }
                 } else {
                     // set the goal without initializing the rest of the task
                     if (settings.task) {
-                        this.task.setAgentGoal();
+                        await this.task.setAgentGoal();
                     }
                 }
 

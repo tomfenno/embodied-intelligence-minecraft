@@ -107,8 +107,15 @@ export class SelfPrompter {
 
     async stopLoop() {
         // you can call this without await if you don't need to wait for it to finish
-        if (this.interrupt)
+        // Guard on loop_active, not interrupt: callers like pause()/stop() already
+        // set this.interrupt = true before calling this, which used to make this
+        // early-return before ever reaching `this.interrupt = false` below — leaving
+        // interrupt permanently stuck true and making the *next* startLoop() call
+        // exit its `while (!this.interrupt)` loop immediately, producing zero turns.
+        if (!this.loop_active) {
+            this.interrupt = false;
             return;
+        }
         console.log('stopping self-prompt loop')
         this.interrupt = true;
         while (this.loop_active) {
