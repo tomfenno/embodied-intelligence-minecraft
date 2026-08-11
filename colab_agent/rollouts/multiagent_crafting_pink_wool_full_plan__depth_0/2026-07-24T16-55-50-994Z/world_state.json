@@ -1,0 +1,25 @@
+{
+  "task_id": "multiagent_crafting_pink_wool_full_plan__depth_0",
+  "shared_goal": "Collaborate with other agents to craft an pink_wool",
+  "self": {
+    "name": "andy",
+    "inventory": {
+      "pink_dye": 1
+    },
+    "blocked_actions": [
+      "!endGoal",
+      "!endConversation"
+    ]
+  },
+  "teammates": {
+    "jill": {
+      "qna": [
+        {
+          "question": "Hi Jill, what is your current inventory, what actions are you blocked or restricted from taking, and do you have any personal goals or special instructions that differ from our shared goal of crafting pink_wool?",
+          "answer": "I have nothing in my inventory, and I'm currently unrestricted in actions. I don't have any personal goals apart from crafting pink_wool. Waiting for your plan, Andy! \t"
+        }
+      ]
+    }
+  },
+  "status": "complete"
+}

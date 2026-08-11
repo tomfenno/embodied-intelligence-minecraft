@@ -5,17 +5,19 @@
  */
 
 /**
- * Converts a graph { objective, sinks, vertices, edges } to a Mermaid LR
- * diagram. Edges are stored as from→to (from is a prerequisite of to), so we
- * display them left-to-right: raw materials on the left, goal sinks on the
- * right.
+ * Converts a graph { objective, sinks, vertices, edges } to a Mermaid
+ * diagram. Edges are stored as from→to (from is a prerequisite of to).
+ * Defaults to LR (left-to-right: raw materials on the left, goal sinks on
+ * the right) to preserve existing callers' output; pass direction: 'TD' for
+ * a top-down layout instead, which fits a narrower container better for
+ * graphs with many vertices.
  */
-export function graph_to_mermaid(graph) {
+export function graph_to_mermaid(graph, direction = 'LR') {
   if (!graph || !graph.vertices || graph.vertices.length === 0) {
-    return '```mermaid\ngraph LR\n    empty["(empty graph)"]\n```';
+    return `\`\`\`mermaid\ngraph ${direction}\n    empty["(empty graph)"]\n\`\`\``;
   }
 
-  const lines = ['```mermaid', 'graph LR'];
+  const lines = ['```mermaid', `graph ${direction}`];
 
   for (const v of graph.vertices) {
     const safe_id = _safe_id(v.id);

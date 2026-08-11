@@ -1,0 +1,66 @@
+{
+  "objective": "Collaborate with other agents to craft an pink_wool",
+  "sinks": [
+    "craft_pink_wool"
+  ],
+  "vertices": [
+    {
+      "id": "find_sheep",
+      "description": "Search for and move to the nearest sheep within a large radius.",
+      "eligible_agents": [
+        "jill"
+      ],
+      "min_agents": 1
+    },
+    {
+      "id": "kill_sheep_for_wool",
+      "description": "Attack the sheep to obtain white wool.",
+      "eligible_agents": [
+        "jill"
+      ],
+      "min_agents": 1
+    },
+    {
+      "id": "go_to_andy_for_handoff",
+      "description": "Go to Andy to prepare for the handoff of the white wool.",
+      "eligible_agents": [
+        "jill"
+      ],
+      "min_agents": 1
+    },
+    {
+      "id": "give_wool_to_andy",
+      "description": "Give 1 white wool to Andy.",
+      "eligible_agents": [
+        "jill"
+      ],
+      "min_agents": 1
+    },
+    {
+      "id": "craft_pink_wool",
+      "description": "Craft pink_wool using pink dye and white wool.",
+      "eligible_agents": [
+        "andy"
+      ],
+      "min_agents": 1
+    }
+  ],
+  "edges": [
+    {
+      "from": "find_sheep",
+      "to": "kill_sheep_for_wool"
+    },
+    {
+      "from": "kill_sheep_for_wool",
+      "to": "go_to_andy_for_handoff"
+    },
+    {
+      "from": "go_to_andy_for_handoff",
+      "to": "give_wool_to_andy"
+    },
+    {
+      "from": "give_wool_to_andy",
+      "to": "craft_pink_wool"
+    }
+  ]
+}

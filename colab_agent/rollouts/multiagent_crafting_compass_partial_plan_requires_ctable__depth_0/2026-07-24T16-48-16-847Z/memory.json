@@ -1,0 +1,17 @@
+[
+  {
+    "phase": "phase_1",
+    "status": "complete",
+    "summary": "We collectively have 4 iron ingots and 1 redstone; Jill has crafting table access and knows the compass recipe. I (Andy) have some meta blocked actions, Jill has none, and we both share the goal to craft a compass."
+  },
+  {
+    "phase": "phase_2",
+    "status": "complete",
+    "summary": "Andy gives Jill 2 iron ingots; Jill, who has redstone, crafting-table access, and the recipe knowledge, crafts the compass."
+  },
+  {
+    "phase": "phase_3",
+    "status": "started",
+    "summary": "Andy gives Jill 2 iron ingots; Jill, who has redstone, crafting-table access, and the recipe knowledge, crafts the compass."
+  }
+]

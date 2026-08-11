@@ -1,0 +1,17 @@
+[
+  {
+    "phase": "phase_1",
+    "status": "complete",
+    "summary": "I have the pink dye and can’t end the session, while Jill has no items, no action restrictions, and shares the goal; together we’ll obtain white wool and dye it to craft pink wool."
+  },
+  {
+    "phase": "phase_2",
+    "status": "complete",
+    "summary": "Jill finds and kills a sheep to obtain white wool, brings it to Andy, and Andy uses his pink dye to craft pink wool."
+  },
+  {
+    "phase": "phase_3",
+    "status": "started",
+    "summary": "Jill finds and kills a sheep to obtain white wool, brings it to Andy, and Andy uses his pink dye to craft pink wool."
+  }
+]

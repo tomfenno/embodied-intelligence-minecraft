@@ -1,0 +1,30 @@
+{
+  "task_id": "multiagent_crafting_compass_partial_plan_requires_ctable__depth_0",
+  "shared_goal": "Collaborate with other agents to craft a compass",
+  "self": {
+    "name": "andy",
+    "inventory": {
+      "iron_ingot": 2
+    },
+    "blocked_actions": [
+      "!getCraftingPlan",
+      "!endGoal",
+      "!endConversation"
+    ]
+  },
+  "teammates": {
+    "jill": {
+      "qna": [
+        {
+          "question": "Please share your current inventory, any blocked or restricted actions you have, and any personal goals or special knowledge relevant to crafting a compass (e.g., recipe knowledge or access to a crafting table or furnace).",
+          "answer": "I have 2 iron ingots and 1 redstone in my inventory. I can access a crafting table, and I know the recipe for crafting a compass. Let me know what else you need! !inventoryI have 2 iron ingots, 1 redstone, and a crafting table. Ready to contribute! What do you need from me?"
+        },
+        {
+          "question": "Please list any blocked or restricted actions you have, and note any personal goals or constraints beyond the shared goal of crafting a compass.",
+          "answer": "I don't have any blocked or restricted actions. My only goal is to collaborate on crafting the compass. No personal constraints beyond that. Ready when you are!"
+        }
+      ]
+    }
+  },
+  "status": "complete"
+}

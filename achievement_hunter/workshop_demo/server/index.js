@@ -37,7 +37,7 @@ function safe_mermaid_id(id) {
 // catalog preview doesn't have: the in-progress node (blue) and nodes the
 // SCSG no longer lists as remaining, i.e. already satisfied (dimmed).
 function render_live_mermaid(graph, currentNodeId, remainingIds) {
-  let mermaid = strip_mermaid_fence(graph_to_mermaid(graph));
+  let mermaid = strip_mermaid_fence(graph_to_mermaid(graph, 'TD'));
 
   if (remainingIds) {
     const remaining = new Set(remainingIds);
@@ -56,7 +56,13 @@ function render_live_mermaid(graph, currentNodeId, remainingIds) {
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+// no-store: this UI is actively iterated on, and a stale cached copy of
+// index.html/app.js/styles.css after an edit is confusing to debug (looks
+// like the change didn't take effect). The mermaid vendor bundle below is
+// static and large, so it's left with normal caching.
+app.use(express.static(
+    path.join(__dirname, '../public'),
+    {setHeaders: (res) => res.setHeader('Cache-Control', 'no-store')}));
 app.use(
     '/vendor/mermaid',
     express.static(
@@ -68,7 +74,7 @@ app.get('/api/ptds', (req, res) => {
     return {
       filename,
       objective: objectiveFromPtdFilename(filename),
-      mermaid: strip_mermaid_fence(graph_to_mermaid(graph)),
+      mermaid: strip_mermaid_fence(graph_to_mermaid(graph, 'TD')),
     };
   });
   res.json(ptds);
@@ -115,17 +121,12 @@ app.get('/api/live', (req, res) => {
   const currentNodeId = raw.task_state?.task?.target_item ?? null;
   const remainingIds = raw.scsg_result?.final?.vertices?.map((v) => v.id) ?? null;
   const graph = raw.ptd?.parsed ?? null;
-  const lastAction = raw.am_history?.length ?
-      raw.am_history[raw.am_history.length - 1] :
-      null;
 
   res.json({
     objective: raw.objective,
     status: raw.status,
     elapsed: raw.elapsed,
     mermaid: graph ? render_live_mermaid(graph, currentNodeId, remainingIds) : null,
-    task: raw.task_state?.task ?? null,
-    action: lastAction,
     completion: raw.completion,
   });
 });

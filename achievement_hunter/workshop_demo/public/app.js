@@ -12,7 +12,7 @@ const backButton = document.getElementById('back-button');
 const SPECTATOR_TEXT = {
   idle: '',
   launching: 'Launching Prism Launcher for the spectator view…',
-  joined: 'Spectator connected — watching AH_Bot.',
+  joined: '',
   timeout: 'Spectator client didn’t join in time — join manually if needed.',
   skipped: 'Spectator auto-join skipped (Prism not configured on this machine).',
   error: 'Spectator auto-join failed.',
@@ -32,8 +32,6 @@ const liveDashboard = document.getElementById('live-dashboard');
 const liveGraph = document.getElementById('live-graph');
 const liveElapsed = document.getElementById('live-elapsed');
 const liveStatusBadge = document.getElementById('live-status-badge');
-const liveTask = document.getElementById('live-task');
-const liveAction = document.getElementById('live-action');
 
 const STATUS_TEXT = {
   idle: 'Idle',
@@ -47,12 +45,6 @@ const STATUS_TEXT = {
 let pollTimer = null;
 let mermaidCounter = 0;
 let lastLiveMermaidSource = null;
-
-function escapeHtml(value) {
-  const div = document.createElement('div');
-  div.textContent = String(value ?? '');
-  return div.innerHTML;
-}
 
 async function loadPtds() {
   const res = await fetch('/api/ptds');
@@ -132,10 +124,6 @@ function renderStatus(status) {
   if (status.status === 'error') {
     statusDetail.textContent = status.error || '';
     stopPolling();
-  } else if (status.status === 'running') {
-    const world =
-        status.world ? `${status.world.host}:${status.world.port}` : '';
-    statusDetail.textContent = world ? `World live at ${world}` : '';
   } else {
     statusDetail.textContent = '';
   }
@@ -158,23 +146,6 @@ function renderLive(live) {
           liveGraph.innerHTML = svg;
         })
         .catch((err) => console.error('live mermaid render failed', err));
-  }
-
-  if (live.task) {
-    const t = live.task;
-    liveTask.innerHTML = `<div class="task-line"><strong>${
-        escapeHtml(t.action_type)}</strong> ${escapeHtml(t.target_item)} ×${
-        escapeHtml(t.qty)}</div>`;
-  } else {
-    liveTask.innerHTML = '<div class="muted">No task selected yet.</div>';
-  }
-
-  if (live.action) {
-    liveAction.innerHTML = `<div class="action-line"><code>${
-        escapeHtml(live.action.raw)}</code> <span class="muted">(attempt ${
-        escapeHtml(live.action.attempt)})</span></div>`;
-  } else {
-    liveAction.innerHTML = '<div class="muted">No action executed yet.</div>';
   }
 }
 

@@ -42,8 +42,10 @@ main {
 
 #ptd-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1.25rem;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .ptd-card {
@@ -177,23 +179,6 @@ main {
 
 .elapsed-badge.completed {
   color: var(--accent);
-}
-
-.task-line, .action-line {
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
-
-.action-line code {
-  background: #0b0f14;
-  border-radius: 6px;
-  padding: 0.15rem 0.4rem;
-  font-size: 1rem;
-}
-
-.muted {
-  color: var(--muted);
-  font-size: 0.9rem;
 }
 
 button {

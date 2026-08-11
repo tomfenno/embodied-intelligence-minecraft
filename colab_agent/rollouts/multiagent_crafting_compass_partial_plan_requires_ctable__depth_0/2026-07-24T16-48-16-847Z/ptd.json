@@ -1,0 +1,30 @@
+{
+  "objective": "Collaborate with other agents to craft a compass",
+  "sinks": [
+    "craft_compass_jill"
+  ],
+  "vertices": [
+    {
+      "id": "transfer_iron_to_jill",
+      "description": "Andy gives Jill 2 iron ingots using !givePlayer to supply the missing materials.",
+      "eligible_agents": [
+        "andy"
+      ],
+      "min_agents": 1
+    },
+    {
+      "id": "craft_compass_jill",
+      "description": "Jill crafts 1 compass using !craftRecipe with the required 4 iron ingots and 1 redstone.",
+      "eligible_agents": [
+        "jill"
+      ],
+      "min_agents": 1
+    }
+  ],
+  "edges": [
+    {
+      "from": "transfer_iron_to_jill",
+      "to": "craft_compass_jill"
+    }
+  ]
+}
