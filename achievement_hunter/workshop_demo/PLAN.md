@@ -1384,3 +1384,58 @@ this environment to see the actual rendered pixels, so the one thing
 still unverified is what a genuinely large/deep PTD graph looks like
 scaled down to fit — left for the user to eyeball on the next real run,
 particularly with one of the larger/more-complex PTDs.
+
+### Post-launch change — pick from a curated seed list instead of Date.now()
+
+**Ask:** "instead of a random seed the world loads using a random seed
+from a list of seeds."
+
+**Design.** `world_launcher.js`'s `launchManagedWorld()` previously
+defaulted `seed` to `Date.now()` — fully random, so a demo run could land
+AH_Bot somewhere bad (a tiny island, boxed into terrain) with zero chance
+to have noticed ahead of time. Added `WORLD_SEEDS` to `config.js` (a
+curated list, not a fully independent invention — copied from
+`evaluation_harness/advancement_tester_suite.json`'s own `seeds` list,
+since that config targets the same Minecraft version and identical
+peaceful/survival/generate_structures world settings, so terrain is
+identical regardless of the demo's Fabric-vs-vanilla template — Fabric
+Tailor/Fabric API don't touch world gen). Copied rather than imported, so
+the demo's list can be pruned/extended independently of whatever reasons
+the benchmark suite has for changing its own seeds later.
+`world_launcher.js` gets a `pickRandomSeed()` helper and the `seed`
+parameter's default becomes `pickRandomSeed()` instead of `Date.now()` —
+JS re-evaluates default-parameter expressions on every call that omits
+the argument, so this still picks fresh each run; explicitly passing a
+`seed` (e.g. to pin one for debugging) still works exactly as before.
+
+**Bug caught during verification, not by inspection.** Minecraft seeds
+are 64-bit longs; `6812388553834026379` and the other two curated values
+all exceed `Number.MAX_SAFE_INTEGER` (2^53-1). Writing them as plain
+numeric literals in `WORLD_SEEDS` silently rounds them to the nearest
+representable double — confirmed live (see Verification): the array,
+after nothing more than being written into a `.js` file and read back,
+printed as `6812388553834026000`, not `...379`. That's not a cosmetic
+issue — it's a *different* seed than the one actually curated/vetted,
+silently. Traced the value all the way to
+`evaluation_harness/lib/utils.js`'s `formatPropertyValue()` (`String(value)`
+for non-booleans) to confirm a *string* seed passes through every layer
+(`pickRandomSeed()` → `launchManagedWorld()` → `prepareManagedServer()` →
+`updatePropertiesFile()`) untouched, with nothing in between doing a
+`Number()`/arithmetic coercion — so the fix is `WORLD_SEEDS` holding
+strings (`'6812388553834026379'`), not numbers.
+
+**Verification.** Live, twice — once to catch the precision bug, once to
+confirm the fix. Script: read `WORLD_SEEDS` directly, ran the exact
+`Math.floor(Math.random() * WORLD_SEEDS.length)` index-pick logic 3000
+times to confirm a reasonably even distribution across all three seeds,
+then called the real `launchManagedWorld()` with no explicit seed and
+read the resulting `server.properties`' `level-seed` line back off disk
+before tearing the world down. First pass: printed `WORLD_SEEDS` values
+already showed the rounding corruption, and `level-seed` in
+`server.properties` matched the corrupted (wrong) value — confirming the
+bug was real and present at the point that actually matters (the file
+Minecraft reads), not just a display artifact. Second pass (after
+switching to strings): `WORLD_SEEDS` printed with full original
+precision, `level-seed` matched one of the three curated values exactly,
+and the 3000-pick distribution was roughly even (~1000 each). `node
+--check` on both modified files.

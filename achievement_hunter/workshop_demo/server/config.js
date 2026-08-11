@@ -38,6 +38,32 @@ export const WORLD_CONFIG = {
   level_name: 'world',
 };
 
+// A fully random seed (Date.now(), world_launcher.js's old default) can
+// spawn AH_Bot somewhere bad for a live demo — stranded on a tiny island,
+// boxed in by terrain, etc. — with no chance to notice ahead of time.
+// Picking randomly from a small curated list instead keeps runs varied
+// while staying within seeds already known to be fine. Starting values
+// match evaluation_harness/advancement_tester_suite.json's own `seeds`
+// list (same Minecraft version, same peaceful/survival/generate_structures
+// world settings, so terrain is identical — mods like Fabric Tailor don't
+// touch world gen) — copied rather than imported so this list can be
+// pruned/extended for the demo independently of the benchmark suite's own
+// reasons for changing its seeds.
+//
+// Kept as strings, not numbers: these are 64-bit Minecraft world seeds,
+// and several exceed Number.MAX_SAFE_INTEGER (2^53-1) — as plain numeric
+// literals they get silently rounded to the nearest representable double
+// (confirmed live: 6812388553834026379 became 6812388553834026000), which
+// would launch a *different*, unvetted world than the one actually
+// curated. Passed through as strings end-to-end (world_launcher.js's
+// pickRandomSeed(), suite.js's prepareManagedServer()/formatPropertyValue())
+// so server.properties' level-seed gets the exact original digits.
+export const WORLD_SEEDS = [
+  '6812388553834026379',
+  '5641369577242833675',
+  '959980239590277096',
+];
+
 // Must match achievement_hunter/src/profile.json's "name" field — the
 // bot's identity on the mindserver, used as the objective-injection and
 // /spectate target.

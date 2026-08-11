@@ -17,7 +17,15 @@ import {
   waitForProcessExit,
   waitForServerReady,
 } from '../../evaluation_harness/lib/utils.js';
-import {WORLD_CONFIG} from './config.js';
+import {WORLD_CONFIG, WORLD_SEEDS} from './config.js';
+
+// Evaluated fresh on every call that doesn't pass an explicit `seed`
+// (JS default-parameter expressions re-run per call, not once at
+// definition time) — see config.js's WORLD_SEEDS for why a curated list
+// beats a fully random seed here.
+function pickRandomSeed() {
+  return WORLD_SEEDS[Math.floor(Math.random() * WORLD_SEEDS.length)];
+}
 
 /**
  * Spins up a fresh managed-local Minecraft server. Port is chosen
@@ -25,9 +33,11 @@ import {WORLD_CONFIG} from './config.js';
  * process from a prior demo run; the caller reads `.port` off the
  * returned handle to pass along to the agent launch and the spectator
  * client join. `worldConfig` overrides individual fields of config.js's
- * WORLD_CONFIG for one-off callers (e.g. tests).
+ * WORLD_CONFIG for one-off callers (e.g. tests). `seed` defaults to a
+ * random pick from WORLD_SEEDS but can still be pinned explicitly, e.g.
+ * to reproduce a specific run.
  */
-export async function launchManagedWorld(worldConfig = {}, seed = Date.now()) {
+export async function launchManagedWorld(worldConfig = {}, seed = pickRandomSeed()) {
   const mergedConfig = {...WORLD_CONFIG, ...worldConfig};
   const host = '127.0.0.1';
   const serverRoot = makeTempDir('workshop_demo_server_');
