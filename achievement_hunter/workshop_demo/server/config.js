@@ -60,9 +60,10 @@ export const WORLD_CONFIG = {
 // pickRandomSeed(), suite.js's prepareManagedServer()/formatPropertyValue())
 // so server.properties' level-seed gets the exact original digits.
 export const WORLD_SEEDS = [
-  // '-2340086868895727392',  // Passed: MOAR tools, Porkchop, Hot stuff
-  '156741518713417215',  // Passed: MOAR tools
-  // '1622037966260912534',
+  // '-2340086868895727392',  // Completed: MOAR tools, Porkchop, Hot stuff
+  // '156741518713417215',  // Completed: MOAR tools, Hot stuff, Diamonds
+  // '1622037966260912534', // Completed: MOAR tools, Hot stuff, Diamonds
+  '-4961302301103388401',  // Completed: MOAR tools
 ];
 
 // Must match achievement_hunter/src/profile.json's "name" field — the

@@ -52,7 +52,7 @@
     "hunting": false,
     "item_collecting": false,
     "torch_placing": false,
-    "elbow_room": true,
+    "elbow_room": false,
     "idle_staring": false,
     "cheat": false
   }
