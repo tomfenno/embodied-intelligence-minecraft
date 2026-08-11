@@ -62,6 +62,15 @@ class MindServerProxy {
         });
 		
         this.socket.on('send-message', (data) => {
+            // Start of AH code
+            // Unconditional, before any guard/routing logic below — if a
+            // message ever appears to go nowhere again (workshop_demo's
+            // dashboard showing "running" with no further agent activity),
+            // this line is the difference between "proven: it never
+            // arrived" and "arrived, then something after this hung",
+            // instead of inferring it from an absent downstream log line.
+            console.log(`[mindserver_proxy] send-message received from ${data?.from}: ${data?.message}`);
+            // End of AH code
             try {
                 this.agent.respondFunc(data.from, data.message);
             } catch (error) {

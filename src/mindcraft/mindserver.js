@@ -196,15 +196,35 @@ export function createMindServer(host_public = false, port = 8080) {
             
         });
 
-		socket.on('send-message', (agentName, data) => {
+		// Start of AH code
+		// Optional trailing ack callback: existing callers that don't pass one
+		// are unaffected (Socket.IO just skips the ack round-trip). The
+		// workshop demo's objective_injector.js uses it to confirm the
+		// message actually reached this relay before disconnecting its own
+		// socket — without this, `emit()` immediately followed by
+		// `disconnect()` could drop the just-emitted packet if the transport
+		// hadn't flushed it yet, silently losing the objective (confirmed
+		// live: dashboard showed "running" but the agent never received
+		// anything).
+		// End of AH code
+		socket.on('send-message', (agentName, data, callback) => {
 			if (!agent_connections[agentName]) {
 				console.warn(`Agent ${agentName} not in game, cannot send message via MindServer.`);
+				// Start of AH code
+				if (callback) callback({success: false, error: `Agent ${agentName} not in game`});
+				// End of AH code
 				return
 			}
 			try {
 				agent_connections[agentName].socket.emit('send-message', data)
+				// Start of AH code
+				if (callback) callback({success: true});
+				// End of AH code
 			} catch (error) {
 				console.error('Error: ', error);
+				// Start of AH code
+				if (callback) callback({success: false, error: error.message});
+				// End of AH code
 			}
 		});
 

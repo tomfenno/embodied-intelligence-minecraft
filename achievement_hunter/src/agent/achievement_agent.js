@@ -17,6 +17,14 @@ import {init_ah_modes} from './ah_modes.js';
 
 const RESTART_MSG = 'Safely restarting to update inventory.';
 
+// A single one-shot chat broadcast has no retry if it's ever lost in
+// transit — confirmed live as a real failure mode (workshop_demo's
+// dashboard timing out waiting for "ready" despite the agent genuinely
+// sitting there waiting the whole time). Re-sending the same message on an
+// interval while still in a "waiting for the next objective" state fixes
+// this regardless of *why* any single broadcast went missing.
+const READY_REBROADCAST_MS = 5_000;
+
 export class AchievementAgent extends Agent {
   async _setupEventHandlers(save_data, init_message) {
     this._init_spl_models();
@@ -87,7 +95,9 @@ export class AchievementAgent extends Agent {
     }
 
     this._waiting_for_objective = true;
-    this.openChat('Achievement Hunter ready! Send me an objective to begin.');
+    const ready_message = 'Achievement Hunter ready! Send me an objective to begin.';
+    this.openChat(ready_message);
+    this._start_ready_heartbeat(ready_message);
   }
 
   async update(delta) {
@@ -127,6 +137,7 @@ export class AchievementAgent extends Agent {
     if (this._waiting_for_objective && source !== this.name &&
         !message.startsWith('!')) {
       this._waiting_for_objective = false;
+      this._stop_ready_heartbeat();
       console.log('[SPL] Received objective from', source, ':', message);
       this._launch_spl(message);
       return true;
@@ -148,6 +159,7 @@ export class AchievementAgent extends Agent {
   }
 
   killAll() {
+    this._stop_ready_heartbeat();
     if (this._benchmark_task_mode) {
       if (this._benchmark_shutdown_requested) {
         return;
@@ -189,7 +201,9 @@ export class AchievementAgent extends Agent {
           }
 
           this._waiting_for_objective = true;
-          this.openChat('Task complete! Send me a new objective.');
+          const complete_message = 'Task complete! Send me a new objective.';
+          this.openChat(complete_message);
+          this._start_ready_heartbeat(complete_message);
         })
         .catch((err) => {
           console.error('[SPL] Structured loop crashed:', err);
@@ -200,12 +214,31 @@ export class AchievementAgent extends Agent {
             return;
           }
           this._waiting_for_objective = true;
-          this.openChat('SPL crashed. Send a new objective to retry.');
+          const crash_message = 'SPL crashed. Send a new objective to retry.';
+          this.openChat(crash_message);
+          this._start_ready_heartbeat(crash_message);
         });
   }
 
   _silence_chat_listeners() {
     this.bot.removeAllListeners('chat');
     this.bot.removeAllListeners('whisper');
+  }
+
+  // Cleared the instant an objective actually arrives (handleMessage()) or
+  // the agent is killed (killAll()) — this is purely a "keep re-announcing
+  // while genuinely idle" signal, never meant to outlive that state.
+  _start_ready_heartbeat(message) {
+    this._stop_ready_heartbeat();
+    this._ready_heartbeat_timer = setInterval(() => {
+      this.openChat(message);
+    }, READY_REBROADCAST_MS);
+  }
+
+  _stop_ready_heartbeat() {
+    if (this._ready_heartbeat_timer) {
+      clearInterval(this._ready_heartbeat_timer);
+      this._ready_heartbeat_timer = null;
+    }
   }
 }
