@@ -1555,3 +1555,18 @@ real in-progress run's world/agent processes out from under it. That
 `orphan_guard` bug itself is still open — explicitly deferred at the
 user's request ("I don't care about the orphan_guard bug") to stay
 focused on the stall itself.
+
+**Follow-up: "Get rid of the message on the GUI that says 'Live View
+Hasn't updated....'"** Removed the dashboard-facing half described above
+— `#live-stale-warning` (`index.html`, `styles.css`), and `app.js`'s
+`liveStaleWarning`/`LIVE_STALE_MS`/`lastStatus`/`lastLive`/
+`updateStaleWarning()`. Also removed `/api/live`'s now-unconsumed
+`updatedAt` field and the `statSync` import in `server/index.js` that
+computed it, rather than leave a server-side field nothing reads
+anymore. The `io_queue.js` self-heal and the `UV_THREADPOOL_SIZE` bump
+above are unaffected — those fix the actual stall regardless of whether
+the GUI surfaces it, which was the point of splitting them into two
+separate pieces in the first place. Verified: served HTML no longer
+contains the banner markup, `/api/live`'s response shape no longer
+includes `updatedAt`, both checked against a real running server
+instance on a scratch port (not the presenter's own session).

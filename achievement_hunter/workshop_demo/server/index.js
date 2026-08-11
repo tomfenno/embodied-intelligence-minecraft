@@ -1,7 +1,7 @@
 // Workshop demo dashboard server: PTD selection + run orchestration + live
 // rollout view.
 
-import {existsSync, readFileSync, statSync} from 'fs';
+import {existsSync, readFileSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
@@ -229,18 +229,11 @@ app.get('/api/live', (req, res) => {
   const candidateIds = raw.candidates?.map((c) => c.id) ?? null;
   const graph = raw.ptd?.parsed ?? null;
 
-  // File mtime, not "now" — lets the frontend tell "the agent hasn't
-  // updated this in a while" (a real stall — see io_queue.js's matching
-  // stall-warning addition) apart from "the dashboard just hasn't polled
-  // recently," which a client-side timestamp couldn't distinguish.
-  const updatedAt = statSync(LIVE_JSON_PATH).mtimeMs;
-
   res.json({
     mermaid: graph ?
         render_live_mermaid(graph, currentNodeId, remainingIds, candidateIds) :
         null,
     recovery: build_recovery_view(raw),
-    updatedAt,
   });
 });
 
