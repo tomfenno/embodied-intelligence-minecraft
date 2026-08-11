@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Achievement Hunter — Workshop Demo</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header>
+  <h1>Achievement Hunter — pick an achievement</h1>
+</header>
+<main>
+  <section id="selection-view">
+    <div id="ptd-grid"></div>
+  </section>
+
+  <section id="status-view" class="hidden">
+    <div class="run-header">
+      <div class="objective" id="status-objective"></div>
+      <div class="status-label" id="status-label"></div>
+      <div class="status-detail" id="status-detail"></div>
+      <div class="status-detail" id="spectator-detail"></div>
+    </div>
+
+    <div id="live-dashboard" class="hidden">
+      <div class="live-row">
+        <div class="live-panel graph-panel">
+          <div class="panel-title">Dependency graph</div>
+          <div class="mermaid" id="live-graph"></div>
+        </div>
+        <div class="live-panel elapsed-panel">
+          <div class="elapsed-value" id="live-elapsed"></div>
+          <div class="elapsed-badge" id="live-status-badge"></div>
+        </div>
+      </div>
+      <div class="live-row">
+        <div class="live-panel">
+          <div class="panel-title">Current task</div>
+          <div id="live-task"></div>
+        </div>
+        <div class="live-panel">
+          <div class="panel-title">Current action</div>
+          <div id="live-action"></div>
+        </div>
+      </div>
+    </div>
+
+    <button id="back-button">Back to selection</button>
+  </section>
+</main>
+
+<script src="/vendor/mermaid/mermaid.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

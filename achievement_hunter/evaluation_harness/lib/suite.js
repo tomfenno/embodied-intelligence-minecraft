@@ -488,7 +488,7 @@ function buildEpisodeSettings(agentConfig, worldConfig) {
   };
 }
 
-function prepareManagedServer(serverRoot, worldConfig, seed, serverPort) {
+export function prepareManagedServer(serverRoot, worldConfig, seed, serverPort) {
   const serverTemplatePath = resolveProjectPath(worldConfig.server_template_path);
   if (!fs.existsSync(serverTemplatePath)) {
     throw new Error(

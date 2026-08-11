@@ -1,0 +1,211 @@
+:root {
+  color-scheme: dark;
+  --bg: #0d1117;
+  --panel: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #4CAF50;
+  --error: #f85149;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+}
+
+header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.02em;
+}
+
+main {
+  padding: 2rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#ptd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.ptd-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.ptd-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.ptd-card h3 {
+  margin: 0 0 0.6rem 0;
+  font-size: 1.1rem;
+}
+
+.ptd-card .mermaid {
+  background: #0b0f14;
+  border-radius: 8px;
+  padding: 0.5rem;
+  min-height: 80px;
+  overflow: auto;
+}
+
+.ptd-card .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+#status-view {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.run-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+#status-view .objective {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.6rem;
+}
+
+#status-view .status-label {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+#status-view .status-label.error {
+  color: var(--error);
+}
+
+#status-view .status-detail {
+  color: var(--muted);
+}
+
+#live-dashboard {
+  margin-bottom: 2rem;
+}
+
+.live-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.live-row:first-child {
+  grid-template-columns: 72% 1fr;
+}
+
+.live-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem;
+  text-align: left;
+}
+
+.panel-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.8rem;
+}
+
+.graph-panel .mermaid {
+  overflow: auto;
+}
+
+.graph-panel .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.elapsed-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.elapsed-value {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.elapsed-badge {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.elapsed-badge.completed {
+  color: var(--accent);
+}
+
+.task-line, .action-line {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.action-line code {
+  background: #0b0f14;
+  border-radius: 6px;
+  padding: 0.15rem 0.4rem;
+  font-size: 1rem;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+button {
+  font: inherit;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+}

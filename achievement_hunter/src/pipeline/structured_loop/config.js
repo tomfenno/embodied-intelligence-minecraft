@@ -36,7 +36,11 @@ export const PTD_JSON_DIR = 'achievement_hunter/docs/ptd_jsons';
 //   'achievement_hunter/docs/ptd_jsons/bake_a_cake.json'
 //   'achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_diamond.json'
 //   'achievement_hunter/docs/ptd_jsons/construct_one_pickaxe_one_shovel_one_axe_and_one_hoe_with_the_same_material.json'
-export const PTD_JSON_OVERRIDE_PATH = null;
+// Overridable via AH_PTD_JSON_OVERRIDE_PATH (e.g. by the workshop demo
+// orchestrator) so a specific pre-generated PTD can be forced without
+// editing source.
+export const PTD_JSON_OVERRIDE_PATH =
+    process.env.AH_PTD_JSON_OVERRIDE_PATH || null;
 // export const PTD_JSON_OVERRIDE_PATH =
 // 'achievement_hunter/docs/ptd_jsons/craft_a_golden_apple_have_a_golden_apple_in_the_inventory.json';
 //'achievement_hunter/docs/ptd_jsons/obtain_one_obsidian.json';
@@ -145,7 +149,9 @@ export function is_rollout_logging_enabled() {
           process.env.BENCHMARK_EPISODE_DIR.length > 0;
 }
 
-// When true, writes the live dashboard markdown files under `rollout_live/`
-// and runs the per-stage markdown rendering. Disable to remove all
+// When true, writes the live dashboard markdown + JSON files under
+// `rollout_live/` and runs the per-stage rendering. Disable to remove all
 // live-viewer sync I/O and rendering work from the agent's hot path.
-export const ENABLE_LIVE_VIEWER = false;
+// Overridable via AH_ENABLE_LIVE_VIEWER for demo runs that need it without
+// editing source (mirrors the AH_ENABLE_ROLLOUT_LOGGING pattern above).
+export const ENABLE_LIVE_VIEWER = false || env_truthy('AH_ENABLE_LIVE_VIEWER');

@@ -1,0 +1,101 @@
+// Fresh peaceful-survival Minecraft world spin-up for the workshop demo.
+// Reuses the eval harness's managed_local server machinery (see
+// achievement_hunter/workshop_demo/PLAN.md, Phase 1) rather than
+// reimplementing server-template handling.
+
+import path from 'path';
+
+import {prepareManagedServer} from '../../evaluation_harness/lib/suite.js';
+import {
+  PROJECT_ROOT,
+  chooseFreePort,
+  launchLoggedProcess,
+  makeTempDir,
+  safeRemoveTree,
+  sendServerConsoleCommand,
+  terminateProcessTree,
+  waitForProcessExit,
+  waitForServerReady,
+} from '../../evaluation_harness/lib/utils.js';
+import {WORLD_CONFIG} from './config.js';
+
+/**
+ * Spins up a fresh managed-local Minecraft server. Port is chosen
+ * dynamically (not pinned) to avoid colliding with a not-yet-reaped
+ * process from a prior demo run; the caller reads `.port` off the
+ * returned handle to pass along to the agent launch and the spectator
+ * client join. `worldConfig` overrides individual fields of config.js's
+ * WORLD_CONFIG for one-off callers (e.g. tests).
+ */
+export async function launchManagedWorld(worldConfig = {}, seed = Date.now()) {
+  const mergedConfig = {...WORLD_CONFIG, ...worldConfig};
+  const host = '127.0.0.1';
+  const serverRoot = makeTempDir('workshop_demo_server_');
+  const port = await chooseFreePort();
+
+  prepareManagedServer(serverRoot, mergedConfig, seed, port);
+
+  const outputPath = path.join(serverRoot, 'server_stdout.log');
+  const {child: serverProcess} = launchLoggedProcess({
+    command: ['java', '-jar', mergedConfig.server_jar_name, 'nogui'],
+    cwd: serverRoot,
+    outputPath,
+  });
+
+  await waitForServerReady({host, port, process: serverProcess, outputPath});
+  await sendServerConsoleCommand(serverProcess, 'gamerule spawnRadius 0');
+
+  return {
+    host,
+    port,
+    serverRoot,
+    outputPath,
+    serverProcess,
+    sendConsoleCommand: (command, opts) =>
+        sendServerConsoleCommand(serverProcess, command, opts),
+    async stop() {
+      // Not stopServerProcess() (utils.js): that helper sends a graceful
+      // 'stop' console command and waits up to 60s for the world to save
+      // before falling back to a kill, which is right for the eval
+      // harness's real benchmark runs but pointlessly slow here — this
+      // whole directory gets deleted on the next line regardless, so
+      // there's no save worth waiting for. terminateProcessTree() (SIGTERM)
+      // plus a short bounded wait is enough.
+      terminateProcessTree(serverProcess);
+      if (serverProcess.exitCode === null) {
+        try {
+          await waitForProcessExit(serverProcess, 5_000);
+        } catch {
+        }
+      }
+      safeRemoveTree(serverRoot, path.join(PROJECT_ROOT, 'tmp'));
+    },
+  };
+}
+
+/**
+ * Env overrides for a `node main.js` child process to connect it to a
+ * specific managed world. Required outside Docker: settings.js defaults
+ * `host` to 'host.docker.internal', which only resolves inside a Docker
+ * container. Mirrors the technique evaluation_harness/lib/suite.js already
+ * uses for its own agent launches (suite.js:315-325).
+ */
+export function buildAgentLaunchEnv({
+  host,
+  port,
+  mindserverPort,
+  minecraftVersion = WORLD_CONFIG.minecraft_version,
+  settingsOverride = {},
+}) {
+  return {
+    ...process.env,
+    MINECRAFT_PORT: String(port),
+    MINDSERVER_PORT: String(mindserverPort),
+    SETTINGS_JSON: JSON.stringify({
+      auto_open_ui: false,
+      host,
+      minecraft_version: minecraftVersion,
+      ...settingsOverride,
+    }),
+  };
+}

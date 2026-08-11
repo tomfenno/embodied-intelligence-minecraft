@@ -45,6 +45,7 @@ const LIVE_FILE = {
   PTD_REFINEMENT: 'current_ptd_refinement.md',
   SCSG: 'current_scsg.md',
   DASHBOARD: 'current_rollout.md',
+  DASHBOARD_JSON: 'current_rollout.json',
   LEGACY_DASHBOARD: 'current_graphs.md',
   BREADCRUMBS: 'current_breadcrumbs.md',
   SEARCH_RECOVERY: 'current_search_recovery.md',
@@ -791,6 +792,24 @@ export function createRolloutLogger(objective) {
       task: task_content,
       am: am_content,
     });
+
+    // Structured sibling of the markdown dashboard, for a live web viewer to
+    // poll instead of scraping rendered HTML tables. live_state alone lacks
+    // elapsed/status (those only exist as pre-rendered markdown above), so
+    // they're added explicitly here.
+    live_writer.write_file(LIVE_FILE.DASHBOARD_JSON, JSON.stringify({
+      objective,
+      status: rollout.status,
+      elapsed: current_elapsed(),
+      ptd: live_state.ptd,
+      scsg_result: live_state.scsg_result,
+      candidates: live_state.candidates,
+      task_state: live_state.task_state,
+      am_history: live_state.am_history,
+      completion: live_state.completion,
+      recovery: live_state.recovery,
+      search_recovery: live_state.search_recovery,
+    }, null, 2));
   }
 
   // ── Public API

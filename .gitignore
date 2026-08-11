@@ -45,5 +45,6 @@ logs/
 .ipynb_checkpoints/
 achievement_hunter/rollouts/
 achievement_hunter/rollout_live/
+achievement_hunter/workshop_demo/.run/
 timing_experiments/
 achievement_hunter/evaluation_harness/exp*
