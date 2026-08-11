@@ -1457,3 +1457,101 @@ precision concern as the WORLD_SEEDS fix above, so worth double-checking
 this print path specifically didn't reintroduce it (it doesn't: `seed`
 is still the same string value all the way through, `console.log`
 doesn't coerce it).
+
+### Post-launch fix — intermittent stall ("bot not doing anything, PTD
+not loading")
+
+**Report:** across two separate live runs, the agent appeared to freeze
+— no further console output, `/api/live` stuck serving stale or absent
+data despite `/api/status` still saying `"running"`. Not reproducible on
+demand; "does not happen every time."
+
+**Two distinct causes found**, investigated live against the actual
+running processes rather than guessed at statically (see the session's
+own debugging trail — `ps`/`lsof` CPU and network checks, a live
+diagnostic probe sent straight to the stuck agent's mindserver socket,
+and reading server/agent output while a real stall was in progress):
+
+1. **`elbow_room` mode fighting the spectator.** `achievement_hunter/
+   src/agent/ah_modes.js`'s forked copy of Mindcraft's `elbow_room`
+   ("move away from nearby players when idle") was left `on: true`,
+   unchanged from upstream. It triggers on any player entity within 0.5
+   blocks — and the workshop demo's spectator stays `/spectate`-locked
+   onto AH_Bot for the whole run (`orchestrator.js`), whose tracked
+   position vanilla keeps synced to whatever it's spectating. So the mode
+   saw a "player" permanently at ~0 distance and re-triggered forever,
+   starving the real task loop. Fixed by setting it `on: false` — it
+   serves no purpose for AH's task-driven pipeline anyway. All 20
+   existing `ah_modes` tests still pass.
+2. **A single stuck live-view write bricking the dashboard forever.**
+   Separately, a run was found where the bot was genuinely fine — busy
+   crafting through a real task chain — while `current_rollout.json`
+   simply stopped updating. Root cause: `achievement_hunter/src/
+   pipeline/io_queue.js`'s per-path write queue has no timeout on its
+   `await writeFile(...)`. If that call ever stalls (plausible cause:
+   this demo often runs two full Minecraft JVMs plus multiple Node
+   processes on one laptop at once — real resource contention, not a
+   logic bug), `state.in_flight` never clears, and every future write to
+   *that exact path* silently no-ops forever (`write()`'s `if
+   (state.in_flight) return;` guard) — with no error, since nothing ever
+   rejects.
+
+**Fix for #2, in two parts:**
+
+- `io_queue.js`: `_drain_write` (overwrite-mode paths only —
+  `current_rollout.json`, `current_ptd.md`, etc.) now races each write
+  against a `WRITE_ABANDON_MS` (15s) timeout via a new
+  `_write_with_timeout()`. Past that, it stops waiting on the dead
+  promise and lets the loop retry with whatever's newest instead of
+  blocking the path for the rest of the run — safe specifically because
+  `'w'`-mode writes fully replace file content, so an abandoned write
+  landing late just gets clobbered by a newer one, never corrupts
+  anything. A `STALL_WARN_MS` (5s) warning fires earlier for visibility
+  even when a write does eventually complete on its own. Append-mode
+  paths (`full_search_trace.jsonl`, benchmark datasets) deliberately keep
+  the older warn-only behavior (`_watch_for_stall`) and are never
+  abandoned — a late-landing append that's *also* been retried would
+  duplicate a line, which a late-landing overwrite can't.
+- `world_launcher.js`'s `buildAgentLaunchEnv()`: sets `UV_THREADPOOL_SIZE:
+  '8'` (up from Node's default of 4) on the spawned agent process's real
+  environment — cheap, harmless, and reduces one plausible contributing
+  factor if this is actually threadpool contention rather than raw disk
+  slowness. Has to be set as a literal child-process env var here, not
+  e.g. `process.env.UV_THREADPOOL_SIZE = ...` at the top of `main.js`
+  itself — ES module `import`s are hoisted ahead of any of that file's
+  own top-level statements, so it wouldn't reliably beat whatever those
+  imports do before libuv creates its pool on first use.
+
+**Dashboard-facing addition** (`server/index.js` + `public/`): `/api/live`
+now also returns `updatedAt` — the live-view file's own mtime, not a
+client-side clock, so staleness reflects when the *file* last changed,
+not when this browser tab last polled. `app.js`'s new
+`updateStaleWarning()` shows `#live-stale-warning` (amber, non-blocking)
+whenever the run is `"running"` and `Date.now() - updatedAt` (or
+`status.startedAt` before the first live update ever lands) exceeds
+`LIVE_STALE_MS` (20s) — so a presenter sees *something* during a stall
+instead of an unexplained frozen graph, whether or not #2's self-heal
+manages to clear it on its own.
+
+**Verification.** `node --check` on every modified file. `io_queue.js`'s
+new behavior verified with mocked `fs/promises` + vitest fake timers
+(not committed — throwaway, deleted after passing): confirmed (a) a
+normal fast write produces no warnings, (b) rapid coalesced writes still
+land only the final value, and (c) a write mocked to hang forever gets
+warned at 5s, abandoned at 15s, and the path recovers via a retry that
+resolves immediately afterward — `drain()` no longer hangs forever
+behind a single dead write. Ran the full `achievement_hunter` test suite
+before and after (`git stash`/`stash pop`) to confirm the 3 pre-existing
+failures (`trusted_dependency_classifier.test.js`, missing
+`timing_experiments/` fixture data not checked into the repo) predate
+this change and nothing else regressed (333/336 passing, unchanged).
+`buildAgentLaunchEnv()` confirmed live to actually include
+`UV_THREADPOOL_SIZE: '8'` in its output. The dashboard staleness banner
+was verified via a second, isolated dashboard instance on a scratch port
+— **not** by restarting the user's actual live session, after an earlier
+mistake this same debugging session where doing exactly that
+(`orphan_guard.js`'s startup cleanup isn't scoped per-port) killed a
+real in-progress run's world/agent processes out from under it. That
+`orphan_guard` bug itself is still open — explicitly deferred at the
+user's request ("I don't care about the orphan_guard bug") to stay
+focused on the stall itself.

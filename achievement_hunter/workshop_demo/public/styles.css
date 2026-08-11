@@ -126,6 +126,23 @@ main {
   color: var(--muted);
 }
 
+/* Shown when /api/live's `updatedAt` (the live-view file's own mtime, not
+   a client-side clock) falls too far behind while a run is still
+   "running" — see app.js's checkLiveStale(). Amber rather than --error:
+   this is "might be stuck, often clears on its own" (per the io_queue.js
+   stall-warning addition it's paired with), not a hard failure. */
+#live-stale-warning {
+  flex: 0 0 auto;
+  background: rgba(255, 152, 0, 0.12);
+  border: 1px solid #E65100;
+  color: #FFB74D;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 #live-dashboard {
   flex: 1 1 auto;
   min-height: 0;

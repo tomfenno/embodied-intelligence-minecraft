@@ -105,6 +105,19 @@ export function buildAgentLaunchEnv({
 }) {
   return {
     ...process.env,
+    // Node's default libuv threadpool (4 workers) is shared by every
+    // fs/dns/crypto call in the process. Set as a real env var on the
+    // spawned child here (not e.g. `process.env.UV_THREADPOOL_SIZE = ...`
+    // inside main.js itself) because it only takes effect if set before
+    // libuv creates the pool on first use — an ES module's top-level
+    // `import`s already run before any of main.js's own statements, so
+    // setting it there wouldn't reliably beat whatever those imports do.
+    // Doesn't fix genuine system-level I/O contention (this demo often
+    // runs two Minecraft JVMs plus multiple Node processes on one laptop
+    // — see achievement_hunter/src/pipeline/io_queue.js's self-healing
+    // write-timeout addition for that), but it's a free, harmless way to
+    // reduce one plausible contributing factor.
+    UV_THREADPOOL_SIZE: '8',
     MINECRAFT_PORT: String(port),
     MINDSERVER_PORT: String(mindserverPort),
     SETTINGS_JSON: JSON.stringify({

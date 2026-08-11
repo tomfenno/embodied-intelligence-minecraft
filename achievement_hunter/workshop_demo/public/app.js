@@ -29,6 +29,7 @@ function spectatorDetailText(spectator) {
   return SPECTATOR_TEXT[status] || '';
 }
 
+const liveStaleWarning = document.getElementById('live-stale-warning');
 const liveDashboard = document.getElementById('live-dashboard');
 const liveGraph = document.getElementById('live-graph');
 const graphPanel = document.getElementById('graph-panel');
@@ -53,6 +54,16 @@ const STATUS_TEXT = {
 let pollTimer = null;
 let mermaidCounter = 0;
 let lastLiveMermaidSource = null;
+
+// How long the live view can go without an update, while the run is still
+// "running", before it's flagged as possibly stuck rather than just
+// between steps. Paired with the server-side stall-warning added to
+// achievement_hunter/src/pipeline/io_queue.js — this is the demo-facing
+// half of the same diagnostic effort, so a presenter sees *something*
+// during a stall instead of an unexplained frozen graph.
+const LIVE_STALE_MS = 20_000;
+let lastStatus = null;
+let lastLive = null;
 
 async function loadPtds() {
   const res = await fetch('/api/ptds');
@@ -89,7 +100,10 @@ async function startRun(filename) {
   statusLabel.textContent = 'Starting…';
   statusDetail.textContent = '';
   liveDashboard.classList.add('hidden');
+  liveStaleWarning.classList.add('hidden');
   lastLiveMermaidSource = null;
+  lastStatus = null;
+  lastLive = null;
 
   const res = await fetch('/api/start', {
     method: 'POST',
@@ -112,17 +126,35 @@ async function startRun(filename) {
 async function tick() {
   await pollStatus();
   await pollLive();
+  updateStaleWarning();
 }
 
 async function pollStatus() {
   const res = await fetch('/api/status');
-  renderStatus(await res.json());
+  lastStatus = await res.json();
+  renderStatus(lastStatus);
 }
 
 async function pollLive() {
   const res = await fetch('/api/live');
-  const live = await res.json();
-  if (live) renderLive(live);
+  lastLive = await res.json();
+  if (lastLive) renderLive(lastLive);
+}
+
+// Anchors on live.updatedAt (the live-view file's own mtime) once it
+// exists, falling back to status.startedAt before the agent's first
+// render — using status.startedAt (not e.g. Date.now() at first poll)
+// means a run that's *always* been stuck since launch still gets flagged
+// once LIVE_STALE_MS has genuinely passed, not just once this tab happened
+// to start polling.
+function updateStaleWarning() {
+  if (!lastStatus || lastStatus.status !== 'running') {
+    liveStaleWarning.classList.add('hidden');
+    return;
+  }
+  const anchor = lastLive?.updatedAt ?? lastStatus.startedAt;
+  const isStale = anchor != null && (Date.now() - anchor) > LIVE_STALE_MS;
+  liveStaleWarning.classList.toggle('hidden', !isStale);
 }
 
 function renderStatus(status) {
@@ -225,6 +257,7 @@ backButton.addEventListener('click', () => {
   // correctness reason to block the UI on this too.
   statusView.classList.add('hidden');
   liveDashboard.classList.add('hidden');
+  liveStaleWarning.classList.add('hidden');
   selectionView.classList.remove('hidden');
   pageHeader.classList.remove('hidden');
   fetch('/api/stop', {method: 'POST'})
