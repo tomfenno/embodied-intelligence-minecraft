@@ -825,3 +825,109 @@ trailing `.sort()` removed so the curated order is preserved rather than
 re-alphabetized. **Verified live:** `/api/ptds` returns the 7 files in
 exactly this order; confirmed the frontend does no independent sorting of
 its own, so the selection cards render in the same order.
+
+### Post-launch UI iteration — layout, caching, graph direction, panel removal
+
+A short run of quick UI requests, each verified rather than assumed:
+
+- **Selection cards top-down, not left-to-right:** `#ptd-grid` changed from
+  `grid-template-columns: repeat(auto-fill, minmax(320px, 1fr))` to a single
+  `1fr` column (max-width 900px, centered). First report of "still left to
+  right" was the browser showing a cached stylesheet — fixed by adding
+  `Cache-Control: no-store` to the dashboard's own static file serving
+  (`server/index.js`; the large unchanging mermaid vendor bundle keeps
+  normal caching). **Second** report of "still left to right" after that
+  fix turned out to be a real, different bug: each PTD's *mermaid graph
+  itself* was rendered `graph LR` (left-to-right node flow) regardless of
+  card layout. Fixed in `graph_utils.js`'s `graph_to_mermaid()` by adding
+  an optional `direction` parameter (default `'LR'`, so
+  `rollout_logger.js`'s existing markdown-viewer callers are unaffected —
+  verified directly, calling with no second argument still produces `graph
+  LR`), with the workshop demo's two call sites passing `'TD'`.
+- **Removed "World live at host:port" and "Spectator connected — watching
+  AH_Bot" status text** — `app.js`. Kept the other spectator status
+  messages (launching/timeout/skipped/error) since those remain useful for
+  troubleshooting; only the "everything's fine" success text was removed
+  as redundant once the live dashboard already shows the run progressing.
+- **Removed the "Current task"/"Current action" panels** from the live
+  view — `index.html`'s second `.live-row`, `app.js`'s corresponding
+  render logic and the now-dead `escapeHtml()` helper, the now-dead
+  `.task-line`/`.action-line`/`.muted` CSS rules, and the now-unused
+  `task`/`action` fields `server/index.js`'s `/api/live` computed for them
+  (kept `task_state`-derived `currentNodeId`, since that still feeds the
+  graph's current-node highlight, unrelated to what was asked to be
+  removed).
+
+### Post-launch feature — SCSG/candidate node coloring + legend
+
+Requested: distinguish SCSG-remaining nodes and next-task-selector
+candidate nodes with their own colors on the live graph (previously only
+current-node=blue and done=dimmed-gray existed), plus a legend so a
+workshop participant can read the graph without narration.
+
+**Data source, verified against `rollout_logger.js` before wiring anything
+up:** `live_state.scsg_result.final.vertices` (already used for the
+existing "done" dimming) and `live_state.candidates` (an array of
+`compact_candidate()` objects with `.id`, previously unused by the
+dashboard) are both already present in the live JSON — no changes needed
+upstream, just consuming data that was already there.
+
+**Color/precedence design** (`server/index.js`'s `NODE_COLOR` map, low to
+high — later `style` lines win ties in mermaid): goal (green, from
+`graph_to_mermaid()`'s existing sink styling) < remaining (new, amber
+`#FF9800`) < candidate (new, purple `#9C27B0`) < current (blue, existing) <
+done (gray, existing — done is a `style` line appended for any node no
+longer in the SCSG's remaining set, so it doesn't compete with
+remaining/candidate for the same node by construction, only with goal).
+Sink nodes are deliberately excluded from the remaining/candidate overrides
+so the target node stays visually anchored (green) while still pending,
+rather than blending in with everything else labeled "remaining."
+
+**Legend** — `index.html`, a static row of colored swatches + labels
+(Goal/Remaining/Candidate/Current/Done) placed above the graph in
+`.graph-panel`. Colors are hand-kept in sync with `NODE_COLOR` and
+`graph_to_mermaid()`'s sink color via a comment in each file cross-
+referencing the other, since there's no shared constant between the
+Node-side color map and the static HTML — worth consolidating if this
+grows further.
+
+**Verified live against a real run, not synthetic data:** polled
+`/api/live` through an actual "cook a porkchop" run and confirmed the
+exact expected mermaid output — e.g. `porkchop` and `crafting_table` each
+had *two* `style` lines (`remaining` amber followed by `candidate`
+purple), with purple correctly winning per mermaid's last-line-wins
+behavior; `stick` was current (blue); `any_plank`/`any_log` were done
+(gray); the sink stayed green throughout since it was still pending.
+Watched the counts shift across several polls as the run progressed
+(remaining 7→5, done 0→2), confirming the coloring updates live, not just
+once.
+
+### Post-launch fix — Ctrl+C didn't actually stop the demo
+
+Asked: "why doesn't control c kill the server?" Root cause: the world and
+agent child processes `orchestrator.js` spawns are launched `detached:
+true` (deliberately — so `stopRun()` can kill each one's entire process
+group independently via `terminateProcessTree()`'s `process.kill(-pid,
+...)`, without affecting siblings). A detached child gets its own process
+group, separate from the terminal's — so Ctrl+C's SIGINT, which the
+terminal only delivers to its *foreground* process group, never reaches
+them. It only reached the dashboard process itself, which had no signal
+handler at all and so just died via Node's default behavior, leaving
+Minecraft and the agent running orphaned. The exact same failure mode
+`orphan_guard.js` (Phase 6 hardening) cleans up on the *next* dashboard
+startup — but nothing previously stopped it from happening in the first
+place, and Ctrl+C is the most natural way a presenter would actually try
+to stop the demo.
+
+**Fix:** `server/index.js` now registers `SIGINT`/`SIGTERM` handlers that
+call `orchestrator.stopRun()` (the same full teardown `/api/stop` uses —
+world, agent, spectator watcher, checkpoint) before exiting, guarded
+against double-invocation if both signals somehow arrive.
+
+**Verified live:** started a real run, confirmed via `ps` that the
+Minecraft server and agent processes were actually running, sent `SIGINT`
+directly to the dashboard process (exactly what Ctrl+C sends), and
+confirmed both the "tearing down" log line and `"[SPL] Checkpoint
+cleared."` appeared, the dashboard process itself exited, and — critically
+— the Minecraft server and agent processes were both actually gone
+afterward, not just the dashboard.

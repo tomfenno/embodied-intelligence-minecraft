@@ -33,22 +33,56 @@ function safe_mermaid_id(id) {
   return id.replace(/[^a-zA-Z0-9]/g, '_');
 }
 
-// Augments the base PTD diagram with two extra style layers the static
-// catalog preview doesn't have: the in-progress node (blue) and nodes the
-// SCSG no longer lists as remaining, i.e. already satisfied (dimmed).
-function render_live_mermaid(graph, currentNodeId, remainingIds) {
+// Color/precedence key — must match public/index.html's legend and
+// public/styles.css's .legend-swatch.* classes:
+//   goal      #4CAF50  applied by graph_to_mermaid() itself (graph.sinks)
+//   remaining #FF9800  in the current SCSG's remaining set (still relevant)
+//   candidate #9C27B0  in the next-task-selector's current candidate list
+//   current   #2196F3  the task actively being worked right now
+//   done      #2d333b  dropped out of the SCSG's remaining set (satisfied)
+//
+// Precedence, low to high (later `style` lines win ties in mermaid): goal <
+// remaining < candidate < current. Goal is deliberately never overridden by
+// remaining/candidate (so the target node stays visually anchored while
+// pending) but IS overridden by done/current — once truly finished or while
+// it's the active target, that takes priority over "it's the goal".
+const NODE_COLOR = {
+  remaining: 'fill:#FF9800,color:#fff,stroke:#E65100',
+  candidate: 'fill:#9C27B0,color:#fff,stroke:#6A1B9A',
+  current: 'fill:#2196F3,color:#fff,stroke:#1565C0',
+  done: 'fill:#2d333b,color:#6e7681,stroke:#484f58',
+};
+
+// Augments the base PTD diagram with the live-run style layers the static
+// catalog preview doesn't have — see NODE_COLOR above for what each means.
+function render_live_mermaid(graph, currentNodeId, remainingIds, candidateIds) {
   let mermaid = strip_mermaid_fence(graph_to_mermaid(graph, 'TD'));
+  const sinks = new Set(graph.sinks || []);
+  const style = (id, rule) => {
+    mermaid += `\n    style ${safe_mermaid_id(id)} ${rule}`;
+  };
 
   if (remainingIds) {
     const remaining = new Set(remainingIds);
     for (const vertex of graph.vertices) {
-      if (vertex.id === currentNodeId || remaining.has(vertex.id)) continue;
-      mermaid += `\n    style ${safe_mermaid_id(vertex.id)} fill:#2d333b,color:#6e7681,stroke:#484f58`;
+      if (vertex.id === currentNodeId) continue;
+      if (!remaining.has(vertex.id)) {
+        style(vertex.id, NODE_COLOR.done);
+      } else if (!sinks.has(vertex.id)) {
+        style(vertex.id, NODE_COLOR.remaining);
+      }
+    }
+  }
+
+  if (candidateIds) {
+    for (const id of candidateIds) {
+      if (id === currentNodeId || sinks.has(id)) continue;
+      style(id, NODE_COLOR.candidate);
     }
   }
 
   if (currentNodeId) {
-    mermaid += `\n    style ${safe_mermaid_id(currentNodeId)} fill:#2196F3,color:#fff,stroke:#1565C0`;
+    style(currentNodeId, NODE_COLOR.current);
   }
 
   return mermaid;
@@ -120,13 +154,16 @@ app.get('/api/live', (req, res) => {
 
   const currentNodeId = raw.task_state?.task?.target_item ?? null;
   const remainingIds = raw.scsg_result?.final?.vertices?.map((v) => v.id) ?? null;
+  const candidateIds = raw.candidates?.map((c) => c.id) ?? null;
   const graph = raw.ptd?.parsed ?? null;
 
   res.json({
     objective: raw.objective,
     status: raw.status,
     elapsed: raw.elapsed,
-    mermaid: graph ? render_live_mermaid(graph, currentNodeId, remainingIds) : null,
+    mermaid: graph ?
+        render_live_mermaid(graph, currentNodeId, remainingIds, candidateIds) :
+        null,
     completion: raw.completion,
   });
 });
@@ -134,3 +171,22 @@ app.get('/api/live', (req, res) => {
 app.listen(DASHBOARD_PORT, () => {
   console.log(`Workshop demo dashboard: http://localhost:${DASHBOARD_PORT}`);
 });
+
+// The world/agent child processes orchestrator.js spawns are launched
+// detached (their own process group, so stopRun() can kill each one's
+// whole tree independently) — which also means Ctrl+C's SIGINT never
+// reaches them, only this process. Without this handler, Ctrl+C kills the
+// dashboard while Minecraft and the agent keep running orphaned in the
+// background (the same failure mode orphan_guard.js cleans up on the
+// *next* startup, but nothing previously prevented it from happening in
+// the first place).
+let shuttingDown = false;
+async function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`\nReceived ${signal}, tearing down the current run...`);
+  await orchestrator.stopRun();
+  process.exit(0);
+}
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
