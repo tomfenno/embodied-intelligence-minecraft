@@ -39,6 +39,23 @@ import {buildAgentLaunchEnv, launchManagedWorld} from './world_launcher.js';
 const AGENT_STDOUT_PATH =
     path.join(PROJECT_ROOT, 'achievement_hunter', 'workshop_demo', '.run', 'agent_stdout.log');
 
+// Keeps the demo watchable in caves/at night without touching world time or
+// lighting. Targets @a rather than a specific username so one call covers
+// whichever combination of AH_Bot/spectator happens to be online at the
+// moment it fires — simpler than tracking each client's own status, and the
+// user explicitly said giving it to everyone is fine. Amplifier 0,
+// hideParticles true (last two args) so it doesn't add visual clutter around
+// either client. Best-effort: a failed console write here (e.g. server
+// mid-shutdown) shouldn't fail the whole run, same rationale as the
+// spectator flow's own error handling below.
+async function applyNightVision(world) {
+  try {
+    await world.sendConsoleCommand(
+        'effect give @a minecraft:night_vision infinite 0 true');
+  } catch {
+  }
+}
+
 // Runs once when the dashboard server starts (this module is only ever
 // imported once, at boot). Cleans up any world/agent processes a prior
 // dashboard process left running if it was killed without going through
@@ -73,6 +90,7 @@ export function getStatus() {
 
 export async function stopRun() {
   handles?.stopSpectatorWatcher?.();
+  handles?.stopNightVisionWatcher?.();
   if (handles?.agentProcess) {
     terminateProcessTree(handles.agentProcess);
     // Wait for the killed process to actually exit before clearing the
@@ -129,6 +147,14 @@ async function runInBackground(ptdFilename, objective) {
   handles = {world, agentProcess: null};
   current = {...current, status: 'starting_agent', world};
   recordRunPids({serverPid: world.serverProcess.pid, agentPid: null});
+
+  // Independent of the spectator flow below (which only runs if Prism is
+  // configured) — this way the bot itself always gets night vision even on
+  // a machine with no spectator client set up. Fires on the bot's initial
+  // login and every reconnect (crash, "Safely restarting..."), since a
+  // fresh login resets applied effects.
+  handles.stopNightVisionWatcher =
+      watchBotLogins(world.outputPath, AGENT_NAME, () => applyNightVision(world));
 
   // Fire-and-forget: the spectator join runs concurrently with agent
   // startup below and never blocks it — a Prism/client hiccup shouldn't
@@ -188,6 +214,11 @@ async function runSpectatorFlow(world) {
     return;
   }
 
+  // Covers the spectator specifically — the bot's own watcher above only
+  // re-fires on a bot login/reconnect, which may not happen again after the
+  // spectator joins (the common case: spectator launch is the slower of the
+  // two, per PLAN.md, so it usually joins after the bot already has it).
+  await applyNightVision(world);
   current = {...current, spectator: {status: 'joined'}};
 
   // Re-issues /spectate on every AH_Bot login, not just the first: vanilla

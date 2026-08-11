@@ -196,6 +196,109 @@ main {
   height: auto;
 }
 
+/* Recovery panel replaces the graph panel (same #live-dashboard slot,
+   toggled by app.js's renderLive()) whenever achievement_hunter's failure
+   or search replanner is active. Accent color is the main visual cue that
+   the mode changed: red for failure recovery (reuses --error, the same
+   color already used for run errors elsewhere), purple for search
+   recovery — a color free to use here since "candidate" state moved to a
+   white-ring overlay instead of a solid fill (see CANDIDATE_STROKE in
+   server/index.js). */
+.recovery-panel {
+  border-left-width: 4px;
+}
+
+.recovery-panel--failure {
+  border-left-color: var(--error);
+}
+
+.recovery-panel--search {
+  border-left-color: #9C27B0;
+}
+
+.recovery-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.recovery-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.recovery-panel--failure .recovery-title {
+  color: var(--error);
+}
+
+.recovery-panel--search .recovery-title {
+  color: #CE93D8;
+}
+
+.recovery-attempt {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.recovery-context {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-bottom: 0.6rem;
+}
+
+.recovery-note {
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.recovery-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recovery-action {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  background: #0b0f14;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.recovery-action--pending {
+  opacity: 0.7;
+}
+
+.recovery-action--success {
+  border-color: #388E3C;
+}
+
+.recovery-action--fail {
+  border-color: var(--error);
+}
+
+.recovery-action-icon {
+  flex-shrink: 0;
+}
+
+.recovery-action code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--text);
+}
+
+.recovery-action-message {
+  color: var(--muted);
+  font-style: italic;
+}
+
 button {
   font: inherit;
   background: var(--panel);

@@ -1040,3 +1040,233 @@ regardless of which was showing. Gave it `id="page-header"` and toggled
 `app.js` (`startRun()` hides it, the back button restores it). Verified
 by fetching the served page directly and confirming the id/JS wiring
 matches.
+
+### Post-launch feature — recovery visualization (failure/search replanner)
+
+**Ask:** "if the agent goes into the failure or search replanner sections
+of the structure that the visual shows what is happening instead of the
+PTD... This is a large addition so can you take your time and think of
+the best way to do this."
+
+**Research.** Explored `src/pipeline/structured_loop/failure_replanner.js`
+and `search_replanner.js`, and `rollout_logger.js`'s `live_state` shapes:
+
+- `live_state.recovery = {task, attempts: [{attempt, diagnosis,
+  planned_actions, results}]}` — failure replanner, keyed off a single
+  failed task.
+- `live_state.search_recovery = {task, target, attempts: [{attempt,
+  summary, planned_actions, results, end_state}]}` — search replanner,
+  keyed off a multi-target search sweep that exhausted (`target` is
+  already a pre-joined display string, e.g. `"oak_log, birch_log"`, not
+  an array).
+- Both are set to `null` by `recovery_end()`/`search_recovery_end()` —
+  the exact signal to revert to the graph view.
+- `results[i]` fills in progressively as each planned action executes
+  (a sparse array — later indices are `undefined` until their action
+  runs), giving a natural pending/success/fail state machine per action.
+- **Mutual exclusivity confirmed by tracing the actual call graph in
+  `actions.js`**, not assumed from the naming: search recovery always
+  runs to completion — including its own `search_recovery_end()` — before
+  a failure recovery episode can ever begin. So at most one of
+  `recovery`/`search_recovery` is ever non-null at a time; the frontend
+  never needs to reconcile or prioritize between them.
+- `MAX_RECOVERY_ATTEMPTS`/`MAX_SEARCH_REPLANNER_ATTEMPTS` = 10
+  (`structured_loop/config.js`) — a recovery episode can run several
+  attempts; on crash-resume `attempts[0].attempt` isn't guaranteed to
+  start at 1, so attempt numbers/counts are read off the data, never
+  assumed.
+
+**Design decisions:**
+
+- **Normalize server-side, render generically client-side.** `server/
+  index.js` collapses whichever of the two subsystems is active into one
+  shape — `{kind, label, context, attemptNumber, priorAttempts, note,
+  actions: [{command, status, message}]}` — via `build_recovery_view()`.
+  The frontend has no failure-vs-search branching logic at all beyond a
+  CSS class keyed on `kind` for the accent color; the two subsystems'
+  actual field-name differences (`diagnosis` vs. `summary`, `task` vs.
+  `target`) are absorbed in one place instead of leaking into the UI
+  layer.
+- **Keep computing the mermaid graph even while recovery is active.**
+  `/api/live` always includes `mermaid` regardless of `recovery`, so the
+  moment recovery ends the graph is already current — reverting is an
+  instant visibility toggle, not a render-then-wait.
+- **Show only the current attempt, not full history.** `attempts.at(-1)`
+  only. Earlier attempts already played out live in front of the
+  audience; replaying them as scrollback in the panel would be clutter,
+  not information. `priorAttempts` (a count) is still surfaced so it's
+  clear this isn't necessarily attempt 1.
+- **Distinct accent colors per kind, not just a label change.** Failure
+  recovery reuses `--error` (red, already used for run errors elsewhere,
+  so it doesn't need a new "this is bad" color). Search recovery gets
+  purple (`#9C27B0`) — free to use since "candidate" state moved to a
+  white-ring border overlay instead of a solid fill (see the candidate-
+  coloring fix earlier in this doc), so no existing swatch collides with
+  it. The two panel variants are visually distinguishable at a glance
+  without reading the title text, which matters for a room watching a
+  screen from a distance.
+- **Safe DOM construction for the action list, not `innerHTML` string
+  interpolation.** `note`/`command`/`message` originate from LLM
+  output (diagnosis text, tool-call args, failure messages) — rendered
+  via `createElement`/`textContent` in `renderRecovery()`, never
+  concatenated into an HTML string.
+
+**Implementation:**
+
+- `server/index.js`: `format_recovery_command()` (mirrors
+  `rollout_logger.js`'s private formatter — `{name, args} ->
+  name(arg1, arg2)`), `format_task_context()`, and
+  `build_recovery_view(raw)`, wired into `/api/live`'s response as a new
+  `recovery` field alongside the existing `mermaid` field.
+- `public/index.html`: added `#recovery-panel` (title, attempt count,
+  context line, note, action list) as a sibling of the graph panel inside
+  `#live-dashboard`; gave the graph panel `id="graph-panel"` so JS can
+  toggle it.
+- `public/app.js`: `renderRecovery(recovery)` builds the panel via DOM
+  APIs; `renderLive(live)` now toggles `graphPanel`/`recoveryPanel`
+  visibility based on whether `live.recovery` is present, in addition to
+  its existing mermaid-diffing logic (unchanged — still only re-renders
+  the graph when the mermaid source actually changes).
+- `public/styles.css`: `.recovery-panel` (+ `--failure`/`--search`
+  variants), header/title/attempt/context/note layout, and
+  `.recovery-action` rows with `--pending`/`--success`/`--fail`
+  modifiers (opacity for pending, green/red border for success/fail).
+
+**Verification.** Actually triggering a real failure/search recovery
+episode requires a genuine in-game failure, which isn't reliably
+reproducible on demand. Followed the same approach used earlier in this
+doc for `render_live_mermaid()`: ran the real dashboard server, wrote
+synthetic data matching the verified real `live_state` schema directly to
+`rollout_live/current_rollout.json`, and hit the real `/api/live`
+endpoint with curl — exercising the actual production code path, not a
+reimplementation. Confirmed via `node --check` (both files) plus:
+
+- Failure recovery, attempt 2 with 1 prior attempt, one success + one
+  pending action → `build_recovery_view()` produced exactly the expected
+  `{kind: "failure", attemptNumber: 2, priorAttempts: 1, ...}` shape.
+- Search recovery with a joined multi-target string and a failed action
+  carrying a message → `context` and the failed action's `message` came
+  through correctly.
+- Both `recovery`/`search_recovery` null → `recovery: null` while
+  `mermaid` stayed populated, confirming the graph is always ready for an
+  instant revert.
+- Fetched `/index.html`, `/app.js`, `/styles.css` from the running server
+  and grepped for the new panel markup, `renderRecovery`, and the
+  `--search` accent class to confirm nothing was stale/cached.
+
+Synthetic data and the test server were removed/killed afterward
+(`rollout_live/current_rollout*` is gitignored and doesn't affect git
+status either way). The actual panel styling/switching in a real browser
+during a real recovery episode hasn't been visually confirmed — no
+browser tool is available in this environment — left for the user to
+check the next time a run genuinely hits a failure or search recovery.
+
+### Post-launch feature — night vision on launch
+
+**Ask:** give the client(s) night vision on launch, via `/effect give
+<client> minecraft:night_vision infinite` or simpler, apply it to
+everyone on the server.
+
+Went with the "everyone" option, per the user's own suggestion — a
+single `effect give @a minecraft:night_vision infinite 0 true` covers
+both AH_Bot and the spectator without tracking which specific username(s)
+are online, and matches how `gamerule spawnRadius 0` is already applied
+world-wide in `world_launcher.js` rather than per-player. `0` is the
+amplifier (plain Night Vision, not Night Vision II); `true` hides the
+swirling particle ring so it doesn't clutter the spectator footage.
+
+**Why a single call at world-launch time isn't enough:** effects apply
+only to entities that exist at the moment the command runs, and neither
+AH_Bot nor the spectator has logged in yet when the world first comes up
+— an `@a` call then would silently match zero players. Effects also
+reset on a fresh login (a reconnect is a new entity), so this needs to
+re-fire on every login, not just once.
+
+**Implementation** (`server/orchestrator.js`): `applyNightVision(world)`
+wraps the console command in try/catch (best-effort — matches the
+existing rationale for the spectator flow's own error handling; this is
+a nice-to-have, not something that should fail the whole run). Called
+from two places, covering both clients independently since either can be
+missing or can reconnect independently of the other:
+
+- A new `watchBotLogins` watcher, set up unconditionally in
+  `runInBackground` (not nested inside `runSpectatorFlow`, which only
+  runs at all if Prism is configured) — fires on AH_Bot's initial login
+  and every reconnect. This is the one that matters even on a machine
+  with no spectator client set up at all.
+- Once in `runSpectatorFlow`, right after the existing `gamemode
+  spectator` command succeeds — covers the spectator specifically, since
+  Prism/spectator join is typically the slower of the two (per the Phase
+  5 timing notes above), so it usually joins *after* the bot's watcher
+  already fired and wouldn't otherwise get it.
+
+The new watcher's stop function is tracked as
+`handles.stopNightVisionWatcher` and torn down in `stopRun()` alongside
+the existing `stopSpectatorWatcher`, so it doesn't leak a running
+interval across runs or on shutdown.
+
+**Verification.** `node --check` on the modified file, then a live test:
+launched a real managed world via `launchManagedWorld()` directly (no
+mocking) and sent the exact command through the real
+`sendServerConsoleCommand` path. Server log confirmed the command parsed
+correctly — `No entity was found` (the expected vanilla response for
+`@a` matching zero online players), not an "Unknown or incomplete
+command" syntax error — confirming `infinite` as a duration keyword and
+the full argument order are valid on this server's Minecraft version.
+Actually confirming a joined client visually has night vision needs a
+real client connecting, which wasn't done in this pass (no browser/game
+client available here) — left for the user to confirm on the next real
+run.
+
+### Post-launch fix — AH_Bot occasionally spawns with the default skin
+
+**Report:** "Sometimes AH_BOT has a gold skin instead of the robot skin
+we want."
+
+**Root cause.** The skin is set in `src/agent/agent.js`'s `login` handler
+(this predates the workshop demo — it's the same code path for every
+AH_Bot run, eval-harness or demo), as a single fire-and-forget
+`/skin set URL classic <path>` chat command, sent once, with no
+verification and no retry. FabricTailor (the server mod that makes
+`/skin set` a real command — `server_templates/minecraft_1_21_6_fabric/
+mods/fabrictailor-2.7.0.jar`) does its own fetch of the skin URL at that
+moment. Confirmed live (see Verification below) that this fetch actually
+goes through an external skin-lookup/proxy service with its own
+documented rate limit and a "Mojang skin not found, trying via proxy"
+fallback chain — i.e. a real external dependency with real failure
+modes, sitting behind a command that's only ever sent once. A single
+transient hiccup in that chain has nothing to retry it, so the client
+silently falls back to its offline-mode default skin instead — read by
+the reporter as "gold" (an artifact of the offline-mode UUID's default
+Alex/Steve variant, not an actual FabricTailor default-skin config —
+`fabrictailor.json`'s `default_skin.apply_to_all` is `false`, ruling out
+a config-driven override).
+
+**Fix** (`src/agent/agent.js`, `login` handler — wrapped in `// Start of
+AH code` / `// End of AH code` markers per this repo's convention for
+edits outside `achievement_hunter/`, since this block had none
+previously): send the same `/skin set`/`/skin clear` command up to 3
+times, 2 seconds apart, via `setTimeout`, instead of once. This is safe
+to do blindly — no confirmation channel is read — because repeats are
+idempotent and `fabrictailor.json`'s `skin_change_timer` is `-1` (no
+mod-side cooldown) in this project's config.
+
+**Verification.** Rather than guessing, ran the actual mechanism live:
+launched a real managed world via `launchManagedWorld()`, connected a
+raw `mineflayer` bot directly (bypassing the full agent/LLM stack, which
+needs API keys — this isolates just the skin-setting behavior), and sent
+the exact `/skin set URL classic <profile.json path>` command 3 times, 2s
+apart, exactly like the new retry loop does. Server log confirmed all
+three were accepted and independently completed the full fetch chain —
+`Fetching skin from URL` → `Parsing skin reply` (each including the
+`rateLimit` object: `used` climbed 1→2 across the 3 calls, `remaining`
+9→8 out of a 10/minute cap — nowhere near tripping it for one run) →
+`Setting skin for player` → `Reloading player skin on player's client`,
+three times over, no rejection or rate-limit block on the repeats. This
+both validates the retry-is-safe assumption and directly confirms the
+external-fetch/rate-limited-proxy chain that's the actual root cause.
+Also syntax-checked with `node --check`. Not verified: actually
+reproducing the original transient-failure moment itself (not
+reliably triggerable on demand) or a client visually confirming the
+robot skin — left for the user to notice this stops recurring in
+practice.

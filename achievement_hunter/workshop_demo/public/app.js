@@ -31,6 +31,15 @@ function spectatorDetailText(spectator) {
 
 const liveDashboard = document.getElementById('live-dashboard');
 const liveGraph = document.getElementById('live-graph');
+const graphPanel = document.getElementById('graph-panel');
+const recoveryPanel = document.getElementById('recovery-panel');
+const recoveryTitle = document.getElementById('recovery-title');
+const recoveryAttempt = document.getElementById('recovery-attempt');
+const recoveryContext = document.getElementById('recovery-context');
+const recoveryNote = document.getElementById('recovery-note');
+const recoveryActions = document.getElementById('recovery-actions');
+
+const RECOVERY_STATUS_ICON = {pending: '⏳', success: '✅', fail: '❌'};
 
 const STATUS_TEXT = {
   idle: 'Idle',
@@ -134,6 +143,9 @@ function renderStatus(status) {
 function renderLive(live) {
   liveDashboard.classList.remove('hidden');
 
+  // The graph keeps rendering even while the recovery panel is the one
+  // showing, so switching back the instant recovery ends is instant too —
+  // no stale/blank flash while mermaid re-renders.
   if (live.mermaid && live.mermaid !== lastLiveMermaidSource) {
     lastLiveMermaidSource = live.mermaid;
     mermaid.render(`live-mermaid-${mermaidCounter++}`, live.mermaid)
@@ -141,6 +153,60 @@ function renderLive(live) {
           liveGraph.innerHTML = svg;
         })
         .catch((err) => console.error('live mermaid render failed', err));
+  }
+
+  if (live.recovery) {
+    graphPanel.classList.add('hidden');
+    renderRecovery(live.recovery);
+  } else {
+    recoveryPanel.classList.add('hidden');
+    graphPanel.classList.remove('hidden');
+  }
+}
+
+// Failure recovery and search recovery are mutually exclusive in
+// achievement_hunter's own pipeline (confirmed against the actual call
+// graph, not just the naming — see PLAN.md), and server/index.js already
+// normalizes whichever is active into one shape here, tagged by `kind` for
+// the color accent (see .recovery-panel--failure/--search in styles.css).
+// Built via DOM APIs rather than innerHTML string interpolation since
+// `note`/`command`/`message` are LLM-generated text, not something to
+// trust as markup.
+function renderRecovery(recovery) {
+  recoveryPanel.classList.remove(
+      'hidden', 'recovery-panel--failure', 'recovery-panel--search');
+  recoveryPanel.classList.add(`recovery-panel--${recovery.kind}`);
+
+  recoveryTitle.textContent = recovery.label;
+  recoveryAttempt.textContent = recovery.priorAttempts > 0 ?
+      `Attempt ${recovery.attemptNumber} · ${recovery.priorAttempts} earlier attempt${
+          recovery.priorAttempts === 1 ? '' : 's'}` :
+      `Attempt ${recovery.attemptNumber}`;
+  recoveryContext.textContent = recovery.context || '';
+  recoveryNote.textContent = recovery.note || '';
+
+  recoveryActions.innerHTML = '';
+  for (const action of recovery.actions) {
+    const row = document.createElement('div');
+    row.className = `recovery-action recovery-action--${action.status}`;
+
+    const icon = document.createElement('span');
+    icon.className = 'recovery-action-icon';
+    icon.textContent = RECOVERY_STATUS_ICON[action.status] || '';
+    row.appendChild(icon);
+
+    const code = document.createElement('code');
+    code.textContent = action.command;
+    row.appendChild(code);
+
+    if (action.message) {
+      const message = document.createElement('span');
+      message.className = 'recovery-action-message';
+      message.textContent = ` — ${action.message}`;
+      row.appendChild(message);
+    }
+
+    recoveryActions.appendChild(row);
   }
 }
 

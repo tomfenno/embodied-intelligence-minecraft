@@ -97,12 +97,27 @@ export class Agent {
         this.bot.on('login', () => {
             console.log(this.name, 'logged in!');
             serverProxy.login();
-            
+
             // Set skin for profile, requires Fabric Tailor. (https://modrinth.com/mod/fabrictailor)
-            if (this.prompter.profile.skin)
-                this.bot.chat(`/skin set URL ${this.prompter.profile.skin.model} ${this.prompter.profile.skin.path}`);
-            else
-                this.bot.chat(`/skin clear`);
+            // Start of AH code
+            // FabricTailor fetches `skin.path` itself when `/skin set` runs, and
+            // that fetch has no retry or feedback of its own — a transient
+            // failure of it (observed in practice: AH_Bot occasionally spawning
+            // with the default/offline-mode skin instead of the intended one)
+            // silently no-ops with nothing here to notice or react to. Sending
+            // the command a few times, spaced out, gives that fetch multiple
+            // independent chances to succeed. Safe to repeat: `/skin set` is
+            // idempotent and this project's fabrictailor.json config disables
+            // the mod's own change-cooldown (skin_change_timer: -1).
+            const skinCommand = this.prompter.profile.skin ?
+                `/skin set URL ${this.prompter.profile.skin.model} ${this.prompter.profile.skin.path}` :
+                `/skin clear`;
+            const SKIN_RETRY_COUNT = 3;
+            const SKIN_RETRY_DELAY_MS = 2000;
+            for (let attempt = 0; attempt < SKIN_RETRY_COUNT; attempt++) {
+                setTimeout(() => this.bot.chat(skinCommand), attempt * SKIN_RETRY_DELAY_MS);
+            }
+            // End of AH code
         });
 		const spawnTimeoutDuration = settings.spawn_timeout;
         const spawnTimeout = setTimeout(() => {

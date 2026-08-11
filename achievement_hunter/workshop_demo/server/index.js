@@ -98,6 +98,68 @@ function render_live_mermaid(graph, currentNodeId, remainingIds, candidateIds) {
   return mermaid;
 }
 
+// Matches rollout_logger.js's private format_recovery_command() — same
+// `{name, args}` -> `name(arg1, arg2)` convention, duplicated here rather
+// than exported since it's a two-line formatter, not shared logic worth
+// coupling this demo to a core pipeline file's internals for.
+function format_recovery_command(action) {
+  const args = (action.args ?? []).map((a) => JSON.stringify(a)).join(', ');
+  return `${action.name}(${args})`;
+}
+
+// Same shape as the "Current task" panel achievement_hunter's own markdown
+// dashboard used to render (see PLAN.md) — reused here just for the
+// recovery panel's context line.
+function format_task_context(task) {
+  if (!task) return null;
+  const action = task.action_type ? `${task.action_type} ` : '';
+  return `${action}${task.target_item ?? ''} ×${task.qty ?? ''}`.trim();
+}
+
+// Normalizes achievement_hunter's two recovery subsystems — the failure
+// replanner (`raw.recovery`) and the search replanner (`raw.search_recovery`)
+// — into one shape the frontend renders generically. They're mutually
+// exclusive by construction (search always runs to completion, including
+// its own end-of-episode cleanup, before a failure recovery episode can
+// ever start — see PLAN.md for how this was verified against the actual
+// call graph, not assumed from the naming), so at most one is ever
+// present. Only the *current* attempt (attempts.at(-1)) is surfaced in
+// detail — a recovery episode can run up to MAX_RECOVERY_ATTEMPTS/
+// MAX_SEARCH_REPLANNER_ATTEMPTS (10) attempts, and the audience already
+// watched earlier ones play out live, so showing full history here would
+// just be scrollback, not useful information.
+function build_recovery_view(raw) {
+  const search = raw.search_recovery;
+  const failure = raw.recovery;
+  const source = search || failure;
+  if (!source) return null;
+
+  const current = source.attempts?.at(-1);
+  if (!current) return null;
+
+  const actions = (current.planned_actions ?? []).map((action, i) => {
+    const result = current.results?.[i];
+    return {
+      command: format_recovery_command(action),
+      status: !result ? 'pending' : (result.success ? 'success' : 'fail'),
+      message: result && !result.success ? (result.message ?? null) : null,
+    };
+  });
+
+  const isSearch = Boolean(search);
+  return {
+    kind: isSearch ? 'search' : 'failure',
+    label: isSearch ? 'Search Recovery' : 'Failure Recovery',
+    context: isSearch ?
+        (source.target || format_task_context(source.task) || 'unknown target') :
+        (format_task_context(source.task) || 'unknown task'),
+    attemptNumber: current.attempt,
+    priorAttempts: source.attempts.length - 1,
+    note: isSearch ? current.summary : current.diagnosis,
+    actions,
+  };
+}
+
 const app = express();
 app.use(express.json());
 // no-store: this UI is actively iterated on, and a stale cached copy of
@@ -171,6 +233,7 @@ app.get('/api/live', (req, res) => {
     mermaid: graph ?
         render_live_mermaid(graph, currentNodeId, remainingIds, candidateIds) :
         null,
+    recovery: build_recovery_view(raw),
   });
 });
 

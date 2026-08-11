@@ -23,7 +23,7 @@
     </div>
 
     <div id="live-dashboard" class="hidden">
-      <div class="live-panel graph-panel">
+      <div class="live-panel graph-panel" id="graph-panel">
         <div class="panel-title">Dependency graph</div>
         <div class="legend">
           <span class="legend-item"><span class="legend-swatch legend-swatch--goal"></span>Goal</span>
@@ -33,6 +33,16 @@
           <span class="legend-item"><span class="legend-swatch legend-swatch--candidate"></span>Candidate (white ring, any color)</span>
         </div>
         <div class="mermaid" id="live-graph"></div>
+      </div>
+
+      <div class="live-panel recovery-panel hidden" id="recovery-panel">
+        <div class="recovery-header">
+          <div class="recovery-title" id="recovery-title"></div>
+          <div class="recovery-attempt" id="recovery-attempt"></div>
+        </div>
+        <div class="recovery-context" id="recovery-context"></div>
+        <div class="recovery-note" id="recovery-note"></div>
+        <div class="recovery-actions" id="recovery-actions"></div>
       </div>
     </div>
 
