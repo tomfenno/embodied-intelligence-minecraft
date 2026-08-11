@@ -43,6 +43,12 @@ export async function launchManagedWorld(worldConfig = {}, seed = pickRandomSeed
   const serverRoot = makeTempDir('workshop_demo_server_');
   const port = await chooseFreePort();
 
+  // Printed here rather than left to only appear in server.properties —
+  // this is the one thing about a given run's world that isn't visible
+  // anywhere else in the demo's own output, and knowing it lets the
+  // presenter (or the seed list itself, see config.js's WORLD_SEEDS) be
+  // debugged/reproduced without digging through the ephemeral serverRoot.
+  console.log(`Launching Minecraft world with seed ${seed}`);
   prepareManagedServer(serverRoot, mergedConfig, seed, port);
 
   const outputPath = path.join(serverRoot, 'server_stdout.log');

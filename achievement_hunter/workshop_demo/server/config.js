@@ -17,14 +17,15 @@
 // 8080 default — see PLAN.md Phase 4's port-collision note.
 export const DASHBOARD_PORT = Number(process.env.WORKSHOP_DEMO_PORT) || 4173;
 
-// Peaceful survival, matching evaluation_harness/advancement_tester_smoke.json's
-// world block, but on a Fabric server (not the eval harness's own vanilla
-// template — benchmark runs should stay on a clean, unmodified server for
-// reproducibility). Fabric + Fabric API + Fabric Tailor let AH_Bot's
-// profile.json `skin` field actually take effect via the `/skin set URL`
-// command agent.js already sends automatically on login. Point
-// server_template_path back at the eval harness's vanilla template (and
-// server_jar_name at 'server.jar') if mods are ever unwanted.
+// Peaceful survival, matching
+// evaluation_harness/advancement_tester_smoke.json's world block, but on a
+// Fabric server (not the eval harness's own vanilla template — benchmark runs
+// should stay on a clean, unmodified server for reproducibility). Fabric +
+// Fabric API + Fabric Tailor let AH_Bot's profile.json `skin` field actually
+// take effect via the `/skin set URL` command agent.js already sends
+// automatically on login. Point server_template_path back at the eval harness's
+// vanilla template (and server_jar_name at 'server.jar') if mods are ever
+// unwanted.
 export const WORLD_CONFIG = {
   minecraft_version: process.env.WORKSHOP_DEMO_MINECRAFT_VERSION || '1.21.6',
   server_template_path: process.env.WORKSHOP_DEMO_SERVER_TEMPLATE_PATH ||
@@ -59,9 +60,9 @@ export const WORLD_CONFIG = {
 // pickRandomSeed(), suite.js's prepareManagedServer()/formatPropertyValue())
 // so server.properties' level-seed gets the exact original digits.
 export const WORLD_SEEDS = [
-  '6812388553834026379',
-  '5641369577242833675',
-  '959980239590277096',
+  // '-2340086868895727392',  // Passed: MOAR tools, Porkchop, Hot stuff
+  '156741518713417215',  // Passed: MOAR tools
+  // '1622037966260912534',
 ];
 
 // Must match achievement_hunter/src/profile.json's "name" field — the
@@ -76,7 +77,8 @@ export const PRISM_COMMAND_OVERRIDE =
 
 // Prism instance ID to launch (must already exist — created once by the
 // presenter ahead of the workshop, matching WORLD_CONFIG.minecraft_version).
-export const PRISM_INSTANCE = process.env.WORKSHOP_DEMO_PRISM_INSTANCE || '1.21.6';
+export const PRISM_INSTANCE =
+    process.env.WORKSHOP_DEMO_PRISM_INSTANCE || '1.21.6';
 
 // Offline-mode username the spectator client joins as (server has
 // online-mode: false, so no real Microsoft account is required).

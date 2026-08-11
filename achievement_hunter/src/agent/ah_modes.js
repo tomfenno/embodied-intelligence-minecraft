@@ -384,11 +384,22 @@ const modes_list = [
       }
     }
   },
+  // Off by default (unlike upstream modes.js): triggers on ANY nearby
+  // player entity, with no gamemode check — including a spectator whose
+  // position vanilla's own `/spectate` keeps synced to whatever entity
+  // they're spectating. The workshop demo's spectator client stays
+  // /spectate-locked onto AH_Bot for the whole run (see
+  // workshop_demo/server/orchestrator.js), so this mode saw a "player"
+  // permanently at ~0 distance and kept re-triggering forever, starving
+  // the structured_loop task engine entirely (confirmed live: the agent
+  // process stayed alive but produced zero further output/action right
+  // after "Mode elbow_room finished executing", exactly matching this).
+  // AH's task loop doesn't need idle "avoid crowding" behavior anyway.
   {
     name: 'elbow_room',
     description: 'Move away from nearby players when idle.',
     interrupts: ['action:followPlayer'],
-    on: true,
+    on: false,
     active: false,
     distance: 0.5,
     update: async function(agent) {

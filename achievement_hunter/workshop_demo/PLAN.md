@@ -1439,3 +1439,21 @@ switching to strings): `WORLD_SEEDS` printed with full original
 precision, `level-seed` matched one of the three curated values exactly,
 and the 3000-pick distribution was roughly even (~1000 each). `node
 --check` on both modified files.
+
+### Post-launch change — print the chosen seed on launch
+
+**Ask:** "can you have it print the seed in the terminal output when
+loading the world?"
+
+Added a `console.log` in `world_launcher.js`'s `launchManagedWorld()`,
+right before `prepareManagedServer()`, printing the seed about to be
+used. Placed here rather than in `orchestrator.js` since this is the one
+function that actually knows the resolved seed value regardless of
+whether it came from the `pickRandomSeed()` default or an explicit
+override. Verified live: called `launchManagedWorld()` directly and
+confirmed the printed value matches `server.properties`' `level-seed`
+with full precision (`959980239590277096`, not rounded) — same
+precision concern as the WORLD_SEEDS fix above, so worth double-checking
+this print path specifically didn't reintroduce it (it doesn't: `seed`
+is still the same string value all the way through, `console.log`
+doesn't coerce it).
