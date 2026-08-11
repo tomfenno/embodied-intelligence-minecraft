@@ -1270,3 +1270,47 @@ reproducing the original transient-failure moment itself (not
 reliably triggerable on demand) or a client visually confirming the
 robot skin — left for the user to notice this stops recurring in
 practice.
+
+### Post-launch fix — stale live view flashes on a new run
+
+**Report:** "When you choose an achievement it initially shows the last
+live view from the previous rollout before loading the new achievement
+PTD, can we have it so it shows nothing until the PTD loads?"
+
+**Root cause.** `server/index.js`'s `GET /api/live` reads
+`achievement_hunter/rollout_live/current_rollout.json` unconditionally
+whenever it exists. That file is written by `rollout_logger.js`'s
+`render_live()` — but `render_live()` isn't called for the first time in
+a fresh agent process until its PTD stage completes, which is *after*
+world boot, agent connect, and objective injection (several seconds).
+Nothing deleted the file when a new run started, so during that window
+`/api/live` kept serving the *previous* run's graph — same category of
+bug as the checkpoint-hijacking issue from Phase 4 (stale on-disk state
+from a prior run silently affecting the next one), just a different
+file.
+
+**Fix** (`server/orchestrator.js`): added `LIVE_JSON_PATH` (mirrors
+`index.js`'s constant of the same name/value) and delete it in
+`stopRun()` right next to the existing `clearCheckpoint()` call —
+`stopRun()` already runs unconditionally at the top of every
+`startRun()`, before the new world launches, so this guarantees the
+stale file is gone before the client's poll loop can ever see it. Once
+deleted, `/api/live` naturally falls back to its existing `null`
+response (the `!existsSync` branch, unchanged), and `app.js`'s
+`pollLive()` already only calls `renderLive()` when the response is
+truthy — so no frontend change was needed at all; the dashboard simply
+shows nothing (graph panel stays hidden, as `startRun()` already sets it
+on click) until the new agent's first `render_live()` call.
+
+**Verification.** Live end-to-end against the real server (not
+mocked): wrote a fake `current_rollout.json`, confirmed `/api/live`
+served it (reproducing the bug), called the real `POST /api/stop` (same
+`stopRun()` code path `startRun()` uses), confirmed the file was gone
+from disk and `/api/live` now returns literal `null`. Also unit-tested
+`stopRun()` directly via dynamic import before the full HTTP pass. (One
+false start: an initial HTTP test run appeared to show the file
+persisting — turned out to be a stale dashboard server process left
+running on port 4173 from earlier in this session, still serving the
+pre-fix code; the new test server crashed on `EADDRINUSE` and the curl
+calls silently hit the old process. Killed it and reran against a clean
+process, which passed.) `node --check` on the modified file.

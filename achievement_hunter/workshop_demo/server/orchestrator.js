@@ -7,6 +7,7 @@
 // new run tears down any previous one first (fresh world per selection,
 // per achievement_hunter/workshop_demo/PLAN.md decision #4).
 
+import {existsSync, unlinkSync} from 'fs';
 import path from 'path';
 
 import {clearCheckpoint} from '../../src/pipeline/checkpoint.js';
@@ -38,6 +39,15 @@ import {buildAgentLaunchEnv, launchManagedWorld} from './world_launcher.js';
 
 const AGENT_STDOUT_PATH =
     path.join(PROJECT_ROOT, 'achievement_hunter', 'workshop_demo', '.run', 'agent_stdout.log');
+
+// Same path index.js's GET /api/live reads (LIVE_JSON_PATH there) — written
+// by rollout_logger.js's render_live(), which the newly-launched agent
+// process doesn't call for the first time until its PTD stage completes
+// (world boot + agent connect + objective injection all happen first). If
+// left in place, /api/live would keep serving the *previous* run's graph
+// during that window instead of nothing.
+const LIVE_JSON_PATH = path.join(
+    PROJECT_ROOT, 'achievement_hunter', 'rollout_live', 'current_rollout.json');
 
 // Keeps the demo watchable in caves/at night without touching world time or
 // lighting. Targets @a rather than a specific username so one call covers
@@ -114,6 +124,13 @@ export async function stopRun() {
   // silently resume it on spawn instead of waiting for our injected
   // objective — see PLAN.md Phase 4 for how this was discovered.
   await clearCheckpoint();
+
+  // Same category of bug as the checkpoint above: without this, the
+  // dashboard keeps serving the previous run's graph/recovery state
+  // (stale but not literally invalid JSON, so nothing here would error)
+  // until the newly-launched agent's PTD stage completes and overwrites
+  // it — see the comment on LIVE_JSON_PATH above.
+  if (existsSync(LIVE_JSON_PATH)) unlinkSync(LIVE_JSON_PATH);
 }
 
 export async function startRun(ptdFilename) {
