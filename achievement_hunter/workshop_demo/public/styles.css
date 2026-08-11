@@ -80,12 +80,25 @@ main {
   height: auto;
 }
 
+/* Fills the viewport height (main's 2rem top + bottom padding = 4rem) and
+   lays out as a column so #live-dashboard — the one flexible item, via
+   flex/min-height below — absorbs whatever space run-header/back-button
+   don't use. This is what lets the graph be forced to fit without a page
+   scrollbar: the graph's own available height is now bounded by the
+   viewport, not by its content. Scoped to #status-view specifically
+   (not body/main) so the PTD selection screen keeps its normal scrolling
+   behavior if the card grid is ever taller than the viewport. */
 #status-view {
   max-width: 1100px;
   margin: 0 auto;
+  height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .run-header {
+  flex: 0 0 auto;
   text-align: center;
   margin-bottom: 1.5rem;
 }
@@ -114,10 +127,27 @@ main {
 }
 
 #live-dashboard {
-  margin-bottom: 2rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  margin-bottom: 1rem;
 }
 
+/* min-height: 0 overrides flex's default min-height:auto (which would
+   otherwise let the panel grow to fit its content and defeat the point —
+   content-based sizing is exactly what needs to be capped here), letting
+   the panel shrink to whatever height #live-dashboard actually has.
+   Shared by both graph-panel and recovery-panel (only one is ever
+   unhidden at a time), each of which arranges its own children in this
+   same column so their own scrollable/shrinkable part (the mermaid graph,
+   or the recovery action list) is the one that gives, not the title/
+   legend/header text above it. */
 .live-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -187,12 +217,27 @@ main {
   border: 1px solid #484f58;
 }
 
+/* Forces the graph to fit the panel's available space rather than scroll:
+   the panel-title/legend above are flex: 0 0 auto (natural height), so
+   this flex: 1 1 auto gets whatever's left, and the svg rule below scales
+   the graph down (never up — mermaid's own viewBox makes this
+   non-distorting) to fit inside it, same technique as object-fit: contain
+   for a replaced element that isn't an <img>. overflow: hidden instead of
+   auto since there is deliberately nothing left to scroll to once the svg
+   is capped to this box. */
 .graph-panel .mermaid {
-  overflow: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .graph-panel .mermaid svg {
   max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
 }
 
@@ -256,7 +301,16 @@ main {
   margin-bottom: 1rem;
 }
 
+/* Same "the page never scrolls" goal as .graph-panel .mermaid above, but
+   here the content that can legitimately run long (a recovery attempt
+   with many planned actions) is a list, not a diagram — so unlike the
+   graph, scrolling *within* this one element is the right way to keep it
+   readable rather than shrinking text to fit, hence overflow-y: auto
+   instead of a scale-to-fit trick. */
 .recovery-actions {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -307,6 +361,16 @@ button {
   border-radius: 8px;
   padding: 0.6rem 1.2rem;
   cursor: pointer;
+}
+
+/* #status-view is now a flex column (see above) for the graph-fits-
+   viewport change; flex's default align-items: stretch would otherwise
+   stretch this button to the full container width instead of its content
+   width. flex: 0 0 auto keeps it out of the height distribution that
+   #live-dashboard participates in. */
+#back-button {
+  flex: 0 0 auto;
+  align-self: flex-start;
 }
 
 button:hover {

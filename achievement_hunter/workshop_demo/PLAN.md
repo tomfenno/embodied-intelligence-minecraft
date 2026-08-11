@@ -1314,3 +1314,73 @@ running on port 4173 from earlier in this session, still serving the
 pre-fix code; the new test server crashed on `EADDRINUSE` and the curl
 calls silently hit the old process. Killed it and reran against a clean
 process, which passed.) `node --check` on the modified file.
+
+### Post-launch change — force the live graph to fit without scrolling
+
+**Ask:** "Can we make it so that the full graph is forced to fit on the
+screen without scroll?"
+
+**Root cause.** `.graph-panel .mermaid svg` only constrained *width*
+(`max-width: 100%; height: auto;`) — height was unconstrained, so a
+deep/wide dependency graph could render taller than the viewport and
+force the page to scroll to see the rest of it. Nothing in the layout
+(`main`, `#status-view`, `#live-dashboard`) reserved a bounded height for
+the graph in the first place — everything just flowed to its natural
+content height and let the page scroll.
+
+**Design.** Rather than special-casing the mermaid element alone, made
+the whole live-view column height-bounded so there's an actual box for
+the graph to be capped against: `#status-view` gets
+`height: calc(100vh - 4rem)` (4rem = `main`'s own top+bottom padding)
+and becomes a flex column; `.run-header` and `#back-button` are
+`flex: 0 0 auto` (natural height), and `#live-dashboard` /
+`.live-panel` are `flex: 1 1 auto; min-height: 0` so the panel — graph
+or recovery, whichever is showing — absorbs whatever's left. Scoped to
+`#status-view` only, not `body`/`main`, so the PTD *selection* screen
+(untouched by this request) keeps scrolling normally if the card grid
+is ever taller than the viewport.
+
+Inside the panel, `.graph-panel .mermaid` becomes the flex child that
+takes the remaining space (`flex: 1 1 auto; min-height: 0`), and the
+`svg` gets `max-height: 100%; height: auto;` added alongside the
+existing width rule — with both max-width/max-height plus width/height
+auto and mermaid's own `viewBox` giving it an intrinsic aspect ratio,
+the browser scales the whole diagram down (never up) to fit inside the
+box, the same mechanism as `object-fit: contain` on an `<img>`, just via
+plain replaced-element sizing rules since mermaid's raw SVG string
+doesn't have an `object-fit` property to set. `overflow` on the mermaid
+container changed from `auto` to `hidden` — nothing is meant to be
+scrollable inside it once the svg is capped to the box.
+
+Applied the identical treatment to `.recovery-actions` for consistency
+(also inside `#live-dashboard`'s bounded height), but as `overflow-y:
+auto` rather than scale-to-fit — a long recovery-attempt action list is
+naturally suited to an internal scroll, unlike a diagram where shrinking
+to fit is more useful than truncating it. `#back-button` needed
+`align-self: flex-start` since `#status-view` becoming a flex column
+would otherwise stretch it to the full container width (flex's default
+`align-items: stretch`), changing its previous natural/compact sizing.
+
+**A subtlety worth recording:** grepped the bundled `node_modules/
+mermaid/dist/mermaid.min.js` directly to check whether mermaid sets a
+competing inline style on the rendered `<svg>` that could defeat this —
+confirmed it sets an inline `max-width: ${t}px` (a computed natural pixel
+width; inline styles win over any external stylesheet rule for that
+specific property, so our own `max-width: 100%` rule was already losing
+to this even before this change — not a regression). Confirmed it does
+**not** set any inline `max-height`, and its `height` is only ever set as
+a plain SVG attribute (lower cascade priority than any stylesheet rule,
+inline or external) — so the new external `max-height: 100%` rule is
+exactly the constraint that was missing, and applies cleanly with
+nothing inline to override it.
+
+**Verification.** Reasoned through the cascade/flex layout carefully
+(see above) and confirmed it live against the real running server: page
+and CSS both serve 200, `grep`'d the served (not just local-disk)
+`styles.css` for both new rules to rule out any stale-cache issue (this
+project already hard-learned that lesson once — see the earlier
+top-down/mermaid-LR caching bug in this doc). No browser is available in
+this environment to see the actual rendered pixels, so the one thing
+still unverified is what a genuinely large/deep PTD graph looks like
+scaled down to fit — left for the user to eyeball on the next real run,
+particularly with one of the larger/more-complex PTDs.
