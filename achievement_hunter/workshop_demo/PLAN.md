@@ -931,3 +931,112 @@ confirmed both the "tearing down" log line and `"[SPL] Checkpoint
 cleared."` appeared, the dashboard process itself exited, and — critically
 — the Minecraft server and agent processes were both actually gone
 afterward, not just the dashboard.
+
+### Post-launch fix — candidate coloring silently erased other state
+
+Reported: "not obvious that the current action is a candidate, and not
+obvious when the goals are candidates." Root cause was a real design flaw
+in the original coloring scheme (the SCSG/candidate-coloring feature two
+sessions back): candidate was its own solid fill color (`#9C27B0`,
+purple), applied as an independent `style` line appended after
+goal/remaining/current — and mermaid's `style` directive fully *replaces*
+a node's style on repeat, it doesn't merge. So a node that was both
+"current" and "candidate" just showed plain blue (current's line came
+last), and the old code explicitly *excluded* sinks from ever getting the
+candidate color at all (`if (... || sinks.has(id)) continue;`) — both
+silently dropping information the whole feature was supposed to surface.
+
+**Fix:** restructured to compute one merged style per node instead of
+independent per-category lines. `STATE_COLOR` (renamed from `NODE_COLOR`)
+still governs fill/text/border for the four mutually-exclusive states
+(goal/remaining/current/done — a node is in exactly one). "Candidate" is
+no longer a fifth fill color at all — it's a `CANDIDATE_STROKE` overlay
+(thick white ring, `stroke-width:4px`) applied on top of *whichever* fill
+already applies, independent of it. So "goal AND candidate" now renders as
+green fill + white ring, "current AND candidate" as blue fill + white
+ring, instead of one property erasing the other. The legend's candidate
+swatch changed from a solid purple square to a neutral-fill square with a
+white ring, matching the "it's an overlay, not a color" reality.
+
+**Verified live against a real run:** polled `/api/live` through a full
+"cook a porkchop" run and confirmed the exact scenario that was broken —
+multiple nodes (`wooden_pickaxe`, `cobblestone`, `furnace`, and eventually
+`cooked_porkchop` itself, the actual goal node) each appeared with
+`fill:#2196F3` (current/blue) *and* `stroke:#FFFFFF,stroke-width:4px`
+(candidate ring) simultaneously at different points in the run, where the
+old code would have shown plain blue with the candidate information
+silently lost. `porkchop` similarly showed amber fill + white ring
+(remaining + candidate) consistently across several polls.
+
+### Post-launch fix — elapsed display only moved when other panels updated
+
+Root cause: the poll cycle already ran every 1s, but `renderLive()` just
+copied whatever `live.elapsed` string the *backend* returned — and the
+backend only re-renders that string when an actual pipeline event fires
+(`ptd()`/`task()`/`am()`/etc. in `rollout_logger.js`), not on a timer. A
+single action (a long search, a slow collect) can run for well more than a
+second between events, so the displayed elapsed value would visibly freeze
+for stretches, then jump.
+
+**Fix, entirely client-side, zero new network requests** (the explicit
+constraint — polling more often to chase this was rejected as the wrong
+direction): `app.js` now computes the displayed elapsed time from
+`Date.now() - clockAnchorMs` on its own dedicated `setInterval(...,
+1000)`, independent of the poll cycle. `formatElapsedMs()`/
+`parseElapsedMs()` mirror `rollout_logger.js`'s `format_elapsed()`/
+`pad2()` exactly (verified with a round-trip test:
+`formatElapsedMs(parseElapsedMs(x)) === x` for several values spanning
+seconds/minutes/hours) so the two "clocks" never visibly disagree. Every
+time a fresh `live.elapsed` *does* arrive from a poll, `clockAnchorMs` is
+re-synced to it — self-correcting any drift rather than accumulating it —
+and the local ticking stops the moment `live.status` isn't `'running'`
+(freezing on the last known value, matching the backend's own
+freeze-on-complete behavior instead of continuing to count up past it).
+Reset on both `startRun()` (new run, stale anchor from the previous one
+shouldn't carry over even for a frame) and the back-button handler.
+
+Verified the parse/format math directly (round-trip test above) and the
+full pipeline end-to-end for regressions; the actual smooth-ticking visual
+effect needs eyes on a browser to fully confirm, which isn't available in
+this environment — left for the user to check.
+
+**Follow-up: reported "it doesn't work."** The parse/format logic and
+element IDs were re-checked and found correct; no root cause was found or
+confirmed (this environment has no browser to inspect the actual runtime
+behavior or console, and the user didn't confirm the specifics — frozen
+vs. still jumping vs. a console error — before deciding to drop it).
+**Removed rather than debugged further**, at the user's call: the elapsed
+clock display (`#live-elapsed`, `formatElapsedMs()`/`parseElapsedMs()`/
+`tickClock()`/`stopClock()` and the clock state vars in `app.js`, the
+`.elapsed-value` CSS rule, and the `elapsed` field `server/index.js`'s
+`/api/live` no longer needs to compute or return). The status badge
+(Running/Completed) in the same panel was kept — that was never part of
+the complaint, only the numeric clock was. If revisited later, actually
+inspecting the browser console/DevTools first (not available in this
+session) would be the right starting point rather than re-guessing at
+the implementation.
+
+**Immediate follow-up: "get rid of the entire running component."** Removed
+the whole panel that badge lived in, not just the clock. `index.html`'s
+`.live-row`/`.elapsed-panel` wrapper is gone — the graph panel is now
+`#live-dashboard`'s only, direct child (no longer needs the 72%/1fr
+two-column split that existed to make room for the panel next to it).
+`app.js`'s `liveStatusBadge` and its update logic removed. This also
+surfaced that `/api/live`'s `objective`/`status`/`completion` fields had
+*all* become dead — `objective` was always redundant with `/api/status`'s
+own field (never actually consumed), and `status`/`completion` existed
+specifically to feed the now-removed badge — so `server/index.js`'s
+`/api/live` response was simplified down to just `{mermaid}`, the one
+field still actually used. Verified live: full run through the real
+pipeline, confirmed `/api/live` returns exactly `{mermaid}` and nothing
+else broke.
+
+### Post-launch change — hide the page header once a run starts
+
+The `<header>` ("Achievement Hunter — pick an achievement") sat outside
+both `#selection-view` and `#status-view`, so it stayed visible
+regardless of which was showing. Gave it `id="page-header"` and toggled
+`.hidden` on it alongside the existing selection/status view switches in
+`app.js` (`startRun()` hides it, the back button restores it). Verified
+by fetching the served page directly and confirming the id/JS wiring
+matches.

@@ -33,56 +33,66 @@ function safe_mermaid_id(id) {
   return id.replace(/[^a-zA-Z0-9]/g, '_');
 }
 
-// Color/precedence key — must match public/index.html's legend and
-// public/styles.css's .legend-swatch.* classes:
-//   goal      #4CAF50  applied by graph_to_mermaid() itself (graph.sinks)
-//   remaining #FF9800  in the current SCSG's remaining set (still relevant)
-//   candidate #9C27B0  in the next-task-selector's current candidate list
-//   current   #2196F3  the task actively being worked right now
-//   done      #2d333b  dropped out of the SCSG's remaining set (satisfied)
-//
-// Precedence, low to high (later `style` lines win ties in mermaid): goal <
-// remaining < candidate < current. Goal is deliberately never overridden by
-// remaining/candidate (so the target node stays visually anchored while
-// pending) but IS overridden by done/current — once truly finished or while
-// it's the active target, that takes priority over "it's the goal".
-const NODE_COLOR = {
-  remaining: 'fill:#FF9800,color:#fff,stroke:#E65100',
-  candidate: 'fill:#9C27B0,color:#fff,stroke:#6A1B9A',
-  current: 'fill:#2196F3,color:#fff,stroke:#1565C0',
-  done: 'fill:#2d333b,color:#6e7681,stroke:#484f58',
+// Fill color key — must match public/index.html's legend and
+// public/styles.css's .legend-swatch.* classes. Mutually exclusive per
+// node (a node is in exactly one of these states), precedence low to high:
+// goal < remaining < done < current. (done and remaining can't both apply
+// to the same node by construction — a node is either in the SCSG's
+// remaining set or it isn't — so their relative order doesn't matter.)
+const STATE_COLOR = {
+  goal: {fill: '#4CAF50', color: '#fff', stroke: '#388E3C'},
+  remaining: {fill: '#FF9800', color: '#fff', stroke: '#E65100'},
+  current: {fill: '#2196F3', color: '#fff', stroke: '#1565C0'},
+  done: {fill: '#2d333b', color: '#6e7681', stroke: '#484f58'},
 };
 
+// "Candidate" (in the next-task-selector's current shortlist) is
+// deliberately NOT its own fill color — a fifth exclusive color would hide
+// whether a candidate is also the goal, or already the active task, which
+// was the actual complaint: it wasn't obvious when the current action or a
+// goal node was also a candidate, because candidate's own fill silently
+// replaced whichever fill was already there. Instead it's a thick border
+// overlay independent of fill, so e.g. "goal AND candidate" renders as
+// green fill + white ring, not a fifth unrelated color.
+const CANDIDATE_STROKE = {color: '#FFFFFF', width: '4px'};
+
 // Augments the base PTD diagram with the live-run style layers the static
-// catalog preview doesn't have — see NODE_COLOR above for what each means.
+// catalog preview doesn't have. Computes one merged style per node (fill
+// from STATE_COLOR, optionally overlaid with CANDIDATE_STROKE) rather than
+// appending independent per-category style lines — mermaid's `style`
+// directive fully replaces on repeat for the same node id, it doesn't
+// merge, so appending separate lines per category would make later
+// categories silently erase earlier ones instead of combining.
 function render_live_mermaid(graph, currentNodeId, remainingIds, candidateIds) {
   let mermaid = strip_mermaid_fence(graph_to_mermaid(graph, 'TD'));
   const sinks = new Set(graph.sinks || []);
-  const style = (id, rule) => {
-    mermaid += `\n    style ${safe_mermaid_id(id)} ${rule}`;
-  };
+  const remaining = remainingIds ? new Set(remainingIds) : null;
+  const candidates = new Set(candidateIds || []);
 
-  if (remainingIds) {
-    const remaining = new Set(remainingIds);
-    for (const vertex of graph.vertices) {
-      if (vertex.id === currentNodeId) continue;
-      if (!remaining.has(vertex.id)) {
-        style(vertex.id, NODE_COLOR.done);
-      } else if (!sinks.has(vertex.id)) {
-        style(vertex.id, NODE_COLOR.remaining);
-      }
+  for (const vertex of graph.vertices) {
+    const isCurrent = vertex.id === currentNodeId;
+    const isDone = remaining ? !remaining.has(vertex.id) && !isCurrent : false;
+
+    let state;
+    if (isCurrent) {
+      state = STATE_COLOR.current;
+    } else if (isDone) {
+      state = STATE_COLOR.done;
+    } else if (sinks.has(vertex.id)) {
+      state = STATE_COLOR.goal;
+    } else if (remaining?.has(vertex.id)) {
+      state = STATE_COLOR.remaining;
+    } else {
+      continue; // no live state yet for this vertex — leave mermaid default
     }
-  }
 
-  if (candidateIds) {
-    for (const id of candidateIds) {
-      if (id === currentNodeId || sinks.has(id)) continue;
-      style(id, NODE_COLOR.candidate);
-    }
-  }
+    const isCandidate = candidates.has(vertex.id) && !isDone;
+    const stroke = isCandidate ? CANDIDATE_STROKE.color : state.stroke;
+    const strokeWidth = isCandidate ? CANDIDATE_STROKE.width : '1px';
 
-  if (currentNodeId) {
-    style(currentNodeId, NODE_COLOR.current);
+    mermaid += `\n    style ${safe_mermaid_id(vertex.id)} fill:${
+        state.fill},color:${state.color},stroke:${stroke},stroke-width:${
+        strokeWidth}`;
   }
 
   return mermaid;
@@ -158,13 +168,9 @@ app.get('/api/live', (req, res) => {
   const graph = raw.ptd?.parsed ?? null;
 
   res.json({
-    objective: raw.objective,
-    status: raw.status,
-    elapsed: raw.elapsed,
     mermaid: graph ?
         render_live_mermaid(graph, currentNodeId, remainingIds, candidateIds) :
         null,
-    completion: raw.completion,
   });
 });
 

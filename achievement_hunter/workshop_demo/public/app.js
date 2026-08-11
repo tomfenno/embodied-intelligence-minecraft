@@ -1,5 +1,6 @@
 mermaid.initialize({startOnLoad: false, theme: 'dark'});
 
+const pageHeader = document.getElementById('page-header');
 const selectionView = document.getElementById('selection-view');
 const statusView = document.getElementById('status-view');
 const ptdGrid = document.getElementById('ptd-grid');
@@ -30,8 +31,6 @@ function spectatorDetailText(spectator) {
 
 const liveDashboard = document.getElementById('live-dashboard');
 const liveGraph = document.getElementById('live-graph');
-const liveElapsed = document.getElementById('live-elapsed');
-const liveStatusBadge = document.getElementById('live-status-badge');
 
 const STATUS_TEXT = {
   idle: 'Idle',
@@ -73,6 +72,7 @@ async function renderMermaid(key, source, container) {
 }
 
 async function startRun(filename) {
+  pageHeader.classList.add('hidden');
   selectionView.classList.add('hidden');
   statusView.classList.remove('hidden');
   statusLabel.classList.remove('error');
@@ -134,11 +134,6 @@ function renderStatus(status) {
 function renderLive(live) {
   liveDashboard.classList.remove('hidden');
 
-  liveElapsed.textContent = live.elapsed || '';
-  const completed = live.status === 'completed';
-  liveStatusBadge.textContent = completed ? 'Completed' : 'Running';
-  liveStatusBadge.classList.toggle('completed', completed);
-
   if (live.mermaid && live.mermaid !== lastLiveMermaidSource) {
     lastLiveMermaidSource = live.mermaid;
     mermaid.render(`live-mermaid-${mermaidCounter++}`, live.mermaid)
@@ -165,6 +160,7 @@ backButton.addEventListener('click', () => {
   statusView.classList.add('hidden');
   liveDashboard.classList.add('hidden');
   selectionView.classList.remove('hidden');
+  pageHeader.classList.remove('hidden');
   fetch('/api/stop', {method: 'POST'})
       .catch((err) => console.error('stop request failed', err));
 });

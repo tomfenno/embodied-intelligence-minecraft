@@ -91,13 +91,13 @@ main {
 }
 
 #status-view .objective {
-  font-size: 2rem;
+  font-size: 1rem;
   font-weight: 800;
   margin-bottom: 0.6rem;
 }
 
 #status-view .status-label {
-  font-size: 1.3rem;
+  font-size: .7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -115,17 +115,6 @@ main {
 
 #live-dashboard {
   margin-bottom: 2rem;
-}
-
-.live-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.live-row:first-child {
-  grid-template-columns: 72% 1fr;
 }
 
 .live-panel {
@@ -167,7 +156,7 @@ main {
   flex-shrink: 0;
 }
 
-/* Colors mirror server/index.js's NODE_COLOR map and graph_to_mermaid()'s
+/* Colors mirror server/index.js's STATE_COLOR map and graph_to_mermaid()'s
    sink styling exactly, so the legend always matches the live graph. */
 .legend-swatch--goal {
   background: #4CAF50;
@@ -179,9 +168,13 @@ main {
   border: 1px solid #E65100;
 }
 
+/* Candidate is a border overlay on top of whichever fill a node already
+   has (see server/index.js's CANDIDATE_STROKE), not its own fill color —
+   this swatch uses a neutral fill specifically so the white ring reads as
+   "overlay," not "yet another solid color to memorize." */
 .legend-swatch--candidate {
-  background: #9C27B0;
-  border: 1px solid #6A1B9A;
+  background: var(--muted);
+  border: 3px solid #FFFFFF;
 }
 
 .legend-swatch--current {
@@ -201,33 +194,6 @@ main {
 .graph-panel .mermaid svg {
   max-width: 100%;
   height: auto;
-}
-
-.elapsed-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.elapsed-value {
-  font-size: 3rem;
-  font-weight: 800;
-  line-height: 1;
-  margin-bottom: 0.5rem;
-}
-
-.elapsed-badge {
-  font-size: 1rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--muted);
-}
-
-.elapsed-badge.completed {
-  color: var(--accent);
 }
 
 button {

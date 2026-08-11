@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<header>
+<header id="page-header">
   <h1>Achievement Hunter — pick an achievement</h1>
 </header>
 <main>
@@ -23,22 +23,16 @@
     </div>
 
     <div id="live-dashboard" class="hidden">
-      <div class="live-row">
-        <div class="live-panel graph-panel">
-          <div class="panel-title">Dependency graph</div>
-          <div class="legend">
-            <span class="legend-item"><span class="legend-swatch legend-swatch--goal"></span>Goal</span>
-            <span class="legend-item"><span class="legend-swatch legend-swatch--remaining"></span>Remaining</span>
-            <span class="legend-item"><span class="legend-swatch legend-swatch--candidate"></span>Candidate</span>
-            <span class="legend-item"><span class="legend-swatch legend-swatch--current"></span>Current</span>
-            <span class="legend-item"><span class="legend-swatch legend-swatch--done"></span>Done</span>
-          </div>
-          <div class="mermaid" id="live-graph"></div>
+      <div class="live-panel graph-panel">
+        <div class="panel-title">Dependency graph</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch legend-swatch--goal"></span>Goal</span>
+          <span class="legend-item"><span class="legend-swatch legend-swatch--remaining"></span>Remaining</span>
+          <span class="legend-item"><span class="legend-swatch legend-swatch--current"></span>Current</span>
+          <span class="legend-item"><span class="legend-swatch legend-swatch--done"></span>Done</span>
+          <span class="legend-item"><span class="legend-swatch legend-swatch--candidate"></span>Candidate (white ring, any color)</span>
         </div>
-        <div class="live-panel elapsed-panel">
-          <div class="elapsed-value" id="live-elapsed"></div>
-          <div class="elapsed-badge" id="live-status-badge"></div>
-        </div>
+        <div class="mermaid" id="live-graph"></div>
       </div>
     </div>
 
